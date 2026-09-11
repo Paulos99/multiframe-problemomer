@@ -3,7 +3,7 @@ import { Header } from './Header';
 import { ProgressDots } from './ProgressDots';
 import { StickyCta } from './StickyCta';
 import { useSession } from '../state/SessionContext';
-import { buildCalculatorUrl, roomNextHint } from '../state/session';
+import { buildCalculatorUrl } from '../state/session';
 import { StartScreen } from '../screens/Start/StartScreen';
 import { RoomScreen } from '../screens/Room/RoomScreen';
 import { ScenariosScreen } from '../screens/Scenarios/ScenariosScreen';
@@ -17,7 +17,6 @@ export function AppShell() {
   const { step } = session;
   const showNav = step !== 'start';
   const isResult = step === 'result';
-  const roomHint = roomNextHint(session);
 
   let content = null;
   switch (step) {
@@ -61,25 +60,18 @@ export function AppShell() {
       {step !== 'start' ? <ProgressDots /> : null}
       <main className={styles.main}>{content}</main>
       {showNav ? (
-        <>
-          {step === 'room' && roomHint && !canGoNext ? (
-            <p className={styles.hint} role="status">
-              {roomHint}
-            </p>
-          ) : null}
-          <StickyCta
-            onBack={goBack}
-            onNext={() => {
-              if (isResult && calcUrl) {
-                window.open(calcUrl, '_blank', 'noopener,noreferrer');
-                return;
-              }
-              goNext();
-            }}
-            nextDisabled={isResult ? false : !canGoNext}
-            nextLabel={ctaLabel}
-          />
-        </>
+        <StickyCta
+          onBack={goBack}
+          onNext={() => {
+            if (isResult && calcUrl) {
+              window.open(calcUrl, '_blank', 'noopener,noreferrer');
+              return;
+            }
+            goNext();
+          }}
+          nextDisabled={isResult ? false : !canGoNext}
+          nextLabel={ctaLabel}
+        />
       ) : null}
     </div>
   );

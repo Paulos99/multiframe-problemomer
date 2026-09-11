@@ -20,19 +20,3 @@
     padding: 28px 24px 40px;
   }
 }
-
-.hint {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: calc(var(--footer-h) + var(--safe-bottom));
-  z-index: 49;
-  width: min(100%, var(--max-w, 720px));
-  margin: 0 auto;
-  padding: 0 16px 6px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #9a6700;
-  text-align: right;
-  pointer-events: none;
-}
