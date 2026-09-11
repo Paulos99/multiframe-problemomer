@@ -1,7 +1,8 @@
 .simWrap {
-  /* Keep SimCompare fully above sticky «Далее». */
-  scroll-margin-bottom: calc(var(--footer-h) + var(--safe-bottom) + 24px);
-  padding-bottom: 8px;
+  /* Keep SimCompare metrics fully above sticky «Далее» on showroom phones. */
+  scroll-margin-bottom: calc(var(--footer-h) + var(--safe-bottom) + 40px);
+  padding-bottom: 16px;
+  margin-bottom: 8px;
 }
 
 .block h2 {

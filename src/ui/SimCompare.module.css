@@ -318,13 +318,33 @@
   font-size: 12px;
 }
 
+.head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Secondary: digits support emotion, not drown it (comparison screen). */
+.secondary {
+  gap: 10px;
+  padding: 12px 14px;
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.06));
+  opacity: 0.96;
+}
+
+.secondary .metric strong {
+  font-size: 17px;
+}
+
 .secondary .feeling {
   font-size: 12px;
   padding: 4px 10px;
 }
 
 .secondary .range,
-.secondary .ibox p {
+.secondary .lines,
+.secondary .ibox {
   font-size: 11px;
 }
 

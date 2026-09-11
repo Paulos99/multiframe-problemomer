@@ -6,7 +6,7 @@ import styles from './SimCompare.module.css';
 interface Props {
   sim: DerivedSimulation;
   emphasize?: 'before' | 'after' | 'both';
-  /** Quieter digits when emotion dual is primary (Compare / Profile). */
+  /** Quieter digits when emotion dual is primary (comparison screen). */
   tone?: 'primary' | 'secondary';
 }
 
@@ -105,7 +105,9 @@ function Column({
 }) {
   const impact = impactChip(side);
   const showNote =
-    side.classStatus === 'partial' || side.classStatus === 'below' ? side.label : null;
+    side.classStatus === 'partial' || side.classStatus === 'below'
+      ? side.label
+      : null;
 
   return (
     <div className={styles.col}>

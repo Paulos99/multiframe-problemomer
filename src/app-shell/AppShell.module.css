@@ -5,7 +5,7 @@
 }
 
 .withFooter {
-  padding-bottom: calc(var(--footer-h) + var(--safe-bottom) + 24px);
+  padding-bottom: calc(var(--footer-h) + var(--safe-bottom) + 40px);
 }
 
 .main {

@@ -14,7 +14,7 @@ export function BeforeAfterScreen() {
   return (
     <Screen
       title="До и после"
-      subtitle="Сначала ощущение — цифры только поддерживают."
+      subtitle="Эмоциональный контраст: обычный натяжной потолок и потолок с MultiFrame."
     >
       <div className={styles.dual}>
         <article className={`${styles.card} ${styles.before}`}>
@@ -33,9 +33,9 @@ export function BeforeAfterScreen() {
           <h2>Бескаркасная акустика</h2>
           <p className={styles.emotion}>Тише. Спокойнее. Свой потолок.</p>
           <ul>
-            <li>Воздух: примерно вдвое спокойнее — шум как будто дальше</li>
-            <li>Удар: тише; норму часто закрывает пол у соседа</li>
+            <li>Ударный и смешанный шум воспринимаются мягче</li>
             <li>Без каркаса — бережём высоту комнаты</li>
+            <li>Готовит основу для натяжного полотна</li>
           </ul>
         </article>
       </div>

@@ -199,7 +199,7 @@ export function classCyr(label: 'A' | 'B' | 'V' | 'below'): string {
   return CLASS_CYR[label];
 }
 
-/** Chip helpers: independent Воздух / Удар. Cyrillic А/Б/В for UI. */
+/** Chip helpers: independent Воздух / Удар (Design). Cyrillic А/Б/В for UI. */
 export function airChip(side: DerivedSimSide): string {
   if (side.Rw >= NORMS.A.Rw) return CLASS_CYR.A;
   if (side.Rw >= NORMS.B.Rw) return CLASS_CYR.B;
