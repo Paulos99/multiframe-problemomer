@@ -248,3 +248,28 @@
   opacity: 0.75;
   font-size: 11px;
 }
+
+.classPill {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill, 999px);
+  color: var(--accent-color, #01644f);
+  background: var(--accent-soft, rgba(1, 100, 79, 0.12));
+}
+
+.housing {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 650;
+  color: var(--text-secondary, #5f6b73);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}

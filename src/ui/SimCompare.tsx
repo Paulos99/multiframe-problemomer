@@ -1,29 +1,25 @@
-import type { ComfortLevel, SimulationEstimate, SimulationSide } from '../state/types';
+import type { ComfortLevel, DerivedSimSide, DerivedSimulation } from '../state/types';
 import { COMFORT_FEELING, DISCLAIMER_SIMULATION } from '../state/types';
-import { impactChipLabel } from '../state/simulation';
+import { airChip, impactChip } from '../state/simulation';
 import styles from './SimCompare.module.css';
 
 interface Props {
-  sim: SimulationEstimate;
+  sim: DerivedSimulation;
   emphasize?: 'before' | 'after' | 'both';
-}
-
-function airLabel(side: SimulationSide): string {
-  return side.airClass === 'below' ? 'вне нормы' : side.airClass;
 }
 
 function Feeling({ level }: { level: ComfortLevel }) {
   return <span className={`${styles.feeling} ${styles[level]}`}>{COMFORT_FEELING[level]}</span>;
 }
 
-function StatusPill({ side }: { side: SimulationSide }) {
-  if (side.status === 'partial') {
+function ClassPill({ side }: { side: DerivedSimSide }) {
+  if (side.classLabel === 'partial') {
     return <span className={styles.statusPartial}>частично</span>;
   }
-  if (side.status === 'below') {
-    return <span className={styles.statusBelow}>ниже базы</span>;
+  if (side.classLabel === 'below') {
+    return <span className={styles.statusBelow}>ниже V</span>;
   }
-  return null;
+  return <span className={styles.classPill}>класс {side.classLabel}</span>;
 }
 
 function Column({
@@ -33,16 +29,17 @@ function Column({
   delta,
 }: {
   title: string;
-  side: SimulationSide;
+  side: DerivedSimSide;
   feeling: ComfortLevel;
   delta?: { Rw: number; Lnw: number };
 }) {
+  const impact = impactChip(side);
   return (
     <div className={styles.col}>
       <div className={styles.colHead}>
         <h3>{title}</h3>
         <div className={styles.headMeta}>
-          <StatusPill side={side} />
+          <ClassPill side={side} />
           <Feeling level={feeling} />
         </div>
       </div>
@@ -71,18 +68,12 @@ function Column({
         </div>
       </div>
       <div className={styles.chips}>
-        <span className={styles.chip}>Воздух: {airLabel(side)}</span>
-        <span className={`${styles.chip} ${side.impactOutOfNorm || side.ceilingOnly ? styles.chipWarn : ''}`}>
-          Удар: {impactChipLabel(side)}
+        <span className={styles.chip}>Воздух: {airChip(side)}</span>
+        <span className={`${styles.chip} ${impact === 'вне нормы' ? styles.chipWarn : ''}`}>
+          Удар: {impact}
         </span>
       </div>
-      {side.status === 'partial' ? (
-        <p className={styles.partialNote}>
-          {side.ceilingOnly
-            ? 'Rw лучше, Lnw потолком не нормируется — пол у соседа сверху часто нужен.'
-            : 'Rw тянет на класс, Lnw ещё нет — ударный путь через плиту/соседа.'}
-        </p>
-      ) : null}
+      {side.label ? <p className={styles.partialNote}>{side.label}</p> : null}
     </div>
   );
 }
@@ -95,6 +86,9 @@ export function SimCompare({ sim, emphasize = 'both' }: Props) {
     <section className={styles.card} aria-label={sim.uiLabel}>
       <header className={styles.head}>
         <span className={styles.badge}>{sim.uiLabel}</span>
+        <span className={styles.housing}>
+          housingClass: {sim.housingClass}
+        </span>
       </header>
 
       <div className={styles.grid}>
@@ -112,7 +106,8 @@ export function SimCompare({ sim, emphasize = 'both' }: Props) {
       </div>
 
       <p className={styles.range}>
-        ΔRw +{rwLo}…+{rwHi} · ΔLnw −{lnwLo}…−{lnwHi}
+        ΔRw +{sim.delta.Rw} (ориентир +{rwLo}…+{rwHi}) · ΔLnw {sim.delta.Lnw}{' '}
+        (ориентир −{lnwLo}…−{lnwHi})
         <span className={styles.rangeMeta}>
           {' '}
           · {sim.source} · {sim.disclaimer}

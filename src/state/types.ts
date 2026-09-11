@@ -54,53 +54,58 @@ export interface RoomAnswers {
   floorSlab?: FloorSlab;
 }
 
-export type SimulationStatus = 'full' | 'partial' | 'below';
+/** Joint housing class from both indices; 'partial' when Rw ok but Lnw fails */
+export type ClassLabel = 'A' | 'B' | 'V' | 'partial' | 'below';
 
-export interface SimulationSide {
+/**
+ * DerivedSimulation side — schemaVersion 1 additive shape.
+ * classLabel: joint A/B/V; partial if Rw meets but Lnw fails; below otherwise.
+ */
+export interface DerivedSimSide {
   Rw: number;
   Lnw: number;
-  /** Independent airborne grade */
-  airClass: HousingClass | 'below';
-  /** Independent impact grade (raw); UI may show «вне нормы» when Lnw > 60 */
-  impactClass: HousingClass | 'below';
-  /** Design: true when Lnw > 60 */
-  impactOutOfNorm: boolean;
-  /**
-   * full = both indices meet a class;
-   * partial = Rw meets but Lnw fails / ceiling-only cannot claim Lnw;
-   * below = Rw also below class V.
-   */
-  status: SimulationStatus;
-  /** Ceiling-only path never claims Lnw SP compliance */
-  ceilingOnly: boolean;
+  classLabel: ClassLabel;
+  /** Optional human-readable status copy */
+  label?: string;
 }
 
 /**
- * Additive under derived — schemaVersion stays 1.
- * LOCKED Acoustics canon Product v1.1 + Design SimCompare.
+ * Additive under derived.simulation — schemaVersion stays 1.
+ *
+ * before/after by slab thickness (NOT generic concrete/hollow):
+ * 140:50/80; 160:52/78; 180 DEFAULT:54/76; 200:55/74; PC220:52/74; mono250:~56/74
+ * DELTA: +10 Rw, −8 Lnw (marketing_placeholder / pre_lab only)
+ * Class: A Rw≥54&Lnw≤55; B 52/58; V 50/60; else below / partial if Rw ok Lnw fail
+ * housingClass = after.classLabel
  */
-export interface SimulationEstimate {
-  before: SimulationSide;
-  after: SimulationSide;
+export interface DerivedSimulation {
+  before: DerivedSimSide;
+  after: DerivedSimSide;
   delta: { Rw: number; Lnw: number };
-  /** Magnitudes for secondary range copy: +8…+12 / −6…−10 */
-  deltaRange: { Rw: readonly [number, number]; Lnw: readonly [number, number] };
+  /** = after.classLabel */
+  housingClass: ClassLabel;
   source: 'marketing_placeholder';
   disclaimer: 'pre_lab';
+  /** UI helpers (additive) */
+  deltaRange: { Rw: readonly [number, number]; Lnw: readonly [number, number] };
   uiLabel: string;
   slabPreset: SlabPreset;
   feelingBefore: ComfortLevel;
   feelingAfter: ComfortLevel;
-  /** 1–2 short honest lines for SimCompare */
   honestLines: string[];
 }
+
+/** @deprecated alias — prefer DerivedSimulation */
+export type SimulationEstimate = DerivedSimulation;
+export type SimulationSide = DerivedSimSide;
+
 
 export interface DerivedProfile {
   comfortLevel: ComfortLevel;
   noiseType: NoiseType;
   whyMultiFrame: string[];
   disclaimer: 'expert_not_engineering';
-  simulation: SimulationEstimate;
+  simulation: DerivedSimulation;
 }
 
 export interface AudioPair {
