@@ -1,0 +1,43 @@
+import type { ReactNode } from 'react';
+import styles from './CardSelect.module.css';
+
+interface Props {
+  selected?: boolean;
+  onClick?: () => void;
+  title: string;
+  hint?: string;
+  icon?: ReactNode;
+  multi?: boolean;
+  disabled?: boolean;
+}
+
+export function CardSelect({
+  selected,
+  onClick,
+  title,
+  hint,
+  icon,
+  multi,
+  disabled,
+}: Props) {
+  return (
+    <button
+      type="button"
+      className={`${styles.card} ${selected ? styles.selected : ''}`}
+      onClick={onClick}
+      aria-pressed={selected}
+      disabled={disabled}
+    >
+      <span className={styles.lead}>
+        {icon ? <span className={styles.icon}>{icon}</span> : null}
+        <span className={styles.text}>
+          <span className={styles.title}>{title}</span>
+          {hint ? <span className={styles.hint}>{hint}</span> : null}
+        </span>
+      </span>
+      <span className={styles.check} aria-hidden>
+        {selected ? '✓' : multi ? '' : ''}
+      </span>
+    </button>
+  );
+}

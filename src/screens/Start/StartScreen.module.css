@@ -1,0 +1,82 @@
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 28px 22px 26px;
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(160deg, rgba(1, 100, 79, 0.12), transparent 42%),
+    var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: fadeUp var(--duration-slow) var(--ease-out);
+}
+
+.glow {
+  position: absolute;
+  inset: auto -20% -40% 20%;
+  height: 220px;
+  background: radial-gradient(circle, rgba(1, 100, 79, 0.22), transparent 65%);
+  pointer-events: none;
+  animation: softGlow 4.5s ease-in-out infinite;
+}
+
+.kicker {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-color);
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.55rem, 5vw, 2.1rem);
+  line-height: 1.18;
+  letter-spacing: -0.025em;
+  position: relative;
+}
+
+.lead {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 15px;
+  max-width: 38ch;
+  position: relative;
+}
+
+.cta {
+  position: relative;
+  margin-top: 6px;
+}
+
+.points {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  position: relative;
+}
+
+.points li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.points li::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  margin-top: 5px;
+  border-radius: 50%;
+  background: var(--accent-color);
+  flex: 0 0 auto;
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}

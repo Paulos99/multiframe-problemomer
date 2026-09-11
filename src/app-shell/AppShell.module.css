@@ -1,0 +1,22 @@
+.shell {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.withFooter {
+  padding-bottom: calc(var(--footer-h) + var(--safe-bottom) + 8px);
+}
+
+.main {
+  width: min(100%, var(--max-w));
+  margin: 0 auto;
+  padding: 20px 16px 28px;
+  flex: 1;
+}
+
+@media (min-width: 640px) {
+  .main {
+    padding: 28px 24px 40px;
+  }
+}

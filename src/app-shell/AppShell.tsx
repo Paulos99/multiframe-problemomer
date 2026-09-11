@@ -1,0 +1,66 @@
+import styles from './AppShell.module.css';
+import { Header } from './Header';
+import { ProgressDots } from './ProgressDots';
+import { StickyCta } from './StickyCta';
+import { useSession } from '../state/SessionContext';
+import { StartScreen } from '../screens/Start/StartScreen';
+import { RoomScreen } from '../screens/Room/RoomScreen';
+import { ScenariosScreen } from '../screens/Scenarios/ScenariosScreen';
+import { CurrentStateScreen } from '../screens/CurrentState/CurrentStateScreen';
+import { BeforeAfterScreen } from '../screens/BeforeAfter/BeforeAfterScreen';
+import { AudioDiffScreen } from '../screens/AudioDiff/AudioDiffScreen';
+import { ResultScreen } from '../screens/Result/ResultScreen';
+
+export function AppShell() {
+  const { session, goNext, goBack, canGoNext } = useSession();
+  const { step } = session;
+  const showNav = step !== 'start' && step !== 'result';
+
+  let content = null;
+  switch (step) {
+    case 'start':
+      content = <StartScreen />;
+      break;
+    case 'room':
+      content = <RoomScreen />;
+      break;
+    case 'scenarios':
+      content = <ScenariosScreen />;
+      break;
+    case 'current':
+      content = <CurrentStateScreen />;
+      break;
+    case 'beforeAfter':
+      content = <BeforeAfterScreen />;
+      break;
+    case 'audio':
+      content = <AudioDiffScreen />;
+      break;
+    case 'result':
+      content = <ResultScreen />;
+      break;
+  }
+
+  const ctaLabel =
+    step === 'beforeAfter'
+      ? 'Услышать разницу'
+      : step === 'audio'
+        ? 'К профилю'
+        : 'Далее';
+
+  return (
+    <div className={`${styles.shell} ${showNav ? styles.withFooter : ''}`}>
+      <Header />
+      {step !== 'start' ? <ProgressDots /> : null}
+      <main className={styles.main}>{content}</main>
+      {showNav ? (
+        <StickyCta
+          onBack={goBack}
+          onNext={goNext}
+          nextDisabled={!canGoNext}
+          nextLabel={ctaLabel}
+        />
+      ) : null}
+    </div>
+  );
+}

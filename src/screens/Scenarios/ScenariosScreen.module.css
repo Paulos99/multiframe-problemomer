@@ -1,0 +1,15 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.count {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.count strong {
+  color: var(--accent-color);
+}
