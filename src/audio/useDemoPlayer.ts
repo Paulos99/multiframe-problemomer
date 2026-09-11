@@ -8,7 +8,6 @@ function getCtx(): AudioContext {
   return sharedCtx;
 }
 
-/** Soft procedural demo: impact thumps or muffled speech-like noise */
 function playStub(
   ctx: AudioContext,
   kind: StubKind,
@@ -19,14 +18,11 @@ function playStub(
   const master = ctx.createGain();
   master.gain.value = 0.35;
   master.connect(ctx.destination);
-
-  const nodes: AudioNode[] = [master];
   const duration = scene === 'steps' ? 2.4 : 2.8;
   const damp = kind === 'after' ? 0.35 : 1;
 
   if (scene === 'steps') {
-    const beats = [0, 0.45, 0.9, 1.35, 1.8];
-    for (const t of beats) {
+    for (const t of [0, 0.45, 0.9, 1.35, 1.8]) {
       const osc = ctx.createOscillator();
       const g = ctx.createGain();
       const f = ctx.createBiquadFilter();
@@ -42,7 +38,6 @@ function playStub(
       g.connect(master);
       osc.start(now + t);
       osc.stop(now + t + 0.32);
-      nodes.push(osc, g, f);
     }
   } else {
     const bufferSize = Math.floor(ctx.sampleRate * duration);
@@ -63,11 +58,9 @@ function playStub(
     f.connect(master);
     src.start(now);
     src.stop(now + duration);
-    nodes.push(src, f);
   }
 
   const timer = window.setTimeout(onEnd, duration * 1000 + 50);
-
   return () => {
     window.clearTimeout(timer);
     try {
@@ -80,12 +73,25 @@ function playStub(
 
 export function useDemoPlayer() {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
   const stopRef = useRef<(() => void) | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const startedAt = useRef(0);
+  const durationMs = useRef(2400);
+
+  const clearRaf = () => {
+    if (rafRef.current != null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+  };
 
   const stop = useCallback(() => {
     stopRef.current?.();
     stopRef.current = null;
+    clearRaf();
     setActiveId(null);
+    setProgress(0);
   }, []);
 
   useEffect(() => () => stop(), [stop]);
@@ -97,19 +103,35 @@ export function useDemoPlayer() {
       const ctx = getCtx();
       if (ctx.state === 'suspended') await ctx.resume();
 
+      durationMs.current = stub?.scene === 'talk' ? 2800 : 2400;
+      startedAt.current = performance.now();
       setActiveId(id);
+      setProgress(0);
+
+      const tick = () => {
+        const p = Math.min(1, (performance.now() - startedAt.current) / durationMs.current);
+        setProgress(p);
+        if (p < 1 && stopRef.current) {
+          rafRef.current = requestAnimationFrame(tick);
+        }
+      };
+      rafRef.current = requestAnimationFrame(tick);
+
       if (stub) {
         stopRef.current = playStub(ctx, stub.kind, stub.scene, () => {
+          clearRaf();
           setActiveId(null);
+          setProgress(0);
           stopRef.current = null;
         });
         return;
       }
 
-      // Future: real mapped files
       const audio = new Audio(src);
       audio.onended = () => {
+        clearRaf();
         setActiveId(null);
+        setProgress(0);
         stopRef.current = null;
       };
       stopRef.current = () => {
@@ -120,10 +142,11 @@ export function useDemoPlayer() {
         await audio.play();
       } catch {
         setActiveId(null);
+        setProgress(0);
       }
     },
     [stop],
   );
 
-  return { activeId, play, stop };
+  return { activeId, progress, play, stop };
 }

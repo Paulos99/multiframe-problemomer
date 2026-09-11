@@ -3,6 +3,7 @@ import { Header } from './Header';
 import { ProgressDots } from './ProgressDots';
 import { StickyCta } from './StickyCta';
 import { useSession } from '../state/SessionContext';
+import { buildCalculatorUrl, roomNextHint } from '../state/session';
 import { StartScreen } from '../screens/Start/StartScreen';
 import { RoomScreen } from '../screens/Room/RoomScreen';
 import { ScenariosScreen } from '../screens/Scenarios/ScenariosScreen';
@@ -14,7 +15,9 @@ import { ResultScreen } from '../screens/Result/ResultScreen';
 export function AppShell() {
   const { session, goNext, goBack, canGoNext } = useSession();
   const { step } = session;
-  const showNav = step !== 'start' && step !== 'result';
+  const showNav = step !== 'start';
+  const isResult = step === 'result';
+  const roomHint = roomNextHint(session);
 
   let content = null;
   switch (step) {
@@ -46,7 +49,11 @@ export function AppShell() {
       ? 'Услышать разницу'
       : step === 'audio'
         ? 'К профилю'
-        : 'Далее';
+        : step === 'result'
+          ? 'Расчёт материалов'
+          : 'Далее';
+
+  const calcUrl = isResult ? buildCalculatorUrl(session.cta) : null;
 
   return (
     <div className={`${styles.shell} ${showNav ? styles.withFooter : ''}`}>
@@ -54,12 +61,25 @@ export function AppShell() {
       {step !== 'start' ? <ProgressDots /> : null}
       <main className={styles.main}>{content}</main>
       {showNav ? (
-        <StickyCta
-          onBack={goBack}
-          onNext={goNext}
-          nextDisabled={!canGoNext}
-          nextLabel={ctaLabel}
-        />
+        <>
+          {step === 'room' && roomHint && !canGoNext ? (
+            <p className={styles.hint} role="status">
+              {roomHint}
+            </p>
+          ) : null}
+          <StickyCta
+            onBack={goBack}
+            onNext={() => {
+              if (isResult && calcUrl) {
+                window.open(calcUrl, '_blank', 'noopener,noreferrer');
+                return;
+              }
+              goNext();
+            }}
+            nextDisabled={isResult ? false : !canGoNext}
+            nextLabel={ctaLabel}
+          />
+        </>
       ) : null}
     </div>
   );

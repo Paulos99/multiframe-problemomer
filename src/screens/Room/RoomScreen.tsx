@@ -3,28 +3,26 @@ import { CardSelect } from '../../ui/CardSelect';
 import { Field, TextInput, Select } from '../../ui/Field';
 import { useSession } from '../../state/SessionContext';
 import {
-  NORMS_SLAB_TYPICAL,
   ROOM_TYPE_LABELS,
-  SLAB_TYPE_LABELS,
+  SLAB_PRESET_LABELS,
   type RoomType,
-  type SlabType,
+  type SlabPreset,
 } from '../../state/types';
+import { roomNextHint } from '../../state/session';
 import styles from './RoomScreen.module.css';
 
 const ROOM_TYPES = Object.keys(ROOM_TYPE_LABELS) as RoomType[];
+const SLAB_PRESETS = Object.keys(SLAB_PRESET_LABELS) as SlabPreset[];
 
 export function RoomScreen() {
-  const { session, setRoomType, setCeilingArea, setFloorSlab } = useSession();
+  const { session, setRoomType, setCeilingArea, setFloorSlab, canGoNext } = useSession();
   const room = session.answers.room;
-  const slab = room.floorSlab;
-
-  const educational =
-    slab && slab.type !== 'unknown' ? NORMS_SLAB_TYPICAL[slab.type] : null;
+  const hint = roomNextHint(session);
 
   return (
     <Screen
       title="Комната и потолок"
-      subtitle="Опишите помещение. Этаж не спрашиваем — важен только потолок и перекрытие сверху."
+      subtitle="Опишите помещение. Этаж не спрашиваем — важен потолок и перекрытие сверху."
     >
       <div className={styles.grid}>
         {ROOM_TYPES.map((type) => (
@@ -54,56 +52,34 @@ export function RoomScreen() {
 
       <div className={styles.optional}>
         <h2>Перекрытие сверху (по желанию)</h2>
-        <p>Только для образовательного контекста — не обещание эффекта MultiFrame.</p>
-        <div className={styles.row}>
-          <Field label="Тип плиты">
-            <Select
-              value={slab?.type ?? ''}
-              onChange={(e) => {
-                const v = e.target.value as SlabType | '';
-                if (!v) {
-                  setFloorSlab(undefined);
-                  return;
-                }
-                setFloorSlab({ type: v, thicknessMm: slab?.thicknessMm });
-              }}
-            >
-              <option value="">Не указывать</option>
-              {(Object.keys(SLAB_TYPE_LABELS) as SlabType[]).map((t) => (
-                <option key={t} value={t}>
-                  {SLAB_TYPE_LABELS[t]}
-                </option>
-              ))}
-            </Select>
-          </Field>
-          <Field label="Толщина, мм">
-            <TextInput
-              type="number"
-              inputMode="numeric"
-              min={50}
-              max={400}
-              placeholder="опционально"
-              disabled={!slab}
-              value={slab?.thicknessMm ?? ''}
-              onChange={(e) => {
-                if (!slab) return;
-                const v = e.target.value;
-                setFloorSlab({
-                  ...slab,
-                  thicknessMm: v === '' ? undefined : Number(v),
-                });
-              }}
-            />
-          </Field>
-        </div>
-        {educational ? (
-          <aside className={styles.edu}>
-            <strong>Справка по типичным перекрытиям</strong>
-            <span>{educational.thicknessHint}</span>
-            <p>{educational.note}</p>
-          </aside>
-        ) : null}
+        <p>Для оценочной симуляции Rw / Lnw. Если не указать — берём сплошную 180 мм.</p>
+        <Field label="Тип / толщина плиты">
+          <Select
+            value={room.floorSlab?.preset ?? ''}
+            onChange={(e) => {
+              const v = e.target.value as SlabPreset | '';
+              if (!v) {
+                setFloorSlab(undefined);
+                return;
+              }
+              setFloorSlab({ preset: v });
+            }}
+          >
+            <option value="">Не указывать (180 мм по умолчанию)</option>
+            {SLAB_PRESETS.map((p) => (
+              <option key={p} value={p}>
+                {SLAB_PRESET_LABELS[p]}
+              </option>
+            ))}
+          </Select>
+        </Field>
       </div>
+
+      {!canGoNext && hint ? (
+        <p className={styles.validation} role="status">
+          {hint === 'выберите тип' ? 'выберите тип' : 'укажите площадь'}
+        </p>
+      ) : null}
     </Screen>
   );
 }

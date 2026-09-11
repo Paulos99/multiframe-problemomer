@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Screen } from '../../ui/Screen';
 import { CardSelect } from '../../ui/CardSelect';
+import { SimCompare } from '../../ui/SimCompare';
 import { useSession } from '../../state/SessionContext';
 import {
   COMFORT_LABELS,
@@ -8,30 +9,41 @@ import {
   type ComfortLevel,
   type NoiseType,
 } from '../../state/types';
-import { classifyFromScenarios } from './suggest';
+import { buildSimulation } from '../../state/simulation';
 import styles from './CurrentStateScreen.module.css';
 
 const COMFORT: ComfortLevel[] = ['quiet', 'ok', 'bothers'];
 const NOISE: NoiseType[] = ['impact', 'airborne', 'mixed'];
 
+function suggestNoise(scenarios: string[]): NoiseType {
+  const impact = ['steps', 'drop', 'furniture', 'repair'];
+  const air = ['talk', 'tv', 'music'];
+  const hasI = scenarios.some((s) => impact.includes(s));
+  const hasA = scenarios.some((s) => air.includes(s));
+  if (hasI && hasA) return 'mixed';
+  if (hasI) return 'impact';
+  if (hasA) return 'airborne';
+  return 'mixed';
+}
+
 export function CurrentStateScreen() {
   const { session, setCurrentState } = useSession();
   const current = session.answers.current;
+  const sim = session.derived?.simulation ?? buildSimulation(session.answers);
 
   useEffect(() => {
     if (!current && session.answers.scenarios.length) {
-      const suggested = classifyFromScenarios(session.answers.scenarios);
-      setCurrentState('ok', suggested);
+      setCurrentState('ok', suggestNoise(session.answers.scenarios));
     }
   }, [current, session.answers.scenarios, setCurrentState]);
 
   const comfort = current?.comfortLevel ?? 'ok';
-  const noiseType = current?.noiseType ?? classifyFromScenarios(session.answers.scenarios);
+  const noiseType = current?.noiseType ?? suggestNoise(session.answers.scenarios);
 
   return (
     <Screen
       title="Как сейчас?"
-      subtitle="Оцените ощущение комфорта и характер шума — своими словами, без цифр."
+      subtitle="Оцените ощущение и характер шума — рядом покажем ориентиры Rw / Lnw."
     >
       <div className={styles.block}>
         <h2>Уровень комфорта</h2>
@@ -60,6 +72,8 @@ export function CurrentStateScreen() {
           ))}
         </div>
       </div>
+
+      <SimCompare sim={sim} emphasize="before" />
 
       {current?.whyPlain ? (
         <aside className={styles.why}>

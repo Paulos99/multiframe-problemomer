@@ -4,25 +4,7 @@ import { useSession } from '../../state/SessionContext';
 import { SCENARIO_LABELS, type NoiseScenario } from '../../state/types';
 import styles from './ScenariosScreen.module.css';
 
-const ORDER: NoiseScenario[] = [
-  'steps',
-  'drop',
-  'furniture',
-  'talk',
-  'tv',
-  'music',
-  'repair',
-];
-
-const ICONS: Record<NoiseScenario, string> = {
-  steps: '‥',
-  drop: '↓',
-  furniture: '▣',
-  talk: '◎',
-  tv: '▶',
-  music: '♪',
-  repair: '⚒',
-};
+const ORDER = Object.keys(SCENARIO_LABELS) as NoiseScenario[];
 
 export function ScenariosScreen() {
   const { session, toggleScenario } = useSession();
@@ -40,7 +22,6 @@ export function ScenariosScreen() {
             multi
             title={SCENARIO_LABELS[id].title}
             hint={SCENARIO_LABELS[id].hint}
-            icon={ICONS[id]}
             selected={selected.includes(id)}
             onClick={() => toggleScenario(id)}
           />

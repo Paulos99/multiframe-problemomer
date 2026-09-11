@@ -61,3 +61,10 @@
 .edu p {
   margin: 4px 0 0;
 }
+
+.validation {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #9a6700;
+}

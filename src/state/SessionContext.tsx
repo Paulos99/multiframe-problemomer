@@ -53,7 +53,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       const n = nextStep(prev.step);
       if (!n) return prev;
       let next = { ...prev, step: n };
-      if (n === 'beforeAfter' || n === 'audio' || n === 'result') {
+      if (n === 'beforeAfter' || n === 'audio' || n === 'result' || n === 'current') {
         next = withDerived(next);
       }
       return next;
@@ -121,17 +121,20 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   const setCurrentState = useCallback(
     (comfortLevel: ComfortLevel, noiseType: NoiseType) => {
-      patch((s) => ({
-        ...s,
-        answers: {
-          ...s.answers,
-          current: {
-            comfortLevel,
-            noiseType,
-            whyPlain: buildPlainWhy(comfortLevel, noiseType, s.answers.scenarios),
+      patch((s) => {
+        const next = {
+          ...s,
+          answers: {
+            ...s.answers,
+            current: {
+              comfortLevel,
+              noiseType,
+              whyPlain: buildPlainWhy(comfortLevel, noiseType, s.answers.scenarios),
+            },
           },
-        },
-      }));
+        };
+        return withDerived(next);
+      });
     },
     [patch],
   );

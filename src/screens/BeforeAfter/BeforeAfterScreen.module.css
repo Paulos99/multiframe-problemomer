@@ -97,3 +97,10 @@
 .after li::before {
   background: var(--accent-color);
 }
+
+.note p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-secondary, #5f6b73);
+  line-height: 1.45;
+}

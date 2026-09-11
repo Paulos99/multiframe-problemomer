@@ -8,6 +8,16 @@ export type RoomType =
   | 'office'
   | 'other';
 
+/** Product v1.1 bare-slab presets. solid180 = DEFAULT when unknown. */
+export type SlabPreset =
+  | 'solid140'
+  | 'solid160'
+  | 'solid180'
+  | 'solid200'
+  | 'pk220'
+  | 'mono250';
+
+/** @deprecated legacy — mapped to SlabPreset in simulation */
 export type SlabType = 'concrete' | 'hollow' | 'wood' | 'unknown';
 
 export type NoiseScenario =
@@ -21,6 +31,7 @@ export type NoiseScenario =
 
 export type ComfortLevel = 'quiet' | 'ok' | 'bothers';
 export type NoiseType = 'impact' | 'airborne' | 'mixed';
+export type HousingClass = 'A' | 'B' | 'V';
 
 export type WizardStep =
   | 'start'
@@ -32,7 +43,8 @@ export type WizardStep =
   | 'result';
 
 export interface FloorSlab {
-  type: SlabType;
+  preset?: SlabPreset;
+  type?: SlabType;
   thicknessMm?: number;
 }
 
@@ -42,11 +54,43 @@ export interface RoomAnswers {
   floorSlab?: FloorSlab;
 }
 
+export interface SimulationSide {
+  Rw: number;
+  Lnw: number;
+  /** Independent airborne grade */
+  airClass: HousingClass | 'below';
+  /** Independent impact grade (raw); UI may show «вне нормы» when Lnw > 60 */
+  impactClass: HousingClass | 'below';
+  /** Design: true when Lnw > 60 */
+  impactOutOfNorm: boolean;
+}
+
+/**
+ * Additive under derived — schemaVersion stays 1.
+ * LOCKED Acoustics canon Product v1.1 + Design SimCompare.
+ */
+export interface SimulationEstimate {
+  before: SimulationSide;
+  after: SimulationSide;
+  delta: { Rw: number; Lnw: number };
+  /** Magnitudes for secondary range copy: +8…+12 / −6…−10 */
+  deltaRange: { Rw: readonly [number, number]; Lnw: readonly [number, number] };
+  source: 'marketing_placeholder';
+  disclaimer: 'pre_lab';
+  uiLabel: string;
+  slabPreset: SlabPreset;
+  feelingBefore: ComfortLevel;
+  feelingAfter: ComfortLevel;
+  /** 1–2 short honest lines for SimCompare */
+  honestLines: string[];
+}
+
 export interface DerivedProfile {
   comfortLevel: ComfortLevel;
   noiseType: NoiseType;
   whyMultiFrame: string[];
   disclaimer: 'expert_not_engineering';
+  simulation: SimulationEstimate;
 }
 
 export interface AudioPair {
@@ -56,11 +100,14 @@ export interface AudioPair {
   afterLabel: string;
   beforeSrc: string;
   afterSrc: string;
+  scenarios?: NoiseScenario[];
 }
 
 export interface AudioState {
   mode: 'demo_stub' | 'mapped';
   pairs: AudioPair[];
+  /** true when showing unfiltered fixed stub set */
+  demoSet?: boolean;
 }
 
 export interface CtaPayload {
@@ -72,7 +119,6 @@ export interface CtaPayload {
 export interface SessionAnswers {
   room: RoomAnswers;
   scenarios: NoiseScenario[];
-  /** Always ceiling — product scope */
   scope: 'ceiling';
   current?: {
     comfortLevel: ComfortLevel;
@@ -125,10 +171,32 @@ export const COMFORT_LABELS: Record<ComfortLevel, string> = {
   bothers: 'Мешает — хочется тишины',
 };
 
+/** Design SimCompare feeling chips */
+export const COMFORT_FEELING: Record<ComfortLevel, string> = {
+  quiet: 'Тихо',
+  ok: 'Терпимо',
+  bothers: 'Мешает',
+};
+
+export const COMFORT_SHORT: Record<ComfortLevel, string> = {
+  quiet: 'тихо',
+  ok: 'терпимо',
+  bothers: 'мешает',
+};
+
 export const NOISE_TYPE_LABELS: Record<NoiseType, string> = {
   impact: 'Ударный (шаги, падения, мебель)',
   airborne: 'Воздушный (голоса, ТВ, музыка)',
   mixed: 'Смешанный',
+};
+
+export const SLAB_PRESET_LABELS: Record<SlabPreset, string> = {
+  solid140: 'Сплошная 140 мм',
+  solid160: 'Сплошная 160 мм',
+  solid180: 'Сплошная 180 мм (по умолчанию)',
+  solid200: 'Сплошная 200 мм',
+  pk220: 'ПК 220 мм (пустотка)',
+  mono250: 'Монолит 250 мм',
 };
 
 export const SLAB_TYPE_LABELS: Record<SlabType, string> = {
@@ -138,7 +206,6 @@ export const SLAB_TYPE_LABELS: Record<SlabType, string> = {
   unknown: 'Не знаю',
 };
 
-/** Educational only — never as MultiFrame promise */
 export const NORMS_SLAB_TYPICAL: Record<
   Exclude<SlabType, 'unknown'>,
   { thicknessHint: string; note: string }
@@ -158,5 +225,15 @@ export const NORMS_SLAB_TYPICAL: Record<
 };
 
 export const CALCULATOR_URL = 'https://paulos99.github.io/MF_StP/';
+
 export const DISCLAIMER_EXPERT =
   'Оценка экспертная и качественная. Это не инженерный расчёт звукоизоляции и не гарантия конкретных показателей.';
+
+/** Design badge on SimCompare */
+export const SIMULATION_BADGE = 'Оценка до лабораторных данных';
+
+export const SIMULATION_UI_LABEL = SIMULATION_BADGE;
+
+export const DISCLAIMER_SIMULATION =
+  'Не замер и не гарантия Δ. A/B/V — ориентир комфорта, не расчёт по СП. Потолком нельзя заявлять норму Lnw по перекрытию.';
+

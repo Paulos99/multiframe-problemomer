@@ -1,12 +1,13 @@
 import type { AudioPair, AudioState, CtaPayload, SessionState, WizardStep } from './types';
-import { WIZARD_STEPS } from './types';
+import { WIZARD_STEPS, CALCULATOR_URL } from './types';
 import { deriveProfile } from './derive';
-import { DEMO_AUDIO_PAIRS } from '../audio/demoAudio';
+import { DEMO_AUDIO_PAIRS, pairsForScenarios } from '../audio/demoAudio';
 
 export function createInitialSession(): SessionState {
   const audio: AudioState = {
     mode: 'demo_stub',
     pairs: DEMO_AUDIO_PAIRS,
+    demoSet: true,
   };
 
   return {
@@ -40,13 +41,16 @@ export function buildCta(session: SessionState): CtaPayload {
 
 export function withDerived(session: SessionState): SessionState {
   const derived = deriveProfile(session.answers);
+  const { pairs, demoSet } = pairsForScenarios(session.answers.scenarios);
   return {
     ...session,
     derived,
     cta: buildCta(session),
-    audio: session.audio.pairs.length
-      ? session.audio
-      : { mode: 'demo_stub', pairs: DEMO_AUDIO_PAIRS as AudioPair[] },
+    audio: {
+      mode: 'demo_stub',
+      pairs,
+      demoSet,
+    },
   };
 }
 
@@ -89,6 +93,32 @@ export function canProceed(session: SessionState): boolean {
   }
 }
 
+/** Room step inline hint when Далее disabled */
+export function roomNextHint(session: SessionState): string | null {
+  if (session.step !== 'room') return null;
+  if (session.answers.room.roomType == null) return 'выберите тип';
+  if (
+    session.answers.room.ceilingAreaM2 == null ||
+    session.answers.room.ceilingAreaM2 <= 0
+  ) {
+    return 'укажите площадь';
+  }
+  return null;
+}
+
+/** Calculator CTA: area + roomType + scenarios (comma-separated enums). */
+export function buildCalculatorUrl(cta: CtaPayload, base = CALCULATOR_URL): string {
+  const url = new URL(base);
+  if (cta.ceilingAreaM2 != null && cta.ceilingAreaM2 > 0) {
+    url.searchParams.set('area', String(cta.ceilingAreaM2));
+  }
+  if (cta.roomType) url.searchParams.set('roomType', cta.roomType);
+  if (cta.scenarios.length) {
+    url.searchParams.set('scenarios', cta.scenarios.join(','));
+  }
+  return url.toString();
+}
+
 export function toSessionJson(session: SessionState): string {
   const full = withDerived(session);
   return JSON.stringify(
@@ -103,3 +133,5 @@ export function toSessionJson(session: SessionState): string {
     2,
   );
 }
+
+export type { AudioPair };

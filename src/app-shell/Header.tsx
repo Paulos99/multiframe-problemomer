@@ -37,9 +37,8 @@ export function Header() {
           title={dark ? 'Светлая тема' : 'Тёмная тема'}
         >
           <span className={styles.themeIcon} aria-hidden>
-            {dark ? 'A' : 'A'}
+            {dark ? '☀' : '☾'}
           </span>
-          <span className={`${styles.themeMark} ${dark ? styles.on : ''}`} />
         </button>
       </div>
     </header>
