@@ -43,7 +43,7 @@ export function CurrentStateScreen() {
   return (
     <Screen
       title="Как сейчас?"
-      subtitle="Оцените ощущение и характер шума — рядом покажем ориентиры Rw / Lnw."
+      subtitle="Оцените ощущение и характер шума — рядом покажем ориентиры комфорта."
     >
       <div className={styles.block}>
         <h2>Уровень комфорта</h2>
@@ -73,7 +73,9 @@ export function CurrentStateScreen() {
         </div>
       </div>
 
-      <SimCompare sim={sim} emphasize="before" />
+      <div className={styles.simWrap}>
+        <SimCompare sim={sim} emphasize="before" />
+      </div>
 
       {current?.whyPlain ? (
         <aside className={styles.why}>
