@@ -34,8 +34,11 @@ jobs:
       - name: Install and build
         run: npm ci && npm run build
 
+      # enablement: true — first run creates Pages site with build_type=workflow
       - name: Setup Pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
