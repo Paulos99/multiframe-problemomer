@@ -13,10 +13,14 @@ function Feeling({ level }: { level: ComfortLevel }) {
 }
 
 function ClassPill({ side }: { side: DerivedSimSide }) {
-  if (side.classLabel === 'partial') {
-    return <span className={styles.statusPartial}>частично</span>;
+  if (side.classStatus === 'partial') {
+    return (
+      <span className={styles.statusPartial}>
+        частично · Rw {side.classLabel}
+      </span>
+    );
   }
-  if (side.classLabel === 'below') {
+  if (side.classStatus === 'below' || side.classLabel === 'below') {
     return <span className={styles.statusBelow}>ниже V</span>;
   }
   return <span className={styles.classPill}>класс {side.classLabel}</span>;
@@ -88,6 +92,9 @@ export function SimCompare({ sim, emphasize = 'both' }: Props) {
         <span className={styles.badge}>{sim.uiLabel}</span>
         <span className={styles.housing}>
           housingClass: {sim.housingClass}
+          {sim.after.classStatus !== 'ok' ? ` · ${sim.after.classStatus}` : ''}
+          {' · '}
+          {sim.slabKey}
         </span>
       </header>
 

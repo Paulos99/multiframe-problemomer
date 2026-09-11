@@ -8,16 +8,16 @@ export type RoomType =
   | 'office'
   | 'other';
 
-/** Product v1.1 bare-slab presets. solid180 = DEFAULT when unknown. */
-export type SlabPreset =
-  | 'solid140'
-  | 'solid160'
-  | 'solid180'
-  | 'solid200'
-  | 'pk220'
-  | 'mono250';
+/**
+ * Locked backend SlabKey (deriveSimulation stub).
+ * 180 = DEFAULT when unknown.
+ */
+export type SlabKey = '140' | '160' | '180' | '200' | 'pk220' | 'mono250';
 
-/** @deprecated legacy — mapped to SlabPreset in simulation */
+/** @deprecated use SlabKey — kept for UI aliases during migration */
+export type SlabPreset = SlabKey | 'solid140' | 'solid160' | 'solid180' | 'solid200';
+
+/** UI / legacy type — mapped → SlabKey (hollow≈pk220, monolith≈mono250|thickness, unknown→180) */
 export type SlabType = 'concrete' | 'hollow' | 'wood' | 'unknown';
 
 export type NoiseScenario =
@@ -43,6 +43,9 @@ export type WizardStep =
   | 'result';
 
 export interface FloorSlab {
+  /** Preferred locked key */
+  key?: SlabKey;
+  /** @deprecated alias of key / legacy solid* presets */
   preset?: SlabPreset;
   type?: SlabType;
   thicknessMm?: number;
@@ -54,29 +57,30 @@ export interface RoomAnswers {
   floorSlab?: FloorSlab;
 }
 
-/** Joint housing class from both indices; 'partial' when Rw ok but Lnw fails */
-export type ClassLabel = 'A' | 'B' | 'V' | 'partial' | 'below';
+/**
+ * classLabel A|B|V|below (partial is NOT a classLabel — use classStatus).
+ * classStatus: ok when both indices meet; partial when Rw ok Lnw not; below otherwise.
+ */
+export type ClassLabel = 'A' | 'B' | 'V' | 'below';
+export type ClassStatus = 'ok' | 'partial' | 'below';
 
 /**
- * DerivedSimulation side — schemaVersion 1 additive shape.
- * classLabel: joint A/B/V; partial if Rw meets but Lnw fails; below otherwise.
+ * DerivedSimulation side — schemaVersion 1 additive.
  */
 export interface DerivedSimSide {
   Rw: number;
   Lnw: number;
   classLabel: ClassLabel;
+  classStatus: ClassStatus;
   /** Optional human-readable status copy */
   label?: string;
 }
 
 /**
  * Additive under derived.simulation — schemaVersion stays 1.
- *
- * before/after by slab thickness (NOT generic concrete/hollow):
- * 140:50/80; 160:52/78; 180 DEFAULT:54/76; 200:55/74; PC220:52/74; mono250:~56/74
- * DELTA: +10 Rw, −8 Lnw (marketing_placeholder / pre_lab only)
- * Class: A Rw≥54&Lnw≤55; B 52/58; V 50/60; else below / partial if Rw ok Lnw fail
+ * Locked stub: SLABS by SlabKey, DELTA {Rw:10,Lnw:-8}, grade → classLabel+classStatus.
  * housingClass = after.classLabel
+ * source: marketing_placeholder, disclaimer: pre_lab
  */
 export interface DerivedSimulation {
   before: DerivedSimSide;
@@ -89,7 +93,7 @@ export interface DerivedSimulation {
   /** UI helpers (additive) */
   deltaRange: { Rw: readonly [number, number]; Lnw: readonly [number, number] };
   uiLabel: string;
-  slabPreset: SlabPreset;
+  slabKey: SlabKey;
   feelingBefore: ComfortLevel;
   feelingAfter: ComfortLevel;
   honestLines: string[];
@@ -205,14 +209,17 @@ export const NOISE_TYPE_LABELS: Record<NoiseType, string> = {
   mixed: 'Смешанный',
 };
 
-export const SLAB_PRESET_LABELS: Record<SlabPreset, string> = {
-  solid140: 'Сплошная 140 мм',
-  solid160: 'Сплошная 160 мм',
-  solid180: 'Сплошная 180 мм (по умолчанию)',
-  solid200: 'Сплошная 200 мм',
+export const SLAB_KEY_LABELS: Record<SlabKey, string> = {
+  '140': 'Сплошная 140 мм',
+  '160': 'Сплошная 160 мм',
+  '180': 'Сплошная 180 мм (по умолчанию)',
+  '200': 'Сплошная 200 мм',
   pk220: 'ПК 220 мм (пустотка)',
   mono250: 'Монолит 250 мм',
 };
+
+/** @deprecated use SLAB_KEY_LABELS */
+export const SLAB_PRESET_LABELS = SLAB_KEY_LABELS;
 
 export const SLAB_TYPE_LABELS: Record<SlabType, string> = {
   concrete: 'Монолитный бетон',

@@ -9,7 +9,7 @@ import {
   type ComfortLevel,
   type NoiseType,
 } from '../../state/types';
-import { buildSimulation } from '../../state/simulation';
+import { deriveSimulation } from '../../state/simulation';
 import styles from './CurrentStateScreen.module.css';
 
 const COMFORT: ComfortLevel[] = ['quiet', 'ok', 'bothers'];
@@ -29,7 +29,7 @@ function suggestNoise(scenarios: string[]): NoiseType {
 export function CurrentStateScreen() {
   const { session, setCurrentState } = useSession();
   const current = session.answers.current;
-  const sim = session.derived?.simulation ?? buildSimulation(session.answers);
+  const sim = session.derived?.simulation ?? deriveSimulation(session.answers);
 
   useEffect(() => {
     if (!current && session.answers.scenarios.length) {

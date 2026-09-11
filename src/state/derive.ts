@@ -5,7 +5,7 @@ import type {
   NoiseType,
   SessionAnswers,
 } from './types';
-import { buildSimulation } from './simulation';
+import { deriveSimulation } from './simulation';
 
 const IMPACT: NoiseScenario[] = ['steps', 'drop', 'furniture', 'repair'];
 const AIRBORNE: NoiseScenario[] = ['talk', 'tv', 'music'];
@@ -62,7 +62,7 @@ export function deriveProfile(answers: SessionAnswers): DerivedProfile {
     noiseType,
     whyMultiFrame: whyFor(noiseType, answers.scenarios, comfortLevel),
     disclaimer: 'expert_not_engineering',
-    simulation: buildSimulation(answers),
+    simulation: deriveSimulation(answers),
   };
 }
 

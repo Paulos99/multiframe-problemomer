@@ -1,12 +1,12 @@
 import { Screen } from '../../ui/Screen';
 import { SimCompare } from '../../ui/SimCompare';
 import { useSession } from '../../state/SessionContext';
-import { buildSimulation } from '../../state/simulation';
+import { deriveSimulation } from '../../state/simulation';
 import styles from './BeforeAfterScreen.module.css';
 
 export function BeforeAfterScreen() {
   const { session } = useSession();
-  const sim = session.derived?.simulation ?? buildSimulation(session.answers);
+  const sim = session.derived?.simulation ?? deriveSimulation(session.answers);
 
   return (
     <Screen

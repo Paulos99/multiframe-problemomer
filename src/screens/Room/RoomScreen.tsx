@@ -4,15 +4,15 @@ import { Field, TextInput, Select } from '../../ui/Field';
 import { useSession } from '../../state/SessionContext';
 import {
   ROOM_TYPE_LABELS,
-  SLAB_PRESET_LABELS,
+  SLAB_KEY_LABELS,
   type RoomType,
-  type SlabPreset,
+  type SlabKey,
 } from '../../state/types';
 import { roomNextHint } from '../../state/session';
 import styles from './RoomScreen.module.css';
 
 const ROOM_TYPES = Object.keys(ROOM_TYPE_LABELS) as RoomType[];
-const SLAB_PRESETS = Object.keys(SLAB_PRESET_LABELS) as SlabPreset[];
+const SLAB_KEYS = Object.keys(SLAB_KEY_LABELS) as SlabKey[];
 
 export function RoomScreen() {
   const { session, setRoomType, setCeilingArea, setFloorSlab, canGoNext } = useSession();
@@ -53,22 +53,22 @@ export function RoomScreen() {
       <div className={styles.optional}>
         <h2>Перекрытие сверху (по желанию)</h2>
         <p>Для оценочной симуляции Rw / Lnw. Если не указать — берём сплошную 180 мм.</p>
-        <Field label="Тип / толщина плиты">
+        <Field label="Тип / толщина плиты (SlabKey)">
           <Select
-            value={room.floorSlab?.preset ?? ''}
+            value={room.floorSlab?.key ?? room.floorSlab?.preset ?? ''}
             onChange={(e) => {
-              const v = e.target.value as SlabPreset | '';
+              const v = e.target.value as SlabKey | '';
               if (!v) {
                 setFloorSlab(undefined);
                 return;
               }
-              setFloorSlab({ preset: v });
+              setFloorSlab({ key: v });
             }}
           >
-            <option value="">Не указывать (180 мм по умолчанию)</option>
-            {SLAB_PRESETS.map((p) => (
-              <option key={p} value={p}>
-                {SLAB_PRESET_LABELS[p]}
+            <option value="">Не указывать (180 по умолчанию)</option>
+            {SLAB_KEYS.map((k) => (
+              <option key={k} value={k}>
+                {SLAB_KEY_LABELS[k]}
               </option>
             ))}
           </Select>

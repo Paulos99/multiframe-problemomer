@@ -12,14 +12,14 @@ import {
   SCENARIO_LABELS,
 } from '../../state/types';
 import { buildCalculatorUrl, toSessionJson } from '../../state/session';
-import { buildSimulation } from '../../state/simulation';
+import { deriveSimulation } from '../../state/simulation';
 import styles from './ResultScreen.module.css';
 
 export function ResultScreen() {
   const { session, restart } = useSession();
   const derived = session.derived;
   const room = session.answers.room;
-  const sim = derived?.simulation ?? buildSimulation(session.answers);
+  const sim = derived?.simulation ?? deriveSimulation(session.answers);
   const [showLead, setShowLead] = useState(false);
   const [sent, setSent] = useState(false);
   const [name, setName] = useState('');
