@@ -1,11 +1,13 @@
 import type { ComfortLevel, DerivedSimSide, DerivedSimulation } from '../state/types';
 import { COMFORT_FEELING, DISCLAIMER_SIMULATION } from '../state/types';
-import { airChip, impactChip } from '../state/simulation';
+import { airChip, classCyr, impactChip } from '../state/simulation';
 import styles from './SimCompare.module.css';
 
 interface Props {
   sim: DerivedSimulation;
   emphasize?: 'before' | 'after' | 'both';
+  /** Quieter digits when emotion dual is primary (comparison screen). */
+  tone?: 'primary' | 'secondary';
 }
 
 function Feeling({ level }: { level: ComfortLevel }) {
@@ -14,16 +16,12 @@ function Feeling({ level }: { level: ComfortLevel }) {
 
 function ClassPill({ side }: { side: DerivedSimSide }) {
   if (side.classStatus === 'partial') {
-    return (
-      <span className={styles.statusPartial}>
-        частично · Rw {side.classLabel}
-      </span>
-    );
+    return <span className={styles.statusPartial}>частично</span>;
   }
   if (side.classStatus === 'below' || side.classLabel === 'below') {
-    return <span className={styles.statusBelow}>ниже V</span>;
+    return <span className={styles.statusBelow}>ниже класса</span>;
   }
-  return <span className={styles.classPill}>класс {side.classLabel}</span>;
+  return <span className={styles.classPill}>класс {classCyr(side.classLabel)}</span>;
 }
 
 function Column({
@@ -38,6 +36,11 @@ function Column({
   delta?: { Rw: number; Lnw: number };
 }) {
   const impact = impactChip(side);
+  const showNote =
+    side.classStatus === 'partial' || side.classStatus === 'below'
+      ? side.label
+      : null;
+
   return (
     <div className={styles.col}>
       <div className={styles.colHead}>
@@ -77,25 +80,22 @@ function Column({
           Удар: {impact}
         </span>
       </div>
-      {side.label ? <p className={styles.partialNote}>{side.label}</p> : null}
+      {showNote ? <p className={styles.partialNote}>{showNote}</p> : null}
     </div>
   );
 }
 
-export function SimCompare({ sim, emphasize = 'both' }: Props) {
+export function SimCompare({ sim, emphasize = 'both', tone = 'primary' }: Props) {
   const [rwLo, rwHi] = sim.deltaRange.Rw;
   const [lnwLo, lnwHi] = sim.deltaRange.Lnw;
 
   return (
-    <section className={styles.card} aria-label={sim.uiLabel}>
+    <section
+      className={`${styles.card} ${tone === 'secondary' ? styles.secondary : ''}`}
+      aria-label={sim.uiLabel}
+    >
       <header className={styles.head}>
         <span className={styles.badge}>{sim.uiLabel}</span>
-        <span className={styles.housing}>
-          housingClass: {sim.housingClass}
-          {sim.after.classStatus !== 'ok' ? ` · ${sim.after.classStatus}` : ''}
-          {' · '}
-          {sim.slabKey}
-        </span>
       </header>
 
       <div className={styles.grid}>
@@ -115,10 +115,6 @@ export function SimCompare({ sim, emphasize = 'both' }: Props) {
       <p className={styles.range}>
         ΔRw +{sim.delta.Rw} (ориентир +{rwLo}…+{rwHi}) · ΔLnw {sim.delta.Lnw}{' '}
         (ориентир −{lnwLo}…−{lnwHi})
-        <span className={styles.rangeMeta}>
-          {' '}
-          · {sim.source} · {sim.disclaimer}
-        </span>
       </p>
 
       <ul className={styles.lines}>

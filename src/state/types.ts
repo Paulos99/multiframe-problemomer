@@ -257,5 +257,5 @@ export const SIMULATION_BADGE = 'Оценка до лабораторных да
 export const SIMULATION_UI_LABEL = SIMULATION_BADGE;
 
 export const DISCLAIMER_SIMULATION =
-  'Не замер и не гарантия Δ (source: marketing_placeholder, disclaimer: pre_lab). A/B/V — ориентир комфорта, не расчёт по СП. Потолком нельзя заявлять полную норму Lnw: часто нужен пол у соседа сверху.';
+  'Не замер и не гарантия Δ. Классы А/Б/В — ориентир комфорта, не расчёт по СП. Потолком нельзя заявлять полную норму по ударному шуму: часто нужен пол у соседа сверху.';
 

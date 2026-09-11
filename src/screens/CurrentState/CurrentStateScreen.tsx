@@ -73,7 +73,9 @@ export function CurrentStateScreen() {
         </div>
       </div>
 
-      <SimCompare sim={sim} emphasize="before" />
+      <div className={styles.simWrap}>
+        <SimCompare sim={sim} emphasize="before" />
+      </div>
 
       {current?.whyPlain ? (
         <aside className={styles.why}>

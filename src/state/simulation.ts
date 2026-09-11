@@ -115,7 +115,7 @@ export function grade(
       return {
         classLabel: cls,
         classStatus: 'partial',
-        label: `частично · Rw к ${cls}, Lnw не дотягивает (часто нужен пол у соседа)`,
+        label: 'частично: воздух ближе к комфорту, удар ещё не в норме',
       };
     }
   }
@@ -123,7 +123,7 @@ export function grade(
   return {
     classLabel: 'below',
     classStatus: 'below',
-    label: 'ниже класса V',
+    label: 'ниже базового класса',
   };
 }
 
@@ -187,18 +187,30 @@ export const MULTIFRAME_PLACEHOLDER = {
   disclaimer: SIM_META.disclaimer,
 };
 
-/** Chip helpers: independent Воздух / Удар (Design). */
+/** Cyrillic display for housing class chips (UI only; canon stays A|B|V). */
+export const CLASS_CYR: Record<'A' | 'B' | 'V', string> = {
+  A: 'А',
+  B: 'Б',
+  V: 'В',
+};
+
+export function classCyr(label: 'A' | 'B' | 'V' | 'below'): string {
+  if (label === 'below') return '';
+  return CLASS_CYR[label];
+}
+
+/** Chip helpers: independent Воздух / Удар (Design). Cyrillic А/Б/В for UI. */
 export function airChip(side: DerivedSimSide): string {
-  if (side.Rw >= NORMS.A.Rw) return 'A';
-  if (side.Rw >= NORMS.B.Rw) return 'B';
-  if (side.Rw >= NORMS.V.Rw) return 'V';
+  if (side.Rw >= NORMS.A.Rw) return CLASS_CYR.A;
+  if (side.Rw >= NORMS.B.Rw) return CLASS_CYR.B;
+  if (side.Rw >= NORMS.V.Rw) return CLASS_CYR.V;
   return 'вне нормы';
 }
 
 export function impactChip(side: DerivedSimSide): string {
   if (side.Lnw > NORMS.V.Lnw) return 'вне нормы';
-  if (side.Lnw <= NORMS.A.Lnw) return 'A';
-  if (side.Lnw <= NORMS.B.Lnw) return 'B';
-  if (side.Lnw <= NORMS.V.Lnw) return 'V';
+  if (side.Lnw <= NORMS.A.Lnw) return CLASS_CYR.A;
+  if (side.Lnw <= NORMS.B.Lnw) return CLASS_CYR.B;
+  if (side.Lnw <= NORMS.V.Lnw) return CLASS_CYR.V;
   return 'вне нормы';
 }

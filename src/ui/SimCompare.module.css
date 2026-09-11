@@ -220,8 +220,7 @@
 .statusBelow {
   font-size: 10px;
   font-weight: 800;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
   padding: 2px 7px;
   border-radius: var(--radius-pill, 999px);
 }
@@ -260,16 +259,36 @@
   background: var(--accent-soft, rgba(1, 100, 79, 0.12));
 }
 
-.housing {
-  margin-left: auto;
-  font-size: 11px;
-  font-weight: 650;
-  color: var(--text-secondary, #5f6b73);
-}
-
 .head {
   display: flex;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+/* Secondary: digits support emotion, not drown it (comparison screen). */
+.secondary {
+  gap: 10px;
+  padding: 12px 14px;
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.06));
+  opacity: 0.96;
+}
+
+.secondary .metric strong {
+  font-size: 17px;
+}
+
+.secondary .feeling {
+  font-size: 12px;
+  padding: 4px 10px;
+}
+
+.secondary .range,
+.secondary .lines,
+.secondary .ibox {
+  font-size: 11px;
+}
+
+.secondary .lines li {
+  font-size: 12px;
 }
