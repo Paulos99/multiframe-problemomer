@@ -32,6 +32,13 @@ export function AudioDiffScreen() {
       title="Услышать разницу"
       subtitle="Сравните «до» и «после». Крупные кнопки — удобно на телефоне."
     >
+      {isDemo ? (
+        <p className={styles.contrastNote}>
+          <Badge>демо, контраст усилен для показа</Badge>
+          <span>«До» заметно громче, «После» — явно тише.</span>
+        </p>
+      ) : null}
+
       {demoSet ? (
         <p className={styles.demoSet}>
           <Badge>демо-набор</Badge>
@@ -57,8 +64,8 @@ export function AudioDiffScreen() {
                 aria-pressed={beforeOn}
                 aria-label={
                   beforeOn
-                    ? `Пауза: ${pair.beforeLabel}`
-                    : `Слушать до: ${pair.beforeLabel}`
+                    ? `Пауза: До — громко, ${pair.beforeLabel}`
+                    : `Слушать До — громко: ${pair.beforeLabel}`
                 }
                 onClick={() => {
                   if (beforeOn) stop();
@@ -69,8 +76,8 @@ export function AudioDiffScreen() {
                   <PlayIcon playing={beforeOn} />
                 </span>
                 <span className={styles.meta}>
-                  <strong>{pair.beforeLabel}</strong>
-                  <small>До</small>
+                  <strong className={styles.loudLabel}>До — громко</strong>
+                  <small>{pair.beforeLabel}</small>
                   {beforeOn ? <span className={styles.stateLabel}>играет</span> : null}
                 </span>
                 {beforeOn ? (
@@ -85,8 +92,8 @@ export function AudioDiffScreen() {
                 aria-pressed={afterOn}
                 aria-label={
                   afterOn
-                    ? `Пауза: ${pair.afterLabel}`
-                    : `Слушать после: ${pair.afterLabel}`
+                    ? `Пауза: После — тише, ${pair.afterLabel}`
+                    : `Слушать После — тише: ${pair.afterLabel}`
                 }
                 onClick={() => {
                   if (afterOn) stop();
@@ -97,8 +104,8 @@ export function AudioDiffScreen() {
                   <PlayIcon playing={afterOn} />
                 </span>
                 <span className={styles.meta}>
-                  <strong>{pair.afterLabel}</strong>
-                  <small>После</small>
+                  <strong className={styles.quietLabel}>После — тише</strong>
+                  <small>{pair.afterLabel}</small>
                   {afterOn ? <span className={styles.stateLabel}>играет</span> : null}
                 </span>
                 {afterOn ? (

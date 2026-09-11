@@ -113,7 +113,17 @@
 }
 
 .meta strong {
-  font-size: 14px;
+  font-size: 17px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.loudLabel {
+  color: var(--text-primary, #1a1f24);
+}
+
+.quietLabel {
+  color: var(--accent-color, #01644f);
 }
 
 .meta small {
@@ -129,13 +139,22 @@
   color: var(--accent-color);
 }
 
+.contrastNote,
 .demoSet {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
   margin: 0;
   font-size: 13px;
   color: var(--text-secondary, #5f6b73);
+}
+
+.contrastNote {
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: rgba(1, 100, 79, 0.06);
+  border: 1px solid rgba(1, 100, 79, 0.18);
 }
 
 .bar {
