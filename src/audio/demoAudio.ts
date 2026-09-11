@@ -49,10 +49,9 @@ export function pairsForScenarios(scenarios: NoiseScenario[]): {
     (p.scenarios ?? []).some((s) => scenarios.includes(s)),
   );
   if (!filtered.length) {
+    // No stub matches selection — fall back to fixed demo set.
     return { pairs: DEMO_AUDIO_PAIRS, demoSet: true };
   }
-  return {
-    pairs: filtered,
-    demoSet: filtered.length === DEMO_AUDIO_PAIRS.length,
-  };
+  // Filtered to selected scenarios; keep «ДЕМО» on pairs, not «демо-набор».
+  return { pairs: filtered, demoSet: false };
 }

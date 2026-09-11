@@ -5,6 +5,80 @@ import { useSession } from '../../state/SessionContext';
 import { useDemoPlayer } from '../../audio/useDemoPlayer';
 import styles from './AudioDiffScreen.module.css';
 
+function PlayIcon({ playing }: { playing: boolean }) {
+  if (playing) {
+    return (
+      <span className={styles.pauseGlyph} aria-hidden>
+        <i />
+        <i />
+      </span>
+    );
+  }
+  return <span className={styles.playGlyph} aria-hidden />;
+}
+
+function NowPlaying({ progress }: { progress: number }) {
+  return (
+    <>
+      <span className={styles.nowPlaying} aria-live="polite">
+        <span className={styles.eq} aria-hidden>
+          <i />
+          <i />
+          <i />
+        </span>
+        <span className={styles.nowPlayingText}>
+          <strong>Играет</strong>
+          <span>нажмите — пауза</span>
+        </span>
+      </span>
+      <span className={styles.bar} aria-hidden>
+        <span style={{ width: `${Math.round(progress * 100)}%` }} />
+      </span>
+    </>
+  );
+}
+
+type SideProps = {
+  playing: boolean;
+  progress: number;
+  side: 'before' | 'after';
+  title: string;
+  subtitle: string;
+  ariaLabel: string;
+  onToggle: () => void;
+};
+
+function SideButton({
+  playing,
+  progress,
+  side,
+  title,
+  subtitle,
+  ariaLabel,
+  onToggle,
+}: SideProps) {
+  return (
+    <button
+      type="button"
+      className={`${styles.play} ${styles[side]} ${playing ? styles.playing : ''}`}
+      aria-pressed={playing}
+      aria-label={ariaLabel}
+      onClick={onToggle}
+    >
+      <span className={`${styles.icon} ${playing ? styles.iconPlaying : ''}`}>
+        <PlayIcon playing={playing} />
+      </span>
+      <span className={styles.meta}>
+        <strong className={side === 'before' ? styles.loudLabel : styles.quietLabel}>
+          {title}
+        </strong>
+        <small>{subtitle}</small>
+        {playing ? <NowPlaying progress={progress} /> : null}
+      </span>
+    </button>
+  );
+}
+
 export function AudioDiffScreen() {
   const { session } = useSession();
   const { activeId, progress, play, stop } = useDemoPlayer();
@@ -16,6 +90,13 @@ export function AudioDiffScreen() {
       title="Услышать разницу"
       subtitle="Сравните «до» и «после». Крупные кнопки — удобно на телефоне."
     >
+      {isDemo ? (
+        <p className={styles.contrastNote}>
+          <Badge>демо, контраст усилен для показа</Badge>
+          <span>«До» заметно громче, «После» — явно тише.</span>
+        </p>
+      ) : null}
+
       {demoSet ? (
         <p className={styles.demoSet}>
           <Badge>демо-набор</Badge>
@@ -35,48 +116,38 @@ export function AudioDiffScreen() {
               {isDemo ? <Badge>демо</Badge> : null}
             </header>
             <div className={styles.controls}>
-              <button
-                type="button"
-                className={`${styles.play} ${styles.before} ${beforeOn ? styles.active : ''}`}
-                onClick={() => {
+              <SideButton
+                side="before"
+                playing={beforeOn}
+                progress={progress}
+                title="До — громко"
+                subtitle={pair.beforeLabel}
+                ariaLabel={
+                  beforeOn
+                    ? `Пауза: До — громко, ${pair.beforeLabel}`
+                    : `Слушать До — громко: ${pair.beforeLabel}`
+                }
+                onToggle={() => {
                   if (beforeOn) stop();
                   else void play(beforeId, pair.beforeSrc);
                 }}
-              >
-                <span className={styles.icon} aria-hidden>
-                  {beforeOn ? '❚❚' : '▶'}
-                </span>
-                <span className={styles.meta}>
-                  <strong>{pair.beforeLabel}</strong>
-                  <small>До</small>
-                </span>
-                {beforeOn ? (
-                  <span className={styles.bar} aria-hidden>
-                    <span style={{ width: `${Math.round(progress * 100)}%` }} />
-                  </span>
-                ) : null}
-              </button>
-              <button
-                type="button"
-                className={`${styles.play} ${styles.after} ${afterOn ? styles.active : ''}`}
-                onClick={() => {
+              />
+              <SideButton
+                side="after"
+                playing={afterOn}
+                progress={progress}
+                title="После — тише"
+                subtitle={pair.afterLabel}
+                ariaLabel={
+                  afterOn
+                    ? `Пауза: После — тише, ${pair.afterLabel}`
+                    : `Слушать После — тише: ${pair.afterLabel}`
+                }
+                onToggle={() => {
                   if (afterOn) stop();
                   else void play(afterId, pair.afterSrc);
                 }}
-              >
-                <span className={styles.icon} aria-hidden>
-                  {afterOn ? '❚❚' : '▶'}
-                </span>
-                <span className={styles.meta}>
-                  <strong>{pair.afterLabel}</strong>
-                  <small>После</small>
-                </span>
-                {afterOn ? (
-                  <span className={styles.bar} aria-hidden>
-                    <span style={{ width: `${Math.round(progress * 100)}%` }} />
-                  </span>
-                ) : null}
-              </button>
+              />
             </div>
           </article>
         );
