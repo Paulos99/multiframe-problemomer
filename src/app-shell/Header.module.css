@@ -26,12 +26,14 @@
   min-width: 0;
 }
 
+/* Logos are near-white PNGs — darken on light header, keep bright on dark. */
 .stp {
   width: 40px;
   height: 40px;
   object-fit: contain;
   flex: 0 0 auto;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.12));
+  filter: brightness(0) saturate(100%);
+  opacity: 0.88;
 }
 
 .mf {
@@ -39,7 +41,18 @@
   width: auto;
   max-width: 150px;
   object-fit: contain;
-  filter: contrast(1.18) saturate(1.12) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+  filter: brightness(0) saturate(100%);
+  opacity: 0.9;
+}
+
+.dark .stp {
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+  opacity: 1;
+}
+
+.dark .mf {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+  opacity: 1;
 }
 
 .product {
@@ -65,24 +78,10 @@
 }
 
 .themeIcon {
-  font-size: 13px;
+  font-size: 15px;
+  line-height: 1;
   font-weight: 800;
   color: var(--text-primary);
-}
-
-.themeMark {
-  position: absolute;
-  right: 6px;
-  bottom: 6px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #f5c542;
-  box-shadow: 0 0 0 2px var(--bg-card);
-}
-
-.themeMark.on {
-  background: #7ec8ff;
 }
 
 @media (max-width: 420px) {
@@ -90,8 +89,6 @@
     display: none;
   }
   .mf {
-  filter: contrast(1.15) saturate(1.1) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.18));
-
     max-width: 120px;
   }
 }

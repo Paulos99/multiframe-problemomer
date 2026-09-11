@@ -98,3 +98,47 @@
   opacity: 1;
   transform: scale(1);
 }
+
+/* Dense tiles for 2-col mobile input grids (~390px) */
+.dense {
+  min-height: 52px;
+  padding: 10px 12px;
+  gap: 8px;
+  align-items: flex-start;
+  box-shadow: none;
+}
+
+.dense:hover:not(:disabled) {
+  transform: none;
+  box-shadow: none;
+}
+
+.dense .lead {
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.dense .title {
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.dense .hint {
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.dense .check {
+  width: 20px;
+  height: 20px;
+  font-size: 11px;
+  margin-top: 1px;
+}
+
+.dense .icon {
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
+  border-radius: 8px;
+}

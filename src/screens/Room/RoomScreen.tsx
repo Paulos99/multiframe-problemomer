@@ -21,6 +21,7 @@ export function RoomScreen() {
 
   return (
     <Screen
+      stickyHead
       title="Комната и потолок"
       subtitle="Опишите помещение. Этаж не спрашиваем — важен потолок и перекрытие сверху."
     >
@@ -28,6 +29,7 @@ export function RoomScreen() {
         {ROOM_TYPES.map((type) => (
           <CardSelect
             key={type}
+            dense
             title={ROOM_TYPE_LABELS[type]}
             selected={room.roomType === type}
             onClick={() => setRoomType(type)}
@@ -49,6 +51,12 @@ export function RoomScreen() {
           }}
         />
       </Field>
+
+      {!canGoNext && hint ? (
+        <p className={styles.validation} role="status">
+          {hint === 'выберите тип' ? 'выберите тип' : 'укажите площадь'}
+        </p>
+      ) : null}
 
       <div className={styles.optional}>
         <h2>Перекрытие сверху (по желанию)</h2>
@@ -74,12 +82,6 @@ export function RoomScreen() {
           </Select>
         </Field>
       </div>
-
-      {!canGoNext && hint ? (
-        <p className={styles.validation} role="status">
-          {hint === 'выберите тип' ? 'выберите тип' : 'укажите площадь'}
-        </p>
-      ) : null}
     </Screen>
   );
 }
