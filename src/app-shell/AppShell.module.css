@@ -11,7 +11,7 @@
 .main {
   width: min(100%, var(--max-w));
   margin: 0 auto;
-  padding: 20px 16px 28px;
+  padding: 12px 16px 28px;
   flex: 1;
 }
 
@@ -19,13 +19,4 @@
   .main {
     padding: 28px 24px 40px;
   }
-}
-
-.hint {
-  width: min(100%, var(--max-w, 720px));
-  margin: 0 auto;
-  padding: 0 16px 8px;
-  font-size: 13px;
-  color: var(--text-secondary, #5f6b73);
-  text-align: right;
 }

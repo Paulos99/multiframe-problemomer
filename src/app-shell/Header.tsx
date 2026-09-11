@@ -11,7 +11,7 @@ export function Header() {
   }, [dark]);
 
   return (
-    <header className={styles.header}>
+    <header className={`${styles.header} ${dark ? styles.dark : ''}`}>
       <div className={styles.inner}>
         <div className={styles.brand}>
           <img
