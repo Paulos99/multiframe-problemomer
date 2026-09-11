@@ -14,10 +14,68 @@ function PlayIcon({ playing }: { playing: boolean }) {
       </span>
     );
   }
+  return <span className={styles.playGlyph} aria-hidden />;
+}
+
+function NowPlaying({ progress }: { progress: number }) {
   return (
-    <span aria-hidden>
-      ▶
-    </span>
+    <>
+      <span className={styles.nowPlaying} aria-live="polite">
+        <span className={styles.eq} aria-hidden>
+          <i />
+          <i />
+          <i />
+        </span>
+        <span className={styles.nowPlayingText}>
+          <strong>Играет</strong>
+          <span>нажмите — пауза</span>
+        </span>
+      </span>
+      <span className={styles.bar} aria-hidden>
+        <span style={{ width: `${Math.round(progress * 100)}%` }} />
+      </span>
+    </>
+  );
+}
+
+type SideProps = {
+  playing: boolean;
+  progress: number;
+  side: 'before' | 'after';
+  title: string;
+  subtitle: string;
+  ariaLabel: string;
+  onToggle: () => void;
+};
+
+function SideButton({
+  playing,
+  progress,
+  side,
+  title,
+  subtitle,
+  ariaLabel,
+  onToggle,
+}: SideProps) {
+  return (
+    <button
+      type="button"
+      className={`${styles.play} ${styles[side]} ${playing ? styles.playing : ''}`}
+      aria-pressed={playing}
+      aria-label={ariaLabel}
+      onClick={onToggle}
+    >
+      <span className={`${styles.icon} ${playing ? styles.iconPlaying : ''}`}>
+        <PlayIcon playing={playing} />
+      </span>
+      <span className={styles.meta}>
+        <strong className={side === 'before' ? styles.loudLabel : styles.quietLabel}>
+          {title}
+        </strong>
+        <small>{subtitle}</small>
+        {playing ? <NowPlaying progress={progress} /> : null}
+      </span>
+    </button>
   );
 }
 
@@ -58,62 +116,38 @@ export function AudioDiffScreen() {
               {isDemo ? <Badge>демо</Badge> : null}
             </header>
             <div className={styles.controls}>
-              <button
-                type="button"
-                className={`${styles.play} ${styles.before} ${beforeOn ? styles.active : ''}`}
-                aria-pressed={beforeOn}
-                aria-label={
+              <SideButton
+                side="before"
+                playing={beforeOn}
+                progress={progress}
+                title="До — громко"
+                subtitle={pair.beforeLabel}
+                ariaLabel={
                   beforeOn
                     ? `Пауза: До — громко, ${pair.beforeLabel}`
                     : `Слушать До — громко: ${pair.beforeLabel}`
                 }
-                onClick={() => {
+                onToggle={() => {
                   if (beforeOn) stop();
                   else void play(beforeId, pair.beforeSrc);
                 }}
-              >
-                <span className={styles.icon}>
-                  <PlayIcon playing={beforeOn} />
-                </span>
-                <span className={styles.meta}>
-                  <strong className={styles.loudLabel}>До — громко</strong>
-                  <small>{pair.beforeLabel}</small>
-                  {beforeOn ? <span className={styles.stateLabel}>играет</span> : null}
-                </span>
-                {beforeOn ? (
-                  <span className={styles.bar} aria-hidden>
-                    <span style={{ width: `${Math.round(progress * 100)}%` }} />
-                  </span>
-                ) : null}
-              </button>
-              <button
-                type="button"
-                className={`${styles.play} ${styles.after} ${afterOn ? styles.active : ''}`}
-                aria-pressed={afterOn}
-                aria-label={
+              />
+              <SideButton
+                side="after"
+                playing={afterOn}
+                progress={progress}
+                title="После — тише"
+                subtitle={pair.afterLabel}
+                ariaLabel={
                   afterOn
                     ? `Пауза: После — тише, ${pair.afterLabel}`
                     : `Слушать После — тише: ${pair.afterLabel}`
                 }
-                onClick={() => {
+                onToggle={() => {
                   if (afterOn) stop();
                   else void play(afterId, pair.afterSrc);
                 }}
-              >
-                <span className={styles.icon}>
-                  <PlayIcon playing={afterOn} />
-                </span>
-                <span className={styles.meta}>
-                  <strong className={styles.quietLabel}>После — тише</strong>
-                  <small>{pair.afterLabel}</small>
-                  {afterOn ? <span className={styles.stateLabel}>играет</span> : null}
-                </span>
-                {afterOn ? (
-                  <span className={styles.bar} aria-hidden>
-                    <span style={{ width: `${Math.round(progress * 100)}%` }} />
-                  </span>
-                ) : null}
-              </button>
+              />
             </div>
           </article>
         );
