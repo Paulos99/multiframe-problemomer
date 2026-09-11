@@ -10,6 +10,17 @@ interface Props {
   tone?: 'primary' | 'secondary';
 }
 
+/** Effect heroes — air may say «вдвое»; impact never. */
+const AIR_HERO = {
+  lead: 'примерно вдвое спокойнее',
+  sub: 'шум как будто дальше',
+} as const;
+
+const IMPACT_HERO = {
+  lead: 'тише',
+  sub: 'норму часто закрывает пол',
+} as const;
+
 function Feeling({ level }: { level: ComfortLevel }) {
   return <span className={`${styles.feeling} ${styles[level]}`}>{COMFORT_FEELING[level]}</span>;
 }
@@ -24,16 +35,73 @@ function ClassPill({ side }: { side: DerivedSimSide }) {
   return <span className={styles.classPill}>класс {classCyr(side.classLabel)}</span>;
 }
 
+function MetricTertiary({
+  label,
+  value,
+  delta,
+}: {
+  label: string;
+  value: number;
+  delta?: number;
+}) {
+  return (
+    <p className={styles.metricTertiary}>
+      <span className={styles.key}>{label}</span>
+      <span className={styles.metricNums}>
+        <strong>{value}</strong>
+        <span className={styles.unit}>дБ</span>
+        {delta != null ? (
+          <span className={styles.delta}>
+            {delta > 0 ? '+' : ''}
+            {delta}
+          </span>
+        ) : null}
+      </span>
+    </p>
+  );
+}
+
+function EffectBlock({
+  channel,
+  hero,
+  metricLabel,
+  value,
+  delta,
+  showHero,
+}: {
+  channel: string;
+  hero: { lead: string; sub: string };
+  metricLabel: string;
+  value: number;
+  delta?: number;
+  showHero: boolean;
+}) {
+  return (
+    <div className={styles.effectBlock}>
+      <span className={styles.channel}>{channel}</span>
+      {showHero ? (
+        <div className={styles.hero}>
+          <p className={styles.heroLead}>{hero.lead}</p>
+          <p className={styles.heroSub}>{hero.sub}</p>
+        </div>
+      ) : null}
+      <MetricTertiary label={metricLabel} value={value} delta={delta} />
+    </div>
+  );
+}
+
 function Column({
   title,
   side,
   feeling,
   delta,
+  showEffectHero,
 }: {
   title: string;
   side: DerivedSimSide;
   feeling: ComfortLevel;
   delta?: { Rw: number; Lnw: number };
+  showEffectHero: boolean;
 }) {
   const impact = impactChip(side);
   const showNote =
@@ -50,30 +118,26 @@ function Column({
           <Feeling level={feeling} />
         </div>
       </div>
-      <div className={styles.metrics}>
-        <div className={styles.metric}>
-          <span className={styles.key}>Rw</span>
-          <strong>{side.Rw}</strong>
-          <span className={styles.unit}>дБ</span>
-          {delta ? (
-            <span className={styles.delta}>
-              {delta.Rw > 0 ? '+' : ''}
-              {delta.Rw}
-            </span>
-          ) : null}
-        </div>
-        <div className={styles.metric}>
-          <span className={styles.key}>Lnw</span>
-          <strong>{side.Lnw}</strong>
-          <span className={styles.unit}>дБ</span>
-          {delta ? (
-            <span className={styles.delta}>
-              {delta.Lnw > 0 ? '+' : ''}
-              {delta.Lnw}
-            </span>
-          ) : null}
-        </div>
+
+      <div className={styles.effects}>
+        <EffectBlock
+          channel="Воздух"
+          hero={AIR_HERO}
+          metricLabel="воздух"
+          value={side.Rw}
+          delta={delta?.Rw}
+          showHero={showEffectHero}
+        />
+        <EffectBlock
+          channel="Удар"
+          hero={IMPACT_HERO}
+          metricLabel="удар"
+          value={side.Lnw}
+          delta={delta?.Lnw}
+          showHero={showEffectHero}
+        />
       </div>
+
       <div className={styles.chips}>
         <span className={styles.chip}>Воздух: {airChip(side)}</span>
         <span className={`${styles.chip} ${impact === 'вне нормы' ? styles.chipWarn : ''}`}>
@@ -88,6 +152,8 @@ function Column({
 export function SimCompare({ sim, emphasize = 'both', tone = 'primary' }: Props) {
   const [rwLo, rwHi] = sim.deltaRange.Rw;
   const [lnwLo, lnwHi] = sim.deltaRange.Lnw;
+  const showAfter = emphasize !== 'before';
+  const showBefore = emphasize !== 'after';
 
   return (
     <section
@@ -99,22 +165,27 @@ export function SimCompare({ sim, emphasize = 'both', tone = 'primary' }: Props)
       </header>
 
       <div className={styles.grid}>
-        {emphasize !== 'after' ? (
-          <Column title="Сейчас" side={sim.before} feeling={sim.feelingBefore} />
+        {showBefore ? (
+          <Column
+            title="Сейчас"
+            side={sim.before}
+            feeling={sim.feelingBefore}
+            showEffectHero={false}
+          />
         ) : null}
-        {emphasize !== 'before' ? (
+        {showAfter ? (
           <Column
             title="С MultiFrame"
             side={sim.after}
             feeling={sim.feelingAfter}
             delta={sim.delta}
+            showEffectHero
           />
         ) : null}
       </div>
 
       <p className={styles.range}>
-        ΔRw +{sim.delta.Rw} (ориентир +{rwLo}…+{rwHi}) · ΔLnw {sim.delta.Lnw}{' '}
-        (ориентир −{lnwLo}…−{lnwHi})
+        ориентир Δ воздух +{rwLo}…+{rwHi} · удар −{lnwLo}…−{lnwHi}
       </p>
 
       <ul className={styles.lines}>

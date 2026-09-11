@@ -161,8 +161,8 @@ export function deriveSimulation(answers: SessionAnswers): DerivedSimulation {
     feelingBefore: feelingFromSide(before, answers.current?.comfortLevel),
     feelingAfter: feelingFromSide(after, answers.current?.comfortLevel),
     honestLines: [
-      'Воздух после MultiFrame ближе к комфорту — потолок помогает.',
-      'Удар смягчается, но полной нормы Lnw потолком нет: пол у соседа сверху часто всё ещё нужен.',
+      'Воздух: примерно вдвое спокойнее — шум как будто дальше.',
+      'Удар: тише; полную норму часто закрывает пол у соседа сверху.',
     ],
   };
 }

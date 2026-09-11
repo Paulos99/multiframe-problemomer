@@ -9,6 +9,8 @@ interface Props {
   icon?: ReactNode;
   multi?: boolean;
   disabled?: boolean;
+  /** Compact tile for 2-col mobile grids */
+  dense?: boolean;
 }
 
 export function CardSelect({
@@ -19,11 +21,12 @@ export function CardSelect({
   icon,
   multi,
   disabled,
+  dense,
 }: Props) {
   return (
     <button
       type="button"
-      className={`${styles.card} ${selected ? styles.selected : ''}`}
+      className={`${styles.card} ${selected ? styles.selected : ''} ${dense ? styles.dense : ''}`}
       onClick={onClick}
       aria-pressed={selected}
       disabled={disabled}

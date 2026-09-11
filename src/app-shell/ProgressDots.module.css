@@ -1,13 +1,19 @@
 .wrap {
-  width: min(100%, var(--max-w));
-  margin: 0 auto;
-  padding: 10px 16px 0;
+  position: sticky;
+  top: calc(var(--safe-top) + var(--header-h));
+  z-index: 35;
+  width: 100%;
+  margin: 0;
+  padding: 8px 16px 6px;
+  background: color-mix(in srgb, var(--bg-page) 94%, transparent);
+  backdrop-filter: blur(10px);
 }
 
 .list {
   list-style: none;
-  margin: 0;
+  margin: 0 auto;
   padding: 0;
+  width: min(100%, var(--max-w));
   display: flex;
   gap: 4px;
   justify-content: space-between;
@@ -55,6 +61,10 @@
 }
 
 @media (max-width: 520px) {
+  .wrap {
+    padding: 6px 16px 4px;
+  }
+
   .label {
     display: none;
   }

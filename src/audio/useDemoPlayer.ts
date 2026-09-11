@@ -3,10 +3,32 @@ import { parseStubSrc, type StubKind, type StubScene } from './demoAudio';
 
 let sharedCtx: AudioContext | null = null;
 
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+}
+
 function getCtx(): AudioContext {
   if (!sharedCtx) sharedCtx = new AudioContext();
   return sharedCtx;
 }
+
+/**
+ * Demo contrast is intentionally exaggerated so the sell difference is obvious
+ * on laptop speakers / phone (release blocker). UI shows «контраст усилен».
+ * BEFORE ≈ loud; AFTER ≈ clearly quieter (~−16…−20 dB level + darker filter).
+ */
+const DEMO_CONTRAST = {
+  master: 0.5,
+  /** Peak envelope for footsteps (linear gain into master). */
+  beforePeak: 0.9,
+  afterPeak: 0.11,
+  /** Broadband talk/TV noise amplitude. */
+  beforeNoise: 0.34,
+  afterNoise: 0.055,
+} as const;
 
 function playStub(
   ctx: AudioContext,
@@ -16,10 +38,11 @@ function playStub(
 ): () => void {
   const now = ctx.currentTime;
   const master = ctx.createGain();
-  master.gain.value = 0.35;
+  master.gain.value = DEMO_CONTRAST.master;
   master.connect(ctx.destination);
   const duration = scene === 'steps' ? 2.4 : 2.8;
-  const damp = kind === 'after' ? 0.35 : 1;
+  const isAfter = kind === 'after';
+  const peak = isAfter ? DEMO_CONTRAST.afterPeak : DEMO_CONTRAST.beforePeak;
 
   if (scene === 'steps') {
     for (const t of [0, 0.45, 0.9, 1.35, 1.8]) {
@@ -27,11 +50,12 @@ function playStub(
       const g = ctx.createGain();
       const f = ctx.createBiquadFilter();
       f.type = 'lowpass';
-      f.frequency.value = kind === 'after' ? 180 : 420;
+      // After: darker + softer so attenuation is audible, not just muffled.
+      f.frequency.value = isAfter ? 120 : 520;
       osc.type = 'sine';
       osc.frequency.setValueAtTime(90 + Math.random() * 30, now + t);
       g.gain.setValueAtTime(0.0001, now + t);
-      g.gain.exponentialRampToValueAtTime(0.55 * damp, now + t + 0.02);
+      g.gain.exponentialRampToValueAtTime(peak, now + t + 0.02);
       g.gain.exponentialRampToValueAtTime(0.0001, now + t + 0.28);
       osc.connect(f);
       f.connect(g);
@@ -43,17 +67,18 @@ function playStub(
     const bufferSize = Math.floor(ctx.sampleRate * duration);
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const data = buffer.getChannelData(0);
+    const noiseAmp = isAfter ? DEMO_CONTRAST.afterNoise : DEMO_CONTRAST.beforeNoise;
     for (let i = 0; i < bufferSize; i++) {
       const env = Math.sin((Math.PI * i) / bufferSize);
-      const wobble = Math.sin(i / (ctx.sampleRate / (kind === 'after' ? 90 : 140)));
-      data[i] = (Math.random() * 2 - 1) * 0.22 * env * wobble * damp;
+      const wobble = Math.sin(i / (ctx.sampleRate / (isAfter ? 70 : 160)));
+      data[i] = (Math.random() * 2 - 1) * noiseAmp * env * wobble;
     }
     const src = ctx.createBufferSource();
     src.buffer = buffer;
     const f = ctx.createBiquadFilter();
     f.type = 'bandpass';
-    f.frequency.value = kind === 'after' ? 600 : 1200;
-    f.Q.value = 0.7;
+    f.frequency.value = isAfter ? 380 : 1400;
+    f.Q.value = isAfter ? 0.55 : 0.85;
     src.connect(f);
     f.connect(master);
     src.start(now);
@@ -106,16 +131,19 @@ export function useDemoPlayer() {
       durationMs.current = stub?.scene === 'talk' ? 2800 : 2400;
       startedAt.current = performance.now();
       setActiveId(id);
-      setProgress(0);
+      // Reduced motion: static mid progress — play-state stays clear without bar animation.
+      setProgress(prefersReducedMotion() ? 0.5 : 0);
 
-      const tick = () => {
-        const p = Math.min(1, (performance.now() - startedAt.current) / durationMs.current);
-        setProgress(p);
-        if (p < 1 && stopRef.current) {
-          rafRef.current = requestAnimationFrame(tick);
-        }
-      };
-      rafRef.current = requestAnimationFrame(tick);
+      if (!prefersReducedMotion()) {
+        const tick = () => {
+          const p = Math.min(1, (performance.now() - startedAt.current) / durationMs.current);
+          setProgress(p);
+          if (p < 1 && stopRef.current) {
+            rafRef.current = requestAnimationFrame(tick);
+          }
+        };
+        rafRef.current = requestAnimationFrame(tick);
+      }
 
       if (stub) {
         stopRef.current = playStub(ctx, stub.kind, stub.scene, () => {
