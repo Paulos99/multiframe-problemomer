@@ -11,6 +11,120 @@
   gap: 12px;
 }
 
+.dual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 600px) {
+  .dual {
+    grid-template-columns: 1fr;
+  }
+}
+
+.emotionCard {
+  position: relative;
+  padding: 18px 16px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.before {
+  background:
+    linear-gradient(180deg, rgba(95, 107, 115, 0.08), transparent 50%),
+    var(--bg-card);
+}
+
+.after {
+  background:
+    linear-gradient(165deg, rgba(1, 100, 79, 0.18), transparent 48%),
+    var(--bg-card);
+  border-color: rgba(1, 100, 79, 0.35);
+  box-shadow: var(--shadow-accent);
+}
+
+.tag {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
+}
+
+.after .tag {
+  background: var(--accent-color);
+  color: #fff;
+}
+
+.emotionCard h2 {
+  margin: 12px 0 6px;
+  font-size: 1.1rem;
+  letter-spacing: -0.02em;
+}
+
+.emotion {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.after .emotion {
+  color: var(--accent-color);
+}
+
+.emotionCard ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.emotionCard li {
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding-left: 16px;
+  position: relative;
+}
+
+.emotionCard li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 7px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--border-color);
+}
+
+.after li::before {
+  background: var(--accent-color);
+}
+
+.simSecondary {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.simLead {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  color: var(--text-secondary, #5f6b73);
+  text-transform: uppercase;
+}
+
 .row {
   display: flex;
   justify-content: space-between;
