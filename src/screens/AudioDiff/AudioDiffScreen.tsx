@@ -5,6 +5,22 @@ import { useSession } from '../../state/SessionContext';
 import { useDemoPlayer } from '../../audio/useDemoPlayer';
 import styles from './AudioDiffScreen.module.css';
 
+function PlayIcon({ playing }: { playing: boolean }) {
+  if (playing) {
+    return (
+      <span className={styles.pauseGlyph} aria-hidden>
+        <i />
+        <i />
+      </span>
+    );
+  }
+  return (
+    <span aria-hidden>
+      ▶
+    </span>
+  );
+}
+
 export function AudioDiffScreen() {
   const { session } = useSession();
   const { activeId, progress, play, stop } = useDemoPlayer();
@@ -38,17 +54,24 @@ export function AudioDiffScreen() {
               <button
                 type="button"
                 className={`${styles.play} ${styles.before} ${beforeOn ? styles.active : ''}`}
+                aria-pressed={beforeOn}
+                aria-label={
+                  beforeOn
+                    ? `Пауза: ${pair.beforeLabel}`
+                    : `Слушать до: ${pair.beforeLabel}`
+                }
                 onClick={() => {
                   if (beforeOn) stop();
                   else void play(beforeId, pair.beforeSrc);
                 }}
               >
-                <span className={styles.icon} aria-hidden>
-                  {beforeOn ? '❚❚' : '▶'}
+                <span className={styles.icon}>
+                  <PlayIcon playing={beforeOn} />
                 </span>
                 <span className={styles.meta}>
                   <strong>{pair.beforeLabel}</strong>
                   <small>До</small>
+                  {beforeOn ? <span className={styles.stateLabel}>играет</span> : null}
                 </span>
                 {beforeOn ? (
                   <span className={styles.bar} aria-hidden>
@@ -59,17 +82,24 @@ export function AudioDiffScreen() {
               <button
                 type="button"
                 className={`${styles.play} ${styles.after} ${afterOn ? styles.active : ''}`}
+                aria-pressed={afterOn}
+                aria-label={
+                  afterOn
+                    ? `Пауза: ${pair.afterLabel}`
+                    : `Слушать после: ${pair.afterLabel}`
+                }
                 onClick={() => {
                   if (afterOn) stop();
                   else void play(afterId, pair.afterSrc);
                 }}
               >
-                <span className={styles.icon} aria-hidden>
-                  {afterOn ? '❚❚' : '▶'}
+                <span className={styles.icon}>
+                  <PlayIcon playing={afterOn} />
                 </span>
                 <span className={styles.meta}>
                   <strong>{pair.afterLabel}</strong>
                   <small>После</small>
+                  {afterOn ? <span className={styles.stateLabel}>играет</span> : null}
                 </span>
                 {afterOn ? (
                   <span className={styles.bar} aria-hidden>

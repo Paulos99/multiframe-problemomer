@@ -32,11 +32,12 @@
 }
 
 .play {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 12px;
   min-height: 88px;
-  padding: 14px 16px;
+  padding: 14px 16px 18px;
   border-radius: var(--radius-md);
   border: 1.5px solid var(--border-color);
   background: var(--bg-subtle);
@@ -45,7 +46,8 @@
   transition:
     border-color var(--duration-fast),
     box-shadow var(--duration-normal),
-    transform var(--duration-fast);
+    transform var(--duration-fast),
+    background var(--duration-fast);
 }
 
 .play:hover {
@@ -60,6 +62,7 @@
 .active {
   border-color: var(--accent-color);
   box-shadow: var(--shadow-accent);
+  background: rgba(1, 100, 79, 0.08);
   animation: pulseRing 1.4s ease-out infinite;
 }
 
@@ -81,6 +84,27 @@
   color: #fff;
 }
 
+.active .icon {
+  animation: pulseSoft 1.2s ease-in-out infinite;
+}
+
+.pauseGlyph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 14px;
+  height: 16px;
+}
+
+.pauseGlyph i {
+  display: block;
+  width: 4px;
+  height: 100%;
+  border-radius: 1px;
+  background: currentColor;
+}
+
 .meta {
   display: flex;
   flex-direction: column;
@@ -95,6 +119,14 @@
 .meta small {
   color: var(--text-secondary);
   font-size: 12px;
+}
+
+.stateLabel {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--accent-color);
 }
 
 .demoSet {
@@ -123,16 +155,43 @@
   background: var(--accent-color, #01644f);
 }
 
-.play {
-  position: relative;
-  padding-bottom: 18px;
-}
-
-.active .icon {
-  animation: pulseSoft 1.2s ease-in-out infinite;
+/* Local keyframes — CSS Modules hashes names; global pulseRing would not match. */
+@keyframes pulseRing {
+  0% {
+    box-shadow: 0 0 0 0 rgba(1, 100, 79, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgba(1, 100, 79, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(1, 100, 79, 0);
+  }
 }
 
 @keyframes pulseSoft {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.06); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play:hover {
+    transform: none;
+  }
+
+  .active {
+    animation: none;
+  }
+
+  .active .icon {
+    animation: none;
+  }
+
+  .bar > span {
+    transition: none;
+  }
 }

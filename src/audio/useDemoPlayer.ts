@@ -3,6 +3,13 @@ import { parseStubSrc, type StubKind, type StubScene } from './demoAudio';
 
 let sharedCtx: AudioContext | null = null;
 
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+}
+
 function getCtx(): AudioContext {
   if (!sharedCtx) sharedCtx = new AudioContext();
   return sharedCtx;
@@ -106,16 +113,19 @@ export function useDemoPlayer() {
       durationMs.current = stub?.scene === 'talk' ? 2800 : 2400;
       startedAt.current = performance.now();
       setActiveId(id);
-      setProgress(0);
+      // Reduced motion: static mid progress — play-state stays clear without bar animation.
+      setProgress(prefersReducedMotion() ? 0.5 : 0);
 
-      const tick = () => {
-        const p = Math.min(1, (performance.now() - startedAt.current) / durationMs.current);
-        setProgress(p);
-        if (p < 1 && stopRef.current) {
-          rafRef.current = requestAnimationFrame(tick);
-        }
-      };
-      rafRef.current = requestAnimationFrame(tick);
+      if (!prefersReducedMotion()) {
+        const tick = () => {
+          const p = Math.min(1, (performance.now() - startedAt.current) / durationMs.current);
+          setProgress(p);
+          if (p < 1 && stopRef.current) {
+            rafRef.current = requestAnimationFrame(tick);
+          }
+        };
+        rafRef.current = requestAnimationFrame(tick);
+      }
 
       if (stub) {
         stopRef.current = playStub(ctx, stub.kind, stub.scene, () => {
