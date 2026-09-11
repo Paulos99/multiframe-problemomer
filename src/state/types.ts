@@ -54,6 +54,8 @@ export interface RoomAnswers {
   floorSlab?: FloorSlab;
 }
 
+export type SimulationStatus = 'full' | 'partial' | 'below';
+
 export interface SimulationSide {
   Rw: number;
   Lnw: number;
@@ -63,6 +65,14 @@ export interface SimulationSide {
   impactClass: HousingClass | 'below';
   /** Design: true when Lnw > 60 */
   impactOutOfNorm: boolean;
+  /**
+   * full = both indices meet a class;
+   * partial = Rw meets but Lnw fails / ceiling-only cannot claim Lnw;
+   * below = Rw also below class V.
+   */
+  status: SimulationStatus;
+  /** Ceiling-only path never claims Lnw SP compliance */
+  ceilingOnly: boolean;
 }
 
 /**
@@ -235,5 +245,5 @@ export const SIMULATION_BADGE = 'Оценка до лабораторных да
 export const SIMULATION_UI_LABEL = SIMULATION_BADGE;
 
 export const DISCLAIMER_SIMULATION =
-  'Не замер и не гарантия Δ. A/B/V — ориентир комфорта, не расчёт по СП. Потолком нельзя заявлять норму Lnw по перекрытию.';
+  'Не замер и не гарантия Δ (source: marketing_placeholder, disclaimer: pre_lab). A/B/V — ориентир комфорта, не расчёт по СП. Потолком нельзя заявлять полную норму Lnw: часто нужен пол у соседа сверху.';
 

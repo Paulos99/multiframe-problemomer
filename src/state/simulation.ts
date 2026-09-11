@@ -5,6 +5,7 @@ import type {
   SessionAnswers,
   SimulationEstimate,
   SimulationSide,
+  SimulationStatus,
   SlabPreset,
 } from './types';
 import { SIMULATION_BADGE } from './types';
@@ -22,21 +23,31 @@ export const SP_FLOOR_NORMS: Record<
   V: { rwMin: 50, lnwMax: 60 },
 };
 
-/** slabs_bare — no floating floor. solid180 = DEFAULT. */
-export const SLABS_BARE: Record<SlabPreset, { Rw: number; Lnw: number }> = {
+/**
+ * slabs_bare — no floating floor. solid180 = DEFAULT.
+ *
+ * Acoustics validation notes:
+ * - mono250 before Rw ≈ 56 (accepted range 55–57 in data/comments).
+ */
+export const SLABS_BARE: Record<
+  SlabPreset,
+  { Rw: number; Lnw: number; note?: string }
+> = {
   solid140: { Rw: 50, Lnw: 80 },
   solid160: { Rw: 52, Lnw: 78 },
   solid180: { Rw: 54, Lnw: 76 },
   solid200: { Rw: 55, Lnw: 74 },
   pk220: { Rw: 52, Lnw: 74 },
-  mono250: { Rw: 56, Lnw: 74 },
+  /** Monolith 250 mm: Rw center 56 (range 55–57 ok) */
+  mono250: { Rw: 56, Lnw: 74, note: 'mono250 Rw≈56 (55–57)' },
 };
 
 /**
- * multiframe_placeholder:
- * dRw center 10 (8..12); dLnw center 8 → Lnw decreases by 8 (6..10)
- * after.Rw = base.Rw + 10; after.Lnw = base.Lnw - 8
- * NEVER claim Lnw SP norm met by ceiling-only on bare slab (honest copy).
+ * MultiFrame deltas — ONLY with source marketing_placeholder + disclaimer pre_lab.
+ * dRw center 10 (8..12); dLnw center 8 → Lnw decreases by 8 (6..10).
+ * after.Rw = base.Rw + 10; after.Lnw = base.Lnw - 8.
+ *
+ * NEVER promise full Lnw norm from ceiling treatment alone.
  */
 export const MULTIFRAME_PLACEHOLDER = {
   dRw: 10,
@@ -76,19 +87,58 @@ export function gradeLnw(lnw: number): HousingClass | 'below' {
   return 'below';
 }
 
-/** Design: «вне нормы» ONLY when Lnw > 60 */
-export function buildSide(Rw: number, Lnw: number): SimulationSide {
+/**
+ * Independent Rw / Lnw grades.
+ * ceilingOnly → never claim Lnw SP compliance.
+ * status partial when Rw meets but Lnw still fails / unclaimed.
+ */
+export function buildSide(
+  Rw: number,
+  Lnw: number,
+  opts: { ceilingOnly: boolean },
+): SimulationSide {
+  const airClass = gradeRw(Rw);
+  const measuredImpact = gradeLnw(Lnw);
+  const lnwAbove60 = Lnw > 60;
+
+  // Bare slab: Design chip «вне нормы» only when Lnw > 60; class otherwise.
+  // Ceiling-only: never claim Lnw norm (impactClass stays below / unclaimed).
+  const impactClaimed =
+    !opts.ceilingOnly && measuredImpact !== 'below' && !lnwAbove60;
+  const impactClass: HousingClass | 'below' = impactClaimed
+    ? measuredImpact
+    : 'below';
+  let status: SimulationStatus;
+  if (airClass !== 'below' && impactClaimed) {
+    status = 'full';
+  } else if (airClass !== 'below') {
+    status = 'partial'; // Rw ok, Lnw fails or ceiling-only unclaimed
+  } else {
+    status = 'below';
+  }
+
   return {
     Rw,
     Lnw,
-    airClass: gradeRw(Rw),
-    impactClass: gradeLnw(Lnw),
-    impactOutOfNorm: Lnw > 60,
+    airClass,
+    impactClass,
+    impactOutOfNorm: lnwAbove60, // Design rule for chip «вне нормы»
+    status,
+    ceilingOnly: opts.ceilingOnly,
   };
 }
 
+export function impactChipLabel(side: SimulationSide): string {
+  if (side.ceilingOnly) {
+    // Never promise full Lnw norm from ceiling alone
+    return side.impactOutOfNorm ? 'вне нормы' : 'не нормируется потолком';
+  }
+  if (side.impactOutOfNorm) return 'вне нормы';
+  return side.impactClass === 'below' ? 'вне нормы' : side.impactClass;
+}
+
 function feelingFromSide(side: SimulationSide, user?: ComfortLevel): ComfortLevel {
-  if (side.airClass === 'A' && !side.impactOutOfNorm) return 'quiet';
+  if (side.status === 'full' && side.airClass === 'A') return 'quiet';
   if (side.airClass === 'A' || side.airClass === 'B') return 'ok';
   if (side.Lnw >= 74 || side.Rw < 52) return user === 'quiet' ? 'ok' : 'bothers';
   return user ?? 'ok';
@@ -98,10 +148,11 @@ export function buildSimulation(answers: SessionAnswers): SimulationEstimate {
   const preset = resolveSlabPreset(answers.room.floorSlab);
   const base = SLABS_BARE[preset];
 
-  const before = buildSide(base.Rw, base.Lnw);
+  const before = buildSide(base.Rw, base.Lnw, { ceilingOnly: false });
   const after = buildSide(
     base.Rw + MULTIFRAME_PLACEHOLDER.dRw,
     base.Lnw - MULTIFRAME_PLACEHOLDER.dLnw,
+    { ceilingOnly: true },
   );
 
   return {
@@ -123,11 +174,9 @@ export function buildSimulation(answers: SessionAnswers): SimulationEstimate {
     feelingAfter: feelingFromSide(after, answers.current?.comfortLevel),
     honestLines: [
       'Воздух после MultiFrame ближе к комфорту — потолок помогает.',
-      'Удар смягчается, но пол у соседа сверху часто всё ещё нужен.',
+      'Удар смягчается, но полной нормы Lnw потолком нет: пол у соседа сверху часто всё ещё нужен.',
     ],
   };
 }
 
-/** Alias expected by Design lock wording */
 export const deriveSimulation = buildSimulation;
-

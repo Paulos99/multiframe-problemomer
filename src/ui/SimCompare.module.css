@@ -209,3 +209,42 @@
   line-height: 1.45;
   color: var(--text-secondary, #5f6b73);
 }
+
+.headMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.statusPartial,
+.statusBelow {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill, 999px);
+}
+
+.statusPartial {
+  color: #9a6700;
+  background: #fff7ed;
+}
+
+.statusBelow {
+  color: #5f6b73;
+  background: #f3f4f6;
+}
+
+.partialNote {
+  margin: 8px 0 0;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--text-secondary, #5f6b73);
+}
+
+.rangeMeta {
+  font-weight: 500;
+  opacity: 0.75;
+  font-size: 11px;
+}
