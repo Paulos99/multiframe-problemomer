@@ -52,8 +52,8 @@ export function RoomScreen() {
 
       <div className={styles.optional}>
         <h2>Перекрытие сверху (по желанию)</h2>
-        <p>Для оценочной симуляции Rw / Lnw. Если не указать — берём сплошную 180 мм.</p>
-        <Field label="Тип / толщина плиты (SlabKey)">
+        <p>Для оценочной симуляции. Если не указать — берём сплошную 180 мм.</p>
+        <Field label="Тип / толщина плиты">
           <Select
             value={room.floorSlab?.key ?? room.floorSlab?.preset ?? ''}
             onChange={(e) => {

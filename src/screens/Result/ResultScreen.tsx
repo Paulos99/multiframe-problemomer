@@ -20,6 +20,8 @@ export function ResultScreen() {
   const derived = session.derived;
   const room = session.answers.room;
   const sim = derived?.simulation ?? deriveSimulation(session.answers);
+  const comfort =
+    derived?.comfortLevel ?? session.answers.current?.comfortLevel ?? 'ok';
   const [showLead, setShowLead] = useState(false);
   const [sent, setSent] = useState(false);
   const [name, setName] = useState('');
@@ -42,17 +44,33 @@ export function ResultScreen() {
   return (
     <Screen
       title="Акустический профиль"
-      subtitle="Экспертная картина и оценочная симуляция — основа для расчёта MultiFRAME."
+      subtitle="Сначала ощущение эффекта — цифры вторичны. Затем расчёт MultiFRAME."
     >
+      <div className={styles.dual}>
+        <article className={`${styles.emotionCard} ${styles.before}`}>
+          <span className={styles.tag}>Сейчас</span>
+          <h2>Без MultiFrame</h2>
+          <p className={styles.emotion}>Шум сверху остаётся «рядом»</p>
+          <ul>
+            <li>
+              Ощущение: {derived ? COMFORT_LABELS[derived.comfortLevel] : COMFORT_LABELS[comfort]}
+            </li>
+            <li>Тип: {derived ? NOISE_TYPE_LABELS[derived.noiseType] : '—'}</li>
+          </ul>
+        </article>
+
+        <article className={`${styles.emotionCard} ${styles.after}`}>
+          <span className={styles.tag}>С MultiFrame</span>
+          <h2>Эффект в ощущении</h2>
+          <p className={styles.emotion}>Тише. Спокойнее. Свой потолок.</p>
+          <ul>
+            <li>Воздух: примерно вдвое спокойнее — шум как будто дальше</li>
+            <li>Удар: тише; норму часто закрывает пол у соседа</li>
+          </ul>
+        </article>
+      </div>
+
       <div className={styles.profile}>
-        <div className={styles.row}>
-          <span>Ощущение</span>
-          <strong>{derived ? COMFORT_LABELS[derived.comfortLevel] : '—'}</strong>
-        </div>
-        <div className={styles.row}>
-          <span>Тип шума</span>
-          <strong>{derived ? NOISE_TYPE_LABELS[derived.noiseType] : '—'}</strong>
-        </div>
         <div className={styles.row}>
           <span>Комната</span>
           <strong>
@@ -67,7 +85,10 @@ export function ResultScreen() {
         </div>
       </div>
 
-      <SimCompare sim={sim} />
+      <div className={styles.simSecondary}>
+        <p className={styles.simLead}>Ориентиры в цифрах — вторичны к ощущению</p>
+        <SimCompare sim={sim} tone="secondary" />
+      </div>
 
       {derived?.whyMultiFrame?.length ? (
         <div className={styles.why}>
