@@ -12,12 +12,13 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 
 - Feeling + comfort-class story first on early screens; **no numbers on Start**.
 - On Before/After + Profile: show the **full evidence pack** — personal room story, classes А/Б/В, numbers, charts, and plain-language explanations of each (owner 2026-09-12: «показать всё, аргументированно, понятно, персонально»).
+- **Evidence layout (Q4, owner 2026-09-12):** everything on one scroll — **conclusion / verdict on top**, detailed data below. Not progressive disclosure; not role-trimmed packs. Manager and homeowner skim what they need. Same stack for both roles (role may still change copy/CTA emphasis).
 - Effect source: `marketing_placeholder`; disclaimer: `pre_lab` / expert qualitative — never lab guarantees. Charts/numbers are **oriented arguments**, not certificates.
 - ΔRw center **+10** (show range **+8…+12**); ΔLnw center **−8** (show range **−6…−10** as absolute 6…10 in UI copy).
 - Classes **A/B/V** (UI: **А/Б/В**), Trofimov-style comfort grading — “пониженный → выше классом” is a required narrative beat.
 - «примерно вдвое спокойнее» **only for air (воздух)**; impact (удар) = quieter + floor often needed — never claim Lnw norm from ceiling alone.
 - Audio must sell the difference; demo stubs allowed with clear «демо» labeling.
-- Mobile: denser inputs + sticky question/CTA; evidence pack must remain scannable (see open question on progressive disclosure). No raw tech dumps without explanation.
+- Mobile: denser inputs + sticky question/CTA; pack stays one scroll with sticky verdict readable above the fold when possible. No raw tech dumps without explanation.
 - Out of scope: walls, partitions, floors systems, Polyblock, framed systems, fake lab guarantees, floor-level question.
 
 ### Workshop log (durable)
@@ -27,6 +28,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-12 | Value ≈ «плёнка без акустики / шум останется» + class uplift + feel quieter + justify ~500k + non-acoustic benefits + sales tool |
 | 2026-09-12 | Audiences **C**: both equal; Start role switcher; shared answer flow |
 | 2026-09-12 | Result depth: **full pack** — personal + classes + numbers + charts + explanations (not A/B-only; not “feeling only”) |
+| 2026-09-12 | Evidence presentation **Q4**: all-at-once scroll; **вывод сверху, данные ниже**; user/manager self-select depth (not progressive disclosure; not role-dependent density) |
 
 ---
 
@@ -271,11 +273,13 @@ None beyond disabled Далее until current answers exist.
 
 ### Goal
 
-Emotional contrast: ordinary stretch ceiling vs MultiFrame. Feeling primary; SimCompare secondary tone.
+Emotional contrast: ordinary stretch ceiling vs MultiFrame. Feeling primary; SimCompare secondary tone. Full pack on one scroll: **verdict strip on top**, numbers/charts/explanations below (owner Q4).
 
 ### Visible elements
 
-- Title, subtitle, Before card, After card, secondary SimCompare, honesty note, sticky CTA with next label override.
+- **Top:** short conclusion (class change / quieter story) before deep dive.
+- Title, subtitle, Before card, After card, secondary SimCompare, numbers + chart block, honesty note, sticky CTA with next label override.
+- **Below fold OK:** detailed oriented numbers/charts — user scrolls as needed.
 
 ### Exact primary copy (RU)
 
@@ -368,11 +372,13 @@ Claims of laboratory measurement; downloadable “certified” WAV as real lab p
 
 ### Goal
 
-Summarize acoustic profile (feeling first), restates why MultiFrame fits, then CTA to MultiFRAME calculator and demo lead.
+Summarize acoustic profile with **verdict first**, then the full evidence stack on one page (owner Q4: вывод сверху, данные ниже). Restate why MultiFrame fits; CTA to MultiFRAME calculator and demo lead.
 
 ### Visible elements
 
-- Title, subtitle, Before/After summary cards, room/scenario profile, secondary SimCompare, «Почему MultiFrame уместен», expert Disclaimer, calculator CTA, demo consultation (disabled), demo lead form, restart.
+- **Top verdict:** personal one-liner + class before→after (А/Б/В) + what ~MultiFrame changes in plain language.
+- Title, subtitle, Before/After summary cards, room/scenario profile, secondary SimCompare, numbers + charts + explanations, «Почему MultiFrame уместен», expert Disclaimer, calculator CTA, demo consultation (disabled), demo lead form, restart.
+- Do **not** hide detail behind tabs/accordions as the primary pattern; scroll is the disclosure.
 
 ### Exact primary copy (RU)
 
