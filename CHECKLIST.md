@@ -1,0 +1,203 @@
+# Install Checklist
+
+This file is the intake record for **MultiFrame Проблемомер**. The agent fills it in during product-discipline setup and keeps it current afterwards.
+
+**For the agent:** treat this file as the source of truth for what the product needs. Do not start feature work until everything through _First-version capabilities_ (and every conditional section activated by those answers) is completed. Never ask the product owner anything under _Decided by the agent_ — make those calls yourself and explain them in product terms. Prefer evidence from `README.md`, `PRODUCT_SPEC.md`, and the live SPA; label gaps as **ASSUMPTION**.
+
+**For the product owner:** this is the record of what was decided. If something here is wrong, say so.
+
+Answer cells hold `_unanswered_` until asked, and `n/a` when the question cannot apply. Answers may be in Russian; section headings and capability-ledger state words stay in English: `included` | `available` | `absent` | `removed`. Keep every section heading, even when its rows are all `n/a`.
+
+**Install status:** `completed 2026-09-12`
+<!-- Set to: not started | in progress | completed YYYY-MM-DD -->
+
+---
+
+## 1. Project identity
+
+| Question                                                        | Answer |
+| --------------------------------------------------------------- | ------ |
+| New project from this template, or work on the template itself? | Existing product repo (not a vibe-template install). Product-discipline docs inspired by [di-sukharev/vibe](https://github.com/di-sukharev/vibe) CHECKLIST process. |
+| Project name / slug                                             | MultiFrame Проблемомер (`multiframe-problemomer`) |
+| Your own GitHub repository URL, if you have one                 | https://github.com/Paulos99/multiframe-problemomer |
+
+Live context (do not redesign from this URL alone): https://paulos99.github.io/multiframe-problemomer/
+
+## 2. Product
+
+| Question                                                  | Answer |
+| --------------------------------------------------------- | ------ |
+| What product do you want to build first?                  | **MultiFrame Проблемомер** — веб-инструмент спроса на **акустический комфорт** при выборе натяжного потолка с бескаркасной системой **StP MultiFrame**. Это **не** калькулятор материалов и **не** инженерный расчёт звукоизоляции. MVP: только потолок; шум сверху через перекрытие; только frameless MultiFrame. Аудитории: домовладелец и менеджер шоурума / монтажник — **один общий поток**. |
+| What is the first user journey that must work end to end? | Comfort check → комната → сценарии шума → текущее состояние → до/после → аудио-контраст → профиль + CTA в калькулятор MultiFRAME / демо-заявка. Числа не на старте; герой — ощущение; дБ — третичны. Аудио продаёт разницу (демо-stubs с явной меткой «демо»). |
+
+## 3. Active surfaces
+
+Mark what is active now. Everything unmarked is deferred and must be left alone: no features, no setup, no test flows for deferred surfaces.
+
+- [ ] `backend` - API, database, auth
+- [x] `webapp` - browser SPA (no SEO requirement for this MVP)
+- [ ] `website` - public marketing pages that must rank in search or preview when shared
+- [ ] `mobile` - native / Expo app
+
+| Question                                                                                                             | Answer |
+| -------------------------------------------------------------------------------------------------------------------- | ------ |
+| Why the unmarked surfaces are deferred, if it needs explaining                                                       | MVP — один статический SPA на GitHub Pages. Нет серверного API, аккаунтов, SEO-лендинга и нативного приложения. Отдельный «website» не нужен: продукт сам является публичным webapp. Backend / mobile — только если позже появятся CRM-лиды, auth или магазинный оффлайн-режим. |
+| If `mobile` is active: are Expo/EAS builds, Expo Push, and Maestro E2E needed now, or left unconfigured until later? | n/a (`mobile` deferred) |
+
+**ASSUMPTION:** vibe’s `webapp` usually means “behind sign-in”; here the SPA is public and unauthenticated. We still mark only `webapp` as active because it is the interactive product surface (not a content/SEO site).
+
+## 4. First-version capabilities
+
+Ask about product needs, not implementations. Mark what the first version actually needs.
+
+- [ ] Accounts / sign-in
+- [ ] Saved data that survives a restart
+- [ ] File, image, or media uploads → also answer _Files, images, and media_
+- [ ] Paid subscriptions or one-off payments → also answer _Payments_
+- [ ] Admin tools or roles
+- [x] External integrations (which: outbound handoff to MultiFRAME calculator URL; demo lead stub to console only — no real CRM)
+- [ ] Real-time chat, presence, collaboration, or live updates
+
+Product capabilities that **are** in the first version (not listed as vibe template toggles above — see ledger):
+
+- 7-screen comfort wizard (ceiling / upstairs noise only)
+- Expert qualitative effect model with `marketing_placeholder` ΔRw / ΔLnw and pre_lab disclaimer
+- Before/after emotional contrast + SimCompare (feeling primary, dB tertiary)
+- Demo audio stubs that sell the difference
+- CTA: calculator deep-link + demo lead form
+- Mobile-dense layout + sticky question/CTA chrome
+
+| Question                                                                                          | Answer |
+| ------------------------------------------------------------------------------------------------- | ------ |
+| What the first version explicitly should NOT do (write "nothing ruled out" if that is the answer) | Стены, перегородки, системы пола, Polyblock, каркасные системы; вопрос про этаж; обещание полной нормы Lnw только потолком; фейковые «лабораторные гарантии»; tech dumps в UI; «вдвое спокойнее» для ударного канала; реальные платежи / auth / CRM. Не расширять скоуп в walls/Polyblock. |
+
+## 5. Files, images, and media
+
+No user uploads in MVP. Audio is generated in-browser (Web Audio demo stubs), not uploaded.
+
+| Question                                                                                      | Answer |
+| --------------------------------------------------------------------------------------------- | ------ |
+| What do users upload?                                                                         | n/a — uploads absent |
+| Public, private, shared with selected people, or mixed?                                       | n/a |
+| Who can upload, view, replace, and delete?                                                    | n/a |
+| Maximum file size and allowed file types                                                      | n/a |
+| Do images need thumbnails, resizing, format conversion, compression, cropping, or moderation? | n/a |
+| How long do files live after the owning record is deleted?                                    | n/a |
+| Should filenames be visible to users, or opaque?                                              | n/a |
+
+## 6. Website data and freshness
+
+`website` surface is deferred. Public SPA is built from the repo and published as static assets.
+
+| Question                                                                                    | Answer |
+| ------------------------------------------------------------------------------------------- | ------ |
+| Which public product or content data comes from the backend/database at website build time? | n/a |
+| How soon after that data changes must the public website show the change?                   | n/a |
+| Which changes require an automatic rebuild/redeploy rather than a manual release?           | n/a — GitHub Actions rebuilds the SPA on push to `main` (existing Pages workflow) |
+
+## 7. Payments
+
+Payments are not part of this product.
+
+| Question                                                                                                                    | Answer |
+| --------------------------------------------------------------------------------------------------------------------------- | ------ |
+| What exactly do users pay for?                                                                                              | n/a |
+| Recurring subscription, one-off purchase, or both?                                                                          | n/a |
+| Does the public website need a local cart or offer selection before registration/sign-in?                                   | n/a |
+| Which active surfaces need payment: browser checkout, App Store / Google Play, native card entry, Apple Pay, or Google Pay? | n/a |
+| What stops working when someone does not pay?                                                                               | n/a |
+
+## 8. Deployment
+
+| Question                                                                                     | Answer |
+| -------------------------------------------------------------------------------------------- | ------ |
+| Is deployment needed now, or local-only for the moment?                                      | Already deployed: static SPA via GitHub Pages. Further commercial hosting unanswered / deferred. |
+| Where are your users, and must the data stay in Russia?                                      | **ASSUMPTION:** primary audience is Russia / CIS (StP MultiFrame, Russian UI). No personal data is persisted server-side in MVP (lead is console stub), so residency is not yet a hosting constraint. |
+| Hosting, picked by the agent from the answer above: DigitalOcean / Yandex Cloud / own server | Deferred. Current production = **GitHub Pages** (static). Do not migrate hosting until product owner asks. |
+| Production domains / URLs for API, webapp, and website; is Yandex CDN needed now?            | Webapp: `https://paulos99.github.io/multiframe-problemomer/` (base path `/multiframe-problemomer/`). API / website / Yandex CDN: n/a for now. Calculator handoff: `https://paulos99.github.io/MF_StP/`. |
+| Which surfaces are released first                                                            | `webapp` only |
+
+**Ask the audience question, not the provider question.** Hosting beyond GitHub Pages stays `_unanswered_` / deferred until a real backend or CRM appears.
+
+## 9. Decided by the agent - do not ask the user
+
+Engineering decisions already made / owned by the agent (product terms):
+
+- **Surface:** one public Vite + React + TypeScript SPA (`webapp`). No separate SEO `website`, no backend microservices.
+- **Stack (recorded, do not reopen):** Vite + React SPA, client session state, GitHub Actions → GitHub Pages. No microservices.
+- **Effect model:** `source: marketing_placeholder`, center ΔRw **+10** (UI range 8–12), ΔLnw **−8** (UI range 6–10), classes **A/B/V** (UI Cyrillic А/Б/В) from Trofimov-style comfort grading; always `pre_lab` / expert disclaimers.
+- **Audio:** procedural Web Audio demo stubs; always labeled «демо»; may exaggerate contrast for showroom.
+- **CTA:** deep-link to MultiFRAME calculator with query payload; lead form is demo-only (`console` stub), never invent a corporate CRM endpoint.
+- **Mobile:** denser inputs + sticky progress/CTA; touch targets ≥44px; no tech dumps.
+- **Out of scope code paths:** walls, partitions, floors systems, Polyblock, framed systems — do not add.
+- Libraries, file layout, naming, refactors, and validation scope for future feature work follow existing repo patterns; product screen contracts live in `PRODUCT_SPEC.md`.
+
+## 10. Capability ledger
+
+What this project actually contains. The agent updates it whenever a capability is added or removed. Every row carries exactly one state:
+
+- `included` - present and expected to work.
+- `available` - partly there but not usable yet; the note says exactly what is still missing.
+- `absent` - not part of this project. Build it only after the product owner asks.
+- `removed` - deliberately deleted. **Do not re-add it.**
+
+A capability with no row is `absent` by default. The State column always holds one of the four states above — never `_unanswered_` or `n/a`.
+
+| Capability | State | Note |
+| ---------- | ----- | ---- |
+| Comfort wizard (7 screens) | included | Start → Room → Scenarios → Current → Before/After → Audio → Result. One flow for homeowner + showroom. |
+| Ceiling-only / upstairs noise scope | included | `answers.scope: 'ceiling'`. No floor question. |
+| Frameless MultiFrame positioning | included | Only бескаркасная StP MultiFrame; framed systems out of scope. |
+| Room + optional slab input | included | Room type, area m², optional slab key (default solid 180 mm). |
+| Noise scenario multi-select | included | steps, drop, furniture, talk, tv, music, repair. |
+| Current comfort + noise type | included | quiet/ok/bothers + impact/airborne/mixed; plain-language “why”. |
+| Emotional before/after contrast | included | Feeling-first copy; numbers secondary. |
+| SimCompare effect UI | included | Feeling primary; Rw/Lnw tertiary; А/Б/В chips; honestLines; pre_lab badge. |
+| marketing_placeholder Δ model | included | ΔRw +10 (range 8–12), ΔLnw −8 (range 6–10); `source: marketing_placeholder`; `disclaimer: pre_lab`. Never claim lab guarantees. |
+| Trofimov-style comfort classes A/B/V | included | Canon A\|B\|V; UI Cyrillic А\|Б\|В; partial/below statuses. Never promise full Lnw norm from ceiling alone. |
+| Demo audio difference | included | Web Audio stubs; badges «демо» / «демо-набор»; «вдвое спокойнее» only for air channel. |
+| Calculator CTA handoff | included | Opens `MF_StP` with `area`, `roomType`, `scenarios` query params. |
+| Demo lead form | available | UI + `console` stub + JSON payload (`schemaVersion: 1`). No real StP CRM / email endpoint. |
+| Sticky mobile chrome | included | Header + progress + sticky Далее/CTA; denser cards on narrow viewports. |
+| Theme toggle (light/dark) | included | Client-only preference. |
+| Auth (email + password) | absent | No accounts. |
+| Admin roles | absent | — |
+| Password reset / email delivery | absent | — |
+| Saved sessions / cloud sync | absent | Session lives in memory for the visit. |
+| File/media uploads | absent | — |
+| Payments / checkout | absent | — |
+| Backend API / database | absent | Static SPA only. |
+| Real CRM / lead delivery | absent | Demo stub only; do not invent endpoints. |
+| Walls / partitions / floor systems | absent | Explicitly out of MVP scope. |
+| Polyblock product path | absent | Explicitly out of scope. |
+| Framed acoustic systems | absent | Explicitly out of scope. |
+| Lab-certified ΔRw/ΔLnw guarantees | absent | Placeholders only; always pre_lab. |
+| Native mobile app | absent | Deferred. |
+| SEO marketing website | absent | Deferred; SPA is the product. |
+| Real-time / WebSockets | absent | — |
+| Push notifications | absent | — |
+| Social sign-in | absent | — |
+| Infrastructure as code (DO/Yandex) | absent | GitHub Pages is enough for static MVP. |
+
+## 11. Environment checks
+
+Verified by the agent during setup, not asked.
+
+- [x] Repository inspected (`README.md`, `src/`, GitHub Pages workflow present)
+- [x] Live SPA URL recorded for context only (no redesign-by-coding)
+- [x] Product screen contracts captured in `PRODUCT_SPEC.md`
+- [ ] `docker compose` — n/a (no backend)
+- [x] `git remote` points at `Paulos99/multiframe-problemomer`
+- [ ] App-local `.env` — n/a for static MVP (no secrets required to run)
+- [ ] Automated validation suite — deferred; acceptance criteria live in `PRODUCT_SPEC.md` (A solo / B showroom ≤3 min)
+
+## 12. After setup
+
+- [x] Durable answers above filled in, install status set to `completed 2026-09-12`
+- [x] Validation scope recorded for this project: manual acceptance tests A/B in `PRODUCT_SPEC.md`; no mandatory CI product suite beyond existing Pages build until owner asks
+- [x] Product docs added: `CHECKLIST.md`, `PRODUCT_SPEC.md`; README pointer
+- [x] Deferred surfaces recorded (backend / website / mobile)
+- [ ] `AGENTS.md` Bootstrap block — n/a (this repo does not ship vibe’s AGENTS bootstrap; product rules live here + `PRODUCT_SPEC.md`)
+- [x] Local commands remain `npm install` / `npm run dev` / `npm run build` as in README
+
+`README.md` and future agent docs should cross-reference this file by **section name**, not by number.
