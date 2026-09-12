@@ -10,13 +10,14 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 
 **Global product rules**
 
-- Feeling + comfort-class story first; dB supporting; **no numbers on Start**.
-- Effect source: `marketing_placeholder`; disclaimer: `pre_lab` / expert qualitative — never lab guarantees.
+- Feeling + comfort-class story first on early screens; **no numbers on Start**.
+- On Before/After + Profile: show the **full evidence pack** — personal room story, classes А/Б/В, numbers, charts, and plain-language explanations of each (owner 2026-09-12: «показать всё, аргументированно, понятно, персонально»).
+- Effect source: `marketing_placeholder`; disclaimer: `pre_lab` / expert qualitative — never lab guarantees. Charts/numbers are **oriented arguments**, not certificates.
 - ΔRw center **+10** (show range **+8…+12**); ΔLnw center **−8** (show range **−6…−10** as absolute 6…10 in UI copy).
-- Classes **A/B/V** (UI: **А/Б/В**), Trofimov-style comfort grading — owner wants “пониженный → выше классом”; exact UI weight of charts vs classes still in workshop.
+- Classes **A/B/V** (UI: **А/Б/В**), Trofimov-style comfort grading — “пониженный → выше классом” is a required narrative beat.
 - «примерно вдвое спокойнее» **only for air (воздух)**; impact (удар) = quieter + floor often needed — never claim Lnw norm from ceiling alone.
 - Audio must sell the difference; demo stubs allowed with clear «демо» labeling.
-- Mobile: denser inputs + sticky question/CTA; no tech dumps in UI.
+- Mobile: denser inputs + sticky question/CTA; evidence pack must remain scannable (see open question on progressive disclosure). No raw tech dumps without explanation.
 - Out of scope: walls, partitions, floors systems, Polyblock, framed systems, fake lab guarantees, floor-level question.
 
 ### Workshop log (durable)
@@ -25,6 +26,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | ---- | -------- |
 | 2026-09-12 | Value ≈ «плёнка без акустики / шум останется» + class uplift + feel quieter + justify ~500k + non-acoustic benefits + sales tool |
 | 2026-09-12 | Audiences **C**: both equal; Start role switcher; shared answer flow |
+| 2026-09-12 | Result depth: **full pack** — personal + classes + numbers + charts + explanations (not A/B-only; not “feeling only”) |
 
 ---
 
