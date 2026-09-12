@@ -4,18 +4,27 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 
 **Related:** `CHECKLIST.md` (intake + ledger) · live context `https://paulos99.github.io/multiframe-problemomer/` (do not redesign from the live site alone).
 
-**Audiences:** homeowner + showroom manager/installer — **one flow**.
+**Audiences (confirmed 2026-09-12):** homeowner/customer **and** showroom manager are **equal**. One answer flow; **role switcher on Start** with two short hooks. Role changes framing/copy emphasis and CTA wording, not the 7-step data path.
+
+**Core value (owner-confirmed direction):** show that in *this* room comfort is lower than assumed; MultiFrame can raise comfort class (often by a step+); let user feel how much quieter; explain what ~500k pays for (quiet + frameless “beautiful and quiet ceiling”, not only ΔdB); give manager a fast sales argument. Still **not** a materials calculator and **not** a lab certificate.
 
 **Global product rules**
 
-- Feeling first; dB tertiary; **no numbers on Start**.
+- Feeling + comfort-class story first; dB supporting; **no numbers on Start**.
 - Effect source: `marketing_placeholder`; disclaimer: `pre_lab` / expert qualitative — never lab guarantees.
 - ΔRw center **+10** (show range **+8…+12**); ΔLnw center **−8** (show range **−6…−10** as absolute 6…10 in UI copy).
-- Classes **A/B/V** (UI: **А/Б/В**), Trofimov-style comfort grading.
+- Classes **A/B/V** (UI: **А/Б/В**), Trofimov-style comfort grading — owner wants “пониженный → выше классом”; exact UI weight of charts vs classes still in workshop.
 - «примерно вдвое спокойнее» **only for air (воздух)**; impact (удар) = quieter + floor often needed — never claim Lnw norm from ceiling alone.
 - Audio must sell the difference; demo stubs allowed with clear «демо» labeling.
 - Mobile: denser inputs + sticky question/CTA; no tech dumps in UI.
 - Out of scope: walls, partitions, floors systems, Polyblock, framed systems, fake lab guarantees, floor-level question.
+
+### Workshop log (durable)
+
+| Date | Decision |
+| ---- | -------- |
+| 2026-09-12 | Value ≈ «плёнка без акустики / шум останется» + class uplift + feel quieter + justify ~500k + non-acoustic benefits + sales tool |
+| 2026-09-12 | Audiences **C**: both equal; Start role switcher; shared answer flow |
 
 ---
 
@@ -75,11 +84,11 @@ Must **not** appear: calculator links, dB values, lead form, Polyblock, floor qu
 
 ### Goal
 
-Emotional hook: create demand for acoustic comfort before choosing a stretch ceiling. Push into the wizard. No numbers.
+Pick role (equal weight) + emotional hook: create demand for acoustic comfort before choosing a stretch ceiling. Push into the wizard. No numbers.
 
 ### Visible elements
 
-- Kicker, H1, lead paragraph, primary CTA `Начать`, three scope bullets.
+- Role switcher (two options), kicker, role-dependent H1/lead, primary CTA `Начать`, three scope bullets.
 - Header (no progress, no sticky CTA).
 
 ### Exact primary copy (RU)
@@ -87,8 +96,10 @@ Emotional hook: create demand for acoustic comfort before choosing a stretch cei
 | Role | Text |
 | ---- | ---- |
 | Kicker | `StP · MultiFRAME · потолок` |
-| H1 | `Проверьте уровень акустического комфорта перед выбором натяжного потолка` |
-| Lead | `Проблемомер помогает почувствовать разницу: обычный потолок и потолок с бескаркасной системой MultiFrame — без сложных терминов.` |
+| Role switcher | **DRAFT (owner-confirmed need, copy TBD):** `Я выбираю потолок` · `Я продаю в шоуруме` (or equivalent; exact labels open) |
+| H1 (homeowner — DRAFT) | Keep current baseline until copy pass: `Проверьте уровень акустического комфорта перед выбором натяжного потолка` — rewrite later toward «за что плачу / класс комфорта в моей комнате» |
+| H1 (showroom — DRAFT) | TBD — toward «быстрый аргумент: красивый и тихий потолок за 3 минуты» |
+| Lead | `Проблемомер помогает почувствовать разницу: обычный потолок и потолок с бескаркасной системой MultiFrame — без сложных терминов.` (may fork by role later) |
 | Bullet 1 | `Только потолок и шум сверху через перекрытие` |
 | Bullet 2 | `Экспертная оценка с понятными ориентирами` |
 | Bullet 3 | `Далее — расчёт материалов MultiFRAME` |
@@ -98,6 +109,7 @@ Emotional hook: create demand for acoustic comfort before choosing a stretch cei
 
 | Control | Action | Enabled |
 | ------- | ------ | ------- |
+| Role switcher | Sets `audienceRole: homeowner \| showroom` (shared data path) | Always; default **ASSUMPTION:** last used or homeowner |
 | `Начать` | Go to Room | Always |
 
 ### Validation messages
