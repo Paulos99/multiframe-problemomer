@@ -18,7 +18,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 - **Numbers policy (owner 2026-09-13):** show a **full working MultiFrame effect model** with complete numbers now — currently **unconfirmed** (`marketing_placeholder` / `pre_lab`). After Trofimov (or lab) confirmation, **replace** values with correct ones; do not redesign the UX around hiding numbers. Never present placeholders as lab guarantees or certificates.
 - Effect source: `marketing_placeholder`; disclaimer: `pre_lab` / expert qualitative — never lab guarantees. Charts/numbers are **oriented arguments**, not certificates.
 - ΔRw center **+10** (show range **+8…+12**); ΔLnw center **−8** (show range **−6…−10** as absolute 6…10 in UI copy). **ASSUMPTION** until technical confirmation.
-- Classes **A/B/V** (UI: **А/Б/В**), Trofimov-style comfort grading — “пониженный → выше классом” is a required narrative beat.
+- Classes **А/Б/В** (Trofimov / SP-style): **А** = высокая комфортность, **Б** = комфортная, **В** = предельно допустимая. UI = **hybrid plain label + letter** (e.g. `Комфорт (Б)`, `Высокий комфорт (А)`, `Базовый / допустимый (В)`) with a soft «по ориентиру нормативного документа / СП…» note — not a legal certificate. “пониженный → выше классом” remains required. **ASSUMPTION on everyday synonyms:** prefer Trofimov plain words; avoid mapping «эконом» to **А** (А is the top, not economy).
 - «примерно вдвое спокойнее» **only for air (воздух)**; impact (удар) = quieter + floor often needed — never claim Lnw norm from ceiling alone.
 - Audio must sell the difference; demo stubs allowed with clear «демо» labeling.
 - Mobile: denser inputs + sticky question/CTA; pack stays one scroll with sticky verdict readable above the fold when possible. No raw tech dumps without explanation.
@@ -40,6 +40,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | MultiFrame features on Result: **понятно + аргументированно** (plain language + why it matters; not bare bullet dump, not tech dump) |
 | 2026-09-13 | Feature copy pattern confirmed: **claim + 1 short why/how** (e.g. drum-effect → MultiFrame dissipates); clear and argued |
 | 2026-09-13 | Result feature order: **1 class of comfort/housing → 2 effectiveness → 3 drum-effect → 4 safety → 5 rest**. Install only as **fast / no long construction** — not tech details about mounting/comms unless needed |
+| 2026-09-13 | Class labels: **hybrid** — plain name + letter (А/Б/В), soft link to normative doc (Trofimov/SP). Official: А высокая комфортность, Б комфортная, В предельно допустимая. Do not invert letters. |
 
 ---
 
@@ -77,6 +78,20 @@ Owner listed ads / search / MultiFrame site / partner site / sales manager / ins
 
 May lightly change pronoun/CTA tone («вам» / «клиенту»). **Must not** trim evidence. **No Q2 role drill-down on Start.**
 
+
+### Comfort class labels (hybrid — confirmed direction 2026-09-13)
+
+| Letter (official, Trofimov/SP) | Meaning (official) | UI plain label (DRAFT) |
+| ------------------------------ | ------------------ | ---------------------- |
+| **А** | высокая комфортность | `Высокий комфорт (А)` |
+| **Б** | комфортная | `Комфорт (Б)` |
+| **В** | предельно допустимая | `Базовый (В)` or `Допустимый (В)` |
+
+- Show **plain name + letter** together.
+- Soft footnote/link: e.g. `Ориентир по шкале комфортности (нормативные документы / материалы StP)` — not “мы сертифицировали вашу квартиру”.
+- Owner intent: mix official scale with everyday words. **Do not** call **А** «эконом» — that would invert the official ladder (А is best).
+- Chart still uses А→Б→В movement with these hybrid captions.
+
 ### MultiFrame features for Result (from owner presentation + stp-multiframe.ru)
 
 **Tone:** present facts so the user concludes value themselves. **Forbidden in UI:** «за что платим», blunt price/cost framing, «средний чек».
@@ -85,7 +100,7 @@ May lightly change pronoun/CTA tone («вам» / «клиенту»). **Must no
 
 **Result feature order (confirmed 2026-09-13)** — each item = тезис + 1 фраза why/how; no price talk:
 
-1. **Класс жилья / комфорта** — куда сдвигается класс (А/Б/В) после MultiFrame; персональный вывод «выше классом».
+1. **Класс комфорта жилья** — hybrid label + letter (напр. `Комфорт (Б)` → `Высокий комфорт (А)`); soft norm-doc hint; personal «выше классом».
 2. **Эффективность** — ориентир эффекта (числа/диапазоны, `pre_lab`), шкала + столбцы; как аргумент, не сертификат.
 3. **Эффект барабана** — без системы воздух под натяжным «играет как барабан»; MultiFrame рассеивает энергию → в комнате спокойнее.
 4. **Безопасность** — эко/здоровье, сертификаты как reason-to-believe (мягко).
@@ -146,7 +161,7 @@ Must **not** appear: calculator links, dB values, lead form, Polyblock, floor qu
 
 ### Simulation disclaimer (SimCompare)
 
-`Не замер и не гарантия Δ. Классы А/Б/В — ориентир комфорта, не расчёт по СП. Потолком нельзя заявлять полную норму по ударному шуму: часто нужен пол у соседа сверху.`
+`Не замер и не гарантия Δ. Классы комфорта А/Б/В (с понятными названиями) — ориентир по нормативной шкале, не сертификат и не полный расчёт по СП. Потолком нельзя заявлять полную норму по ударному шуму: часто нужен пол у соседа сверху.`
 
 ### Simulation badge
 
@@ -548,7 +563,7 @@ Real StP phone/email presented as live; lab certificate; Polyblock upsell; walls
 - Badge = `Оценка до лабораторных данных`
 - Columns: `Сейчас` · `С MultiFrame`
 - Feeling chips: `Тихо` · `Терпимо` · `Мешает`
-- Class pills: `класс А|Б|В` · `частично` · `ниже класса`
+- Class pills (hybrid): e.g. `Высокий комфорт (А)` · `Комфорт (Б)` · `Базовый (В)` · `частично` · `ниже класса` — plus soft norm hint
 - **Chart A — class scale:** visual А→Б→В (or equivalent) showing before→after move; primary scannable chart
 - **Chart B — bars:** before/after bars for oriented ΔRw (воздух) and ΔLnw (удар); secondary to class scale; always captioned
 - Channels: `Воздух` / `Удар` with tertiary dB + optional delta
