@@ -82,6 +82,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Result feature order reconfirmed (A): **1** class → **2** effectiveness → **3** drum-effect → **4** safety → **5** rest |
 | 2026-09-13 | Result sticky CTA **C4:** `Открыть калькулятор MultiFrame` (replaces «Расчёт материалов») |
 | 2026-09-13 | Result lead = consultation/selection: open **P2** `Запросить консультацию или подбор`; title `Заявка на консультацию`; note `Разберём ваш случай, подберём материал.`; no separate disabled «Консультация» button |
+| 2026-09-13 | Workshop reconcile: product chrome/flow largely locked; still open for owner — exact feature teзис+why lines (beyond drum example); Start chrome polish if desired. Engineering ASSUMPTIONs OK until Trofimov: dB→% map, mixed EQ blend, Δ model numbers, lead stub endpoint |
 
 ---
 
