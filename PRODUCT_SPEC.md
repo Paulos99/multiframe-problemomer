@@ -54,7 +54,8 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Build year: **not in MVP**. Noisy neighbors options: drop «ещё не живу»; keep only `Не знаю` · `Обычно тихо` · `Соседи сверху шумные` |
 | 2026-09-13 | Floor-above: **Не знаю is a first-class valid answer** — user often does not know; model uses conservative ASSUMPTION when unknown |
 | 2026-09-13 | Room validation: **required only** room type + area. Floor-above, house type, stage, planned ceiling, noisy neighbors — each may be `Не знаю`; enough to proceed |
-| 2026-09-13 | Room field order confirmed: type → area → slab → floor above → house type → stage → planned ceiling → noisy neighbors |
+| 2026-09-13 | Room field order confirmed: type → area → slab type → slab thickness → floor above → house type → stage → planned ceiling → noisy neighbors |
+| 2026-09-13 | Slab: **type and thickness as separate Room fields** (do not multiply type×mm cards). Thickness may be `Не знаю` |
 
 ---
 
@@ -240,7 +241,7 @@ Long role catalog (sales / site / designer / …) on Start; further “уточ�
 
 ### Visible elements
 
-- Title, subtitle; then in order: room type → area → slab → floor above → house type → stage → planned ceiling → noisy neighbors (optional fields allow `Не знаю`).
+- Title, subtitle; then: room type → area → slab type → slab thickness → floor above → house type → stage → planned ceiling → noisy neighbors (`Не знаю` OK on optionals).
 - Progress + sticky `Назад` / `Далее`.
 
 ### Exact primary copy (RU)
@@ -286,23 +287,25 @@ Room answers drive the **presumed comfort class** on the object. Type + area + s
 
 **Room fields — direction (owner 2026-09-13)**
 
-**Locked / keep:** тип помещения · площадь · перекрытие (slab).
+**Locked / keep:** тип помещения · площадь · **тип перекрытия** · **толщина перекрытия** (separate; both allow `Не знаю`).
 
 **Add to Room (confirmed intent):**
 
 | Field | Role in model | UI sketch (RU) | Notes |
 | ----- | ------------- | -------------- | ----- |
+| Тип перекрытия | Construction family for baseline | `Монолит / сплошная ж/б` · `Многопустотная (ПК)` · `Деревянное / по балкам` · `Не знаю` | No mm on these cards |
+| Толщина перекрытия | Mass proxy for Rw / baseline | Buckets e.g. `~140` · `~160` · `~180` · `~200` · `~220` · `~250` · `Не знаю` (**DRAFT mm set**) | Separate from type — do not create type×mm matrix. If type or thickness `Не знаю` → conservative ASSUMPTION |
 | Пол сверху | Strongest impact on удар / Lnw baseline | `Не знаю` · `Обычный пол (без плавающей схемы)` · `Есть плавающий пол / шумоизоляция в полу` · `Пока без чистового пола` | **Не знаю = valid** (owner). When unknown → conservative model ASSUMPTION (typical ordinary floor / no floating). Do not block Далее. |
 | Тип дома | Proxy when slab unknown; typical construction | `Панельный` · `Кирпичный` · `Монолит` · `Деревянные/балочные` · `Не знаю` | |
 | Стадия объекта | Narrative + baseline story without «мешает ли» | `Новостройка / до заселения` · `Идёт ремонт` · `Уже живут` · `Не знаю` | |
 | Планируемый потолок | Fit story for MultiFrame under finish | `Натяжной` · `Натяжной + ГКЛ` · `Уже есть черновой` · `Не знаю` | |
 | Шумные соседи сверху | Expectation of upstairs activity (not “does it bother you”) | `Не знаю` · `Обычно тихо` · `Соседи сверху шумные` | Replaces «кто сверху». Must **not** sound like complaint quiz |
 
-**Field order on Room (confirmed):** тип → площадь → перекрытие → пол сверху → тип дома → стадия → планируемый потолок → шумные соседи.
+**Field order on Room (confirmed):** тип → площадь → **тип перекрытия** → **толщина перекрытия** → пол сверху → тип дома → стадия → планируемый потолок → шумные соседи.
 
 **Room required vs optional (confirmed 2026-09-13):**
 - **Required to proceed:** `roomType` + `area` (> 0).
-- **Optional (any may be `Не знаю`, still proceed):** slab/перекрытие, floor above, house type, object stage, planned ceiling, noisy neighbors.
+- **Optional (any may be `Не знаю`, still proceed):** slab type, slab thickness, floor above, house type, object stage, planned ceiling, noisy neighbors.
 - Missing optional / `Не знаю` → model ASSUMPTIONs (conservative where it affects class/Δ; default slab ASSUMPTION remains e.g. solid 180 mm until tuned).
 
 **Unknown floor-above (confirmed):** choosing `Не знаю` is normal and sufficient to proceed. Sim uses a declared conservative default (ASSUMPTION: treat as ordinary floor without floating scheme unless later tuned).
