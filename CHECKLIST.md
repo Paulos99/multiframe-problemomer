@@ -171,7 +171,7 @@ Engineering decisions already made / owned by the agent (product terms):
 - **Stack (recorded, do not reopen):** Vite + React SPA, client session state, GitHub Actions → GitHub Pages. No microservices.
 - **Effect model:** `source: marketing_placeholder`, center ΔRw **+10** (UI range 8–12), ΔLnw **−8** (UI range 6–10), classes **A/B/V** (UI Cyrillic А/Б/В) from Trofimov-style comfort grading; always `pre_lab` / expert disclaimers.
 - **Audio:** groups воздух / удар / смешанный; locked stubs; After = case Δ (level + EQ); mixed blends both; ≈% from room model; `pre_lab` / ориентир.
-- **CTA:** deep-link to MultiFRAME calculator with query payload; lead form is demo-only (`console` stub), never invent a corporate CRM endpoint.
+- **CTA:** deep-link to MultiFRAME calculator with query payload; lead = consultation/selection request (MVP may stub delivery — never invent a corporate CRM endpoint).
 - **Mobile:** denser inputs + sticky progress/CTA; touch targets ≥44px; no tech dumps.
 - **Out of scope code paths:** walls, partitions, floors systems, Polyblock, framed systems — do not add.
 - Libraries, file layout, naming, refactors, and validation scope for future feature work follow existing repo patterns; product screen contracts live in `PRODUCT_SPEC.md`.
@@ -201,7 +201,7 @@ A capability with no row is `absent` by default. The State column always holds o
 | Trofimov-style comfort classes A/B/V | included | Canon A\|B\|V; UI Cyrillic А\|Б\|В; partial/below statuses. Never promise full Lnw norm from ceiling alone. |
 | Case-specific audio (air / impact / mixed) | included | Locked examples; After cuts level + frequencies from room Δ; mixed = blend; show ≈%; `pre_lab`. |
 | Calculator CTA handoff | included | Opens calculator with `area`, `roomType` (no scenarios). |
-| Demo lead form | available | UI + `console` stub + JSON payload (`schemaVersion: 1`). No real StP CRM / email endpoint. |
+| Consultation / selection lead | available | UI: `Запросить консультацию или подбор` · `Заявка на консультацию` · `Разберём ваш случай, подберём материал.` Delivery may stub until real endpoint; no invented StP CRM. |
 | Sticky mobile chrome | included | Header + progress + sticky Далее/CTA; denser cards on narrow viewports. |
 | Theme toggle (light/dark) | included | Client-only preference. |
 | Auth (email + password) | absent | No accounts. |

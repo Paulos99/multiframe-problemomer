@@ -675,12 +675,13 @@ Base: `https://paulos99.github.io/MF_StP/`
 
 Visible/export shape includes: `{ schemaVersion, answers, derived, audio, cta }` where `cta` carries `{ roomType, ceilingAreaM2 }` (no scenarios).
 
-### Demo lead behavior
+### Lead form behavior
 
+- Purpose: request **consultation or material selection** (not a “demo toy” label in UI).
 - Fields: name, phone.
-- On submit: `console` stub (e.g. `[lead-demo]`) with `{ name, phone, cta, derived, note: 'demo-only stub — no real StP CRM endpoint' }`.
-- Show success `Принято (демо-stub)` + JSON summary.
-- No network CRM; do not invent StP corporate endpoints.
+- Open: `Запросить консультацию или подбор` · Title: `Заявка на консультацию` · Help: `Разберём ваш случай, подберём материал.`
+- On submit (MVP): may still be a `console` stub until real endpoint exists — **do not invent** StP CRM URL. Success UI: `Заявка принята`.
+- No separate disabled «Консультация» button.
 
 ---
 
