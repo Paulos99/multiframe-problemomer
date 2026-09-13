@@ -142,7 +142,7 @@ May lightly change pronoun/CTA tone («вам» / «клиенту»). **Must no
 
 **Tone:** present facts so the user concludes value themselves. **Forbidden in UI:** «за что платим», blunt price/cost framing, «средний чек».
 
-**Presentation rule (confirmed 2026-09-13):** advantages **понятно, но аргументированно** — each point = **тезис + 1 короткая фраза why/how** (example OK’d: «Без системы под натяжным воздух работает как барабан. MultiFrame рассеивает эту энергию — в комнате спокойнее.»). Not a bare slogan list; not a datasheet dump.
+**Presentation rule (confirmed 2026-09-13):** advantages **понятно, но аргументированно** — each point = **тезис + 1 короткая фраза why/how**. Not a bare slogan list; not a datasheet dump. Drum copy: see item 3 below (rephrased 2026-09-13).
 
 **Result feature order (confirmed 2026-09-13)** — each item = тезис + why/how; no price talk.  
 **Copy tone (owner 2026-09-13):** лёгкий премиальный язык, цельные фразы; не обрывать мысль тире и не писать «телеграфно». Умеренная длина.  
