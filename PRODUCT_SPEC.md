@@ -56,6 +56,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Room validation: **required only** room type + area. Floor-above, house type, stage, planned ceiling, noisy neighbors — each may be `Не знаю`; enough to proceed |
 | 2026-09-13 | Room field order confirmed: type → area → slab type → slab thickness → floor above → house type → stage → planned ceiling → noisy neighbors |
 | 2026-09-13 | Slab: **type and thickness as separate Room fields** (do not multiply type×mm cards). Thickness may be `Не знаю` |
+| 2026-09-13 | Slab thickness UI = **ranges/buckets**, not single mm points (owner not in typical-thickness details) |
 
 ---
 
@@ -294,7 +295,10 @@ Room answers drive the **presumed comfort class** on the object. Type + area + s
 | Field | Role in model | UI sketch (RU) | Notes |
 | ----- | ------------- | -------------- | ----- |
 | Тип перекрытия | Construction family for baseline | `Монолит / сплошная ж/б` · `Многопустотная (ПК)` · `Деревянное / по балкам` · `Не знаю` | No mm on these cards |
-| Толщина перекрытия | Mass proxy for Rw / baseline | Buckets e.g. `~140` · `~160` · `~180` · `~200` · `~220` · `~250` · `Не знаю` (**DRAFT mm set**) | Separate from type — do not create type×mm matrix. If type or thickness `Не знаю` → conservative ASSUMPTION |
+| Толщина перекрытия | Mass proxy for Rw / baseline | **Ranges (not point mm):** `До ~160 мм` · `Около 160–200 мм` · `Около 200–250 мм` · `Толще ~250 мм` · `Не знаю` | Owner: give spreads, not expert single values. Map ranges → model mid ASSUMPTION internally. Type×mm matrix forbidden |
+
+**Thickness copy rule:** show **разбросы** for non-experts; engineering may map bucket → mid value inside the model (ASSUMPTION), never force user to pick exact mm.
+
 | Пол сверху | Strongest impact on удар / Lnw baseline | `Не знаю` · `Обычный пол (без плавающей схемы)` · `Есть плавающий пол / шумоизоляция в полу` · `Пока без чистового пола` | **Не знаю = valid** (owner). When unknown → conservative model ASSUMPTION (typical ordinary floor / no floating). Do not block Далее. |
 | Тип дома | Proxy when slab unknown; typical construction | `Панельный` · `Кирпичный` · `Монолит` · `Деревянные/балочные` · `Не знаю` | |
 | Стадия объекта | Narrative + baseline story without «мешает ли» | `Новостройка / до заселения` · `Идёт ремонт` · `Уже живут` · `Не знаю` | |
