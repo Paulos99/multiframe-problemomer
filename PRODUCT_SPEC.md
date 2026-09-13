@@ -70,6 +70,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Before/After copy rewrite: owner — previous emotional bullets / feeling chips are **obsolete**; rebuild from hybrid class + new copy (not patch old `Тихо/Терпимо/Мешает` SPA) |
 | 2026-09-13 | Before/After bullet frame (A): **2 phrases + hybrid class** per card (not one phrase only, not class-only) |
 | 2026-09-13 | Before/After bullet copy locked: Before `Соседи сверху слышны слишком отчётливо` · `Бытовые звуки сверху легко различить` · `Сейчас: {class}`; After `В комнате заметно спокойнее` · `Ударный и воздушный шум воспринимаются мягче` · `С MultiFrame: {class}` |
+| 2026-09-13 | Before/After chrome: subtitle **S3** `Как меняется комфорт комнаты с MultiFrame`; numbers **N3** `Оценка в цифрах`; honesty **H3** meaning OK — wording still to polish |
 
 ---
 
@@ -370,15 +371,15 @@ Show the comfort shift for this room: ordinary stretch ceiling vs MultiFrame. **
 | Role | Text |
 | ---- | ---- |
 | Title | `До и после` |
-| Subtitle | `Обычный натяжной потолок и потолок с MultiFrame — ориентир комфорта для вашей комнаты.` |
+| Subtitle | `Как меняется комфорт комнаты с MultiFrame` |
 | Before tag | `Сейчас типично` |
 | Before h2 | `Обычный потолок` |
 | Before bullets | `Соседи сверху слышны слишком отчётливо` · `Бытовые звуки сверху легко различить` · `Сейчас: {hybrid class}` |
 | After tag | `С MultiFrame` |
 | After h2 | `Бескаркасная акустика` |
 | After bullets | `В комнате заметно спокойнее` · `Ударный и воздушный шум воспринимаются мягче` · `С MultiFrame: {hybrid class}` |
-| Numbers section title | `Ориентиры в цифрах` |
-| Honesty note | `Цифры — рабочая модель (`pre_lab`), не лабораторный замер. Ударный шум потолком смягчается; часто нужен ещё пол у соседа сверху.` |
+| Numbers section title | `Оценка в цифрах` |
+| Honesty note | **Draft (owner: polish):** `Цифры — предварительная оценка. Ударный шум потолком мягче, но пол у соседа сверху часто всё ещё важен.` — alternatives below |
 | Sticky next | `Услышать разницу` |
 
 **Class rule (confirmed):** Before and After cards both end with the hybrid class from the Room model. Same vocabulary as the top verdict strip. No `Тихо` / `Терпимо` / `Мешает`.
