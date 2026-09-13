@@ -42,6 +42,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Result feature order: **1 class of comfort/housing → 2 effectiveness → 3 drum-effect → 4 safety → 5 rest**. Install only as **fast / no long construction** — not tech details about mounting/comms unless needed |
 | 2026-09-13 | Class labels: **hybrid** — plain name + letter (А/Б/В), soft link to normative doc (Trofimov/SP). Official: А высокая комфортность, Б комфортная, В предельно допустимая. Do not invert letters. |
 | 2026-09-13 | Class V UI label = **Допустимый (В)**; below-scale state when even V not reached (common) — UI label **`Дискомфорт`** (confirmed) |
+| 2026-09-13 | Result top class shift copy confirmed: e.g. `Сейчас: Дискомфорт → с MultiFrame: Комфорт (Б)` |
 
 ---
 
@@ -103,7 +104,7 @@ May lightly change pronoun/CTA tone («вам» / «клиенту»). **Must no
 
 **Result feature order (confirmed 2026-09-13)** — each item = тезис + 1 фраза why/how; no price talk:
 
-1. **Класс комфорта жилья** — hybrid label + letter (напр. `Комфорт (Б)` → `Высокий комфорт (А)`); soft norm-doc hint; personal «выше классом».
+1. **Класс комфорта жилья** — top verdict shift line confirmed: `Сейчас: {class} → с MultiFrame: {class}` (e.g. `Сейчас: Дискомфорт → с MultiFrame: Комфорт (Б)`); soft norm-doc hint.
 2. **Эффективность** — ориентир эффекта (числа/диапазоны, `pre_lab`), шкала + столбцы; как аргумент, не сертификат.
 3. **Эффект барабана** — без системы воздух под натяжным «играет как барабан»; MultiFrame рассеивает энергию → в комнате спокойнее.
 4. **Безопасность** — эко/здоровье, сертификаты как reason-to-believe (мягко).
@@ -366,7 +367,7 @@ Emotional contrast: ordinary stretch ceiling vs MultiFrame. Feeling primary; Sim
 
 ### Visible elements
 
-- **Top:** short conclusion (class change / quieter story) before deep dive.
+- **Top:** short conclusion with class shift `Сейчас: … → с MultiFrame: …` before deep dive.
 - Title, subtitle, Before card, After card, secondary SimCompare, numbers + chart block, honesty note, sticky CTA with next label override.
 - **Charts block (C):** class scale А→Б→В with move arrow, then before/after bars (ΔRw / ΔLnw) with captions; both required.
 - **Below fold OK:** detailed oriented numbers/charts — user scrolls as needed.
@@ -466,7 +467,7 @@ Summarize acoustic profile with **verdict first**, then the full evidence stack 
 
 ### Visible elements
 
-- **Top verdict:** personal one-liner + class before→after (А/Б/В) + what ~MultiFrame changes in plain language.
+- **Top verdict:** personal one-liner + class shift line `Сейчас: {label} → с MultiFrame: {label}` (hybrid labels / `Дискомфорт`) + what ~MultiFrame changes in plain language.
 - Title, subtitle, Before/After summary cards, room/scenario profile, secondary SimCompare, numbers + charts + explanations, «Почему MultiFrame уместен», expert Disclaimer, calculator CTA, demo consultation (disabled), demo lead form, restart.
 - **Charts block (C):** class scale А→Б→В first, then before/after bars (ΔRw / ΔLnw); captions + `pre_lab` badge; no frequency spectrum.
 - Do **not** hide detail behind tabs/accordions as the primary pattern; scroll is the disclosure.
