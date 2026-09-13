@@ -52,6 +52,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Room fields: keep type+area+slab; **add** floor-above, house type, object stage, planned ceiling; replace «кто сверху» with **noisy neighbors** check (not bother quiz) |
 | 2026-09-13 | Year of build: **optional candidate** — useful as soft proxy for typical construction + normative context; weaker than slab/floor-above; owner to confirm |
 | 2026-09-13 | Build year: **not in MVP**. Noisy neighbors options: drop «ещё не живу»; keep only `Не знаю` · `Обычно тихо` · `Соседи сверху шумные` |
+| 2026-09-13 | Floor-above: **Не знаю is a first-class valid answer** — user often does not know; model uses conservative ASSUMPTION when unknown |
 
 ---
 
@@ -289,11 +290,13 @@ Room answers drive the **presumed comfort class** on the object. Type + area + s
 
 | Field | Role in model | UI sketch (RU) | Notes |
 | ----- | ------------- | -------------- | ----- |
-| Пол сверху | Strongest impact on удар / Lnw baseline | `Не знаю` · `Обычный пол (без плавающей схемы)` · `Есть плавающий пол / шумоизоляция в полу` · `Пока без чистового пола` | From Trofimov: slab alone fails impact norm |
+| Пол сверху | Strongest impact on удар / Lnw baseline | `Не знаю` · `Обычный пол (без плавающей схемы)` · `Есть плавающий пол / шумоизоляция в полу` · `Пока без чистового пола` | **Не знаю = valid** (owner). When unknown → conservative model ASSUMPTION (typical ordinary floor / no floating). Do not block Далее. |
 | Тип дома | Proxy when slab unknown; typical construction | `Панельный` · `Кирпичный` · `Монолит` · `Деревянные/балочные` · `Не знаю` | |
 | Стадия объекта | Narrative + baseline story without «мешает ли» | `Новостройка / до заселения` · `Идёт ремонт` · `Уже живут` · `Не знаю` | |
 | Планируемый потолок | Fit story for MultiFrame under finish | `Натяжной` · `Натяжной + ГКЛ` · `Уже есть черновой` · `Не знаю` | |
 | Шумные соседи сверху | Expectation of upstairs activity (not “does it bother you”) | `Не знаю` · `Обычно тихо` · `Соседи сверху шумные` | Replaces «кто сверху». Must **not** sound like complaint quiz |
+
+**Unknown floor-above (confirmed):** choosing `Не знаю` is normal and sufficient to proceed. Sim uses a declared conservative default (ASSUMPTION: treat as ordinary floor without floating scheme unless later tuned).
 
 **Dropped:** «Кто сверху» (жилая/нежилое) — replaced by noisy-neighbors check.
 
