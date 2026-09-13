@@ -74,7 +74,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | **Audio rewrite (Trofimov + owner):** channels воздух / удар (+ UI group **смешанный**); After = case-specific MultiFrame reduction — cut **level and frequencies**; % tied to this room’s Δ (`pre_lab`) |
 | 2026-09-13 | Audio examples locked (D): **воздух** — лай собаки · музыка · громкие разговоры; **удар** — детский бег · перестановка мебели · цоканье когтей собаки; **смешанный** — стиральная машина · пылесос |
 | 2026-09-13 | Audio reduction UI **C:** `≈ −{n}%` + Δ caption; log footnote **F2b:** `Шкала дБ логарифмическая: −8 дБ ≈ вдвое тише по ощущению.` |
-| 2026-09-13 | Audio chrome partial: title **T1** `Услышать разницу`; buttons **B2** `До` · `После` (no subs); sticky **N3** `Смотреть итог`; subtitle still open (S1–S3 rejected) |
+| 2026-09-13 | Audio chrome locked: title **T1** `Услышать разницу`; subtitle **S6** `Сравните звук обычного потолка и потолка с MultiFrame`; buttons **B2** `До` · `После`; sticky **N3** `Смотреть итог` |
 
 ---
 
@@ -427,7 +427,7 @@ None.
 | Role | Text |
 | ---- | ---- |
 | Title | `Услышать разницу` |
-| Subtitle | **TBD** — owner rejected S1–S3; new options below |
+| Subtitle | `Сравните звук обычного потолка и потолка с MultiFrame` |
 | Channel air title | `Воздушный шум` |
 | Channel air help | `Через перекрытие (Rw): речь, музыка, лай.` |
 | Channel impact title | `Ударный шум` |
