@@ -63,6 +63,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | House type options expanded for common RU stock: add **Блочный**; monolith includes монолит-кирпич (note); keep Не знаю — confirmed |
 | 2026-09-13 | House type options confirmed: `Панельный` · `Блочный` · `Кирпичный` · `Монолит` (в т.ч. монолит-кирпич) · `Деревянный / по балкам` · `Не знаю` |
 | 2026-09-13 | Object stage confirmed: `Новостройка / до заселения` · `Идёт ремонт` · `Уже живут` · `Не знаю` |
+| 2026-09-13 | Planned ceiling confirmed (B): `Планируем натяжной` · `Потолок уже есть` · `Не знаю` — plain language, no ГКЛ/черновой jargon |
 
 ---
 
@@ -310,7 +311,7 @@ Owner: do **not** put «пока без чистового пола» under floo
 **House-type coverage (confirmed):** most frequent apartment cases = panel / block / brick / monolith (+ clad monolith). Wood/beam for private or old beam floors. Do not add separate «сталинка» / «хрущёвка» cards — those are eras, partly covered by type (+ deferred year).
 | Тип дома | Proxy when slab unknown; typical construction | `Панельный` · `Блочный` · `Кирпичный` · `Монолит` (в т.ч. монолит-кирпич) · `Деревянный / по балкам` · `Не знаю` | Common RU apartment stock. Сталинка → usually `Кирпичный` (hint, not separate card). Skip rare types. | `Панельный` · `Блочный` · `Кирпичный` · `Монолит` (в т.ч. монолит-кирпич) · `Деревянный / по балкам` · `Не знаю` | |
 | Стадия объекта | Narrative without «мешает ли» | `Новостройка / до заселения` · `Идёт ремонт` · `Уже живут` · `Не знаю` | Confirmed | `Новостройка / до заселения` · `Идёт ремонт` · `Уже живут` · `Не знаю` | |
-| Планируемый потолок | Fit story for MultiFrame under finish | `Натяжной` · `Натяжной + ГКЛ` · `Уже есть черновой` · `Не знаю` | |
+| Планируемый потолок | Fit story for MultiFrame under finish | `Планируем натяжной` · `Потолок уже есть` · `Не знаю` | Owner chose plain **B** — no ГКЛ/«черновой» jargon | `Планируем натяжной` · `Потолок уже есть` · `Не знаю` | |
 | Шумные соседи сверху | Expectation of upstairs activity (not “does it bother you”) | `Не знаю` · `Обычно тихо` · `Соседи сверху шумные` | Replaces «кто сверху». Must **not** sound like complaint quiz |
 
 **Field order on Room (confirmed):** тип → площадь → **тип перекрытия** → **толщина перекрытия** → пол сверху → тип дома → стадия → планируемый потолок → шумные соседи.
