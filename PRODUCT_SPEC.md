@@ -53,6 +53,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Year of build: **optional candidate** — useful as soft proxy for typical construction + normative context; weaker than slab/floor-above; owner to confirm |
 | 2026-09-13 | Build year: **not in MVP**. Noisy neighbors options: drop «ещё не живу»; keep only `Не знаю` · `Обычно тихо` · `Соседи сверху шумные` |
 | 2026-09-13 | Floor-above: **Не знаю is a first-class valid answer** — user often does not know; model uses conservative ASSUMPTION when unknown |
+| 2026-09-13 | Room validation: **required only** room type + area. Floor-above, house type, stage, planned ceiling, noisy neighbors — each may be `Не знаю`; enough to proceed |
 
 ---
 
@@ -264,7 +265,7 @@ Long role catalog (sales / site / designer / …) on Start; further “уточ�
 | Room card (single select) | Sets `roomType` | Always |
 | Area number input | Sets `ceilingAreaM2` | Always |
 | Slab select | Sets optional `floorSlab` / key; empty → default 180 | Always |
-| Sticky `Далее` | Go to Before/After | Enabled iff room type selected **and** area > 0 |
+| Sticky `Далее` | Go to Before/After | Enabled iff room type selected **and** area > 0. Other Room fields optional / may be `Не знаю` |
 | Sticky `Назад` | Go to Start | Always |
 
 ### Validation messages
@@ -295,6 +296,11 @@ Room answers drive the **presumed comfort class** on the object. Type + area + s
 | Стадия объекта | Narrative + baseline story without «мешает ли» | `Новостройка / до заселения` · `Идёт ремонт` · `Уже живут` · `Не знаю` | |
 | Планируемый потолок | Fit story for MultiFrame under finish | `Натяжной` · `Натяжной + ГКЛ` · `Уже есть черновой` · `Не знаю` | |
 | Шумные соседи сверху | Expectation of upstairs activity (not “does it bother you”) | `Не знаю` · `Обычно тихо` · `Соседи сверху шумные` | Replaces «кто сверху». Must **not** sound like complaint quiz |
+
+**Room required vs optional (confirmed 2026-09-13):**
+- **Required to proceed:** `roomType` + `area` (> 0).
+- **Optional (any may be `Не знаю`, still proceed):** floor above, house type, object stage, planned ceiling, noisy neighbors.
+- Missing optional → model ASSUMPTIONs (conservative where it affects class/Δ).
 
 **Unknown floor-above (confirmed):** choosing `Не знаю` is normal and sufficient to proceed. Sim uses a declared conservative default (ASSUMPTION: treat as ordinary floor without floating scheme unless later tuned).
 
