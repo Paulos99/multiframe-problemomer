@@ -143,17 +143,28 @@ May lightly change pronoun/CTA tone («вам» / «клиенту»). **Must no
 
 **Presentation rule (confirmed 2026-09-13):** advantages **понятно, но аргументированно** — each point = **тезис + 1 короткая фраза why/how** (example OK’d: «Без системы под натяжным воздух работает как барабан. MultiFrame рассеивает эту энергию — в комнате спокойнее.»). Not a bare slogan list; not a datasheet dump.
 
-**Result feature order (confirmed 2026-09-13)** — each item = тезис + 1 фраза why/how; no price talk:
+**Result feature order (confirmed 2026-09-13)** — each item = тезис + why/how; no price talk. Owner 2026-09-13: premium flowing copy (not clipped telegram / dry dashes); keep moderate length.
 
-1. **Класс комфорта жилья** — top verdict shift line confirmed: `Сейчас: {class} → с MultiFrame: {class}` (e.g. `Сейчас: Дискомфорт → с MultiFrame: Комфорт (Б)`); soft norm-doc hint.
-2. **Эффективность** — **сначала ориентиры Δ** (воздух / удар) with **explaining captions + sensations** each; then class scale + bars as already decided. `pre_lab` framing; argument not certificate.
+1. **Класс комфорта жилья**
+   - Тезис: `Сейчас: {класс} → с MultiFrame: {класс}`
+   - Why: `Это ориентир по шкале комфортности для вашей комнаты — мягкая опора на нормативные представления о тишине, а не лабораторный вердикт.`
 
-**Effectiveness block (confirmed 2026-09-13):** lead with **Δ orientations**, not a feeling-only headline.
-**Always both channels** (воздух + удар), even if user never picked scenarios. For each: oriented Δ + short caption that *explains* the number + sensation phrase (claim+why pattern). Example shape: `Δ воздух +8…+12 дБ` — `шум как будто дальше` / plain why. Then charts (class scale + bars). Always `pre_lab`.
+2. **Эффективность**
+   - Тезис: `Ориентиры снижения шума: по воздуху около {Δ}, по удару около {Δ}.`
+   - Why: `Обе оценки собраны под параметры этой комнаты. Шкала децибел логарифмическая, поэтому даже небольшое снижение на слух ощущается заметно спокойнее.`
 
-3. **Эффект барабана** — без системы воздух под натяжным «играет как барабан»; MultiFrame рассеивает энергию → в комнате спокойнее.
-4. **Безопасность** — эко/здоровье, сертификаты как reason-to-believe (мягко).
-5. **Остальное (коротко):** система нового поколения; Flat/Wave и совместимость с натяжным/ГКЛ по смыслу «красивый потолок + тишина»; при необходимости — патент/отличие мягко.
+3. **Эффект барабана** *(locked example)*
+   - Тезис: `Без системы под натяжным воздух работает как барабан.`
+   - Why: `MultiFrame рассеивает эту энергию — в комнате спокойнее.`
+
+4. **Безопасность** *(draft for owner lock)*
+   - Тезис: `Спокойный выбор для жилого пространства.`
+   - Why: `Состав и сертификаты поддерживают ощущение, что решение уместно дома, а не только на стройплощадке.`
+
+5. **Остальное** *(draft for owner lock)*
+   - **Монтаж.** Тезис: `Монтаж вписывается в обычный ритм натяжного потолка.` Why: `Система собирается быстро и без тяжёлого каркаса, без ощущения долгой стройки.`
+   - **Форма.** Тезис: `Две формы панели под разные потолки.` Why: `Flat и Wave помогают сохранить свет и геометрию, не жертвуя тишиной.`
+   - **Поколение.** Тезис: `Архитектура панели нового поколения.` Why: `Жёсткий контур и перфорация вместе рассеивают энергию шума в пространстве над полотном.`
 
 **Монтаж / коммуникации (owner nuance):** клиенту **не** разворачивать технику крепежа и прокладки коммуникаций. Достаточно смысла: **быстро, без долгой стройки** (vendor: 1 мастер, панель ≤1 мин — as soft claim). Details for «для клиента» / профи могут быть глубже later; MVP client-facing copy stays light.
 
