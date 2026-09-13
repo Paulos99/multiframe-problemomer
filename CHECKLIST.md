@@ -46,6 +46,7 @@ Live context (do not redesign from this URL alone): https://paulos99.github.io/m
 | Planned ceiling (confirmed 2026-09-13) | `Планируем натяжной` · `Потолок уже есть` · `Не знаю` (вариант B, без строительного жаргона). |
 | Noisy neighbors (confirmed 2026-09-13) | `Не знаю` · `Обычно тихо` · `Сверху бывает шумно` (вариант B — мягче, не «шумные соседи»). Не опрос «мешает ли». |
 | Before/After «До» comfort (confirmed 2026-09-13) | В буллете карточки «Сейчас типично» — **гибридный класс из модели** (вариант A): `Сейчас: Дискомфорт` / `Допустимый (В)` / `Комфорт (Б)` / `Высокий комфорт (А)`. Не `Тихо/Терпимо/Мешает`. |
+| Before/After «После» comfort (confirmed 2026-09-13) | Симметрично: последний буллет `С MultiFrame: {hybrid class}`. Старые chips `Тихо/Терпимо/Мешает` и прежние эмоциональные буллеты Before/After — **устарели**; пишем заново. |
 | Object stage (confirmed 2026-09-13) | `Новостройка / до заселения` · `Идёт ремонт` · `Уже живут` · `Не знаю`. |
 | House type options (confirmed 2026-09-13) | `Панельный` · `Блочный` · `Кирпичный` · `Монолит` (в т.ч. монолит-кирпич) · `Деревянный / по балкам` · `Не знаю`. Сталинка ≈ кирпичный (подсказка). |
 | Room field order (confirmed 2026-09-13) | тип → площадь → тип перекрытия → толщина перекрытия → пол сверху → тип дома → стадия → потолок → соседи. |
@@ -182,8 +183,8 @@ A capability with no row is `absent` by default. The State column always holds o
 | Room + optional slab input | included | Room type, area m², optional slab key (default solid 180 mm). |
 | Noise scenario multi-select | removed | Owner 2026-09-13: do not quiz «что мешает». |
 | Current comfort + noise type | removed | Owner 2026-09-13: no complaint quiz; class from model. |
-| Emotional before/after contrast | included | Feeling-first copy; numbers secondary. |
-| SimCompare effect UI | included | Feeling primary; Rw/Lnw tertiary; А/Б/В chips; honestLines; pre_lab badge. |
+| Emotional before/after contrast | included | Hybrid class on both cards + top verdict; emotional bullets rewritten from scratch (old copy obsolete). |
+| SimCompare effect UI | included | Hybrid class primary; no `Тихо/Терпимо/Мешает`; Rw/Lnw tertiary; pre_lab badge. |
 | marketing_placeholder Δ model | included | ΔRw +10 (range 8–12), ΔLnw −8 (range 6–10); `source: marketing_placeholder`; `disclaimer: pre_lab`. Never claim lab guarantees. |
 | Trofimov-style comfort classes A/B/V | included | Canon A\|B\|V; UI Cyrillic А\|Б\|В; partial/below statuses. Never promise full Lnw norm from ceiling alone. |
 | Demo audio difference | included | Web Audio stubs; badges «демо» / «демо-набор»; «вдвое спокойнее» only for air channel. |

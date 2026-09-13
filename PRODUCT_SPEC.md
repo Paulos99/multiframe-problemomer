@@ -66,6 +66,8 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Planned ceiling confirmed (B): `Планируем натяжной` · `Потолок уже есть` · `Не знаю` — plain language, no ГКЛ/черновой jargon |
 | 2026-09-13 | Noisy neighbors confirmed (B): `Не знаю` · `Обычно тихо` · `Сверху бывает шумно` — softer third label; not a «does it bother you» quiz |
 | 2026-09-13 | Before/After «До» card bullet (A): last Before bullet = hybrid class from model — `Сейчас: {Высокий комфорт (А)|Комфорт (Б)|Допустимый (В)|Дискомфорт}`; drop `Тихо/Терпимо/Мешает` |
+| 2026-09-13 | Before/After «После» card bullet (A): last After bullet = `С MultiFrame: {hybrid class}` — symmetric with Before |
+| 2026-09-13 | Before/After copy rewrite: owner — previous emotional bullets / feeling chips are **obsolete**; rebuild from hybrid class + new copy (not patch old `Тихо/Терпимо/Мешает` SPA) |
 
 ---
 
@@ -352,12 +354,12 @@ Do **not** ask complaint-framed «Как сейчас?» / «мешает ли»
 
 ### Goal
 
-Emotional contrast: ordinary stretch ceiling vs MultiFrame. Feeling primary; SimCompare secondary tone. Full pack on one scroll: **verdict strip on top**, numbers/charts/explanations below (owner Q4).
+Show the comfort shift for this room: ordinary stretch ceiling vs MultiFrame. **Hybrid class is the primary signal** (not old `Тихо/Терпимо/Мешает`). Full pack on one scroll: **verdict strip on top**, numbers/charts/explanations below (owner Q4). Emotional bullets — **rewrite from scratch** (owner 2026-09-13: prior copy obsolete).
 
 ### Visible elements
 
 - **Top:** short conclusion with class shift `Сейчас: … → с MultiFrame: …` before deep dive.
-- Title, subtitle, Before card, After card, secondary SimCompare, numbers + chart block, honesty note, sticky CTA with next label override.
+- Title, subtitle, Before card, After card, secondary SimCompare (hybrid classes, no feeling chips), numbers + chart block, honesty note, sticky CTA with next label override.
 - **Charts block (C):** class scale А→Б→В with move arrow, then before/after bars (ΔRw / ΔLnw) with captions; both required.
 - **Below fold OK:** detailed oriented numbers/charts — user scrolls as needed.
 
@@ -366,16 +368,18 @@ Emotional contrast: ordinary stretch ceiling vs MultiFrame. Feeling primary; Sim
 | Role | Text |
 | ---- | ---- |
 | Title | `До и после` |
-| Subtitle | `Эмоциональный контраст: обычный натяжной потолок и потолок с MultiFrame.` |
+| Subtitle | `Обычный натяжной потолок и потолок с MultiFrame — ориентир комфорта для вашей комнаты.` |
 | Before tag | `Сейчас типично` |
 | Before h2 | `Обычный потолок` |
-| Before bullets | `Шум сверху остаётся «рядом»` · `Шаги и голоса легко читаются` · `Ощущение тонкой границы с соседями` · **`Сейчас: {hybrid class}`** — e.g. `Сейчас: Дискомфорт`, `Сейчас: Допустимый (В)` (owner **A**; from Room model, not self-report) |
+| Before bullets | Emotional lines — **TBD rewrite** (owner: old bullets obsolete). **Last bullet locked:** `Сейчас: {hybrid class}` e.g. `Сейчас: Дискомфорт` |
 | After tag | `С MultiFrame` |
 | After h2 | `Бескаркасная акустика` |
-| After bullets | `Тише. Спокойнее. Свой потолок.` · `Ударный и смешанный шум воспринимаются мягче` · `Без каркаса — бережём высоту комнаты` · `Готовит основу для натяжного полотна` |
-| Numbers section title | `Ориентиры в цифрах — вторичны к ощущению` |
-| Honesty note | `Цифры поддерживают ощущение, а не заменяют его. Ударный шум потолком смягчается, но часто нужен ещё пол у соседа сверху.` |
+| After bullets | Emotional lines — **TBD rewrite**. **Last bullet locked (A):** `С MultiFrame: {hybrid class}` e.g. `С MultiFrame: Комфорт (Б)` |
+| Numbers section title | `Ориентиры в цифрах` |
+| Honesty note | `Цифры — рабочая модель (`pre_lab`), не лабораторный замер. Ударный шум потолком смягчается; часто нужен ещё пол у соседа сверху.` |
 | Sticky next | `Услышать разницу` |
+
+**Class rule (confirmed):** Before and After cards both end with the hybrid class from the Room model. Same vocabulary as the top verdict strip. No `Тихо` / `Терпимо` / `Мешает`.
 
 ### Controls
 
@@ -543,31 +547,30 @@ Real StP phone/email presented as live; lab certificate; Polyblock upsell; walls
 
 ## SimCompare component contract
 
-**Purpose:** show before→after comfort orientation with feeling primary and metrics tertiary.
+**Purpose:** show before→after **hybrid comfort class** + oriented metrics. Owner 2026-09-13: rewrite away from old feeling chips.
 
 **Inputs**
 
-- `sim: DerivedSimulation` (before/after sides, delta, deltaRange, uiLabel, honestLines, feelings, slabKey, source, disclaimer)
+- `sim: DerivedSimulation` (before/after sides, delta, deltaRange, uiLabel, honestLines, hybridClassBefore/After, slabKey, source, disclaimer)
 - `emphasize?: 'before' | 'after' | 'both'` (default `both`)
-- `tone?: 'primary' | 'secondary'` (secondary = quieter digits when emotion dual is on screen)
+- `tone?: 'primary' | 'secondary'` (secondary = quieter digits when dual cards are on screen)
 
 **Must render**
 
-- Badge = `Оценка до лабораторных данных`
+- Badge = `Оценка до лабораторных данных` (or equivalent pre_lab frame)
 - Columns: `Сейчас` · `С MultiFrame`
-- Feeling chips: `Тихо` · `Терпимо` · `Мешает`
-- Class pills (hybrid): `Высокий комфорт (А)` · `Комфорт (Б)` · `Допустимый (В)` · `Дискомфорт` · optional `частично` — plus soft norm hint
-- **Chart A — class scale:** visual А→Б→В (or equivalent) showing before→after move; primary scannable chart
+- **Hybrid class labels (primary):** `Высокий комфорт (А)` · `Комфорт (Б)` · `Допустимый (В)` · `Дискомфорт` — plus soft norm hint
+- **Do NOT render** old feeling chips `Тихо` · `Терпимо` · `Мешает` (obsolete)
+- **Chart A — class scale:** visual А→Б→В showing before→after move; primary scannable chart
 - **Chart B — bars:** before/after bars for oriented ΔRw (воздух) and ΔLnw (удар); secondary to class scale; always captioned
-- Channels: `Воздух` / `Удар` with tertiary dB + optional delta
-- After heroes: air `примерно вдвое спокойнее` / `шум как будто дальше`; impact `тише` / `норму часто закрывает пол`
-- Chips: `Воздух: {А|Б|В|вне нормы}` · `Удар: {…}`
-- Range line: `ориентир Δ воздух +8…+12 · удар −6…−10`
+- Channels: `Воздух` / `Удар` with caption + sensation + tertiary dB / Δ
+- Range line when useful: e.g. `ориентир Δ воздух +8…+12 · удар −6…−10`
 - `honestLines` + `DISCLAIMER_SIMULATION`
 
 **Must NOT render (MVP)**
 
 - Frequency / spectrum charts as the primary evidence visual
+- Feeling chips `Тихо` / `Терпимо` / `Мешает`
 
 **Must NOT**
 
