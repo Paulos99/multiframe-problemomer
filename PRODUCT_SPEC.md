@@ -4,15 +4,16 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 
 **Related:** `CHECKLIST.md` (intake + ledger) · live context `https://paulos99.github.io/multiframe-problemomer/` (do not redesign from the live site alone).
 
-**Audiences (confirmed 2026-09-12):** homeowner/customer **and** showroom manager are **equal**. One answer flow; **role switcher on Start** with two short hooks. Role changes framing/copy emphasis and CTA wording, not the 7-step data path.
+**Audiences (revised 2026-09-13):** do **not** collapse users into two roles. Many entry paths and helpers (see User models). **One shared diagnostic flow** → everyone gets the **full picture**: baseline ceiling comfort + MultiFrame acoustic effect + other MultiFrame advantages. Start uses **1–2 guiding questions** (context), not a narrow binary switcher. Context may change hook/CTA wording only — **never** trim the evidence pack.
 
-**Core value (owner-confirmed direction):** show that in *this* room comfort is lower than assumed; MultiFrame can raise comfort class (often by a step+); let user feel how much quieter; explain what ~500k pays for (quiet + frameless “beautiful and quiet ceiling”, not only ΔdB); give manager a fast sales argument. Still **not** a materials calculator and **not** a lab certificate.
+**Core value (owner-confirmed direction):** show that in *this* room comfort is lower than assumed; MultiFrame can raise comfort class (often by a step+); let user feel how much quieter; explain what ~500k pays for (quiet + frameless “beautiful and quiet ceiling”, not only ΔdB); give sales/field/design helpers a fast argument. Still **not** a materials calculator and **not** a lab certificate.
 
 **Global product rules**
 
 - Feeling + comfort-class story first on early screens; **no numbers on Start**.
 - On Before/After + Profile: show the **full evidence pack** — personal room story, classes А/Б/В, numbers, charts, and plain-language explanations of each (owner 2026-09-12: «показать всё, аргументированно, понятно, персонально»).
-- **Evidence layout (Q4, owner 2026-09-12):** everything on one scroll — **conclusion / verdict on top**, detailed data below. Not progressive disclosure; not role-trimmed packs. Manager and homeowner skim what they need. Same stack for both roles (role may still change copy/CTA emphasis).
+- **Evidence layout (Q4, owner 2026-09-12):** everything on one scroll — **conclusion / verdict on top**, detailed data below. Not progressive disclosure; not audience-trimmed packs. Anyone skims what they need. Same full stack for all user models (context may still change copy/CTA emphasis).
+- **Result must include (owner 2026-09-13):** (1) baseline state of *this* ceiling/room, (2) MultiFrame acoustic effect (full unconfirmed model), (3) **other MultiFrame advantages** beyond dB (frameless / height / speed / stretch-ceiling fit / heat / etc. — from MultiFrame site claims, plain language).
 - **Charts (owner 2026-09-13):** **both** — comfort **class scale А→Б→В** (arrow “where we move”) **above**; **before/after bars** for oriented ΔRw / ΔLnw **below**. Not spectrum/frequency charts in MVP. Always with plain-language captions + `pre_lab` framing.
 - **Numbers policy (owner 2026-09-13):** show a **full working MultiFrame effect model** with complete numbers now — currently **unconfirmed** (`marketing_placeholder` / `pre_lab`). After Trofimov (or lab) confirmation, **replace** values with correct ones; do not redesign the UX around hiding numbers. Never present placeholders as lab guarantees or certificates.
 - Effect source: `marketing_placeholder`; disclaimer: `pre_lab` / expert qualitative — never lab guarantees. Charts/numbers are **oriented arguments**, not certificates.
@@ -28,11 +29,62 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | Date | Decision |
 | ---- | -------- |
 | 2026-09-12 | Value ≈ «плёнка без акустики / шум останется» + class uplift + feel quieter + justify ~500k + non-acoustic benefits + sales tool |
-| 2026-09-12 | Audiences **C**: both equal; Start role switcher; shared answer flow |
+| 2026-09-12 | Audiences **C** (narrow binary) — **superseded 2026-09-13** |
 | 2026-09-12 | Result depth: **full pack** — personal + classes + numbers + charts + explanations (not A/B-only; not “feeling only”) |
-| 2026-09-12 | Evidence presentation **Q4**: all-at-once scroll; **вывод сверху, данные ниже**; user/manager self-select depth (not progressive disclosure; not role-dependent density) |
+| 2026-09-12 | Evidence presentation **Q4**: all-at-once scroll; **вывод сверху, данные ниже**; self-select depth (not progressive disclosure; not audience-trimmed) |
 | 2026-09-13 | Charts **C**: class scale А→Б→В on top + before/after bars (ΔRw/ΔLnw) below; no frequency spectrum in MVP |
 | 2026-09-13 | Numbers: **show full unconfirmed model now**; after confirmation swap to correct values (do not hide numbers in MVP) |
+| 2026-09-13 | User models expanded (ads/search/MultiFrame/partner/sales/installer/measurer/designer…); binary role switcher rejected; segment via guiding Q + full picture for all |
+
+---
+
+## User models & Start segmentation
+
+### User models (owner list — durable)
+
+| Cluster | Model | Typical entry / job |
+| ------- | ----- | ------------------- |
+| Client | Targeted ads | «Делаешь красивый потолок? Сделай его и тихим» |
+| Client | Search | «звукоизоляция потолка» |
+| Client | MultiFrame site | «проверь свой потолок» |
+| Client | Partner ceiling site | «Проверь, нужна ли звукоизоляция под натяжной потолок» |
+| Pro | Sales manager in office | Argument for MultiFrame upsell while choosing a ceiling with the client |
+| Pro | Ceiling installer on site | Fast “why noise isolation” argument for the client |
+| Pro | Measurer | Extra sale at measurement |
+| Pro | Designer | Put ceiling noise isolation into the flat project and justify to the client |
+| Pro | Other helpers | Same job: argue MultiFrame value with a shared full picture |
+
+Master-prompt alignment: client + ceiling sales + installer/partner — **expanded**, not reduced.
+
+### Start: guiding questions (DRAFT — awaiting owner OK)
+
+**Principle:** one or two short questions; **not** a long role catalog. UTM/referrer may pre-select hook copy (**ASSUMPTION**).
+
+**Q1 — context (proposed):** `Сейчас вы…`
+
+| Option | Maps to |
+| ------ | ------- |
+| `Выбираю потолок / комфорт для себя` | Client self |
+| `Подбираю решение вместе с клиентом (продажи / шоурум)` | Sales |
+| `На объекте: замер или монтаж` | Measurer / installer |
+| `Проектирую (дизайн / проект квартиры)` | Designer |
+
+**Q2 — optional intent (proposed, only if needed):** `Что важнее прямо сейчас?` → `Понять, тихий ли будет потолок` · `Аргумент для клиента / заказчика` · `Уже ищу звукоизоляцию`
+
+**Normative:** whatever Start answers, Result still shows **full** baseline + MultiFrame acoustic model + non-acoustic advantages + classes/numbers/charts.
+
+### MultiFrame advantages beyond ΔdB (for Result copy — from stp-multiframe.ru / stp.store)
+
+Use as plain-language bullets under verdict (not a datasheet dump):
+
+- Frameless modular panels under stretch/suspended ceiling
+- Small height loss vs framed systems (site claim — keep qualitative unless owner locks a mm figure)
+- Fast install (site: one craftsperson; panel under ~1 minute — label as vendor claim / demo marketing)
+- Tongue-and-groove fit, cut-to-size, service routes possible
+- Extra thermal insulation as a side benefit (vendor claim)
+- Certified / non-dusting materials messaging (vendor claim)
+
+Acoustic effect remains the core; these support “за что платим / почему MultiFrame, а не просто плёнка”.
 
 ---
 
@@ -92,24 +144,25 @@ Must **not** appear: calculator links, dB values, lead form, Polyblock, floor qu
 
 ### Goal
 
-Pick role (equal weight) + emotional hook: create demand for acoustic comfort before choosing a stretch ceiling. Push into the wizard. No numbers.
+Capture **context** with 1–2 guiding questions (not a binary role switcher) + emotional hook: create demand for acoustic comfort when choosing / selling / designing a stretch ceiling. Push into the wizard. No numbers. Same full diagnostic for every model.
 
 ### Visible elements
 
-- Role switcher (two options), kicker, role-dependent H1/lead, primary CTA `Начать`, three scope bullets.
+- Guiding question(s) for context (see draft options above), kicker, context-aware H1/lead (**DRAFT**), primary CTA `Начать`, three scope bullets.
 - Header (no progress, no sticky CTA).
+- Optional: entry hook from UTM/referrer (**ASSUMPTION** — may pre-highlight an option or swap H1).
 
 ### Exact primary copy (RU)
 
 | Role | Text |
 | ---- | ---- |
 | Kicker | `StP · MultiFRAME · потолок` |
-| Role switcher | **DRAFT (owner-confirmed need, copy TBD):** `Я выбираю потолок` · `Я продаю в шоуруме` (or equivalent; exact labels open) |
-| H1 (homeowner — DRAFT) | Keep current baseline until copy pass: `Проверьте уровень акустического комфорта перед выбором натяжного потолка` — rewrite later toward «за что плачу / класс комфорта в моей комнате» |
-| H1 (showroom — DRAFT) | TBD — toward «быстрый аргумент: красивый и тихий потолок за 3 минуты» |
-| Lead | `Проблемомер помогает почувствовать разницу: обычный потолок и потолок с бескаркасной системой MultiFrame — без сложных терминов.` (may fork by role later) |
+| Context Q1 | **DRAFT (awaiting owner OK):** `Сейчас вы…` with options: `Выбираю потолок / комфорт для себя` · `Подбираю решение вместе с клиентом (продажи / шоурум)` · `На объекте: замер или монтаж` · `Проектирую (дизайн / проект квартиры)` |
+| Context Q2 | **Optional DRAFT:** `Что важнее прямо сейчас?` → `Понять, тихий ли будет потолок` · `Аргумент для клиента / заказчика` · `Уже ищу звукоизоляцию` |
+| H1 | **DRAFT baseline:** `Проверьте уровень акустического комфорта перед выбором натяжного потолка` — may fork by context/UTM later (ads «красивый и тихий», search «звукоизоляция», partner «нужна ли ЗИ под натяжной», pro «быстрый аргумент») |
+| Lead | `Проблемомер показывает исходное состояние потолка и эффект MultiFrame — по звуку и другим преимуществам, без сложных терминов.` |
 | Bullet 1 | `Только потолок и шум сверху через перекрытие` |
-| Bullet 2 | `Экспертная оценка с понятными ориентирами` |
+| Bullet 2 | `Полная картина: комфорт сейчас → эффект MultiFrame → плюсы системы` |
 | Bullet 3 | `Далее — расчёт материалов MultiFRAME` |
 | Primary CTA | `Начать` |
 
@@ -117,7 +170,7 @@ Pick role (equal weight) + emotional hook: create demand for acoustic comfort be
 
 | Control | Action | Enabled |
 | ------- | ------ | ------- |
-| Role switcher | Sets `audienceRole: homeowner \| showroom` (shared data path) | Always; default **ASSUMPTION:** last used or homeowner |
+| Context Q1 (± Q2) | Sets `userContext` (shared data path; does **not** trim evidence) | Always; default **ASSUMPTION:** self / last used / UTM hint |
 | `Начать` | Go to Room | Always |
 
 ### Validation messages
@@ -126,7 +179,7 @@ None.
 
 ### Must NOT appear
 
-Rw/Lnw, ΔdB, class chips, slab picker, lead form, Polyblock, walls, floor question, audio player, technical SP references.
+Binary-only «заказчик / шоурум» as the sole segmentation; Rw/Lnw, ΔdB, class chips, slab picker, lead form, Polyblock, walls, floor question, audio player, technical SP references.
 
 ---
 
@@ -559,29 +612,29 @@ Visible/export shape includes: `{ schemaVersion, answers, derived, audio, cta }`
 
 ## Acceptance tests
 
-### A — Solo homeowner
+### A — Client for themselves
 
-1. Open Start: see emotional H1, **no dB**, tap `Начать`.
+1. Open Start: pick context `для себя` (or UTM default), see emotional H1, **no dB**, tap `Начать`.
 2. Pick room + area > 0; optional slab; `Далее`.
 3. Select ≥1 scenario; `Далее`.
 4. Confirm comfort + noise type; see SimCompare before emphasis + disclaimer badge.
-5. Before/After: feeling cards primary; numbers secondary; honesty note about floor for impact.
+5. Before/After: verdict on top; class scale + bars; honesty note about floor for impact.
 6. Audio: play До and После; hear clear difference; see `демо`.
-7. Result: feeling summary; «вдвое» only on air line; open calculator with `area` (+ roomType/scenarios); optional demo lead does not claim real send.
+7. Result: full picture — baseline + MultiFrame acoustic model + non-acoustic advantages; «вдвое» only on air line; open calculator with `area`; optional demo lead does not claim real send.
 8. Restart works.
 
 **Pass:** completes without tech dumps; never promises Lnw norm from ceiling alone; sticky CTA usable on phone width.
 
-### B — Showroom ≤ 3 minutes
+### B — Pro with client ≤ 3 minutes
 
-Manager on phone/tablet walks customer Start→Result in **≤ 3 minutes**:
+Sales / measurer / installer / designer on phone/tablet walks with client Start→Result in **≤ 3 minutes**:
 
-1. Skip deep slab debate (use default).
+1. Pick context (sales / site / design); skip deep slab debate (default).
 2. Pick 1–2 vivid scenarios (e.g. steps + talk).
-3. Land on Audio quickly; customer hears До/После.
-4. Open calculator CTA or show demo lead as “next step with manager”.
+3. Land on Audio quickly; client hears До/После.
+4. Result still shows **full** pack (not trimmed); CTA to calculator or demo lead as next step.
 
-**Pass:** path reachable in ≤3 min; audio contrast obvious; CTA to MultiFRAME calculator works; consultation remains demo-disabled without looking broken as a “real missed contact”.
+**Pass:** path reachable in ≤3 min; audio contrast obvious; full evidence available below verdict; CTA to MultiFRAME calculator works; consultation remains demo-disabled without looking like a broken real contact.
 
 ---
 
