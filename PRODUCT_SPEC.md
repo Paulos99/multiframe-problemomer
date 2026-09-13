@@ -77,6 +77,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Audio chrome locked: title **T1** `Услышать разницу`; subtitle **S6** `Сравните звук обычного потолка и потолка с MultiFrame`; buttons **B2** `До` · `После`; sticky **N3** `Смотреть итог` |
 | 2026-09-13 | Result top verdict line reconfirmed (A): `Сейчас: {класс} → с MultiFrame: {класс}` (e.g. `Сейчас: Дискомфорт → с MultiFrame: Комфорт (Б)`) |
 | 2026-09-13 | Result one-liner **L1:** `В этой комнате MultiFrame поднимает комфорт на ступень выше.` (with class line; same for self/client) |
+| 2026-09-13 | Result chrome: title kept `Акустический профиль`; subtitle **R1** `Ориентир комфорта для вашей комнаты и следующий шаг к расчёту` |
 
 ---
 
@@ -508,7 +509,7 @@ Summarize acoustic profile with **verdict first**, then the full evidence stack 
 | Role | Text |
 | ---- | ---- |
 | Title | `Акустический профиль` |
-| Subtitle | `Сначала ощущение эффекта — цифры вторичны. Затем расчёт MultiFRAME.` |
+| Subtitle | `Ориентир комфорта для вашей комнаты и следующий шаг к расчёту` |
 | Verdict one-liner | `В этой комнате MultiFrame поднимает комфорт на ступень выше.` |
 | Verdict class line | `Сейчас: {класс} → с MultiFrame: {класс}` |
 | Norm footnote | `Ориентир по шкале комфортности (норм. документы)` |
