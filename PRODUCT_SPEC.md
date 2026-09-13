@@ -73,7 +73,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Before/After chrome: subtitle **S3** `Как меняется комфорт комнаты с MultiFrame`; numbers **N3** `Оценка в цифрах`; honesty **H3b** `Цифры — ориентир до лабораторных данных. Ударный шум потолком становится мягче; пол сверху часто дополняет результат.` |
 | 2026-09-13 | **Audio rewrite (Trofimov + owner):** channels воздух / удар (+ UI group **смешанный**); After = case-specific MultiFrame reduction — cut **level and frequencies**; % tied to this room’s Δ (`pre_lab`) |
 | 2026-09-13 | Audio examples locked (D): **воздух** — лай собаки · музыка · громкие разговоры; **удар** — детский бег · перестановка мебели · цоканье когтей собаки; **смешанный** — стиральная машина · пылесос |
-| 2026-09-13 | Audio reduction UI **C:** show `≈ −{n}%` **plus** short Δ caption (e.g. `ориентир −8 дБ`). **Must teach log scale:** −8 dB ≈ large perceptual drop (~2× quieter), not a tiny linear % (64→56 is not “~5% quieter”) |
+| 2026-09-13 | Audio reduction UI **C:** `≈ −{n}%` + Δ caption; log footnote **F2** (premium short): `Шкала дБ логарифмическая: −8 дБ — заметно тише (~вдвое по ощущению).` — no «копеечная» / cheap framing |
 
 ---
 
