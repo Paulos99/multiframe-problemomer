@@ -169,7 +169,7 @@ A capability with no row is `absent` by default. The State column always holds o
 | Frameless MultiFrame positioning | included | Only бескаркасная StP MultiFrame; framed systems out of scope. |
 | Room + optional slab input | included | Room type, area m², optional slab key (default solid 180 mm). |
 | Noise scenario multi-select | removed | Owner 2026-09-13: do not quiz «что мешает». |
-| Current comfort + noise type | included | quiet/ok/bothers + impact/airborne/mixed; plain-language “why”. |
+| Current comfort + noise type | removed | Owner 2026-09-13: no complaint quiz; class from model. |
 | Emotional before/after contrast | included | Feeling-first copy; numbers secondary. |
 | SimCompare effect UI | included | Feeling primary; Rw/Lnw tertiary; А/Б/В chips; honestLines; pre_lab badge. |
 | marketing_placeholder Δ model | included | ΔRw +10 (range 8–12), ΔLnw −8 (range 6–10); `source: marketing_placeholder`; `disclaimer: pre_lab`. Never claim lab guarantees. |
