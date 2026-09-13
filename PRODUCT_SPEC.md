@@ -69,6 +69,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Before/After «После» card bullet (A): last After bullet = `С MultiFrame: {hybrid class}` — symmetric with Before |
 | 2026-09-13 | Before/After copy rewrite: owner — previous emotional bullets / feeling chips are **obsolete**; rebuild from hybrid class + new copy (not patch old `Тихо/Терпимо/Мешает` SPA) |
 | 2026-09-13 | Before/After bullet frame (A): **2 phrases + hybrid class** per card (not one phrase only, not class-only) |
+| 2026-09-13 | Before/After bullet copy locked: Before `Соседи сверху слышны слишком отчётливо` · `Бытовые звуки сверху легко различить` · `Сейчас: {class}`; After `В комнате заметно спокойнее` · `Ударный и воздушный шум воспринимаются мягче` · `С MultiFrame: {class}` |
 
 ---
 
