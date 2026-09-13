@@ -73,6 +73,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Before/After chrome: subtitle **S3** `Как меняется комфорт комнаты с MultiFrame`; numbers **N3** `Оценка в цифрах`; honesty **H3b** `Цифры — ориентир до лабораторных данных. Ударный шум потолком становится мягче; пол сверху часто дополняет результат.` |
 | 2026-09-13 | **Audio rewrite (Trofimov + owner):** channels воздух / удар (+ UI group **смешанный**); After = case-specific MultiFrame reduction — cut **level and frequencies**; % tied to this room’s Δ (`pre_lab`) |
 | 2026-09-13 | Audio examples locked (D): **воздух** — лай собаки · музыка · громкие разговоры; **удар** — детский бег · перестановка мебели · цоканье когтей собаки; **смешанный** — стиральная машина · пылесос |
+| 2026-09-13 | Audio reduction UI **C:** show `≈ −{n}%` **plus** short Δ caption (e.g. `ориентир −8 дБ`). **Must teach log scale:** −8 dB ≈ large perceptual drop (~2× quieter), not a tiny linear % (64→56 is not “~5% quieter”) |
 
 ---
 
@@ -432,7 +433,8 @@ None.
 | Channel impact help | `Удар по плите (Lnw): бег, мебель, когти.` |
 | Channel mixed title | `Смешанный шум` |
 | Channel mixed help | `И воздух, и удар сразу — бытовая техника.` |
-| Reduction label | `Оценка снижения для вашей комнаты: ≈ −{n}%` (map from case Δ — ASSUMPTION until Trofimov confirms) |
+| Reduction line | `≈ −{n}% · ориентир {Δ} дБ` (C — both; % = **perceived** reduction from Δ, not linear Δ/level) |
+| Log footnote | `дБ — логарифмическая шкала: −8 дБ — это примерно вдвое тише по ощущению, а не «минус несколько процентов». Пример: было 64 дБ, стало 56 — снижение существенное.` |
 | Before button | `До` / sub `Обычный потолок` |
 | After button | `После` / sub `С MultiFrame` |
 | Playing state | `Играет` · `нажмите — пауза` |
@@ -465,7 +467,8 @@ None.
 - **Examples:** locked list above — do not invent extra stubs without owner.
 - **Personalization:** After processing uses **this room’s** oriented MultiFrame effect (from Room → sim), not a fixed exaggerated duck.
 - **Processing:** reduce **amplitude and frequency content** to reflect MultiFrame’s effect — ASSUMPTION on exact EQ curve until technical confirmation. Mixed = blend of air+impact ASSUMPTION.
-- **% display:** show approximate perceived / energy reduction derived from case Δ for that example’s group (ASSUMPTION: map dB→% for UI; replace when Trofimov confirms).
+- **Reduction UI (C):** always show **both** `≈ −{n}%` and short Δ caption (`ориентир −8 дБ` / case Δ). `%` = **perceived loudness** map from Δ (rule of thumb ASSUMPTION: ~−10 dB ≈ half as loud → ~−50%; ~−8 dB ≈ ~−40…−45% perceived — tune with Trofimov). **Never** compute % as linear `(64−56)/64` or `8/64`.
+- **Log education (required):** visible footnote that dB is logarithmic — small dB numbers = large sensation change; example `64 → 56` is substantial, not “a few percent”.
 - **Impact honesty:** ceiling softens impact; floating floor above often needed for norm — visible near impact (and mixed if impact-heavy).
 - **Labeling:** keep `ориентир` / `pre_lab` — not lab measurement; drop old «контраст усилен для показа» as the *primary* promise.
 - Mode may stay Web Audio / stubs until real stems exist; behavior must follow rules above.
@@ -633,7 +636,8 @@ Real StP phone/email presented as live; lab certificate; Polyblock upsell; walls
 | UI groups | **Воздух** · **Удар** · **Смешанный** |
 | Examples (locked) | Air: `Лай собаки` · `Музыка` · `Громкие разговоры`. Impact: `Детский бег` · `Перестановка мебели` · `Цоканье когтей собаки`. Mixed: `Стиральная машина` · `Пылесос` |
 | After processing | Apply this room’s oriented Δ: cut **level + frequencies** (mixed = blend air+impact ASSUMPTION) |
-| % / label | Show `≈ −{n}%` (and/or Δ) from derived sim for this case/group — `pre_lab` until confirmed |
+| Reduction UI (C) | Always `≈ −{n}%` **+** `ориентир {Δ} дБ`. `%` = perceived map from Δ — **not** linear Δ/level. ~−8 dB ≈ large drop (~2× quieter sensation ASSUMPTION) |
+| Log footnote | Required: dB are logarithmic; 64→56 is substantial, not “~5% quieter” |
 | Impact honesty | Near impact (and mixed if needed): ceiling softens; floor above often complements |
 | Sources | Web Audio / procedural stubs OK until real stems; must obey processing rules |
 | Labels | `ориентир` / not lab; drop primary promise of «контраст усилен» |
