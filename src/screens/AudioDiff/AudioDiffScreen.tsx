@@ -1,8 +1,11 @@
 import { Screen } from '../../ui/Screen';
-import { Badge } from '../../ui/Badge';
 import { Disclaimer } from '../../ui/Disclaimer';
 import { useSession } from '../../state/SessionContext';
 import { useDemoPlayer } from '../../audio/useDemoPlayer';
+import { AUDIO_GROUP_LABELS } from '../../audio/demoAudio';
+import { LOG_DB_FOOTNOTE } from '../../state/types';
+import { deriveSimulation } from '../../state/simulation';
+import type { AudioPair, DerivedSimulation } from '../../state/types';
 import styles from './AudioDiffScreen.module.css';
 
 function PlayIcon({ playing }: { playing: boolean }) {
@@ -79,83 +82,111 @@ function SideButton({
   );
 }
 
+function reductionLine(group: AudioPair['group'], sim: DerivedSimulation): string {
+  const airPct = sim.perceivedAirPct;
+  const impactPct = sim.perceivedImpactPct;
+  const airDb = Math.abs(sim.delta.Rw);
+  const impactDb = Math.abs(sim.delta.Lnw);
+
+  if (group === 'air') {
+    return `≈ −${airPct}% · ориентир −${airDb} дБ`;
+  }
+  if (group === 'impact') {
+    return `≈ −${impactPct}% · ориентир −${impactDb} дБ`;
+  }
+  const pct = Math.round((airPct + impactPct) / 2);
+  const db = Math.round((airDb + impactDb) / 2);
+  return `≈ −${pct}% · ориентир −${db} дБ`;
+}
+
+const GROUPS: Array<AudioPair['group']> = ['air', 'impact', 'mixed'];
+
 export function AudioDiffScreen() {
   const { session } = useSession();
   const { activeId, progress, play, stop } = useDemoPlayer();
-  const isDemo = session.audio.mode === 'demo_stub';
-  const demoSet = session.audio.demoSet;
+  const sim = session.derived?.simulation ?? deriveSimulation(session.answers);
 
   return (
     <Screen
       title="Услышать разницу"
-      subtitle="Сравните «до» и «после». Крупные кнопки — удобно на телефоне."
+      subtitle="Сравните звук обычного потолка и потолка с MultiFrame"
     >
-      {isDemo ? (
-        <p className={styles.contrastNote}>
-          <Badge>демо, контраст усилен для показа</Badge>
-          <span>«До» заметно громче, «После» — явно тише.</span>
-        </p>
-      ) : null}
-
-      {demoSet ? (
-        <p className={styles.demoSet}>
-          <Badge>демо-набор</Badge>
-          <span>Фиксированный набор примеров для выбранных сценариев.</span>
-        </p>
-      ) : null}
-
-      {session.audio.pairs.map((pair) => {
-        const beforeId = `${pair.id}:before`;
-        const afterId = `${pair.id}:after`;
-        const beforeOn = activeId === beforeId;
-        const afterOn = activeId === afterId;
+      {GROUPS.map((group) => {
+        const pairs = session.audio.pairs.filter((p) => p.group === group);
+        if (!pairs.length) return null;
+        const meta = AUDIO_GROUP_LABELS[group];
         return (
-          <article key={pair.id} className={styles.pair}>
-            <header className={styles.pairHead}>
-              <h2>{pair.label}</h2>
-              {isDemo ? <Badge>демо</Badge> : null}
+          <section key={group} className={styles.group}>
+            <header className={styles.groupHead}>
+              <div>
+                <h2>{meta.title}</h2>
+                <p>{meta.help}</p>
+              </div>
+              <p className={styles.reduction}>{reductionLine(group, sim)}</p>
             </header>
-            <div className={styles.controls}>
-              <SideButton
-                side="before"
-                playing={beforeOn}
-                progress={progress}
-                title="До — громко"
-                subtitle={pair.beforeLabel}
-                ariaLabel={
-                  beforeOn
-                    ? `Пауза: До — громко, ${pair.beforeLabel}`
-                    : `Слушать До — громко: ${pair.beforeLabel}`
-                }
-                onToggle={() => {
-                  if (beforeOn) stop();
-                  else void play(beforeId, pair.beforeSrc);
-                }}
-              />
-              <SideButton
-                side="after"
-                playing={afterOn}
-                progress={progress}
-                title="После — тише"
-                subtitle={pair.afterLabel}
-                ariaLabel={
-                  afterOn
-                    ? `Пауза: После — тише, ${pair.afterLabel}`
-                    : `Слушать После — тише: ${pair.afterLabel}`
-                }
-                onToggle={() => {
-                  if (afterOn) stop();
-                  else void play(afterId, pair.afterSrc);
-                }}
-              />
-            </div>
-          </article>
+
+            {group === 'impact' || group === 'mixed' ? (
+              <p className={styles.honesty}>
+                По удару потолок смягчает; пол сверху часто дополняет результат.
+              </p>
+            ) : null}
+
+            {pairs.map((pair) => {
+              const beforeId = `${pair.id}:before`;
+              const afterId = `${pair.id}:after`;
+              const beforeOn = activeId === beforeId;
+              const afterOn = activeId === afterId;
+              return (
+                <article key={pair.id} className={styles.pair}>
+                  <header className={styles.pairHead}>
+                    <h3>{pair.label}</h3>
+                  </header>
+                  <div className={styles.controls}>
+                    <SideButton
+                      side="before"
+                      playing={beforeOn}
+                      progress={progress}
+                      title="До"
+                      subtitle={pair.beforeLabel}
+                      ariaLabel={
+                        beforeOn
+                          ? `Пауза: До, ${pair.label}`
+                          : `Слушать До: ${pair.label}`
+                      }
+                      onToggle={() => {
+                        if (beforeOn) stop();
+                        else void play(beforeId, pair.beforeSrc);
+                      }}
+                    />
+                    <SideButton
+                      side="after"
+                      playing={afterOn}
+                      progress={progress}
+                      title="После"
+                      subtitle={pair.afterLabel}
+                      ariaLabel={
+                        afterOn
+                          ? `Пауза: После, ${pair.label}`
+                          : `Слушать После: ${pair.label}`
+                      }
+                      onToggle={() => {
+                        if (afterOn) stop();
+                        else void play(afterId, pair.afterSrc);
+                      }}
+                    />
+                  </div>
+                </article>
+              );
+            })}
+          </section>
         );
       })}
 
+      <p className={styles.footnote}>{LOG_DB_FOOTNOTE}</p>
+
       <Disclaimer
         compact
-        text="Аудио демонстрационное: иллюстрирует ощущение контраста, а не лабораторный замер."
+        text="Аудио — иллюстрация эффекта модели для этой комнаты, не лабораторный замер. Срезаются громкость и частоты по ориентиру MultiFrame."
       />
     </Screen>
   );

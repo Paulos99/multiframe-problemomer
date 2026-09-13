@@ -1,3 +1,68 @@
+.verdict {
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(155deg, rgba(1, 100, 79, 0.16), transparent 50%),
+    var(--bg-card);
+  border: 1px solid rgba(1, 100, 79, 0.28);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.oneLiner {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.classShift {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--accent-color);
+}
+
+.normNote {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.features > h2 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.feature h3 {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+
+.feature p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
 .profile {
   padding: 18px;
   border-radius: var(--radius-lg);
@@ -64,20 +129,9 @@
 }
 
 .emotionCard h2 {
-  margin: 12px 0 6px;
+  margin: 12px 0 10px;
   font-size: 1.1rem;
   letter-spacing: -0.02em;
-}
-
-.emotion {
-  margin: 0 0 12px;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-
-.after .emotion {
-  color: var(--accent-color);
 }
 
 .emotionCard ul {

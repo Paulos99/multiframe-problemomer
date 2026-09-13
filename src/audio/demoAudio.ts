@@ -1,28 +1,78 @@
-import type { AudioPair, NoiseScenario } from '../state/types';
+import type { AudioPair } from '../state/types';
 
-/**
- * Demo stub audio pairs (mode stays demo_stub).
- * Filter by selected scenarios when possible; otherwise keep fixed stub set
- * and mark demoSet for «демо-набор» UI label.
- */
+/** Fixed household demo set — three groups (air / impact / mixed). */
 export const DEMO_AUDIO_PAIRS: AudioPair[] = [
   {
-    id: 'steps',
-    label: 'Шаги сверху',
-    beforeLabel: 'Обычный потолок',
-    afterLabel: 'С MultiFrame',
-    beforeSrc: 'stub:before:steps',
-    afterSrc: 'stub:after:steps',
-    scenarios: ['steps', 'drop', 'furniture', 'repair'],
-  },
-  {
-    id: 'talk',
-    label: 'Разговор / ТВ',
-    beforeLabel: 'Обычный потолок',
-    afterLabel: 'С MultiFrame',
+    id: 'dog_bark',
+    label: 'Лай собаки',
+    group: 'air',
+    beforeLabel: 'До',
+    afterLabel: 'После',
     beforeSrc: 'stub:before:talk',
     afterSrc: 'stub:after:talk',
-    scenarios: ['talk', 'tv', 'music'],
+  },
+  {
+    id: 'music',
+    label: 'Музыка',
+    group: 'air',
+    beforeLabel: 'До',
+    afterLabel: 'После',
+    beforeSrc: 'stub:before:talk',
+    afterSrc: 'stub:after:talk',
+  },
+  {
+    id: 'loud_talk',
+    label: 'Громкие разговоры',
+    group: 'air',
+    beforeLabel: 'До',
+    afterLabel: 'После',
+    beforeSrc: 'stub:before:talk',
+    afterSrc: 'stub:after:talk',
+  },
+  {
+    id: 'kids_run',
+    label: 'Детский бег',
+    group: 'impact',
+    beforeLabel: 'До',
+    afterLabel: 'После',
+    beforeSrc: 'stub:before:steps',
+    afterSrc: 'stub:after:steps',
+  },
+  {
+    id: 'furniture',
+    label: 'Перестановка мебели',
+    group: 'impact',
+    beforeLabel: 'До',
+    afterLabel: 'После',
+    beforeSrc: 'stub:before:steps',
+    afterSrc: 'stub:after:steps',
+  },
+  {
+    id: 'dog_claws',
+    label: 'Цоканье когтей собаки',
+    group: 'impact',
+    beforeLabel: 'До',
+    afterLabel: 'После',
+    beforeSrc: 'stub:before:steps',
+    afterSrc: 'stub:after:steps',
+  },
+  {
+    id: 'washer',
+    label: 'Стиральная машина',
+    group: 'mixed',
+    beforeLabel: 'До',
+    afterLabel: 'После',
+    beforeSrc: 'stub:before:steps',
+    afterSrc: 'stub:after:talk',
+  },
+  {
+    id: 'vacuum',
+    label: 'Пылесос',
+    group: 'mixed',
+    beforeLabel: 'До',
+    afterLabel: 'После',
+    beforeSrc: 'stub:before:talk',
+    afterSrc: 'stub:after:steps',
   },
 ];
 
@@ -38,20 +88,8 @@ export function parseStubSrc(src: string): { kind: StubKind; scene: StubScene } 
   return { kind, scene };
 }
 
-export function pairsForScenarios(scenarios: NoiseScenario[]): {
-  pairs: AudioPair[];
-  demoSet: boolean;
-} {
-  if (!scenarios.length) {
-    return { pairs: DEMO_AUDIO_PAIRS, demoSet: true };
-  }
-  const filtered = DEMO_AUDIO_PAIRS.filter((p) =>
-    (p.scenarios ?? []).some((s) => scenarios.includes(s)),
-  );
-  if (!filtered.length) {
-    // No stub matches selection — fall back to fixed demo set.
-    return { pairs: DEMO_AUDIO_PAIRS, demoSet: true };
-  }
-  // Filtered to selected scenarios; keep «ДЕМО» on pairs, not «демо-набор».
-  return { pairs: filtered, demoSet: false };
-}
+export const AUDIO_GROUP_LABELS = {
+  air: { title: 'Воздушный шум', help: 'Через перекрытие (Rw): речь, музыка, лай.' },
+  impact: { title: 'Ударный шум', help: 'Удар по плите (Lnw): бег, мебель, когти.' },
+  mixed: { title: 'Смешанный шум', help: 'И воздух, и удар сразу — бытовая техника.' },
+} as const;

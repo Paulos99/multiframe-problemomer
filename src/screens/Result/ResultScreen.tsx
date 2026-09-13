@@ -6,10 +6,9 @@ import { Field, TextInput } from '../../ui/Field';
 import { SimCompare } from '../../ui/SimCompare';
 import { useSession } from '../../state/SessionContext';
 import {
-  COMFORT_LABELS,
-  NOISE_TYPE_LABELS,
+  HYBRID_CLASS_LABELS,
+  NORM_FOOTNOTE,
   ROOM_TYPE_LABELS,
-  SCENARIO_LABELS,
 } from '../../state/types';
 import { buildCalculatorUrl, toSessionJson } from '../../state/session';
 import { deriveSimulation } from '../../state/simulation';
@@ -20,17 +19,20 @@ export function ResultScreen() {
   const derived = session.derived;
   const room = session.answers.room;
   const sim = derived?.simulation ?? deriveSimulation(session.answers);
-  const comfort =
-    derived?.comfortLevel ?? session.answers.current?.comfortLevel ?? 'ok';
+  const beforeClass = HYBRID_CLASS_LABELS[sim.before.classLabel];
+  const afterClass = HYBRID_CLASS_LABELS[sim.after.classLabel];
   const [showLead, setShowLead] = useState(false);
   const [sent, setSent] = useState(false);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
 
   const calcUrl = buildCalculatorUrl(session.cta);
+  const airDelta = Math.abs(sim.delta.Rw);
+  const impactDelta = Math.abs(sim.delta.Lnw);
 
   function onLead(e: FormEvent) {
     e.preventDefault();
+    if (!name.trim() || !phone.trim()) return;
     console.info('[lead-demo]', {
       name,
       phone,
@@ -44,28 +46,36 @@ export function ResultScreen() {
   return (
     <Screen
       title="Акустический профиль"
-      subtitle="Сначала ощущение эффекта — цифры вторичны. Затем расчёт MultiFRAME."
+      subtitle="Ориентир комфорта для вашей комнаты и следующий шаг к расчёту"
     >
+      <div className={styles.verdict} role="status">
+        <p className={styles.oneLiner}>
+          В этой комнате MultiFrame поднимает комфорт на ступень выше.
+        </p>
+        <p className={styles.classShift}>
+          Сейчас: {beforeClass} → с MultiFrame: {afterClass}
+        </p>
+        <p className={styles.normNote}>{NORM_FOOTNOTE}</p>
+      </div>
+
       <div className={styles.dual}>
         <article className={`${styles.emotionCard} ${styles.before}`}>
           <span className={styles.tag}>Сейчас</span>
           <h2>Без MultiFrame</h2>
-          <p className={styles.emotion}>Шум сверху остаётся «рядом»</p>
           <ul>
-            <li>
-              Ощущение: {derived ? COMFORT_LABELS[derived.comfortLevel] : COMFORT_LABELS[comfort]}
-            </li>
-            <li>Тип: {derived ? NOISE_TYPE_LABELS[derived.noiseType] : '—'}</li>
+            <li>Соседи сверху слышны слишком отчётливо</li>
+            <li>Бытовые звуки сверху легко различить</li>
+            <li>Сейчас: {beforeClass}</li>
           </ul>
         </article>
 
         <article className={`${styles.emotionCard} ${styles.after}`}>
           <span className={styles.tag}>С MultiFrame</span>
-          <h2>Эффект в ощущении</h2>
-          <p className={styles.emotion}>Тише. Спокойнее. Свой потолок.</p>
+          <h2>С MultiFrame</h2>
           <ul>
-            <li>Воздух: примерно вдвое спокойнее — шум как будто дальше</li>
-            <li>Удар: тише; норму часто закрывает пол у соседа</li>
+            <li>В комнате заметно спокойнее</li>
+            <li>Ударный и воздушный шум воспринимаются мягче</li>
+            <li>С MultiFrame: {afterClass}</li>
           </ul>
         </article>
       </div>
@@ -78,15 +88,10 @@ export function ResultScreen() {
             {room.ceilingAreaM2 ? ` · ${room.ceilingAreaM2} м²` : ''}
           </strong>
         </div>
-        <div className={styles.scenarios}>
-          {session.answers.scenarios.map((s) => (
-            <span key={s}>{SCENARIO_LABELS[s].title}</span>
-          ))}
-        </div>
       </div>
 
       <div className={styles.simSecondary}>
-        <p className={styles.simLead}>Ориентиры в цифрах — вторичны к ощущению</p>
+        <p className={styles.simLead}>Оценка в цифрах</p>
         <SimCompare sim={sim} tone="secondary" />
       </div>
 
@@ -101,31 +106,83 @@ export function ResultScreen() {
         </div>
       ) : null}
 
+      <div className={styles.features}>
+        <h2>Почему MultiFrame</h2>
+
+        <article className={styles.feature}>
+          <h3>
+            Сейчас: {beforeClass} → с MultiFrame: {afterClass}
+          </h3>
+          <p>
+            Так комната читается на шкале комфортности: это понятный ориентир для
+            вашего случая и мягкая опора на нормативные представления о тишине, без
+            претензии на лабораторный вердикт.
+          </p>
+        </article>
+
+        <article className={styles.feature}>
+          <h3>
+            Ориентиры снижения шума: по воздуху около −{airDelta} дБ, по удару около −
+            {impactDelta} дБ.
+          </h3>
+          <p>
+            Обе оценки собраны под параметры этой комнаты. Поскольку шкала децибел
+            логарифмическая, даже небольшое снижение на слух ощущается заметно
+            спокойнее.
+          </p>
+        </article>
+
+        <article className={styles.feature}>
+          <h3>
+            Под обычным натяжным потолком воздух в зазоре усиливает шум сверху, как
+            полотно барабана.
+          </h3>
+          <p>
+            MultiFrame рассеивает эту энергию в панели, и комната воспринимается
+            спокойнее.
+          </p>
+        </article>
+
+        <article className={styles.feature}>
+          <h3>Решение, с которым спокойно жить в комнате.</h3>
+          <p>
+            Состав и сертификаты подтверждают, что система уместна в жилом интерьере и
+            не воспринимается как «чисто строительный» материал.
+          </p>
+        </article>
+
+        <article className={styles.feature}>
+          <h3>Монтаж идёт в том же темпе, что и обычный натяжной потолок.</h3>
+          <p>
+            Панели собираются быстро, без тяжёлого каркаса и без ощущения затяжной
+            стройки на объекте.
+          </p>
+        </article>
+
+        <article className={styles.feature}>
+          <h3>Панель нового поколения с продуманной архитектурой.</h3>
+          <p>
+            Жёсткий контур вместе с перфорацией рассеивает энергию шума в пространстве
+            над полотном.
+          </p>
+        </article>
+      </div>
+
       <Disclaimer />
 
       <div className={styles.actions}>
-        <a className={styles.linkSecondary} href={calcUrl} target="_blank" rel="noreferrer">
-          Открыть калькулятор
+        <a className={styles.linkBtn} href={calcUrl} target="_blank" rel="noreferrer">
+          Открыть калькулятор MultiFrame
         </a>
-        <div className={styles.demoBlock}>
-          <span className={styles.demoBadge}>демо</span>
-          <p>
-            Реальных контактов StP в этом MVP нет. «Консультация» и заявка — только
-            демонстрационные заглушки.
-          </p>
-          <button type="button" className={styles.demoDisabled} disabled>
-            Консультация (недоступно в демо)
-          </button>
-          <Button variant="secondary" fullWidth onClick={() => setShowLead((v) => !v)}>
-            Оставить заявку (демо)
-          </Button>
-        </div>
+        <Button variant="secondary" fullWidth onClick={() => setShowLead((v) => !v)}>
+          Запросить консультацию или подбор
+        </Button>
       </div>
 
       {showLead ? (
         <form className={styles.form} onSubmit={onLead}>
-          <h3>Заявка · демо</h3>
-          <p>Никуда не отправляется — только console stub. Не inventированный корпоративный email.</p>
+          <h3>Заявка на консультацию</h3>
+          <p>Разберём ваш случай, подберём материал.</p>
           <Field label="Имя">
             <TextInput
               required
@@ -144,7 +201,7 @@ export function ResultScreen() {
             />
           </Field>
           <Button type="submit" fullWidth disabled={sent}>
-            {sent ? 'Принято (демо-stub)' : 'Отправить (демо)'}
+            {sent ? 'Заявка принята' : 'Отправить'}
           </Button>
           <details className={styles.payload}>
             <summary>CTA payload (schemaVersion 1)</summary>

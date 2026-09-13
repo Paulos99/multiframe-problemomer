@@ -1,7 +1,21 @@
-import type { AudioPair, AudioState, CtaPayload, SessionState, WizardStep } from './types';
+import type { AudioState, CtaPayload, SessionState, WizardStep } from './types';
 import { WIZARD_STEPS, CALCULATOR_URL } from './types';
 import { deriveProfile } from './derive';
-import { DEMO_AUDIO_PAIRS, pairsForScenarios } from '../audio/demoAudio';
+import { DEMO_AUDIO_PAIRS } from '../audio/demoAudio';
+
+function defaultRoom() {
+  return {
+    roomType: null as SessionState['answers']['room']['roomType'],
+    ceilingAreaM2: null as number | null,
+    slabType: 'unknown' as const,
+    slabThickness: 'unknown' as const,
+    floorAbove: 'unknown' as const,
+    houseType: 'unknown' as const,
+    objectStage: 'unknown' as const,
+    plannedCeiling: 'unknown' as const,
+    noisyNeighbors: 'unknown' as const,
+  };
+}
 
 export function createInitialSession(): SessionState {
   const audio: AudioState = {
@@ -11,14 +25,11 @@ export function createInitialSession(): SessionState {
   };
 
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     step: 'start',
     answers: {
-      room: {
-        roomType: null,
-        ceilingAreaM2: null,
-      },
-      scenarios: [],
+      interestFor: 'self',
+      room: defaultRoom(),
       scope: 'ceiling',
     },
     derived: null,
@@ -26,7 +37,6 @@ export function createInitialSession(): SessionState {
     cta: {
       roomType: null,
       ceilingAreaM2: null,
-      scenarios: [],
     },
   };
 }
@@ -35,21 +45,19 @@ export function buildCta(session: SessionState): CtaPayload {
   return {
     roomType: session.answers.room.roomType,
     ceilingAreaM2: session.answers.room.ceilingAreaM2,
-    scenarios: [...session.answers.scenarios],
   };
 }
 
 export function withDerived(session: SessionState): SessionState {
   const derived = deriveProfile(session.answers);
-  const { pairs, demoSet } = pairsForScenarios(session.answers.scenarios);
   return {
     ...session,
     derived,
     cta: buildCta(session),
     audio: {
       mode: 'demo_stub',
-      pairs,
-      demoSet,
+      pairs: DEMO_AUDIO_PAIRS,
+      demoSet: true,
     },
   };
 }
@@ -80,10 +88,6 @@ export function canProceed(session: SessionState): boolean {
         session.answers.room.ceilingAreaM2 != null &&
         session.answers.room.ceilingAreaM2 > 0
       );
-    case 'scenarios':
-      return session.answers.scenarios.length > 0;
-    case 'current':
-      return session.answers.current != null;
     case 'beforeAfter':
     case 'audio':
     case 'result':
@@ -93,7 +97,6 @@ export function canProceed(session: SessionState): boolean {
   }
 }
 
-/** Room step inline hint when Далее disabled */
 export function roomNextHint(session: SessionState): string | null {
   if (session.step !== 'room') return null;
   if (session.answers.room.roomType == null) return 'выберите тип';
@@ -106,16 +109,12 @@ export function roomNextHint(session: SessionState): string | null {
   return null;
 }
 
-/** Calculator CTA: area + roomType + scenarios (comma-separated enums). */
 export function buildCalculatorUrl(cta: CtaPayload, base = CALCULATOR_URL): string {
   const url = new URL(base);
   if (cta.ceilingAreaM2 != null && cta.ceilingAreaM2 > 0) {
     url.searchParams.set('area', String(cta.ceilingAreaM2));
   }
   if (cta.roomType) url.searchParams.set('roomType', cta.roomType);
-  if (cta.scenarios.length) {
-    url.searchParams.set('scenarios', cta.scenarios.join(','));
-  }
   return url.toString();
 }
 
@@ -133,5 +132,3 @@ export function toSessionJson(session: SessionState): string {
     2,
   );
 }
-
-export type { AudioPair };

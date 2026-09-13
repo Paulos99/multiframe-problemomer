@@ -7,12 +7,17 @@ import {
   type ReactNode,
 } from 'react';
 import type {
-  ComfortLevel,
-  FloorSlab,
-  NoiseScenario,
-  NoiseType,
+  FloorAboveOption,
+  HouseTypeOption,
+  InterestFor,
+  NoisyNeighborsOption,
+  ObjectStageOption,
+  PlannedCeilingOption,
+  RoomAnswers,
   RoomType,
   SessionState,
+  SlabThicknessOption,
+  SlabTypeOption,
   WizardStep,
 } from './types';
 import {
@@ -22,7 +27,6 @@ import {
   prevStep,
   withDerived,
 } from './session';
-import { buildPlainWhy } from './derive';
 
 interface SessionApi {
   session: SessionState;
@@ -30,11 +34,17 @@ interface SessionApi {
   goBack: () => void;
   goTo: (step: WizardStep) => void;
   restart: () => void;
+  setInterestFor: (v: InterestFor) => void;
   setRoomType: (roomType: RoomType) => void;
   setCeilingArea: (area: number | null) => void;
-  setFloorSlab: (slab: FloorSlab | undefined) => void;
-  toggleScenario: (s: NoiseScenario) => void;
-  setCurrentState: (comfort: ComfortLevel, noiseType: NoiseType) => void;
+  patchRoom: (patch: Partial<RoomAnswers>) => void;
+  setSlabType: (v: SlabTypeOption) => void;
+  setSlabThickness: (v: SlabThicknessOption) => void;
+  setFloorAbove: (v: FloorAboveOption) => void;
+  setHouseType: (v: HouseTypeOption) => void;
+  setObjectStage: (v: ObjectStageOption) => void;
+  setPlannedCeiling: (v: PlannedCeilingOption) => void;
+  setNoisyNeighbors: (v: NoisyNeighborsOption) => void;
   canGoNext: boolean;
 }
 
@@ -53,7 +63,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       const n = nextStep(prev.step);
       if (!n) return prev;
       let next = { ...prev, step: n };
-      if (n === 'beforeAfter' || n === 'audio' || n === 'result' || n === 'current') {
+      if (n === 'beforeAfter' || n === 'audio' || n === 'result') {
         next = withDerived(next);
       }
       return next;
@@ -76,67 +86,66 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     setSession(createInitialSession());
   }, []);
 
-  const setRoomType = useCallback(
-    (roomType: RoomType) => {
+  const setInterestFor = useCallback(
+    (interestFor: InterestFor) => {
       patch((s) => ({
         ...s,
-        answers: { ...s.answers, room: { ...s.answers.room, roomType } },
+        answers: { ...s.answers, interestFor },
       }));
     },
     [patch],
+  );
+
+  const patchRoom = useCallback(
+    (roomPatch: Partial<RoomAnswers>) => {
+      patch((s) => ({
+        ...s,
+        answers: {
+          ...s.answers,
+          room: { ...s.answers.room, ...roomPatch },
+        },
+      }));
+    },
+    [patch],
+  );
+
+  const setRoomType = useCallback(
+    (roomType: RoomType) => patchRoom({ roomType }),
+    [patchRoom],
   );
 
   const setCeilingArea = useCallback(
-    (ceilingAreaM2: number | null) => {
-      patch((s) => ({
-        ...s,
-        answers: { ...s.answers, room: { ...s.answers.room, ceilingAreaM2 } },
-      }));
-    },
-    [patch],
+    (ceilingAreaM2: number | null) => patchRoom({ ceilingAreaM2 }),
+    [patchRoom],
   );
 
-  const setFloorSlab = useCallback(
-    (floorSlab: FloorSlab | undefined) => {
-      patch((s) => ({
-        ...s,
-        answers: { ...s.answers, room: { ...s.answers.room, floorSlab } },
-      }));
-    },
-    [patch],
+  const setSlabType = useCallback(
+    (slabType: SlabTypeOption) => patchRoom({ slabType }),
+    [patchRoom],
   );
-
-  const toggleScenario = useCallback(
-    (scenario: NoiseScenario) => {
-      patch((s) => {
-        const has = s.answers.scenarios.includes(scenario);
-        const scenarios = has
-          ? s.answers.scenarios.filter((x) => x !== scenario)
-          : [...s.answers.scenarios, scenario];
-        return { ...s, answers: { ...s.answers, scenarios } };
-      });
-    },
-    [patch],
+  const setSlabThickness = useCallback(
+    (slabThickness: SlabThicknessOption) => patchRoom({ slabThickness }),
+    [patchRoom],
   );
-
-  const setCurrentState = useCallback(
-    (comfortLevel: ComfortLevel, noiseType: NoiseType) => {
-      patch((s) => {
-        const next = {
-          ...s,
-          answers: {
-            ...s.answers,
-            current: {
-              comfortLevel,
-              noiseType,
-              whyPlain: buildPlainWhy(comfortLevel, noiseType, s.answers.scenarios),
-            },
-          },
-        };
-        return withDerived(next);
-      });
-    },
-    [patch],
+  const setFloorAbove = useCallback(
+    (floorAbove: FloorAboveOption) => patchRoom({ floorAbove }),
+    [patchRoom],
+  );
+  const setHouseType = useCallback(
+    (houseType: HouseTypeOption) => patchRoom({ houseType }),
+    [patchRoom],
+  );
+  const setObjectStage = useCallback(
+    (objectStage: ObjectStageOption) => patchRoom({ objectStage }),
+    [patchRoom],
+  );
+  const setPlannedCeiling = useCallback(
+    (plannedCeiling: PlannedCeilingOption) => patchRoom({ plannedCeiling }),
+    [patchRoom],
+  );
+  const setNoisyNeighbors = useCallback(
+    (noisyNeighbors: NoisyNeighborsOption) => patchRoom({ noisyNeighbors }),
+    [patchRoom],
   );
 
   const value = useMemo<SessionApi>(
@@ -146,11 +155,17 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       goBack,
       goTo,
       restart,
+      setInterestFor,
       setRoomType,
       setCeilingArea,
-      setFloorSlab,
-      toggleScenario,
-      setCurrentState,
+      patchRoom,
+      setSlabType,
+      setSlabThickness,
+      setFloorAbove,
+      setHouseType,
+      setObjectStage,
+      setPlannedCeiling,
+      setNoisyNeighbors,
       canGoNext: canProceed(session),
     }),
     [
@@ -159,11 +174,17 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       goBack,
       goTo,
       restart,
+      setInterestFor,
       setRoomType,
       setCeilingArea,
-      setFloorSlab,
-      toggleScenario,
-      setCurrentState,
+      patchRoom,
+      setSlabType,
+      setSlabThickness,
+      setFloorAbove,
+      setHouseType,
+      setObjectStage,
+      setPlannedCeiling,
+      setNoisyNeighbors,
     ],
   );
 

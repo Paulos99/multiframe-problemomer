@@ -1,21 +1,37 @@
 import { Screen } from '../../ui/Screen';
 import { CardSelect } from '../../ui/CardSelect';
-import { Field, TextInput, Select } from '../../ui/Field';
+import { Field, TextInput } from '../../ui/Field';
 import { useSession } from '../../state/SessionContext';
 import {
+  FLOOR_ABOVE_OPTIONS,
+  HOUSE_TYPE_OPTIONS,
+  NOISY_NEIGHBORS_OPTIONS,
+  OBJECT_STAGE_OPTIONS,
+  PLANNED_CEILING_OPTIONS,
   ROOM_TYPE_LABELS,
-  SLAB_KEY_LABELS,
+  SLAB_THICKNESS_OPTIONS,
+  SLAB_TYPE_OPTIONS,
   type RoomType,
-  type SlabKey,
 } from '../../state/types';
 import { roomNextHint } from '../../state/session';
 import styles from './RoomScreen.module.css';
 
 const ROOM_TYPES = Object.keys(ROOM_TYPE_LABELS) as RoomType[];
-const SLAB_KEYS = Object.keys(SLAB_KEY_LABELS) as SlabKey[];
 
 export function RoomScreen() {
-  const { session, setRoomType, setCeilingArea, setFloorSlab, canGoNext } = useSession();
+  const {
+    session,
+    setRoomType,
+    setCeilingArea,
+    setSlabType,
+    setSlabThickness,
+    setFloorAbove,
+    setHouseType,
+    setObjectStage,
+    setPlannedCeiling,
+    setNoisyNeighbors,
+    canGoNext,
+  } = useSession();
   const room = session.answers.room;
   const hint = roomNextHint(session);
 
@@ -54,34 +70,114 @@ export function RoomScreen() {
 
       {!canGoNext && hint ? (
         <p className={styles.validation} role="status">
-          {hint === 'выберите тип' ? 'выберите тип' : 'укажите площадь'}
+          {hint}
         </p>
       ) : null}
 
-      <div className={styles.optional}>
-        <h2>Перекрытие сверху (по желанию)</h2>
-        <p>Для оценочной симуляции. Если не указать — берём сплошную 180 мм.</p>
-        <Field label="Тип / толщина плиты">
-          <Select
-            value={room.floorSlab?.key ?? room.floorSlab?.preset ?? ''}
-            onChange={(e) => {
-              const v = e.target.value as SlabKey | '';
-              if (!v) {
-                setFloorSlab(undefined);
-                return;
-              }
-              setFloorSlab({ key: v });
-            }}
-          >
-            <option value="">Не указывать (180 по умолчанию)</option>
-            {SLAB_KEYS.map((k) => (
-              <option key={k} value={k}>
-                {SLAB_KEY_LABELS[k]}
-              </option>
-            ))}
-          </Select>
-        </Field>
-      </div>
+      <section className={styles.block}>
+        <h2>Тип перекрытия</h2>
+        <div className={styles.grid}>
+          {SLAB_TYPE_OPTIONS.map((opt) => (
+            <CardSelect
+              key={opt.id}
+              dense
+              title={opt.label}
+              selected={room.slabType === opt.id}
+              onClick={() => setSlabType(opt.id)}
+            />
+          ))}
+        </div>
+      </section>
+
+      <section className={styles.block}>
+        <h2>Толщина перекрытия</h2>
+        <div className={styles.grid}>
+          {SLAB_THICKNESS_OPTIONS.map((opt) => (
+            <CardSelect
+              key={opt.id}
+              dense
+              title={opt.label}
+              selected={room.slabThickness === opt.id}
+              onClick={() => setSlabThickness(opt.id)}
+            />
+          ))}
+        </div>
+      </section>
+
+      <section className={styles.block}>
+        <h2>Пол сверху</h2>
+        <div className={styles.grid}>
+          {FLOOR_ABOVE_OPTIONS.map((opt) => (
+            <CardSelect
+              key={opt.id}
+              dense
+              title={opt.label}
+              selected={room.floorAbove === opt.id}
+              onClick={() => setFloorAbove(opt.id)}
+            />
+          ))}
+        </div>
+      </section>
+
+      <section className={styles.block}>
+        <h2>Тип дома</h2>
+        <div className={styles.grid}>
+          {HOUSE_TYPE_OPTIONS.map((opt) => (
+            <CardSelect
+              key={opt.id}
+              dense
+              title={opt.label}
+              selected={room.houseType === opt.id}
+              onClick={() => setHouseType(opt.id)}
+            />
+          ))}
+        </div>
+      </section>
+
+      <section className={styles.block}>
+        <h2>Стадия объекта</h2>
+        <div className={styles.grid}>
+          {OBJECT_STAGE_OPTIONS.map((opt) => (
+            <CardSelect
+              key={opt.id}
+              dense
+              title={opt.label}
+              selected={room.objectStage === opt.id}
+              onClick={() => setObjectStage(opt.id)}
+            />
+          ))}
+        </div>
+      </section>
+
+      <section className={styles.block}>
+        <h2>Планируемый потолок</h2>
+        <div className={styles.grid}>
+          {PLANNED_CEILING_OPTIONS.map((opt) => (
+            <CardSelect
+              key={opt.id}
+              dense
+              title={opt.label}
+              selected={room.plannedCeiling === opt.id}
+              onClick={() => setPlannedCeiling(opt.id)}
+            />
+          ))}
+        </div>
+      </section>
+
+      <section className={styles.block}>
+        <h2>Шумные соседи сверху</h2>
+        <div className={styles.grid}>
+          {NOISY_NEIGHBORS_OPTIONS.map((opt) => (
+            <CardSelect
+              key={opt.id}
+              dense
+              title={opt.label}
+              selected={room.noisyNeighbors === opt.id}
+              onClick={() => setNoisyNeighbors(opt.id)}
+            />
+          ))}
+        </div>
+      </section>
     </Screen>
   );
 }

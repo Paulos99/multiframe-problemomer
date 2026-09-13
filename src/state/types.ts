@@ -1,4 +1,6 @@
-/** schemaVersion: 1 — MultiFrame Проблемомер session */
+/** schemaVersion: 2 — MultiFrame Проблемомер (workshop 2026-09-13) */
+
+export type InterestFor = 'self' | 'client';
 
 export type RoomType =
   | 'living'
@@ -8,18 +10,35 @@ export type RoomType =
   | 'office'
   | 'other';
 
-/**
- * Locked backend SlabKey (deriveSimulation stub).
- * 180 = DEFAULT when unknown.
- */
+/** Backend slab keys for deriveSimulation */
 export type SlabKey = '140' | '160' | '180' | '200' | 'pk220' | 'mono250';
 
-/** @deprecated use SlabKey — kept for UI aliases during migration */
-export type SlabPreset = SlabKey | 'solid140' | 'solid160' | 'solid180' | 'solid200';
+export type SlabTypeOption = 'monolith' | 'hollow' | 'wood' | 'unknown';
 
-/** UI / legacy type — mapped → SlabKey (hollow≈pk220, monolith≈mono250|thickness, unknown→180) */
-export type SlabType = 'concrete' | 'hollow' | 'wood' | 'unknown';
+export type SlabThicknessOption =
+  | 'up_to_160'
+  | 'about_160_200'
+  | 'about_200_250'
+  | 'over_250'
+  | 'unknown';
 
+export type FloorAboveOption = 'unknown' | 'ordinary' | 'floating';
+
+export type HouseTypeOption =
+  | 'panel'
+  | 'block'
+  | 'brick'
+  | 'monolith'
+  | 'wood'
+  | 'unknown';
+
+export type ObjectStageOption = 'newbuild' | 'renovation' | 'occupied' | 'unknown';
+
+export type PlannedCeilingOption = 'stretch_planned' | 'ceiling_exists' | 'unknown';
+
+export type NoisyNeighborsOption = 'unknown' | 'usually_quiet' | 'sometimes_noisy';
+
+/** Legacy noise tags — still used for audio demo grouping, not a survey */
 export type NoiseScenario =
   | 'steps'
   | 'drop'
@@ -27,82 +46,46 @@ export type NoiseScenario =
   | 'talk'
   | 'tv'
   | 'music'
-  | 'repair';
+  | 'repair'
+  | 'dog_bark'
+  | 'dog_claws'
+  | 'kids_run'
+  | 'washer'
+  | 'vacuum';
 
 export type ComfortLevel = 'quiet' | 'ok' | 'bothers';
 export type NoiseType = 'impact' | 'airborne' | 'mixed';
-export type HousingClass = 'A' | 'B' | 'V';
 
-export type WizardStep =
-  | 'start'
-  | 'room'
-  | 'scenarios'
-  | 'current'
-  | 'beforeAfter'
-  | 'audio'
-  | 'result';
+export type WizardStep = 'start' | 'room' | 'beforeAfter' | 'audio' | 'result';
 
-export interface FloorSlab {
-  /** Preferred locked key */
-  key?: SlabKey;
-  /** @deprecated alias of key / legacy solid* presets */
-  preset?: SlabPreset;
-  type?: SlabType;
-  thicknessMm?: number;
-}
-
-export interface RoomAnswers {
-  roomType: RoomType | null;
-  ceilingAreaM2: number | null;
-  floorSlab?: FloorSlab;
-}
-
-/**
- * classLabel A|B|V|below (partial is NOT a classLabel — use classStatus).
- * classStatus: ok when both indices meet; partial when Rw ok Lnw not; below otherwise.
- */
 export type ClassLabel = 'A' | 'B' | 'V' | 'below';
 export type ClassStatus = 'ok' | 'partial' | 'below';
 
-/**
- * DerivedSimulation side — schemaVersion 1 additive.
- */
 export interface DerivedSimSide {
   Rw: number;
   Lnw: number;
   classLabel: ClassLabel;
   classStatus: ClassStatus;
-  /** Optional human-readable status copy */
   label?: string;
 }
 
-/**
- * Additive under derived.simulation — schemaVersion stays 1.
- * Locked stub: SLABS by SlabKey, DELTA {Rw:10,Lnw:-8}, grade → classLabel+classStatus.
- * housingClass = after.classLabel
- * source: marketing_placeholder, disclaimer: pre_lab
- */
 export interface DerivedSimulation {
   before: DerivedSimSide;
   after: DerivedSimSide;
   delta: { Rw: number; Lnw: number };
-  /** = after.classLabel */
   housingClass: ClassLabel;
   source: 'marketing_placeholder';
   disclaimer: 'pre_lab';
-  /** UI helpers (additive) */
   deltaRange: { Rw: readonly [number, number]; Lnw: readonly [number, number] };
   uiLabel: string;
   slabKey: SlabKey;
   feelingBefore: ComfortLevel;
   feelingAfter: ComfortLevel;
   honestLines: string[];
+  /** Perceived loudness reduction % from Δ (log map, not linear) */
+  perceivedAirPct: number;
+  perceivedImpactPct: number;
 }
-
-/** @deprecated alias — prefer DerivedSimulation */
-export type SimulationEstimate = DerivedSimulation;
-export type SimulationSide = DerivedSimSide;
-
 
 export interface DerivedProfile {
   comfortLevel: ComfortLevel;
@@ -115,39 +98,44 @@ export interface DerivedProfile {
 export interface AudioPair {
   id: string;
   label: string;
+  group: 'air' | 'impact' | 'mixed';
   beforeLabel: string;
   afterLabel: string;
   beforeSrc: string;
   afterSrc: string;
-  scenarios?: NoiseScenario[];
 }
 
 export interface AudioState {
   mode: 'demo_stub' | 'mapped';
   pairs: AudioPair[];
-  /** true when showing unfiltered fixed stub set */
   demoSet?: boolean;
 }
 
 export interface CtaPayload {
   roomType: RoomType | null;
   ceilingAreaM2: number | null;
-  scenarios: NoiseScenario[];
+}
+
+export interface RoomAnswers {
+  roomType: RoomType | null;
+  ceilingAreaM2: number | null;
+  slabType: SlabTypeOption;
+  slabThickness: SlabThicknessOption;
+  floorAbove: FloorAboveOption;
+  houseType: HouseTypeOption;
+  objectStage: ObjectStageOption;
+  plannedCeiling: PlannedCeilingOption;
+  noisyNeighbors: NoisyNeighborsOption;
 }
 
 export interface SessionAnswers {
+  interestFor: InterestFor;
   room: RoomAnswers;
-  scenarios: NoiseScenario[];
   scope: 'ceiling';
-  current?: {
-    comfortLevel: ComfortLevel;
-    noiseType: NoiseType;
-    whyPlain: string;
-  };
 }
 
 export interface SessionState {
-  schemaVersion: 1;
+  schemaVersion: 2;
   step: WizardStep;
   answers: SessionAnswers;
   derived: DerivedProfile | null;
@@ -158,8 +146,6 @@ export interface SessionState {
 export const WIZARD_STEPS: WizardStep[] = [
   'start',
   'room',
-  'scenarios',
-  'current',
   'beforeAfter',
   'audio',
   'result',
@@ -174,76 +160,61 @@ export const ROOM_TYPE_LABELS: Record<RoomType, string> = {
   other: 'Другое',
 };
 
-export const SCENARIO_LABELS: Record<NoiseScenario, { title: string; hint: string }> = {
-  steps: { title: 'Шаги сверху', hint: 'Ходьба, топот' },
-  drop: { title: 'Падение предметов', hint: 'Игрушки, вещи' },
-  furniture: { title: 'Передвижение мебели', hint: 'Стулья, столы' },
-  talk: { title: 'Разговоры', hint: 'Голоса соседей' },
-  tv: { title: 'ТВ', hint: 'Телевизор, сериалы' },
-  music: { title: 'Музыка', hint: 'Бас, колонки' },
-  repair: { title: 'Ремонт', hint: 'Дрель, перфоратор' },
-};
+export const SLAB_TYPE_OPTIONS: { id: SlabTypeOption; label: string }[] = [
+  { id: 'monolith', label: 'Монолит / сплошная ж/б' },
+  { id: 'hollow', label: 'Многопустотная (ПК)' },
+  { id: 'wood', label: 'Деревянное / по балкам' },
+  { id: 'unknown', label: 'Не знаю' },
+];
 
-export const COMFORT_LABELS: Record<ComfortLevel, string> = {
-  quiet: 'Тихо — почти не замечаю',
-  ok: 'Терпимо — иногда отвлекает',
-  bothers: 'Мешает — хочется тишины',
-};
+export const SLAB_THICKNESS_OPTIONS: { id: SlabThicknessOption; label: string }[] = [
+  { id: 'up_to_160', label: 'До ~160 мм' },
+  { id: 'about_160_200', label: 'Около 160–200 мм' },
+  { id: 'about_200_250', label: 'Около 200–250 мм' },
+  { id: 'over_250', label: 'Толще ~250 мм' },
+  { id: 'unknown', label: 'Не знаю' },
+];
 
-/** Design SimCompare feeling chips */
-export const COMFORT_FEELING: Record<ComfortLevel, string> = {
-  quiet: 'Тихо',
-  ok: 'Терпимо',
-  bothers: 'Мешает',
-};
+export const FLOOR_ABOVE_OPTIONS: { id: FloorAboveOption; label: string }[] = [
+  { id: 'unknown', label: 'Не знаю' },
+  { id: 'ordinary', label: 'Обычный пол (без плавающей схемы)' },
+  { id: 'floating', label: 'Есть плавающий пол / шумоизоляция в полу' },
+];
 
-export const COMFORT_SHORT: Record<ComfortLevel, string> = {
-  quiet: 'тихо',
-  ok: 'терпимо',
-  bothers: 'мешает',
-};
+export const HOUSE_TYPE_OPTIONS: { id: HouseTypeOption; label: string }[] = [
+  { id: 'panel', label: 'Панельный' },
+  { id: 'block', label: 'Блочный' },
+  { id: 'brick', label: 'Кирпичный' },
+  { id: 'monolith', label: 'Монолит (в т.ч. монолит-кирпич)' },
+  { id: 'wood', label: 'Деревянный / по балкам' },
+  { id: 'unknown', label: 'Не знаю' },
+];
 
-export const NOISE_TYPE_LABELS: Record<NoiseType, string> = {
-  impact: 'Ударный (шаги, падения, мебель)',
-  airborne: 'Воздушный (голоса, ТВ, музыка)',
-  mixed: 'Смешанный',
-};
+export const OBJECT_STAGE_OPTIONS: { id: ObjectStageOption; label: string }[] = [
+  { id: 'newbuild', label: 'Новостройка / до заселения' },
+  { id: 'renovation', label: 'Идёт ремонт' },
+  { id: 'occupied', label: 'Уже живут' },
+  { id: 'unknown', label: 'Не знаю' },
+];
 
-export const SLAB_KEY_LABELS: Record<SlabKey, string> = {
-  '140': 'Сплошная 140 мм',
-  '160': 'Сплошная 160 мм',
-  '180': 'Сплошная 180 мм (по умолчанию)',
-  '200': 'Сплошная 200 мм',
-  pk220: 'ПК 220 мм (пустотка)',
-  mono250: 'Монолит 250 мм',
-};
+export const PLANNED_CEILING_OPTIONS: { id: PlannedCeilingOption; label: string }[] = [
+  { id: 'stretch_planned', label: 'Планируем натяжной' },
+  { id: 'ceiling_exists', label: 'Потолок уже есть' },
+  { id: 'unknown', label: 'Не знаю' },
+];
 
-/** @deprecated use SLAB_KEY_LABELS */
-export const SLAB_PRESET_LABELS = SLAB_KEY_LABELS;
+export const NOISY_NEIGHBORS_OPTIONS: { id: NoisyNeighborsOption; label: string }[] = [
+  { id: 'unknown', label: 'Не знаю' },
+  { id: 'usually_quiet', label: 'Обычно тихо' },
+  { id: 'sometimes_noisy', label: 'Сверху бывает шумно' },
+];
 
-export const SLAB_TYPE_LABELS: Record<SlabType, string> = {
-  concrete: 'Монолитный бетон',
-  hollow: 'Пустотная плита',
-  wood: 'Деревянное перекрытие',
-  unknown: 'Не знаю',
-};
-
-export const NORMS_SLAB_TYPICAL: Record<
-  Exclude<SlabType, 'unknown'>,
-  { thicknessHint: string; note: string }
-> = {
-  concrete: {
-    thicknessHint: 'часто 160–220 мм',
-    note: 'Типичное перекрытие гасит часть воздушного шума, но ударный часто остаётся заметным.',
-  },
-  hollow: {
-    thicknessHint: 'часто 220 мм',
-    note: 'Пустоты облегчают плиту; шаги и падения могут передаваться сильнее ожиданий.',
-  },
-  wood: {
-    thicknessHint: 'зависит от конструкции',
-    note: 'Деревянные перекрытия чувствительны к ударному шуму — бескаркасная акустика потолка особенно уместна.',
-  },
+/** Hybrid comfort class labels (UI) */
+export const HYBRID_CLASS_LABELS: Record<ClassLabel, string> = {
+  A: 'Высокий комфорт (А)',
+  B: 'Комфорт (Б)',
+  V: 'Допустимый (В)',
+  below: 'Дискомфорт',
 };
 
 export const CALCULATOR_URL = 'https://paulos99.github.io/MF_StP/';
@@ -251,11 +222,12 @@ export const CALCULATOR_URL = 'https://paulos99.github.io/MF_StP/';
 export const DISCLAIMER_EXPERT =
   'Оценка экспертная и качественная. Это не инженерный расчёт звукоизоляции и не гарантия конкретных показателей.';
 
-/** Design badge on SimCompare */
 export const SIMULATION_BADGE = 'Оценка до лабораторных данных';
 
-export const SIMULATION_UI_LABEL = SIMULATION_BADGE;
-
 export const DISCLAIMER_SIMULATION =
-  'Не замер и не гарантия Δ. Классы А/Б/В — ориентир комфорта, не расчёт по СП. Потолком нельзя заявлять полную норму по ударному шуму: часто нужен пол у соседа сверху.';
+  'Цифры — ориентир до лабораторных данных. Ударный шум потолком становится мягче; пол сверху часто дополняет результат.';
 
+export const NORM_FOOTNOTE = 'Ориентир по шкале комфортности (норм. документы)';
+
+export const LOG_DB_FOOTNOTE =
+  'Шкала дБ логарифмическая: −8 дБ ≈ вдвое тише по ощущению.';

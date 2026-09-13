@@ -1,9 +1,15 @@
 import styles from './ProgressDots.module.css';
 import { useSession } from '../state/SessionContext';
-import { WIZARD_STEPS } from '../state/types';
+import { WIZARD_STEPS, type WizardStep } from '../state/types';
 import { stepIndex } from '../state/session';
 
-const LABELS = ['Старт', 'Комната', 'Шум', 'Сейчас', 'Сравнение', 'Звук', 'Профиль'];
+const LABELS: Record<WizardStep, string> = {
+  start: 'Старт',
+  room: 'Комната',
+  beforeAfter: 'Сравнение',
+  audio: 'Звук',
+  result: 'Итог',
+};
 
 export function ProgressDots() {
   const { session } = useSession();
@@ -22,7 +28,7 @@ export function ProgressDots() {
               aria-current={active ? 'step' : undefined}
             >
               <span className={styles.dot} />
-              <span className={styles.label}>{LABELS[i]}</span>
+              <span className={styles.label}>{LABELS[step]}</span>
             </li>
           );
         })}

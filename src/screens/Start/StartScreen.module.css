@@ -23,13 +23,19 @@
   animation: softGlow 4.5s ease-in-out infinite;
 }
 
-.kicker {
+.interestLabel {
   margin: 0;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--accent-color);
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--text-secondary);
+  position: relative;
+}
+
+.interest {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  position: relative;
 }
 
 .title {
