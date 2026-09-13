@@ -76,6 +76,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Audio reduction UI **C:** `≈ −{n}%` + Δ caption; log footnote **F2b:** `Шкала дБ логарифмическая: −8 дБ ≈ вдвое тише по ощущению.` |
 | 2026-09-13 | Audio chrome locked: title **T1** `Услышать разницу`; subtitle **S6** `Сравните звук обычного потолка и потолка с MultiFrame`; buttons **B2** `До` · `После`; sticky **N3** `Смотреть итог` |
 | 2026-09-13 | Result top verdict line reconfirmed (A): `Сейчас: {класс} → с MultiFrame: {класс}` (e.g. `Сейчас: Дискомфорт → с MultiFrame: Комфорт (Б)`) |
+| 2026-09-13 | Result one-liner **L1:** `В этой комнате MultiFrame поднимает комфорт на ступень выше.` (with class line; same for self/client) |
 
 ---
 
@@ -497,7 +498,7 @@ Summarize acoustic profile with **verdict first**, then the full evidence stack 
 
 ### Visible elements
 
-- **Top verdict:** personal one-liner + class shift line `Сейчас: {label} → с MultiFrame: {label}` (hybrid labels / `Дискомфорт`) + what ~MultiFrame changes in plain language.
+- **Top verdict (locked):** one-liner **L1** `В этой комнате MultiFrame поднимает комфорт на ступень выше.` + class shift `Сейчас: {label} → с MultiFrame: {label}` + norm footnote `Ориентир по шкале комфортности (норм. документы)`.
 - Title, subtitle, Before/After summary cards, room/scenario profile, secondary SimCompare, numbers + charts + explanations, «Почему MultiFrame уместен», expert Disclaimer, calculator CTA, demo consultation (disabled), demo lead form, restart.
 - **Charts block (C):** class scale А→Б→В first, then before/after bars (ΔRw / ΔLnw); captions + `pre_lab` badge; no frequency spectrum.
 - Do **not** hide detail behind tabs/accordions as the primary pattern; scroll is the disclosure.
