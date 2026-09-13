@@ -38,6 +38,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | User models = **JTBD content map** (not a long Start quiz); Start = only «для себя / для клиента»; no further Start clarification — full buy-case content covers all JTBD |
 | 2026-09-13 | Tone: no «за что платим» / price-first copy; value inferred from features; MultiFRAME deck is primary product-feature source |
 | 2026-09-13 | MultiFrame features on Result: **понятно + аргументированно** (plain language + why it matters; not bare bullet dump, not tech dump) |
+| 2026-09-13 | Feature copy pattern confirmed: **claim + 1 short why/how** (e.g. drum-effect → MultiFrame dissipates); clear and argued |
 
 ---
 
@@ -79,7 +80,7 @@ May lightly change pronoun/CTA tone («вам» / «клиенту»). **Must no
 
 **Tone:** present facts so the user concludes value themselves. **Forbidden in UI:** «за что платим», blunt price/cost framing, «средний чек».
 
-**Presentation rule (owner 2026-09-13):** talk about these advantages **понятно, но аргументированно** — each point = plain claim + short “почему это важно / как это работает” (e.g. drum-effect → perforation dissipates air energy). Not a bare slogan list; not a datasheet dump.
+**Presentation rule (confirmed 2026-09-13):** advantages **понятно, но аргументированно** — each point = **тезис + 1 короткая фраза why/how** (example OK’d: «Без системы под натяжным воздух работает как барабан. MultiFrame рассеивает эту энергию — в комнате спокойнее.»). Not a bare slogan list; not a datasheet dump.
 
 **Primary narrative anchors (from deck)**
 
