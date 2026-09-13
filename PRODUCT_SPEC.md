@@ -79,6 +79,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Result one-liner **L1:** `В этой комнате MultiFrame поднимает комфорт на ступень выше.` (with class line; same for self/client) |
 | 2026-09-13 | Result chrome: title kept `Акустический профиль`; subtitle **R1** `Ориентир комфорта для вашей комнаты и следующий шаг к расчёту` |
 | 2026-09-13 | Result summary cards **A:** same 2 phrases + class as Before/After; drop old noise-type / «вдвое спокойнее» card copy |
+| 2026-09-13 | Result feature order reconfirmed (A): **1** class → **2** effectiveness → **3** drum-effect → **4** safety → **5** rest |
 
 ---
 
