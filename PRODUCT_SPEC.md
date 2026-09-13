@@ -299,8 +299,8 @@ Room answers drive the **presumed comfort class** on the object. Type + area + s
 
 **Room required vs optional (confirmed 2026-09-13):**
 - **Required to proceed:** `roomType` + `area` (> 0).
-- **Optional (any may be `Не знаю`, still proceed):** floor above, house type, object stage, planned ceiling, noisy neighbors.
-- Missing optional → model ASSUMPTIONs (conservative where it affects class/Δ).
+- **Optional (any may be `Не знаю`, still proceed):** slab/перекрытие, floor above, house type, object stage, planned ceiling, noisy neighbors.
+- Missing optional / `Не знаю` → model ASSUMPTIONs (conservative where it affects class/Δ; default slab ASSUMPTION remains e.g. solid 180 mm until tuned).
 
 **Unknown floor-above (confirmed):** choosing `Не знаю` is normal and sufficient to proceed. Sim uses a declared conservative default (ASSUMPTION: treat as ordinary floor without floating scheme unless later tuned).
 
