@@ -80,6 +80,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Result chrome: title kept `Акустический профиль`; subtitle **R1** `Ориентир комфорта для вашей комнаты и следующий шаг к расчёту` |
 | 2026-09-13 | Result summary cards **A:** same 2 phrases + class as Before/After; drop old noise-type / «вдвое спокойнее» card copy |
 | 2026-09-13 | Result feature order reconfirmed (A): **1** class → **2** effectiveness → **3** drum-effect → **4** safety → **5** rest |
+| 2026-09-13 | Result sticky CTA **C4:** `Открыть калькулятор MultiFrame` (replaces «Расчёт материалов») |
 
 ---
 
@@ -196,7 +197,7 @@ Must **not** appear: calculator links, dB values, lead form, Polyblock, floor qu
 - Shown on steps `room` … `result`.
 - Back: `Назад` (enabled when not on first sticky step; Start has no sticky bar).
 - Next default: `Далее`.
-- Overrides: see per-screen (`Услышать разницу`, `К профилю`, `Расчёт материалов`).
+- Overrides: see per-screen (`Услышать разницу`, `Смотреть итог`, `Открыть калькулятор MultiFrame`).
 - Next disabled until screen validation passes (except Result: always enabled → calculator).
 - Fixed bottom + safe-area; primary control min touch height **44px**.
 
@@ -536,7 +537,7 @@ Summarize acoustic profile with **verdict first**, then the full evidence stack 
 | Submit | `Отправить (демо)` → success `Принято (демо-stub)` |
 | Payload caption | `CTA payload (schemaVersion 1)` |
 | Restart | `Пройти ещё раз` |
-| Sticky next | `Расчёт материалов` (opens calculator; always enabled) |
+| Sticky next | `Открыть калькулятор MultiFrame` (opens calculator; always enabled) |
 
 **Dynamic whyMultiFrame lines (up to ~4, from answers):** examples locked in code intent —
 
