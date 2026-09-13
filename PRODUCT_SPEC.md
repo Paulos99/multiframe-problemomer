@@ -65,6 +65,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Object stage confirmed: `Новостройка / до заселения` · `Идёт ремонт` · `Уже живут` · `Не знаю` |
 | 2026-09-13 | Planned ceiling confirmed (B): `Планируем натяжной` · `Потолок уже есть` · `Не знаю` — plain language, no ГКЛ/черновой jargon |
 | 2026-09-13 | Noisy neighbors confirmed (B): `Не знаю` · `Обычно тихо` · `Сверху бывает шумно` — softer third label; not a «does it bother you» quiz |
+| 2026-09-13 | Before/After «До» card bullet (A): last Before bullet = hybrid class from model — `Сейчас: {Высокий комфорт (А)|Комфорт (Б)|Допустимый (В)|Дискомфорт}`; drop `Тихо/Терпимо/Мешает` |
 
 ---
 
@@ -368,7 +369,7 @@ Emotional contrast: ordinary stretch ceiling vs MultiFrame. Feeling primary; Sim
 | Subtitle | `Эмоциональный контраст: обычный натяжной потолок и потолок с MultiFrame.` |
 | Before tag | `Сейчас типично` |
 | Before h2 | `Обычный потолок` |
-| Before bullets | `Шум сверху остаётся «рядом»` · `Шаги и голоса легко читаются` · `Ощущение тонкой границы с соседями` · `Комфорт: {Тихо\|Терпимо\|Мешает}` (first segment of comfort label) |
+| Before bullets | `Шум сверху остаётся «рядом»` · `Шаги и голоса легко читаются` · `Ощущение тонкой границы с соседями` · **`Сейчас: {hybrid class}`** — e.g. `Сейчас: Дискомфорт`, `Сейчас: Допустимый (В)` (owner **A**; from Room model, not self-report) |
 | After tag | `С MultiFrame` |
 | After h2 | `Бескаркасная акустика` |
 | After bullets | `Тише. Спокойнее. Свой потолок.` · `Ударный и смешанный шум воспринимаются мягче` · `Без каркаса — бережём высоту комнаты` · `Готовит основу для натяжного полотна` |
