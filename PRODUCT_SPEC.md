@@ -509,6 +509,9 @@ Summarize acoustic profile with **verdict first**, then the full evidence stack 
 | ---- | ---- |
 | Title | `Акустический профиль` |
 | Subtitle | `Сначала ощущение эффекта — цифры вторичны. Затем расчёт MultiFRAME.` |
+| Verdict one-liner | `В этой комнате MultiFrame поднимает комфорт на ступень выше.` |
+| Verdict class line | `Сейчас: {класс} → с MultiFrame: {класс}` |
+| Norm footnote | `Ориентир по шкале комфортности (норм. документы)` |
 | Before card | `Сейчас` · `Без MultiFrame` · `Шум сверху остаётся «рядом»` · `Ощущение: {full comfort label}` · `Тип: {noise type label}` |
 | After card | `С MultiFrame` · `Эффект в ощущении` · `Тише. Спокойнее. Свой потолок.` · `Воздух: примерно вдвое спокойнее — шум как будто дальше` · `Удар: тише; норму часто закрывает пол у соседа` |
 | Profile | `Комната` · `{room} · {N} м²` (no scenario chips) |
