@@ -13,6 +13,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 - Feeling + comfort-class story first on early screens; **no numbers on Start**.
 - On Before/After + Profile: show the **full evidence pack** — personal room story, classes А/Б/В, numbers, charts, and plain-language explanations of each (owner 2026-09-12: «показать всё, аргументированно, понятно, персонально»).
 - **Evidence layout (Q4, owner 2026-09-12):** everything on one scroll — **conclusion / verdict on top**, detailed data below. Not progressive disclosure; not role-trimmed packs. Manager and homeowner skim what they need. Same stack for both roles (role may still change copy/CTA emphasis).
+- **Charts (owner 2026-09-13):** **both** — comfort **class scale А→Б→В** (arrow “where we move”) **above**; **before/after bars** for oriented ΔRw / ΔLnw **below**. Not spectrum/frequency charts in MVP. Always with plain-language captions + `pre_lab` framing.
 - Effect source: `marketing_placeholder`; disclaimer: `pre_lab` / expert qualitative — never lab guarantees. Charts/numbers are **oriented arguments**, not certificates.
 - ΔRw center **+10** (show range **+8…+12**); ΔLnw center **−8** (show range **−6…−10** as absolute 6…10 in UI copy).
 - Classes **A/B/V** (UI: **А/Б/В**), Trofimov-style comfort grading — “пониженный → выше классом” is a required narrative beat.
@@ -29,6 +30,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-12 | Audiences **C**: both equal; Start role switcher; shared answer flow |
 | 2026-09-12 | Result depth: **full pack** — personal + classes + numbers + charts + explanations (not A/B-only; not “feeling only”) |
 | 2026-09-12 | Evidence presentation **Q4**: all-at-once scroll; **вывод сверху, данные ниже**; user/manager self-select depth (not progressive disclosure; not role-dependent density) |
+| 2026-09-13 | Charts **C**: class scale А→Б→В on top + before/after bars (ΔRw/ΔLnw) below; no frequency spectrum in MVP |
 
 ---
 
@@ -279,6 +281,7 @@ Emotional contrast: ordinary stretch ceiling vs MultiFrame. Feeling primary; Sim
 
 - **Top:** short conclusion (class change / quieter story) before deep dive.
 - Title, subtitle, Before card, After card, secondary SimCompare, numbers + chart block, honesty note, sticky CTA with next label override.
+- **Charts block (C):** class scale А→Б→В with move arrow, then before/after bars (ΔRw / ΔLnw) with captions; both required.
 - **Below fold OK:** detailed oriented numbers/charts — user scrolls as needed.
 
 ### Exact primary copy (RU)
@@ -378,6 +381,7 @@ Summarize acoustic profile with **verdict first**, then the full evidence stack 
 
 - **Top verdict:** personal one-liner + class before→after (А/Б/В) + what ~MultiFrame changes in plain language.
 - Title, subtitle, Before/After summary cards, room/scenario profile, secondary SimCompare, numbers + charts + explanations, «Почему MultiFrame уместен», expert Disclaimer, calculator CTA, demo consultation (disabled), demo lead form, restart.
+- **Charts block (C):** class scale А→Б→В first, then before/after bars (ΔRw / ΔLnw); captions + `pre_lab` badge; no frequency spectrum.
 - Do **not** hide detail behind tabs/accordions as the primary pattern; scroll is the disclosure.
 
 ### Exact primary copy (RU)
@@ -476,11 +480,17 @@ Real StP phone/email presented as live; lab certificate; Polyblock upsell; walls
 - Columns: `Сейчас` · `С MultiFrame`
 - Feeling chips: `Тихо` · `Терпимо` · `Мешает`
 - Class pills: `класс А|Б|В` · `частично` · `ниже класса`
+- **Chart A — class scale:** visual А→Б→В (or equivalent) showing before→after move; primary scannable chart
+- **Chart B — bars:** before/after bars for oriented ΔRw (воздух) and ΔLnw (удар); secondary to class scale; always captioned
 - Channels: `Воздух` / `Удар` with tertiary dB + optional delta
 - After heroes: air `примерно вдвое спокойнее` / `шум как будто дальше`; impact `тише` / `норму часто закрывает пол`
 - Chips: `Воздух: {А|Б|В|вне нормы}` · `Удар: {…}`
 - Range line: `ориентир Δ воздух +8…+12 · удар −6…−10`
 - `honestLines` + `DISCLAIMER_SIMULATION`
+
+**Must NOT render (MVP)**
+
+- Frequency / spectrum charts as the primary evidence visual
 
 **Must NOT**
 
