@@ -58,6 +58,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Slab: **type and thickness as separate Room fields** (do not multiply type×mm cards). Thickness may be `Не знаю` |
 | 2026-09-13 | Slab thickness UI = **ranges/buckets**, not single mm points (owner not in typical-thickness details) |
 | 2026-09-13 | Slab thickness ranges confirmed: `До ~160` · `~160–200` · `~200–250` · `Толще ~250` · `Не знаю` |
+| 2026-09-13 | Floor-above: remove `Пока без чистового пола` — not a floor-construction param (belongs to object stage if at all) |
 
 ---
 
@@ -300,7 +301,8 @@ Room answers drive the **presumed comfort class** on the object. Type + area + s
 
 **Thickness copy rule:** show **разбросы** for non-experts; engineering may map bucket → mid value inside the model (ASSUMPTION), never force user to pick exact mm.
 
-| Пол сверху | Strongest impact on удар / Lnw baseline | `Не знаю` · `Обычный пол (без плавающей схемы)` · `Есть плавающий пол / шумоизоляция в полу` · `Пока без чистового пола` | **Не знаю = valid** (owner). When unknown → conservative model ASSUMPTION (typical ordinary floor / no floating). Do not block Далее. |
+Owner: do **not** put «пока без чистового пола» under floor-above — applies across situations / belongs to **стадия объекта**, not floor construction.
+| Пол сверху | Strongest impact on удар / Lnw baseline | `Не знаю` · `Обычный пол (без плавающей схемы)` · `Есть плавающий пол / шумоизоляция в полу` | **Не знаю = valid** (owner). When unknown → conservative model ASSUMPTION (typical ordinary floor / no floating). Do not block Далее. |
 | Тип дома | Proxy when slab unknown; typical construction | `Панельный` · `Кирпичный` · `Монолит` · `Деревянные/балочные` · `Не знаю` | |
 | Стадия объекта | Narrative + baseline story without «мешает ли» | `Новостройка / до заселения` · `Идёт ремонт` · `Уже живут` · `Не знаю` | |
 | Планируемый потолок | Fit story for MultiFrame under finish | `Натяжной` · `Натяжной + ГКЛ` · `Уже есть черновой` · `Не знаю` | |
