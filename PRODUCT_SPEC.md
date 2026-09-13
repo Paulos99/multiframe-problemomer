@@ -44,6 +44,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Class V UI label = **Допустимый (В)**; below-scale state when even V not reached (common) — UI label **`Дискомфорт`** (confirmed) |
 | 2026-09-13 | Result top class shift copy confirmed: e.g. `Сейчас: Дискомфорт → с MultiFrame: Комфорт (Б)` |
 | 2026-09-13 | Norm footnote under class shift: **A** — `Ориентир по шкале комфортности (норм. документы)` |
+| 2026-09-13 | Effectiveness block: **delta orientations first**, each with explaining caption + sensation (not feeling-only lead) |
 
 ---
 
@@ -106,7 +107,11 @@ May lightly change pronoun/CTA tone («вам» / «клиенту»). **Must no
 **Result feature order (confirmed 2026-09-13)** — each item = тезис + 1 фраза why/how; no price talk:
 
 1. **Класс комфорта жилья** — top verdict shift line confirmed: `Сейчас: {class} → с MultiFrame: {class}` (e.g. `Сейчас: Дискомфорт → с MultiFrame: Комфорт (Б)`); soft norm-doc hint.
-2. **Эффективность** — ориентир эффекта (числа/диапазоны, `pre_lab`), шкала + столбцы; как аргумент, не сертификат.
+2. **Эффективность** — **сначала ориентиры Δ** (воздух / удар) with **explaining captions + sensations** each; then class scale + bars as already decided. `pre_lab` framing; argument not certificate.
+
+**Effectiveness block (confirmed 2026-09-13):** lead with **Δ orientations**, not a feeling-only headline.
+For each channel (воздух / удар): oriented Δ + short caption that *explains* the number + sensation phrase (claim+why pattern). Example shape: `Δ воздух +8…+12 дБ` — `шум как будто дальше` / plain why. Then charts (class scale + bars). Always `pre_lab`.
+
 3. **Эффект барабана** — без системы воздух под натяжным «играет как барабан»; MultiFrame рассеивает энергию → в комнате спокойнее.
 4. **Безопасность** — эко/здоровье, сертификаты как reason-to-believe (мягко).
 5. **Остальное (коротко):** система нового поколения; Flat/Wave и совместимость с натяжным/ГКЛ по смыслу «красивый потолок + тишина»; при необходимости — патент/отличие мягко.
