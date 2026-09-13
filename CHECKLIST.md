@@ -50,7 +50,8 @@ Live context (do not redesign from this URL alone): https://paulos99.github.io/m
 | Before/After bullet frame (confirmed 2026-09-13) | Вариант A: **2 фразы + класс** в каждой карточке. Не одна фраза и не «только класс». |
 | Before/After bullet copy (confirmed 2026-09-13) | До: `Соседи сверху слышны слишком отчётливо` · `Бытовые звуки сверху легко различить` · `Сейчас: {класс}`. После: `В комнате заметно спокойнее` · `Ударный и воздушный шум воспринимаются мягче` · `С MultiFrame: {класс}`. |
 | Before/After chrome (confirmed 2026-09-13) | Subtitle **S3:** `Как меняется комфорт комнаты с MultiFrame`. Numbers **N3:** `Оценка в цифрах`. Honesty **H3b:** `Цифры — ориентир до лабораторных данных. Ударный шум потолком становится мягче; пол сверху часто дополняет результат.` |
-| Audio concept (confirmed 2026-09-13) | **Два канала** (Трофимов): воздух + удар. По **несколько бытовых примеров** на канал. «После» = снижение **под этот кейс** (модель комнаты): и **громкость**, и **частоты** — не шоурум-утрирование «просто тише». %/фильтр из Δ этой комнаты (`pre_lab` до подтверждения). |
+| Audio concept (confirmed 2026-09-13) | UI-группы: **воздух · удар · смешанный** (физика Rw/Lnw). «После» = снижение **под этот кейс**: **громкость + частоты**; % из Δ комнаты (`pre_lab`). |
+| Audio examples (confirmed 2026-09-13) | Воздух: `Лай собаки` · `Музыка` · `Громкие разговоры`. Удар: `Детский бег` · `Перестановка мебели` · `Цоканье когтей собаки`. Смешанный: `Стиральная машина` · `Пылесос`. |
 | Object stage (confirmed 2026-09-13) | `Новостройка / до заселения` · `Идёт ремонт` · `Уже живут` · `Не знаю`. |
 | House type options (confirmed 2026-09-13) | `Панельный` · `Блочный` · `Кирпичный` · `Монолит` (в т.ч. монолит-кирпич) · `Деревянный / по балкам` · `Не знаю`. Сталинка ≈ кирпичный (подсказка). |
 | Room field order (confirmed 2026-09-13) | тип → площадь → тип перекрытия → толщина перекрытия → пол сверху → тип дома → стадия → потолок → соседи. |
@@ -99,7 +100,7 @@ Product capabilities that **are** in the first version (not listed as vibe templ
 - 5-step comfort wizard after Start: Room → Before/After → Audio → Result (no scenarios/current quiz)
 - Expert qualitative effect model with `marketing_placeholder` ΔRw / ΔLnw and pre_lab disclaimer
 - Before/after emotional contrast + SimCompare (feeling primary, dB tertiary)
-- Two-channel audio (воздух / удар): several household examples; case-specific After (level + frequencies + ≈%)
+- Audio groups воздух / удар / смешанный with locked household examples; case-specific After (level + frequencies + ≈%)
 - CTA: calculator deep-link + demo lead form
 - Mobile-dense layout + sticky question/CTA chrome
 
@@ -162,7 +163,7 @@ Engineering decisions already made / owned by the agent (product terms):
 - **Surface:** one public Vite + React + TypeScript SPA (`webapp`). No separate SEO `website`, no backend microservices.
 - **Stack (recorded, do not reopen):** Vite + React SPA, client session state, GitHub Actions → GitHub Pages. No microservices.
 - **Effect model:** `source: marketing_placeholder`, center ΔRw **+10** (UI range 8–12), ΔLnw **−8** (UI range 6–10), classes **A/B/V** (UI Cyrillic А/Б/В) from Trofimov-style comfort grading; always `pre_lab` / expert disclaimers.
-- **Audio:** two channels; several household stubs; After = case Δ (level + EQ); ≈% from room model; `pre_lab` / ориентир — not lab; no fixed showroom exaggerate as primary promise.
+- **Audio:** groups воздух / удар / смешанный; locked stubs; After = case Δ (level + EQ); mixed blends both; ≈% from room model; `pre_lab` / ориентир.
 - **CTA:** deep-link to MultiFRAME calculator with query payload; lead form is demo-only (`console` stub), never invent a corporate CRM endpoint.
 - **Mobile:** denser inputs + sticky progress/CTA; touch targets ≥44px; no tech dumps.
 - **Out of scope code paths:** walls, partitions, floors systems, Polyblock, framed systems — do not add.
@@ -191,7 +192,7 @@ A capability with no row is `absent` by default. The State column always holds o
 | SimCompare effect UI | included | Hybrid class primary; no `Тихо/Терпимо/Мешает`; Rw/Lnw tertiary; pre_lab badge. |
 | marketing_placeholder Δ model | included | ΔRw +10 (range 8–12), ΔLnw −8 (range 6–10); `source: marketing_placeholder`; `disclaimer: pre_lab`. Never claim lab guarantees. |
 | Trofimov-style comfort classes A/B/V | included | Canon A\|B\|V; UI Cyrillic А\|Б\|В; partial/below statuses. Never promise full Lnw norm from ceiling alone. |
-| Case-specific two-channel audio | included | Воздух + удар; several household examples; After cuts level + frequencies from room Δ; show ≈%; `pre_lab`. |
+| Case-specific audio (air / impact / mixed) | included | Locked examples; After cuts level + frequencies from room Δ; mixed = blend; show ≈%; `pre_lab`. |
 | Calculator CTA handoff | included | Opens calculator with `area`, `roomType` (no scenarios). |
 | Demo lead form | available | UI + `console` stub + JSON payload (`schemaVersion: 1`). No real StP CRM / email endpoint. |
 | Sticky mobile chrome | included | Header + progress + sticky Далее/CTA; denser cards on narrow viewports. |
