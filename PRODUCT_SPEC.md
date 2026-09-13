@@ -525,7 +525,7 @@ Summarize acoustic profile with **verdict first**, then the full evidence stack 
 | Profile | `Комната` · `{room} · {N} м²` (no scenario chips) |
 | Numbers title | `Оценка в цифрах` |
 | Why title | `Почему MultiFrame уместен` |
-| Calculator CTA | `Открыть калькулятор` |
+| Calculator CTA | `Открыть калькулятор MultiFrame` |
 | Demo badge near secondary CTAs | `демо` |
 | Demo contacts note | `Реальных контактов StP в этом MVP нет. «Консультация» и заявка — только демонстрационные заглушки.` |
 | Consultation (disabled) | `Консультация (недоступно в демо)` |
@@ -550,7 +550,7 @@ Summarize acoustic profile with **verdict first**, then the full evidence stack 
 
 | Control | Action | Enabled |
 | ------- | ------ | ------- |
-| `Открыть калькулятор` / sticky `Расчёт материалов` | Open calculator URL in new tab | Always (area may be omitted only if invalid — MVP requires area from Room) |
+| `Открыть калькулятор MultiFrame` (in-body + sticky) | Open calculator URL in new tab | Always (area may be omitted only if invalid — MVP requires area from Room) |
 | `Консультация (недоступно в демо)` | None | **Disabled** |
 | `Оставить заявку (демо)` | Expand lead form | Always |
 | Lead submit | `console` stub + show payload JSON | Name/phone filled per UI validation (**ASSUMPTION:** submit allowed when fields non-empty; exact client validation follows code) |
