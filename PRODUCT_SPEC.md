@@ -81,6 +81,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Result summary cards **A:** same 2 phrases + class as Before/After; drop old noise-type / «вдвое спокойнее» card copy |
 | 2026-09-13 | Result feature order reconfirmed (A): **1** class → **2** effectiveness → **3** drum-effect → **4** safety → **5** rest |
 | 2026-09-13 | Result sticky CTA **C4:** `Открыть калькулятор MultiFrame` (replaces «Расчёт материалов») |
+| 2026-09-13 | Result lead = consultation/selection: open **P2** `Запросить консультацию или подбор`; title `Заявка на консультацию`; note `Разберём ваш случай, подберём материал.`; no separate disabled «Консультация» button |
 
 ---
 
@@ -526,15 +527,12 @@ Summarize acoustic profile with **verdict first**, then the full evidence stack 
 | Numbers title | `Оценка в цифрах` |
 | Why title | `Почему MultiFrame уместен` |
 | Calculator CTA | `Открыть калькулятор MultiFrame` |
-| Demo badge near secondary CTAs | `демо` |
-| Demo contacts note | `Реальных контактов StP в этом MVP нет. «Консультация» и заявка — только демонстрационные заглушки.` |
-| Consultation (disabled) | `Консультация (недоступно в демо)` |
-| Lead open | `Оставить заявку (демо)` |
-| Lead title | `Заявка · демо` |
-| Lead help | Prefer clear RU: stub does not send data; no invented corporate email. **ASSUMPTION / current code quirk:** UI currently says `Не inventированный корпоративный email.` — product intent is “demo stub only, no real CRM email”. Spec normative help: `Никуда не отправляется — только демонстрация. Не используйте как реальную заявку StP.` |
+| Lead open | `Запросить консультацию или подбор` |
+| Lead title | `Заявка на консультацию` |
+| Lead help | `Разберём ваш случай, подберём материал.` |
 | Name | `Имя` / placeholder `Как к вам обращаться` |
 | Phone | `Телефон` / placeholder `+7 …` |
-| Submit | `Отправить (демо)` → success `Принято (демо-stub)` |
+| Submit | `Отправить` → success `Заявка принята` (MVP: demo stub / console — no real StP CRM; do not invent corporate endpoint) |
 | Payload caption | `CTA payload (schemaVersion 1)` |
 | Restart | `Пройти ещё раз` |
 | Sticky next | `Открыть калькулятор MultiFrame` (opens calculator; always enabled) |
@@ -551,19 +549,18 @@ Summarize acoustic profile with **verdict first**, then the full evidence stack 
 | Control | Action | Enabled |
 | ------- | ------ | ------- |
 | `Открыть калькулятор MultiFrame` (in-body + sticky) | Open calculator URL in new tab | Always (area may be omitted only if invalid — MVP requires area from Room) |
-| `Консультация (недоступно в демо)` | None | **Disabled** |
-| `Оставить заявку (демо)` | Expand lead form | Always |
-| Lead submit | `console` stub + show payload JSON | Name/phone filled per UI validation (**ASSUMPTION:** submit allowed when fields non-empty; exact client validation follows code) |
+| `Запросить консультацию или подбор` | Expand lead form | Always |
+| Lead submit | MVP may `console` stub; UI success `Заявка принята` — no invented StP CRM | Name/phone filled per UI validation (**ASSUMPTION:** submit when fields non-empty) |
 | `Пройти ещё раз` | Reset session → Start | Always |
 | Sticky `Назад` | Go to Audio | Always |
 
 ### Validation messages
 
-Lead: empty name/phone should not pretend a real CRM success. Demo success copy only: `Принято (демо-stub)`.
+Lead: empty name/phone must not claim success. Success: `Заявка принята`.
 
 ### Must NOT appear
 
-Real StP phone/email presented as live; lab certificate; Polyblock upsell; walls/floors systems; guaranteed Lnw norm from ceiling alone.
+Separate disabled «Консультация (недоступно в демо)»; primary labels «Оставить заявку (демо)» / «Заявка · демо»; fake live StP phone/email; lab certificate; Polyblock upsell; walls/floors systems; guaranteed Lnw norm from ceiling alone.
 
 ---
 
@@ -576,8 +573,8 @@ Real StP phone/email presented as live; lab certificate; Polyblock upsell; walls
 | Missing slab | Default solid **180 mm** silently for sim |
 | Audio no matching pair | Fallback both pairs + `демо-набор` |
 | Audio playing | Show `Играет` / pause affordance |
-| Lead demo | Never network POST to CRM; `console` + on-screen JSON |
-| Consultation | Always disabled in MVP |
+| Lead form | Opens consultation/selection request; MVP may stub delivery — never invent live StP CRM |
+| Consultation button | **Removed** as separate disabled control — lead CTA covers consultation/selection |
 | Theme | Light/dark client toggle; content identical |
 | Reduced motion | Keep functionality; reduce decorative motion |
 

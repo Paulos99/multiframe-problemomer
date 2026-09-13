@@ -70,6 +70,7 @@ Live context (do not redesign from this URL alone): https://paulos99.github.io/m
 | Effectiveness block (confirmed 2026-09-13) | Сначала **ориентиры Δ** (воздух/удар) с **поясняющими подписями и ощущениями** у каждой дельты; затем графики. Рамка pre_lab. |
 | Result feature order (confirmed 2026-09-13) | **1)** класс жилья/комфорта → **2)** эффективность → **3)** эффект барабана → **4)** безопасность → **5)** остальное. Монтаж клиенту только как **быстро, без долгой стройки** — без техники крепежа/коммуникаций. |
 | Result sticky CTA (confirmed 2026-09-13) | **C4:** `Открыть калькулятор MultiFrame` (вместо «Расчёт материалов»). |
+| Result lead (confirmed 2026-09-13) | Заявка = консультация / подбор. Open **P2:** `Запросить консультацию или подбор`. Title: `Заявка на консультацию`. Note: `Разберём ваш случай, подберём материал.` Отдельную disabled-кнопку «Консультация» не показываем. |
 | Feature copy style (confirmed 2026-09-13) | Преимущества на результате — **тезис + 1 фраза обоснования**. Пример ОК: «Без системы под натяжным воздух работает как барабан. MultiFrame рассеивает эту энергию — в комнате спокойнее.» Не слоганы и не техдамп. |
 | Premium copy tone (confirmed 2026-09-13) | Не использовать прямые формулировки про оплату/стоимость («за что платим», акцент на цене). Клиент сам делает вывод о ценности из преимуществ и эффекта. |
 
@@ -107,7 +108,7 @@ Product capabilities that **are** in the first version (not listed as vibe templ
 - Expert qualitative effect model with `marketing_placeholder` ΔRw / ΔLnw and pre_lab disclaimer
 - Before/after emotional contrast + SimCompare (feeling primary, dB tertiary)
 - Audio groups воздух / удар / смешанный with locked household examples; case-specific After (level + frequencies + ≈%)
-- CTA: calculator deep-link + demo lead form
+- CTA: calculator deep-link + consultation/selection lead form
 - Mobile-dense layout + sticky question/CTA chrome
 
 | Question                                                                                          | Answer |
