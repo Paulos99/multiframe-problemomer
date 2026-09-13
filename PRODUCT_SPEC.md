@@ -78,6 +78,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Result top verdict line reconfirmed (A): `Сейчас: {класс} → с MultiFrame: {класс}` (e.g. `Сейчас: Дискомфорт → с MultiFrame: Комфорт (Б)`) |
 | 2026-09-13 | Result one-liner **L1:** `В этой комнате MultiFrame поднимает комфорт на ступень выше.` (with class line; same for self/client) |
 | 2026-09-13 | Result chrome: title kept `Акустический профиль`; subtitle **R1** `Ориентир комфорта для вашей комнаты и следующий шаг к расчёту` |
+| 2026-09-13 | Result summary cards **A:** same 2 phrases + class as Before/After; drop old noise-type / «вдвое спокойнее» card copy |
 
 ---
 
@@ -513,10 +514,14 @@ Summarize acoustic profile with **verdict first**, then the full evidence stack 
 | Verdict one-liner | `В этой комнате MultiFrame поднимает комфорт на ступень выше.` |
 | Verdict class line | `Сейчас: {класс} → с MultiFrame: {класс}` |
 | Norm footnote | `Ориентир по шкале комфортности (норм. документы)` |
-| Before card | `Сейчас` · `Без MultiFrame` · `Шум сверху остаётся «рядом»` · `Ощущение: {full comfort label}` · `Тип: {noise type label}` |
-| After card | `С MultiFrame` · `Эффект в ощущении` · `Тише. Спокойнее. Свой потолок.` · `Воздух: примерно вдвое спокойнее — шум как будто дальше` · `Удар: тише; норму часто закрывает пол у соседа` |
+| Before card tag | `Сейчас` |
+| Before card title | `Без MultiFrame` |
+| Before card bullets | `Соседи сверху слышны слишком отчётливо` · `Бытовые звуки сверху легко различить` · `Сейчас: {hybrid class}` |
+| After card tag | `С MultiFrame` |
+| After card title | `С MultiFrame` |
+| After card bullets | `В комнате заметно спокойнее` · `Ударный и воздушный шум воспринимаются мягче` · `С MultiFrame: {hybrid class}` |
 | Profile | `Комната` · `{room} · {N} м²` (no scenario chips) |
-| Numbers title | `Ориентиры в цифрах — вторичны к ощущению` |
+| Numbers title | `Оценка в цифрах` |
 | Why title | `Почему MultiFrame уместен` |
 | Calculator CTA | `Открыть калькулятор` |
 | Demo badge near secondary CTAs | `демо` |
