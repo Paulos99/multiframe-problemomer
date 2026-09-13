@@ -51,6 +51,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Room = **primary diagnostic block** (comfort model input). Keep type + area + slab; propose high-impact extras (floor above, building type, object stage, planned ceiling) — owner to pick |
 | 2026-09-13 | Room fields: keep type+area+slab; **add** floor-above, house type, object stage, planned ceiling; replace «кто сверху» with **noisy neighbors** check (not bother quiz) |
 | 2026-09-13 | Year of build: **optional candidate** — useful as soft proxy for typical construction + normative context; weaker than slab/floor-above; owner to confirm |
+| 2026-09-13 | Build year: **not in MVP**. Noisy neighbors options: drop «ещё не живу»; keep only `Не знаю` · `Обычно тихо` · `Соседи сверху шумные` |
 
 ---
 
@@ -232,7 +233,7 @@ Long role catalog (sales / site / designer / …) on Start; further “уточ�
 
 ### Goal
 
-**Primary diagnostic block:** drives presumed comfort on the object. Locked: type + area + slab. Add: floor above, house type, object stage, planned ceiling, noisy-neighbors check. Optional candidate: build-year/period buckets.
+**Primary diagnostic block:** drives presumed comfort on the object. Locked: type + area + slab. Add: floor above, house type, object stage, planned ceiling, noisy-neighbors check (`Не знаю` · `Обычно тихо` · `Соседи сверху шумные`). Year of build: **not in MVP**.
 
 ### Visible elements
 
@@ -292,15 +293,15 @@ Room answers drive the **presumed comfort class** on the object. Type + area + s
 | Тип дома | Proxy when slab unknown; typical construction | `Панельный` · `Кирпичный` · `Монолит` · `Деревянные/балочные` · `Не знаю` | |
 | Стадия объекта | Narrative + baseline story without «мешает ли» | `Новостройка / до заселения` · `Идёт ремонт` · `Уже живут` · `Не знаю` | |
 | Планируемый потолок | Fit story for MultiFrame under finish | `Натяжной` · `Натяжной + ГКЛ` · `Уже есть черновой` · `Не знаю` | |
-| Шумные соседи сверху | Expectation of upstairs activity (not “does it bother you”) | `Не знаю` · `Ещё не живу / не слышал` · `Обычно тихо` · `Соседи сверху шумные` | Replaces «кто сверху». Must **not** sound like complaint quiz |
+| Шумные соседи сверху | Expectation of upstairs activity (not “does it bother you”) | `Не знаю` · `Обычно тихо` · `Соседи сверху шумные` | Replaces «кто сверху». Must **not** sound like complaint quiz |
 
 **Dropped:** «Кто сверху» (жилая/нежилое) — replaced by noisy-neighbors check.
 
-**Year of construction (`год постройки`) — recommendation (ASSUMPTION until owner locks):**
+**Year of construction — deferred (owner 2026-09-13: not in MVP):**
 
 - **Can help:** (1) soft proxy for typical slab/era (хрущёвка / 90s panel / modern monolith); (2) framing that expectations/norms and build practice differ by generation; (3) when user picks «не знаю» on slab + house type.
 - **Limits:** Russian residential acoustic limits are mainly by **building category А/Б/В** and construction type, not a simple “year → other Lnw number” table in the MVP model. Year ≠ substitute for slab + floor-above.
-- **Product call:** add as **optional** `Год или период` with buckets + `Не знаю` (e.g. `до 1990` · `1990–2010` · `после 2010` · `Не знаю`) — useful, not mandatory. Prefer buckets over exact year (easier, less fake precision).
+- **Decision:** do **not** add year/period in current MVP. Revisit later if slab+house type leave too much ambiguity.
 
 
 ## Screens removed from survey (2026-09-13)
