@@ -18,7 +18,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 - **Numbers policy (owner 2026-09-13):** show a **full working MultiFrame effect model** with complete numbers now — currently **unconfirmed** (`marketing_placeholder` / `pre_lab`). After Trofimov (or lab) confirmation, **replace** values with correct ones; do not redesign the UX around hiding numbers. Never present placeholders as lab guarantees or certificates.
 - Effect source: `marketing_placeholder`; disclaimer: `pre_lab` / expert qualitative — never lab guarantees. Charts/numbers are **oriented arguments**, not certificates.
 - ΔRw center **+10** (show range **+8…+12**); ΔLnw center **−8** (show range **−6…−10** as absolute 6…10 in UI copy). **ASSUMPTION** until technical confirmation.
-- Classes **А/Б/В** (Trofimov / SP-style): **А** = высокая комфортность, **Б** = комфортная, **В** = предельно допустимая. UI = **hybrid plain label + letter** (`Высокий комфорт (А)`, `Комфорт (Б)`, `Допустимый (В)`) plus below-scale **`Дискомфорт`** when even В is not reached (owner: this is common). Soft «по ориентиру нормативного документа» note — not a legal certificate. “пониженный → выше классом” remains required. **ASSUMPTION on everyday synonyms:** prefer Trofimov plain words; avoid mapping «эконом» to **А** (А is the top, not economy).
+- Classes **А/Б/В** (Trofimov / SP-style): **А** = высокая комфортность, **Б** = комфортная, **В** = предельно допустимая. UI = **hybrid plain label + letter** (`Высокий комфорт (А)`, `Комфорт (Б)`, `Допустимый (В)`) plus below-scale **`Дискомфорт`** when even В is not reached (owner: this is common). Soft footnote **`Ориентир по шкале комфортности (норм. документы)`** — not a legal certificate. “пониженный → выше классом” remains required. **ASSUMPTION on everyday synonyms:** prefer Trofimov plain words; avoid mapping «эконом» to **А** (А is the top, not economy).
 - «примерно вдвое спокойнее» **only for air (воздух)**; impact (удар) = quieter + floor often needed — never claim Lnw norm from ceiling alone.
 - Audio must sell the difference; demo stubs allowed with clear «демо» labeling.
 - Mobile: denser inputs + sticky question/CTA; pack stays one scroll with sticky verdict readable above the fold when possible. No raw tech dumps without explanation.
@@ -43,6 +43,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Class labels: **hybrid** — plain name + letter (А/Б/В), soft link to normative doc (Trofimov/SP). Official: А высокая комфортность, Б комфортная, В предельно допустимая. Do not invert letters. |
 | 2026-09-13 | Class V UI label = **Допустимый (В)**; below-scale state when even V not reached (common) — UI label **`Дискомфорт`** (confirmed) |
 | 2026-09-13 | Result top class shift copy confirmed: e.g. `Сейчас: Дискомфорт → с MultiFrame: Комфорт (Б)` |
+| 2026-09-13 | Norm footnote under class shift: **A** — `Ориентир по шкале комфортности (норм. документы)` |
 
 ---
 
@@ -165,7 +166,7 @@ Must **not** appear: calculator links, dB values, lead form, Polyblock, floor qu
 
 ### Simulation disclaimer (SimCompare)
 
-`Не замер и не гарантия Δ. Классы комфорта А/Б/В (с понятными названиями) — ориентир по нормативной шкале, не сертификат и не полный расчёт по СП. Потолком нельзя заявлять полную норму по ударному шуму: часто нужен пол у соседа сверху.`
+`Не замер и не гарантия Δ. Классы комфорта — ориентир по шкале комфортности (норм. документы); не сертификат и не полный расчёт по СП. Потолком нельзя заявлять полную норму по ударному шуму: часто нужен пол у соседа сверху.`
 
 ### Simulation badge
 
