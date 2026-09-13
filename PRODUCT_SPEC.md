@@ -74,6 +74,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | **Audio rewrite (Trofimov + owner):** channels воздух / удар (+ UI group **смешанный**); After = case-specific MultiFrame reduction — cut **level and frequencies**; % tied to this room’s Δ (`pre_lab`) |
 | 2026-09-13 | Audio examples locked (D): **воздух** — лай собаки · музыка · громкие разговоры; **удар** — детский бег · перестановка мебели · цоканье когтей собаки; **смешанный** — стиральная машина · пылесос |
 | 2026-09-13 | Audio reduction UI **C:** `≈ −{n}%` + Δ caption; log footnote **F2b:** `Шкала дБ логарифмическая: −8 дБ ≈ вдвое тише по ощущению.` |
+| 2026-09-13 | Audio chrome partial: title **T1** `Услышать разницу`; buttons **B2** `До` · `После` (no subs); sticky **N3** `Смотреть итог`; subtitle still open (S1–S3 rejected) |
 
 ---
 
@@ -426,7 +427,7 @@ None.
 | Role | Text |
 | ---- | ---- |
 | Title | `Услышать разницу` |
-| Subtitle | `Бытовые примеры сверху: воздух, удар и смешанный. «После» — оценка MultiFrame для вашей комнаты.` |
+| Subtitle | **TBD** — owner rejected S1–S3; new options below |
 | Channel air title | `Воздушный шум` |
 | Channel air help | `Через перекрытие (Rw): речь, музыка, лай.` |
 | Channel impact title | `Ударный шум` |
@@ -435,12 +436,12 @@ None.
 | Channel mixed help | `И воздух, и удар сразу — бытовая техника.` |
 | Reduction line | `≈ −{n}% · ориентир {Δ} дБ` (C — both; % = **perceived** reduction from Δ, not linear Δ/level) |
 | Log footnote | `Шкала дБ логарифмическая: −8 дБ ≈ вдвое тише по ощущению.` |
-| Before button | `До` / sub `Обычный потолок` |
-| After button | `После` / sub `С MultiFrame` |
+| Before button | `До` |
+| After button | `После` |
 | Playing state | `Играет` · `нажмите — пауза` |
 | Impact honesty | `По удару потолок смягчает; пол сверху часто дополняет результат.` |
 | Audio disclaimer | `Аудио — иллюстрация эффекта модели для этой комнаты, не лабораторный замер. Срезаются громкость и частоты по ориентиру MultiFrame.` |
-| Sticky next | `К профилю` |
+| Sticky next | `Смотреть итог` |
 
 ### Household examples — locked (owner 2026-09-13, D)
 
