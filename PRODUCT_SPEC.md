@@ -434,7 +434,7 @@ None.
 | Channel mixed title | `Смешанный шум` |
 | Channel mixed help | `И воздух, и удар сразу — бытовая техника.` |
 | Reduction line | `≈ −{n}% · ориентир {Δ} дБ` (C — both; % = **perceived** reduction from Δ, not linear Δ/level) |
-| Log footnote | `дБ — логарифмическая шкала: −8 дБ — это примерно вдвое тише по ощущению, а не «минус несколько процентов». Пример: было 64 дБ, стало 56 — снижение существенное.` |
+| Log footnote | `Шкала дБ логарифмическая: −8 дБ — заметно тише (~вдвое по ощущению).` |
 | Before button | `До` / sub `Обычный потолок` |
 | After button | `После` / sub `С MultiFrame` |
 | Playing state | `Играет` · `нажмите — пауза` |
@@ -637,7 +637,7 @@ Real StP phone/email presented as live; lab certificate; Polyblock upsell; walls
 | Examples (locked) | Air: `Лай собаки` · `Музыка` · `Громкие разговоры`. Impact: `Детский бег` · `Перестановка мебели` · `Цоканье когтей собаки`. Mixed: `Стиральная машина` · `Пылесос` |
 | After processing | Apply this room’s oriented Δ: cut **level + frequencies** (mixed = blend air+impact ASSUMPTION) |
 | Reduction UI (C) | Always `≈ −{n}%` **+** `ориентир {Δ} дБ`. `%` = perceived map from Δ — **not** linear Δ/level. ~−8 dB ≈ large drop (~2× quieter sensation ASSUMPTION) |
-| Log footnote | Required: dB are logarithmic; 64→56 is substantial, not “~5% quieter” |
+| Log footnote | Required **F2:** `Шкала дБ логарифмическая: −8 дБ — заметно тише (~вдвое по ощущению).` Premium short; no cheap «копеечная» framing |
 | Impact honesty | Near impact (and mixed if needed): ceiling softens; floor above often complements |
 | Sources | Web Audio / procedural stubs OK until real stems; must obey processing rules |
 | Labels | `ориентир` / not lab; drop primary promise of «контраст усилен» |
