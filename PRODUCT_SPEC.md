@@ -82,7 +82,8 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Result feature order reconfirmed (A): **1** class → **2** effectiveness → **3** drum-effect → **4** safety → **5** rest |
 | 2026-09-13 | Result sticky CTA **C4:** `Открыть калькулятор MultiFrame` (replaces «Расчёт материалов») |
 | 2026-09-13 | Result lead = consultation/selection: open **P2** `Запросить консультацию или подбор`; title `Заявка на консультацию`; note `Разберём ваш случай, подберём материал.`; no separate disabled «Консультация» button |
-| 2026-09-13 | Workshop reconcile: product chrome/flow largely locked; still open for owner — exact feature teзис+why lines (beyond drum example); Start chrome polish if desired. Engineering ASSUMPTIONs OK until Trofimov: dB→% map, mixed EQ blend, Δ model numbers, lead stub endpoint |
+| 2026-09-13 | Workshop reconcile: product chrome/flow largely locked; still open for owner — exact feature тезис+why lines (beyond drum example). Engineering ASSUMPTIONs OK until Trofimov: dB→% map, mixed EQ blend, Δ model numbers, lead stub endpoint |
+| 2026-09-13 | Start chrome: **no kicker**; H1 kept; lead **E8c** `Проблемомер показывает исходное состояние потолка и эффект MultiFrame — уровень комфорта сейчас, ожидаемый эффект после и что важно учесть до выбора потолка.`; CTA `Начать` |
 
 ---
 
@@ -225,9 +226,9 @@ One light choice **для себя / для клиента** + emotional hook: c
 
 ### Visible elements
 
-- Line + two options: `Интересуюсь звукоизоляцией:` `для себя` / `для клиента`
-- Kicker, H1/lead, primary CTA `Начать`, three scope bullets
-- Header (no progress, no sticky CTA)
+- Interest line + two options: `Интересуюсь звукоизоляцией:` `для себя` / `для клиента`
+- H1, lead, primary CTA `Начать`, three scope bullets
+- Header (no progress, no sticky CTA, **no kicker**)
 - Optional UTM/referrer hook copy (**ASSUMPTION** — no extra question)
 
 ### Exact primary copy (RU)
@@ -236,7 +237,7 @@ One light choice **для себя / для клиента** + emotional hook: c
 | ---- | ---- |
 | Interest | `Интересуюсь звукоизоляцией:` · `для себя` · `для клиента` |
 | H1 | `Проверьте уровень акустического комфорта перед выбором натяжного потолка` |
-| Lead | `Проблемомер показывает исходное состояние потолка и эффект MultiFrame — {ending TBD: E1/E2/E3}.` (kicker removed; dry «по звуку…терминов» dropped) |
+| Lead | `Проблемомер показывает исходное состояние потолка и эффект MultiFrame — уровень комфорта сейчас, ожидаемый эффект после и что важно учесть до выбора потолка.` |
 | Bullet 1 | `Только потолок и шум сверху через перекрытие` |
 | Bullet 2 | `Полная картина: комфорт сейчас → эффект MultiFrame → плюсы системы` |
 | Bullet 3 | `Далее — расчёт материалов MultiFRAME` |
@@ -255,7 +256,7 @@ None.
 
 ### Must NOT appear
 
-Long role catalog (sales / site / designer / …) on Start; further “уточняющие” role questions; Rw/Lnw, ΔdB, class chips, slab picker, lead form, Polyblock, walls, floor question, audio player, technical SP references.
+Long role catalog (sales / site / designer / …) on Start; kicker/eyebrow brand strip; further “уточняющие” role questions; Rw/Lnw, ΔdB, class chips, slab picker, lead form, Polyblock, walls, floor question, audio player, technical SP references.
 
 ---
 
