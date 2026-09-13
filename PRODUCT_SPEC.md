@@ -48,6 +48,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Effectiveness: **always both** Δ channels (воздух + удар), each with caption + sensation |
 | 2026-09-13 | **Remove Scenarios from survey** — client may not live there / not have thought about noise; asking «что мешает» risks «мне ничего не мешает». Audio uses default demo set |
 | 2026-09-13 | **Remove Current complaint survey** with Scenarios (same anti-pattern). Flow: Start → Room → Before/After → Audio → Result |
+| 2026-09-13 | Room = **primary diagnostic block** (comfort model input). Keep type + area + slab; propose high-impact extras (floor above, building type, object stage, planned ceiling) — owner to pick |
 
 ---
 
@@ -229,7 +230,7 @@ Long role catalog (sales / site / designer / …) on Start; further “уточ�
 
 ### Goal
 
-Capture room type + ceiling area (for calculator handoff) and optional upstairs slab for the qualitative sim.
+**Primary diagnostic block:** capture everything that drives presumed comfort on the object. Locked: room type + area + slab. Further fields TBD from ranked proposals below (floor above, building type, …).
 
 ### Visible elements
 
@@ -271,6 +272,25 @@ When Далее disabled, status may show: `выберите тип` and/or `у�
 Этаж / номер этажа; wall materials; Polyblock; dB tables; lead form.
 
 ---
+
+
+### Room as primary diagnostic (owner 2026-09-13)
+
+Room answers drive the **presumed comfort class** on the object. Type + area + slab stay. Additional fields — only if they change the model; prefer «Не знаю» over forcing expertise.
+
+**Proposed additions (DRAFT — pick with owner), ranked by impact on result:**
+
+| Priority | Field | Why it moves the result | Suggested UI |
+| -------- | ----- | ----------------------- | ------------ |
+| **1 — high** | Пол у соседа сверху / конструкция пола над плитой | Trofimov: slab alone never meets impact norm; floating floor changes Lnw by tens of dB. Biggest driver of «Дискомфорт» vs «Допустимый» on impact. | `Не знаю` · `Обычный пол (стяжка / ламинат без плавающей схемы)` · `Есть плавающий пол / шумоизоляция в полу` · `Пока без чистового пола (новостройка)` |
+| **2 — high** | Тип дома / несущая схема | Predicts typical slab if user unsure; panel vs monolith vs wood differ in Rw/Lnw baselines. | `Панельный` · `Кирпичный` · `Монолит` · `Деревянные/балочные перекрытия` · `Не знаю` |
+| **3 — medium** | Стадия объекта | Without asking «мешает ли»: empty new-build vs lived-in changes which baseline story we tell. | `Новостройка / до заселения` · `Идёт ремонт` · `Уже живут` · `Не знаю` |
+| **4 — medium** | Планируемый потолок | Master prompt; frames MultiFrame under stretch vs GKL; little on class numbers, much on narrative fit. | `Натяжной` · `Натяжной + ГКЛ / теневой` · `Уже смонтирован черновой` · `Не знаю` |
+| **5 — lower** | Кто сверху | Residential vs non-residential upstairs changes expected noise mix (still show both Δ). | `Жилая квартира` · `Нежилое / офис` · `Не знаю` |
+| **Avoid for now** | Этаж числом, город, окна, стены | Weak for ceiling-upstairs MVP; noise-bother quiz already rejected. | — |
+
+**Agent recommendation:** lock **#1** (floor above) as the next required/strong field; add **#2** (house type) especially when slab = «не знаю»; keep **#3/#4** short optional. Do not add more until these prove needed.
+
 
 ## Screens removed from survey (2026-09-13)
 
