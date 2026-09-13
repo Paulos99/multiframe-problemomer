@@ -6,14 +6,14 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 
 **Audiences (confirmed 2026-09-13):** Start asks only **«Интересуюсь звукоизоляцией: для себя / для клиента»**. The long role/entry list is **not** a Start picker — it is the **JTBD map** for what purchase-justifying content the shared result must cover. **One diagnostic flow** → everyone gets the **full MultiFrame buy case** (baseline + acoustic effect + other advantages). No further role grilling on Start.
 
-**Core value (owner-confirmed direction):** show that in *this* room comfort is lower than assumed; MultiFrame can raise comfort class (often by a step+); let user feel how much quieter; explain what ~500k pays for (quiet + frameless “beautiful and quiet ceiling”, not only ΔdB); give anyone helping a client a ready argument. Still **not** a materials calculator and **not** a lab certificate.
+**Core value (owner-confirmed direction):** show that in *this* room comfort is lower than assumed; MultiFrame can raise comfort class (often by a step+); let user feel how much quieter; present system features (comfort, install, versatility, safety) so value is **inferred**, not priced aloud; give anyone helping a client a ready argument. Still **not** a materials calculator and **not** a lab certificate.
 
 **Global product rules**
 
 - Feeling + comfort-class story first on early screens; **no numbers on Start**.
 - On Before/After + Profile: show the **full evidence pack** — personal room story, classes А/Б/В, numbers, charts, and plain-language explanations of each (owner 2026-09-12: «показать всё, аргументированно, понятно, персонально»).
 - **Evidence layout (Q4, owner 2026-09-12):** everything on one scroll — **conclusion / verdict on top**, detailed data below. Not progressive disclosure; not audience-trimmed packs. Anyone skims what they need. Same full stack for all user models (context may still change copy/CTA emphasis).
-- **Result must include (owner 2026-09-13):** (1) baseline state of *this* ceiling/room, (2) MultiFrame acoustic effect (full unconfirmed model), (3) **other MultiFrame advantages** beyond dB (frameless / height / speed / stretch-ceiling fit / heat / etc. — from MultiFrame site claims, plain language).
+- **Result must include (owner 2026-09-13):** (1) baseline state of *this* ceiling/room, (2) MultiFrame acoustic effect (full unconfirmed model), (3) **system features & reasons-to-believe** from MultiFRAME presentation/site (comfort, install, versatility, safety, patents) — plain language, **no price-forward copy**.
 - **Charts (owner 2026-09-13):** **both** — comfort **class scale А→Б→В** (arrow “where we move”) **above**; **before/after bars** for oriented ΔRw / ΔLnw **below**. Not spectrum/frequency charts in MVP. Always with plain-language captions + `pre_lab` framing.
 - **Numbers policy (owner 2026-09-13):** show a **full working MultiFrame effect model** with complete numbers now — currently **unconfirmed** (`marketing_placeholder` / `pre_lab`). After Trofimov (or lab) confirmation, **replace** values with correct ones; do not redesign the UX around hiding numbers. Never present placeholders as lab guarantees or certificates.
 - Effect source: `marketing_placeholder`; disclaimer: `pre_lab` / expert qualitative — never lab guarantees. Charts/numbers are **oriented arguments**, not certificates.
@@ -22,19 +22,21 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 - «примерно вдвое спокойнее» **only for air (воздух)**; impact (удар) = quieter + floor often needed — never claim Lnw norm from ceiling alone.
 - Audio must sell the difference; demo stubs allowed with clear «демо» labeling.
 - Mobile: denser inputs + sticky question/CTA; pack stays one scroll with sticky verdict readable above the fold when possible. No raw tech dumps without explanation.
+- **Premium tone (owner 2026-09-13):** never UI phrases like «за что платим», «за что ~500 тыс.», blunt cost/price push. Show features and effects so the user **infers** value. Soft B2B benefits OK («для клиента» path) without «средний чек» / money-first language.
 - Out of scope: walls, partitions, floors systems, Polyblock, framed systems, fake lab guarantees, floor-level question.
 
 ### Workshop log (durable)
 
 | Date | Decision |
 | ---- | -------- |
-| 2026-09-12 | Value ≈ «плёнка без акустики / шум останется» + class uplift + feel quieter + justify ~500k + non-acoustic benefits + sales tool |
+| 2026-09-12 | Value ≈ «плёнка без акустики / шум останется» + class uplift + feel quieter + feature-based value (not price talk) + sales tool |
 | 2026-09-12 | Audiences **C** (narrow binary) — **superseded 2026-09-13** |
 | 2026-09-12 | Result depth: **full pack** — personal + classes + numbers + charts + explanations (not A/B-only; not “feeling only”) |
 | 2026-09-12 | Evidence presentation **Q4**: all-at-once scroll; **вывод сверху, данные ниже**; self-select depth (not progressive disclosure; not audience-trimmed) |
 | 2026-09-13 | Charts **C**: class scale А→Б→В on top + before/after bars (ΔRw/ΔLnw) below; no frequency spectrum in MVP |
 | 2026-09-13 | Numbers: **show full unconfirmed model now**; after confirmation swap to correct values (do not hide numbers in MVP) |
 | 2026-09-13 | User models = **JTBD content map** (not a long Start quiz); Start = only «для себя / для клиента»; no further Start clarification — full buy-case content covers all JTBD |
+| 2026-09-13 | Tone: no «за что платим» / price-first copy; value inferred from features; MultiFRAME deck is primary product-feature source |
 
 ---
 
@@ -72,18 +74,27 @@ Owner listed ads / search / MultiFrame site / partner site / sales manager / ins
 
 May lightly change pronoun/CTA tone («вам» / «клиенту»). **Must not** trim evidence. **No Q2 role drill-down on Start.**
 
-### MultiFrame advantages beyond ΔdB (for Result copy — from MultiFrame site)
+### MultiFrame features for Result (from owner presentation + stp-multiframe.ru)
 
-Use as plain-language bullets under verdict (not a datasheet dump):
+**Tone:** present facts so the user concludes value themselves. **Forbidden in UI:** «за что платим», blunt price/cost framing, «средний чек».
 
-- Frameless modular panels under stretch/suspended ceiling
-- Small height loss vs framed systems (site claim — keep qualitative unless owner locks a mm figure)
-- Fast install (site: one craftsperson; panel under ~1 minute — label as vendor claim / demo marketing)
-- Tongue-and-groove fit, cut-to-size, service routes possible
-- Extra thermal insulation as a side benefit (vendor claim)
-- Certified / non-dusting materials messaging (vendor claim)
+**Primary narrative anchors (from deck)**
 
-Acoustic effect remains the core; these support “за что платим / почему MultiFrame, а не просто плёнка”.
+1. **Проблема потолка без системы** — между плитой и натяжным полотном замкнутый воздух даёт «эффект барабана»; MultiFrame рассеивает эту энергию (перфорация как «воздушный канал»).
+2. **Акустический комфорт** — ориентир снижения ударного и воздушного шума до ~17 дБ (vendor claim; show as `pre_lab` / oriented).
+3. **Система нового поколения** — модульная экосистема под натяжной / ГКЛ, не «просто материал».
+4. **Технология** — жёсткий энергопоглощающий каркас AEROCELL TECHNOLOGY™; наполнители Biplast Eco Foam / PPU Full Touch; сквозная перфорация; слоты 1–4% под диапазон ~100–500 Гц.
+5. **Монтаж** — SmartLock (5 точек); шип-паз в единое полотно; подрезка под архитектуру; 1 мастер; панель ≤1 мин (vendor claim); коммуникации до или после панелей.
+6. **Универсальность** — потолок и стены; любой тип перекрытия; любой этап ремонта; Flat (удобно под светильники) / Wave (может остаться видимым industrial finish).
+7. **Безопасность / доверие** — эко/безопасность; сертификаты ISO 9001, ECO, ISO 14001 (as shown in deck).
+8. **Отличие** — патент / «нет аналогов» (vendor claim — soft wording, not aggression).
+
+**Для пути «для клиента» (мягко):** высокий спрос на услугу; лояльность; встраивается в монтаж потолка; низкий порог освоения — **без** формулировок про деньги/чек.
+
+**Process story (optional short):** подготовка → MultiFrame → коммуникации → каркас → потолок → финиш/свет.
+
+Acoustic diagnosis remains the core of Problemoмер; these features complete the buy-case without price talk.
+
 
 ---
 
