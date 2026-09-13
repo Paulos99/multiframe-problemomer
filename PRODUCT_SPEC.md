@@ -373,7 +373,7 @@ Show the comfort shift for this room: ordinary stretch ceiling vs MultiFrame. **
 | Subtitle | `Обычный натяжной потолок и потолок с MultiFrame — ориентир комфорта для вашей комнаты.` |
 | Before tag | `Сейчас типично` |
 | Before h2 | `Обычный потолок` |
-| Before bullets | `Шум сверху остаётся близко` · `Шаги и голоса легко различаются` · `Сейчас: {hybrid class}` |
+| Before bullets | `Соседи сверху слышны слишком отчётливо` · `Бытовые звуки сверху легко различить` · `Сейчас: {hybrid class}` |
 | After tag | `С MultiFrame` |
 | After h2 | `Бескаркасная акустика` |
 | After bullets | `В комнате заметно спокойнее` · `Ударный и воздушный шум воспринимаются мягче` · `С MultiFrame: {hybrid class}` |
