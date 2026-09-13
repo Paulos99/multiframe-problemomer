@@ -68,6 +68,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Before/After «До» card bullet (A): last Before bullet = hybrid class from model — `Сейчас: {Высокий комфорт (А)|Комфорт (Б)|Допустимый (В)|Дискомфорт}`; drop `Тихо/Терпимо/Мешает` |
 | 2026-09-13 | Before/After «После» card bullet (A): last After bullet = `С MultiFrame: {hybrid class}` — symmetric with Before |
 | 2026-09-13 | Before/After copy rewrite: owner — previous emotional bullets / feeling chips are **obsolete**; rebuild from hybrid class + new copy (not patch old `Тихо/Терпимо/Мешает` SPA) |
+| 2026-09-13 | Before/After bullet frame (A): **2 phrases + hybrid class** per card (not one phrase only, not class-only) |
 
 ---
 
@@ -371,15 +372,17 @@ Show the comfort shift for this room: ordinary stretch ceiling vs MultiFrame. **
 | Subtitle | `Обычный натяжной потолок и потолок с MultiFrame — ориентир комфорта для вашей комнаты.` |
 | Before tag | `Сейчас типично` |
 | Before h2 | `Обычный потолок` |
-| Before bullets | Emotional lines — **TBD rewrite** (owner: old bullets obsolete). **Last bullet locked:** `Сейчас: {hybrid class}` e.g. `Сейчас: Дискомфорт` |
+| Before bullets | `Шум сверху остаётся близко` · `Шаги и голоса легко различаются` · `Сейчас: {hybrid class}` |
 | After tag | `С MultiFrame` |
 | After h2 | `Бескаркасная акустика` |
-| After bullets | Emotional lines — **TBD rewrite**. **Last bullet locked (A):** `С MultiFrame: {hybrid class}` e.g. `С MultiFrame: Комфорт (Б)` |
+| After bullets | `В комнате заметно спокойнее` · `Ударный и воздушный шум воспринимаются мягче` · `С MultiFrame: {hybrid class}` |
 | Numbers section title | `Ориентиры в цифрах` |
 | Honesty note | `Цифры — рабочая модель (`pre_lab`), не лабораторный замер. Ударный шум потолком смягчается; часто нужен ещё пол у соседа сверху.` |
 | Sticky next | `Услышать разницу` |
 
 **Class rule (confirmed):** Before and After cards both end with the hybrid class from the Room model. Same vocabulary as the top verdict strip. No `Тихо` / `Терпимо` / `Мешает`.
+
+**Bullet frame (confirmed A):** exactly **two** short sensation lines + class line per card. Wording may be tuned; structure locked.
 
 ### Controls
 
