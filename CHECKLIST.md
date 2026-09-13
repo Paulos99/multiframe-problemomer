@@ -32,7 +32,7 @@ Live context (do not redesign from this URL alone): https://paulos99.github.io/m
 | Audiences / Start (confirmed 2026-09-13) | На старте только: **«Интересуюсь звукоизоляцией: для себя / для клиента»**. Длинный список ролей/входов — **не UI-опрос**, а **карта JTBD** для полного контента обоснования покупки MultiFrame. |
 | User models = JTBD content map (owner 2026-09-13) | Клиент: таргет / поиск / сайт MultiFrame / сайт партнёра. Профи: менеджер продаж, мастер на объекте, замерщик, дизайнер и аналоги. Нужны не отдельные ветки, а **один полный buy-case**, который закрывает эти работы. |
 | Further Start clarification | **Не делаем.** Зачем не нужно: если результат уже даёт полную аргументацию покупки MultiFrame (исходное состояние + эффект + плюсы + классы/цифры/аудио), доп. вопросы «менеджер / замер / дизайн» только усложняют вход и не добавляют фактов. UTM может менять хук без вопроса. |
-| What is the first user journey that must work end to end? | `для себя`/`для клиента` → comfort framing → комната → сценарии шума → текущее состояние → до/после → аудио → профиль + CTA. На результате — **полный контент обоснования покупки MultiFrame** под все JTBD выше. |
+| What is the first user journey that must work end to end? | `для себя`/`для клиента` → комната → сравнение до/после → аудио → профиль + CTA. **Без** опроса сценариев/«что мешает». На результате — полный buy-case; **оба** канала Δ всегда. |
 | Result evidence depth (confirmed 2026-09-12) | **Показать всё**, аргументированно, понятно, персонально: **цифры + классы А/Б/В + графики + пояснения к ним**. Не выбирать «только ощущение» или «только цифры». Честная рамка pre_lab / marketing_placeholder сохраняется — это ориентиры под комнату, не лаб-сертификат. |
 | Evidence presentation Q4 (confirmed 2026-09-12) | **Всё сразу** на одном скролле: **сверху вывод**, ниже детальные данные. Менеджер и пользователь сами смотрят нужный слой. Не progressive disclosure и не урезание пакета по роли. |
 | Charts (confirmed 2026-09-13) | **C — оба:** сверху шкала классов комфорта А→Б→В (куда сдвинемся), ниже столбцы до/после с ориентирами ΔRw / ΔLnw. Без частотного спектра в MVP. Подписи + рамка pre_lab обязательны. |
@@ -41,6 +41,9 @@ Live context (do not redesign from this URL alone): https://paulos99.github.io/m
 | Norm footnote (confirmed 2026-09-13) | Под сдвигом класса: `Ориентир по шкале комфортности (норм. документы)`. |
 | Class shift verdict line (confirmed 2026-09-13) | Формат: `Сейчас: {класс} → с MultiFrame: {класс}` (пример: `Сейчас: Дискомфорт → с MultiFrame: Комфорт (Б)`). |
 | Comfort class labels (confirmed 2026-09-13) | UI: `Высокий комфорт (А)` · `Комфорт (Б)` · `Допустимый (В)` · **`Дискомфорт`** (когда даже до В не дотягивает — часто). Мягкая отсылка к нормативному документу. А — верх шкалы, не «эконом». |
+| Always both Δ channels (confirmed 2026-09-13) | На эффективности всегда **воздух и удар**, у каждого — пояснение + ощущение. |
+| Scenarios survey (removed 2026-09-13) | Убрать вопрос «что слышите/мешает»: клиент мог не жить в квартире и не задумываться о шуме; опрос провоцирует «мне ничего не мешает». |
+| Current complaint survey (removed 2026-09-13) | Убрать вместе со сценариями (тот же антипаттерн). Класс до/после считает модель, не самооценка «мешает». |
 | Effectiveness block (confirmed 2026-09-13) | Сначала **ориентиры Δ** (воздух/удар) с **поясняющими подписями и ощущениями** у каждой дельты; затем графики. Рамка pre_lab. |
 | Result feature order (confirmed 2026-09-13) | **1)** класс жилья/комфорта → **2)** эффективность → **3)** эффект барабана → **4)** безопасность → **5)** остальное. Монтаж клиенту только как **быстро, без долгой стройки** — без техники крепежа/коммуникаций. |
 | Feature copy style (confirmed 2026-09-13) | Преимущества на результате — **тезис + 1 фраза обоснования**. Пример ОК: «Без системы под натяжным воздух работает как барабан. MultiFrame рассеивает эту энергию — в комнате спокойнее.» Не слоганы и не техдамп. |
@@ -76,7 +79,7 @@ Ask about product needs, not implementations. Mark what the first version actual
 
 Product capabilities that **are** in the first version (not listed as vibe template toggles above — see ledger):
 
-- 7-screen comfort wizard (ceiling / upstairs noise only)
+- 5-step comfort wizard after Start: Room → Before/After → Audio → Result (no scenarios/current quiz)
 - Expert qualitative effect model with `marketing_placeholder` ΔRw / ΔLnw and pre_lab disclaimer
 - Before/after emotional contrast + SimCompare (feeling primary, dB tertiary)
 - Demo audio stubs that sell the difference
@@ -161,18 +164,18 @@ A capability with no row is `absent` by default. The State column always holds o
 
 | Capability | State | Note |
 | ---------- | ----- | ---- |
-| Comfort wizard (7 screens) | included | Start → Room → Scenarios → Current → Before/After → Audio → Result. One flow for homeowner + showroom. |
+| Comfort wizard (Start + 4 steps) | included | Start → Room → Before/After → Audio → Result. No scenarios/current quiz. |
 | Ceiling-only / upstairs noise scope | included | `answers.scope: 'ceiling'`. No floor question. |
 | Frameless MultiFrame positioning | included | Only бескаркасная StP MultiFrame; framed systems out of scope. |
 | Room + optional slab input | included | Room type, area m², optional slab key (default solid 180 mm). |
-| Noise scenario multi-select | included | steps, drop, furniture, talk, tv, music, repair. |
+| Noise scenario multi-select | removed | Owner 2026-09-13: do not quiz «что мешает». |
 | Current comfort + noise type | included | quiet/ok/bothers + impact/airborne/mixed; plain-language “why”. |
 | Emotional before/after contrast | included | Feeling-first copy; numbers secondary. |
 | SimCompare effect UI | included | Feeling primary; Rw/Lnw tertiary; А/Б/В chips; honestLines; pre_lab badge. |
 | marketing_placeholder Δ model | included | ΔRw +10 (range 8–12), ΔLnw −8 (range 6–10); `source: marketing_placeholder`; `disclaimer: pre_lab`. Never claim lab guarantees. |
 | Trofimov-style comfort classes A/B/V | included | Canon A\|B\|V; UI Cyrillic А\|Б\|В; partial/below statuses. Never promise full Lnw norm from ceiling alone. |
 | Demo audio difference | included | Web Audio stubs; badges «демо» / «демо-набор»; «вдвое спокойнее» only for air channel. |
-| Calculator CTA handoff | included | Opens `MF_StP` with `area`, `roomType`, `scenarios` query params. |
+| Calculator CTA handoff | included | Opens calculator with `area`, `roomType` (no scenarios). |
 | Demo lead form | available | UI + `console` stub + JSON payload (`schemaVersion: 1`). No real StP CRM / email endpoint. |
 | Sticky mobile chrome | included | Header + progress + sticky Далее/CTA; denser cards on narrow viewports. |
 | Theme toggle (light/dark) | included | Client-only preference. |

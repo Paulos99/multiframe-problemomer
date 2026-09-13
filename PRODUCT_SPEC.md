@@ -45,6 +45,9 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Result top class shift copy confirmed: e.g. `Сейчас: Дискомфорт → с MultiFrame: Комфорт (Б)` |
 | 2026-09-13 | Norm footnote under class shift: **A** — `Ориентир по шкале комфортности (норм. документы)` |
 | 2026-09-13 | Effectiveness block: **delta orientations first**, each with explaining caption + sensation (not feeling-only lead) |
+| 2026-09-13 | Effectiveness: **always both** Δ channels (воздух + удар), each with caption + sensation |
+| 2026-09-13 | **Remove Scenarios from survey** — client may not live there / not have thought about noise; asking «что мешает» risks «мне ничего не мешает». Audio uses default demo set |
+| 2026-09-13 | **Remove Current complaint survey** with Scenarios (same anti-pattern). Flow: Start → Room → Before/After → Audio → Result |
 
 ---
 
@@ -110,7 +113,7 @@ May lightly change pronoun/CTA tone («вам» / «клиенту»). **Must no
 2. **Эффективность** — **сначала ориентиры Δ** (воздух / удар) with **explaining captions + sensations** each; then class scale + bars as already decided. `pre_lab` framing; argument not certificate.
 
 **Effectiveness block (confirmed 2026-09-13):** lead with **Δ orientations**, not a feeling-only headline.
-For each channel (воздух / удар): oriented Δ + short caption that *explains* the number + sensation phrase (claim+why pattern). Example shape: `Δ воздух +8…+12 дБ` — `шум как будто дальше` / plain why. Then charts (class scale + bars). Always `pre_lab`.
+**Always both channels** (воздух + удар), even if user never picked scenarios. For each: oriented Δ + short caption that *explains* the number + sensation phrase (claim+why pattern). Example shape: `Δ воздух +8…+12 дБ` — `шум как будто дальше` / plain why. Then charts (class scale + bars). Always `pre_lab`.
 
 3. **Эффект барабана** — без системы воздух под натяжным «играет как барабан»; MultiFrame рассеивает энергию → в комнате спокойнее.
 4. **Безопасность** — эко/здоровье, сертификаты как reason-to-believe (мягко).
@@ -145,11 +148,11 @@ Must **not** appear: calculator links, dB values, lead form, Polyblock, floor qu
 | -------- | -------------- |
 | `start` | Старт |
 | `room` | Комната |
-| `scenarios` | Шум |
-| `current` | Сейчас |
 | `beforeAfter` | Сравнение |
 | `audio` | Звук |
 | `result` | Профиль |
+
+**Removed from survey (2026-09-13):** `scenarios` («что слышите/мешает») and `current` (complaint comfort quiz). Reason: many users have not lived in the flat or have not framed a noise problem; asking invites «мне ничего не мешает». Education of typical upstairs noise moves into Result/Before-After copy + default audio demo — not a quiz.
 
 - Hidden on Start.
 - On narrow viewports (≤520px): dots only, labels may hide.
@@ -256,7 +259,7 @@ Capture room type + ceiling area (for calculator handoff) and optional upstairs 
 | Room card (single select) | Sets `roomType` | Always |
 | Area number input | Sets `ceilingAreaM2` | Always |
 | Slab select | Sets optional `floorSlab` / key; empty → default 180 | Always |
-| Sticky `Далее` | Go to Scenarios | Enabled iff room type selected **and** area > 0 |
+| Sticky `Далее` | Go to Before/After | Enabled iff room type selected **and** area > 0 |
 | Sticky `Назад` | Go to Start | Always |
 
 ### Validation messages
@@ -269,103 +272,21 @@ When Далее disabled, status may show: `выберите тип` and/or `у�
 
 ---
 
-## Screen 3 — Scenarios (`scenarios`)
+## Screens removed from survey (2026-09-13)
 
-### Goal
+### ~~Scenarios (`scenarios`)~~ — **removed**
 
-Multi-select upstairs noise scenarios that drive noise-type suggestion and audio pair selection.
+Do **not** ask «Что слышите сверху?» / multi-select of bothersome noises. Owner: client may not live in the apartment yet or may not have thought about noise; the quiz can push them to conclude nothing bothers them.
 
-### Visible elements
+Typical upstairs noises (steps, talk, TV, …) may appear as **illustrations** in Before/After, Audio demo, or Result — not as required answers.
 
-- Title, subtitle, scenario cards (title + hint), selection status, sticky CTA.
+### ~~Current state (`current`)~~ — **removed**
 
-### Exact primary copy (RU)
-
-| Role | Text |
-| ---- | ---- |
-| Title | `Что слышите сверху?` |
-| Subtitle | `Выберите все подходящие сценарии. Можно несколько.` |
-| Status empty | `выберите хотя бы один сценарий` |
-| Status filled | `Выбрано: N` |
-
-| Scenario key | Title | Hint |
-| ------------ | ----- | ---- |
-| `steps` | `Шаги сверху` | `Ходьба, топот` |
-| `drop` | `Падение предметов` | `Игрушки, вещи` |
-| `furniture` | `Передвижение мебели` | `Стулья, столы` |
-| `talk` | `Разговоры` | `Голоса соседей` |
-| `tv` | `ТВ` | `Телевизор, сериалы` |
-| `music` | `Музыка` | `Бас, колонки` |
-| `repair` | `Ремонт` | `Дрель, перфоратор` |
-
-### Controls
-
-| Control | Action | Enabled |
-| ------- | ------ | ------- |
-| Scenario cards | Toggle multi-select | Always |
-| Sticky `Далее` | Go to Current | Enabled iff ≥1 scenario |
-| Sticky `Назад` | Go to Room | Always |
-
-### Validation messages
-
-`выберите хотя бы один сценарий` when none selected.
-
-### Must NOT appear
-
-dB numbers; floor systems; single-select-only UX; tech spectrum charts.
+Do **not** ask complaint-framed «Как сейчас?» / «мешает ли». Same anti-pattern as Scenarios. Comfort class before→after is **derived** by the expert/placeholder model from room (+ optional slab), not from a self-reported bother score.
 
 ---
 
-## Screen 4 — Current state (`current`)
-
-### Goal
-
-User confirms comfort feeling + noise character; show “why it matters” and a before-emphasized SimCompare.
-
-### Visible elements
-
-- Title, subtitle, comfort cards, noise-type cards, «Почему это важно» aside, SimCompare (`emphasize="before"`), sticky CTA.
-
-### Exact primary copy (RU)
-
-| Role | Text |
-| ---- | ---- |
-| Title | `Как сейчас?` |
-| Subtitle | `Оцените ощущение и характер шума — рядом покажем ориентиры комфорта.` |
-| Comfort group | `Уровень комфорта` |
-| Comfort options | `Тихо — почти не замечаю` · `Терпимо — иногда отвлекает` · `Мешает — хочется тишины` |
-| Noise group | `Тип шума` |
-| Noise options | `Ударный (шаги, падения, мебель)` · `Воздушный (голоса, ТВ, музыка)` · `Смешанный` |
-| Aside title | `Почему это важно` |
-
-**Dynamic `whyPlain` (one of):**
-
-- bothers: `Вам мешает {шум сверху|этот сценарий|эти сценарии}. По типу это {ударный|воздушный|смешанный} шум через перекрытие — типичная задача для бескаркасной акустики потолка.`
-- ok: `Шум заметный, но терпимый. Часто на этапе выбора потолка решают: «как у всех» или с акустическим комфортом.`
-- quiet: `Сейчас относительно тихо. Проблемомер помогает понять, стоит ли усилить потолок MultiFrame — как запас комфорта.`
-
-**ASSUMPTION (matches current code):** if `current` is empty on enter, auto-seed comfort `ok` and noise type from scenarios so sticky Далее can enable immediately.
-
-### Controls
-
-| Control | Action | Enabled |
-| ------- | ------ | ------- |
-| Comfort cards | Set `comfortLevel` | Always |
-| Noise-type cards | Set `noiseType` | Always |
-| Sticky `Далее` | Go to Before/After | Enabled when `answers.current` is set |
-| Sticky `Назад` | Go to Scenarios | Always |
-
-### Validation messages
-
-None beyond disabled Далее until current answers exist.
-
-### Must NOT appear
-
-«После» as primary hero (before is emphasized); lab certificates; Polyblock; walls.
-
----
-
-## Screen 5 — Before / After (`beforeAfter`)
+## Screen 3 — Before / After (`beforeAfter`)
 
 ### Goal
 
@@ -399,7 +320,7 @@ Emotional contrast: ordinary stretch ceiling vs MultiFrame. Feeling primary; Sim
 | Control | Action | Enabled |
 | ------- | ------ | ------- |
 | Sticky `Услышать разницу` | Go to Audio | Always |
-| Sticky `Назад` | Go to Current | Always |
+| Sticky `Назад` | Go to Room | Always |
 
 ### Validation messages
 
@@ -411,7 +332,7 @@ None.
 
 ---
 
-## Screen 6 — Audio (`audio`)
+## Screen 4 — Audio (`audio`)
 
 ### Goal
 
@@ -450,7 +371,7 @@ Let the user **hear** the difference. Demo stubs OK; labeling mandatory. Large c
 **Audio rules**
 
 - Mode: `demo_stub` (procedural Web Audio).
-- Always show «демо»; if scenarios do not map to a pair, show «демо-набор» fallback.
+- Always show «демо»; use **default demo set** (no scenario quiz). Optional later: UTM may bias demo pair (**ASSUMPTION**).
 - Exaggerated contrast allowed for showroom (before louder / after clearly quieter).
 - Respect `prefers-reduced-motion` for non-essential motion (e.g. progress animation).
 - Must sell difference; silence or identical before/after is a product bug.
@@ -465,7 +386,7 @@ Claims of laboratory measurement; downloadable “certified” WAV as real lab p
 
 ---
 
-## Screen 7 — Result / Profile (`result`)
+## Screen 5 — Result / Profile (`result`)
 
 ### Goal
 
@@ -486,7 +407,7 @@ Summarize acoustic profile with **verdict first**, then the full evidence stack 
 | Subtitle | `Сначала ощущение эффекта — цифры вторичны. Затем расчёт MultiFRAME.` |
 | Before card | `Сейчас` · `Без MultiFrame` · `Шум сверху остаётся «рядом»` · `Ощущение: {full comfort label}` · `Тип: {noise type label}` |
 | After card | `С MultiFrame` · `Эффект в ощущении` · `Тише. Спокойнее. Свой потолок.` · `Воздух: примерно вдвое спокойнее — шум как будто дальше` · `Удар: тише; норму часто закрывает пол у соседа` |
-| Profile | `Комната` · `{room} · {N} м²` + scenario title chips |
+| Profile | `Комната` · `{room} · {N} м²` (no scenario chips) |
 | Numbers title | `Ориентиры в цифрах — вторичны к ощущению` |
 | Why title | `Почему MultiFrame уместен` |
 | Calculator CTA | `Открыть калькулятор` |
@@ -535,7 +456,7 @@ Real StP phone/email presented as live; lab certificate; Polyblock upsell; walls
 
 | State | Behavior |
 | ----- | -------- |
-| Empty scenarios | Cannot proceed; show `выберите хотя бы один сценарий` |
+| Empty scenarios | **N/A** — screen removed |
 | Empty room type / area | Cannot proceed; `выберите тип` / `укажите площадь` |
 | Missing slab | Default solid **180 mm** silently for sim |
 | Audio no matching pair | Fallback both pairs + `демо-набор` |
@@ -615,7 +536,7 @@ Real StP phone/email presented as live; lab certificate; Polyblock upsell; walls
 | Sources | Procedural stubs `stub:before|after:steps|talk` |
 | Labels | Always `демо`; fallback set `демо-набор` |
 | Contrast | Before clearly louder; after clearly quieter (showroom OK to exaggerate) |
-| Pairs | Prefer scenarios; else fixed demo set |
+| Pairs | Fixed default demo set (scenarios removed) |
 | Controls | Large `До — громко` / `После — тише` with pause |
 | Disclaimer | Demo sensation, not lab measurement |
 | Accessibility | Meaningful aria for play/pause including pair name |
@@ -632,13 +553,13 @@ Base: `https://paulos99.github.io/MF_StP/`
 | ----- | ------ |
 | `area` | ceiling m² (> 0) |
 | `roomType` | enum: `living` \| `bedroom` \| `kids` \| `kitchen` \| `office` \| `other` |
-| `scenarios` | comma-joined enum keys |
+| `scenarios` | **removed from survey** — do not require; omit from handoff or send empty (**ASSUMPTION:** omit) |
 
-**ASSUMPTION:** README historically mentioned only `?area=`; product contract includes `roomType` + `scenarios` as in current code — keep all three.
+**ASSUMPTION:** handoff = `area` + `roomType`; `scenarios` no longer collected — omit.
 
 ### Session / CTA payload (`schemaVersion: 1`)
 
-Visible/export shape includes: `{ schemaVersion, answers, derived, audio, cta }` where `cta` carries `{ roomType, ceilingAreaM2, scenarios }`.
+Visible/export shape includes: `{ schemaVersion, answers, derived, audio, cta }` where `cta` carries `{ roomType, ceilingAreaM2 }` (no scenarios).
 
 ### Demo lead behavior
 
@@ -653,27 +574,24 @@ Visible/export shape includes: `{ schemaVersion, answers, derived, audio, cta }`
 
 ### A — Client for themselves
 
-1. Open Start: pick context `для себя` (or UTM default), see emotional H1, **no dB**, tap `Начать`.
-2. Pick room + area > 0; optional slab; `Далее`.
-3. Select ≥1 scenario; `Далее`.
-4. Confirm comfort + noise type; see SimCompare before emphasis + disclaimer badge.
-5. Before/After: verdict on top; class scale + bars; honesty note about floor for impact.
-6. Audio: play До and После; hear clear difference; see `демо`.
-7. Result: full picture — baseline + MultiFrame acoustic model + non-acoustic advantages; «вдвое» only on air line; open calculator with `area`; optional demo lead does not claim real send.
-8. Restart works.
+1. Open Start: pick `для себя`, emotional H1, **no dB**, tap `Начать`.
+2. Room + area > 0; optional slab; `Далее`.
+3. Before/After: class shift + **both** Δ (воздух/удар) with captions/sensations; charts; floor honesty for impact. **No** «что мешает» quiz.
+4. Audio: default demo До/После; clear difference; `демо`.
+5. Result: full pack; both Δ; «вдвое» only on air; calculator `area` (+ `roomType`); optional demo lead.
+6. Restart works.
+7. Must **not** present Scenarios or Current complaint screens.
 
-**Pass:** completes without tech dumps; never promises Lnw norm from ceiling alone; sticky CTA usable on phone width.
+**Pass:** completes without tech dumps; never promises Lnw norm from ceiling alone; sticky CTA OK on phone.
 
 ### B — Pro with client ≤ 3 minutes
 
-Sales / measurer / installer / designer on phone/tablet walks with client Start→Result in **≤ 3 minutes**:
+1. Pick `для клиента`; default slab OK.
+2. Room → Before/After (both Δ) → Audio quickly.
+3. Result full pack; CTA calculator or demo lead.
+4. ≤3 min without scenario/complaint quiz.
 
-1. Pick context (sales / site / design); skip deep slab debate (default).
-2. Pick 1–2 vivid scenarios (e.g. steps + talk).
-3. Land on Audio quickly; client hears До/После.
-4. Result still shows **full** pack (not trimmed); CTA to calculator or demo lead as next step.
-
-**Pass:** path reachable in ≤3 min; audio contrast obvious; full evidence available below verdict; CTA to MultiFRAME calculator works; consultation remains demo-disabled without looking like a broken real contact.
+**Pass:** path ≤3 min; audio contrast obvious; full evidence under verdict; calculator CTA works.
 
 ---
 
