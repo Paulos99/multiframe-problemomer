@@ -20,7 +20,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 - ΔRw center **+10** (show range **+8…+12**); ΔLnw center **−8** (show range **−6…−10** as absolute 6…10 in UI copy). **ASSUMPTION** until technical confirmation.
 - Classes **А/Б/В** (Trofimov / SP-style): **А** = высокая комфортность, **Б** = комфортная, **В** = предельно допустимая. UI = **hybrid plain label + letter** (`Высокий комфорт (А)`, `Комфорт (Б)`, `Допустимый (В)`) plus below-scale **`Дискомфорт`** when even В is not reached (owner: this is common). Soft footnote **`Ориентир по шкале комфортности (норм. документы)`** — not a legal certificate. “пониженный → выше классом” remains required. **ASSUMPTION on everyday synonyms:** prefer Trofimov plain words; avoid mapping «эконом» to **А** (А is the top, not economy).
 - «примерно вдвое спокойнее» **only for air (воздух)**; impact (удар) = quieter + floor often needed — never claim Lnw norm from ceiling alone.
-- Audio must sell the difference; demo stubs allowed with clear «демо» labeling.
+- Audio = two channels (воздух / удар), several household examples each; After = case-specific MultiFrame cut of **level + frequencies** with ≈% for this room (`pre_lab`); not showroom volume-duck alone.
 - Mobile: denser inputs + sticky question/CTA; pack stays one scroll with sticky verdict readable above the fold when possible. No raw tech dumps without explanation.
 - **Premium tone (owner 2026-09-13):** never UI phrases like «за что платим», «за что ~500 тыс.», blunt cost/price push. Show features and effects so the user **infers** value. Soft B2B benefits OK («для клиента» path) without «средний чек» / money-first language.
 - Out of scope: walls, partitions, floors systems, Polyblock, framed systems, fake lab guarantees, floor-level question.
@@ -70,7 +70,8 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Before/After copy rewrite: owner — previous emotional bullets / feeling chips are **obsolete**; rebuild from hybrid class + new copy (not patch old `Тихо/Терпимо/Мешает` SPA) |
 | 2026-09-13 | Before/After bullet frame (A): **2 phrases + hybrid class** per card (not one phrase only, not class-only) |
 | 2026-09-13 | Before/After bullet copy locked: Before `Соседи сверху слышны слишком отчётливо` · `Бытовые звуки сверху легко различить` · `Сейчас: {class}`; After `В комнате заметно спокойнее` · `Ударный и воздушный шум воспринимаются мягче` · `С MultiFrame: {class}` |
-| 2026-09-13 | Before/After chrome: subtitle **S3** `Как меняется комфорт комнаты с MultiFrame`; numbers **N3** `Оценка в цифрах`; honesty **H3** meaning OK — wording still to polish |
+| 2026-09-13 | Before/After chrome: subtitle **S3** `Как меняется комфорт комнаты с MultiFrame`; numbers **N3** `Оценка в цифрах`; honesty **H3b** `Цифры — ориентир до лабораторных данных. Ударный шум потолком становится мягче; пол сверху часто дополняет результат.` |
+| 2026-09-13 | **Audio rewrite (Trofimov + owner):** two channels (воздух / удар); several household examples per channel; After = case-specific MultiFrame reduction — cut **level and frequencies**, not showroom volume duck alone; % tied to this room’s Δ (`pre_lab`) |
 
 ---
 
@@ -379,7 +380,7 @@ Show the comfort shift for this room: ordinary stretch ceiling vs MultiFrame. **
 | After h2 | `Бескаркасная акустика` |
 | After bullets | `В комнате заметно спокойнее` · `Ударный и воздушный шум воспринимаются мягче` · `С MultiFrame: {hybrid class}` |
 | Numbers section title | `Оценка в цифрах` |
-| Honesty note | **Draft (owner: polish):** `Цифры — предварительная оценка. Ударный шум потолком мягче, но пол у соседа сверху часто всё ещё важен.` — alternatives below |
+| Honesty note | `Цифры — ориентир до лабораторных данных. Ударный шум потолком становится мягче; пол сверху часто дополняет результат.` |
 | Sticky next | `Услышать разницу` |
 
 **Class rule (confirmed):** Before and After cards both end with the hybrid class from the Room model. Same vocabulary as the top verdict strip. No `Тихо` / `Терпимо` / `Мешает`.
@@ -407,45 +408,61 @@ None.
 
 ### Goal
 
-Let the user **hear** the difference. Demo stubs OK; labeling mandatory. Large controls for phone/showroom.
+**Hear the MultiFrame effect for this room** — not a generic showroom contrast. Built on Trofimov’s two-index frame: **воздушный (Rw)** and **ударный (Lnw)**. Several household examples per channel. «После» applies the **case-specific** reduction from the Room model: lower **level** and **frequencies** (not “just quieter”).
 
 ### Visible elements
 
-- Title, subtitle, contrast note + demo badges, pair blocks (steps / talk as applicable), play controls, compact audio disclaimer, sticky CTA.
+- Title, short subtitle (two channels explained in plain language).
+- Two sections: **Воздушный шум** · **Ударный шум**.
+- Per section: several household example chips/cards; each with До / После play.
+- Per example (or per channel): shown reduction for **this case** — e.g. `≈ −X%` and/or oriented Δ — from derived sim (`pre_lab`).
+- Channel honesty: impact note that floor above often complements ceiling.
+- Compact audio disclaimer; sticky CTA.
 
-### Exact primary copy (RU)
+### Exact primary copy (RU) — chrome
 
 | Role | Text |
 | ---- | ---- |
 | Title | `Услышать разницу` |
-| Subtitle | `Сравните «до» и «после». Крупные кнопки — удобно на телефоне.` |
-| Contrast badge | `демо, контраст усилен для показа` |
-| Contrast note | `«До» заметно громче, «После» — явно тише.` |
-| Demo-set badge (fallback) | `демо-набор` |
-| Demo-set note | `Фиксированный набор примеров для выбранных сценариев.` |
-| Pair labels | `Шаги сверху` · `Разговор / ТВ` |
-| Per-pair badge | `демо` |
-| Before button | `До — громко` / sub `Обычный потолок` |
-| After button | `После — тише` / sub `С MultiFrame` |
+| Subtitle | `Два типа шума сверху — воздух и удар. Примеры бытовые; «после» — оценка MultiFrame для вашей комнаты.` |
+| Channel air title | `Воздушный шум` |
+| Channel air help | `Речь, ТВ, музыка — через перекрытие (Rw).` |
+| Channel impact title | `Ударный шум` |
+| Channel impact help | `Шаги, стуки, падения — удар по плите (Lnw).` |
+| Reduction label | `Оценка снижения для вашей комнаты: ≈ −{n}%` (map from case Δ — ASSUMPTION until Trofimov confirms) |
+| Before button | `До` / sub `Обычный потолок` |
+| After button | `После` / sub `С MultiFrame` |
 | Playing state | `Играет` · `нажмите — пауза` |
-| Audio disclaimer | `Аудио демонстрационное: иллюстрирует ощущение контраста, а не лабораторный замер.` |
+| Impact honesty | `По удару потолок смягчает; пол сверху часто дополняет результат.` |
+| Audio disclaimer | `Аудио — иллюстрация эффекта модели для этой комнаты, не лабораторный замер. Срезаются громкость и частоты по ориентиру MultiFrame.` |
 | Sticky next | `К профилю` |
+
+### Household examples — draft (owner to lock)
+
+**Воздух (several):** `Разговор` · `Телевизор` · `Музыка` · `Смех / плач` · `Лай`  
+**Удар (several):** `Шаги` · `Передвижение мебели` · `Падение предметов` · `Детский бег` · `Стук / ремонт`
+
+Exact list + count per channel — **next workshop question**.
 
 ### Controls
 
 | Control | Action | Enabled |
 | ------- | ------ | ------- |
-| Before / After play buttons | Toggle play/pause for that stub | Always when pair present |
+| Example select | Sets active stub within channel | Always |
+| До / После | Toggle play with case filter on After | Always when example present |
 | Sticky `К профилю` | Go to Result | Always |
 | Sticky `Назад` | Go to Before/After | Always |
 
-**Audio rules**
+**Audio rules (confirmed direction 2026-09-13)**
 
-- Mode: `demo_stub` (procedural Web Audio).
-- Always show «демо»; use **default demo set** (no scenario quiz). Optional later: UTM may bias demo pair (**ASSUMPTION**).
-- Exaggerated contrast allowed for showroom (before louder / after clearly quieter).
-- Respect `prefers-reduced-motion` for non-essential motion (e.g. progress animation).
-- Must sell difference; silence or identical before/after is a product bug.
+- **Structure:** two channels (Trofimov Rw / Lnw), not one generic pair list.
+- **Examples:** several household sounds per channel (not only шаги + разговор).
+- **Personalization:** After processing uses **this room’s** oriented MultiFrame effect (from Room → sim), not a fixed exaggerated duck.
+- **Processing:** reduce **amplitude and frequency content** to reflect MultiFrame’s effect (perforation / dissipation story) — ASSUMPTION on exact EQ curve until technical confirmation.
+- **% display:** show approximate perceived / energy reduction derived from case Δ (ASSUMPTION: map dB→% for UI; replace when Trofimov confirms).
+- **Impact honesty:** ceiling softens impact; floating floor above often needed for norm — always visible near impact channel.
+- **Labeling:** keep `ориентир` / `pre_lab` — not lab measurement; drop old «контраст усилен для показа» as the *primary* promise.
+- Mode may stay Web Audio / stubs until real stems exist; behavior must follow rules above.
 
 ### Validation messages
 
@@ -453,7 +470,11 @@ None.
 
 ### Must NOT appear
 
-Claims of laboratory measurement; downloadable “certified” WAV as real lab proof; «вдвое» on impact-only messaging without air context.
+- Old showroom-only promise «До заведомо громче / После утрированно тише»
+- Scenario / «что мешает» quiz
+- Claims of laboratory measurement or “certified” WAV as lab proof
+- Silence or identical before/after (product bug — difference must be audible)
+- Polyblock / walls scope
 
 ---
 
@@ -602,14 +623,16 @@ Real StP phone/email presented as live; lab certificate; Polyblock upsell; walls
 
 | Rule | Spec |
 | ---- | ---- |
-| Purpose | Sell audible before→after difference |
-| Sources | Procedural stubs `stub:before|after:steps|talk` |
-| Labels | Always `демо`; fallback set `демо-набор` |
-| Contrast | Before clearly louder; after clearly quieter (showroom OK to exaggerate) |
-| Pairs | Fixed default demo set (scenarios removed) |
-| Controls | Large `До — громко` / `После — тише` with pause |
-| Disclaimer | Demo sensation, not lab measurement |
-| Accessibility | Meaningful aria for play/pause including pair name |
+| Purpose | Hear **case-specific** MultiFrame effect on household noises (Trofimov two-channel) |
+| Channels | **Воздух (Rw)** and **Удар (Lnw)** — separate UI sections |
+| Examples | Several household stubs per channel (list locked in workshop) |
+| After processing | Apply this room’s oriented Δ: cut **level + frequencies** (not volume-only duck; not fixed showroom exaggerate) |
+| % / label | Show `≈ −{n}%` (and/or Δ) from derived sim for this case — `pre_lab` until confirmed |
+| Impact honesty | Near impact channel: ceiling softens; floor above often complements |
+| Sources | Web Audio / procedural stubs OK until real stems; must obey processing rules |
+| Labels | `ориентир` / not lab; drop primary promise of «контраст усилен» |
+| Controls | Large `До` / `После` with pause; example picker per channel |
+| Accessibility | Aria includes channel + example name |
 
 ---
 
@@ -647,7 +670,7 @@ Visible/export shape includes: `{ schemaVersion, answers, derived, audio, cta }`
 1. Open Start: pick `для себя`, emotional H1, **no dB**, tap `Начать`.
 2. Room + area > 0; optional slab; `Далее`.
 3. Before/After: class shift + **both** Δ (воздух/удар) with captions/sensations; charts; floor honesty for impact. **No** «что мешает» quiz.
-4. Audio: default demo До/После; clear difference; `демо`.
+4. Audio: two channels; several household examples; After = case Δ (level + frequencies) + ≈%; difference audible; `ориентир`/`pre_lab`.
 5. Result: full pack; both Δ; «вдвое» only on air; calculator `area` (+ `roomType`); optional demo lead.
 6. Restart works.
 7. Must **not** present Scenarios or Current complaint screens.
