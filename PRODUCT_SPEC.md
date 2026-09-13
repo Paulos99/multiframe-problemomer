@@ -39,6 +39,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Tone: no «за что платим» / price-first copy; value inferred from features; MultiFRAME deck is primary product-feature source |
 | 2026-09-13 | MultiFrame features on Result: **понятно + аргументированно** (plain language + why it matters; not bare bullet dump, not tech dump) |
 | 2026-09-13 | Feature copy pattern confirmed: **claim + 1 short why/how** (e.g. drum-effect → MultiFrame dissipates); clear and argued |
+| 2026-09-13 | Result feature order: **1 class of comfort/housing → 2 effectiveness → 3 drum-effect → 4 safety → 5 rest**. Install only as **fast / no long construction** — not tech details about mounting/comms unless needed |
 
 ---
 
@@ -82,16 +83,15 @@ May lightly change pronoun/CTA tone («вам» / «клиенту»). **Must no
 
 **Presentation rule (confirmed 2026-09-13):** advantages **понятно, но аргументированно** — each point = **тезис + 1 короткая фраза why/how** (example OK’d: «Без системы под натяжным воздух работает как барабан. MultiFrame рассеивает эту энергию — в комнате спокойнее.»). Not a bare slogan list; not a datasheet dump.
 
-**Primary narrative anchors (from deck)**
+**Result feature order (confirmed 2026-09-13)** — each item = тезис + 1 фраза why/how; no price talk:
 
-1. **Проблема потолка без системы** — между плитой и натяжным полотном замкнутый воздух даёт «эффект барабана»; MultiFrame рассеивает эту энергию (перфорация как «воздушный канал»).
-2. **Акустический комфорт** — ориентир снижения ударного и воздушного шума до ~17 дБ (vendor claim; show as `pre_lab` / oriented).
-3. **Система нового поколения** — модульная экосистема под натяжной / ГКЛ, не «просто материал».
-4. **Технология** — жёсткий энергопоглощающий каркас AEROCELL TECHNOLOGY™; наполнители Biplast Eco Foam / PPU Full Touch; сквозная перфорация; слоты 1–4% под диапазон ~100–500 Гц.
-5. **Монтаж** — SmartLock (5 точек); шип-паз в единое полотно; подрезка под архитектуру; 1 мастер; панель ≤1 мин (vendor claim); коммуникации до или после панелей.
-6. **Универсальность** — потолок и стены; любой тип перекрытия; любой этап ремонта; Flat (удобно под светильники) / Wave (может остаться видимым industrial finish).
-7. **Безопасность / доверие** — эко/безопасность; сертификаты ISO 9001, ECO, ISO 14001 (as shown in deck).
-8. **Отличие** — патент / «нет аналогов» (vendor claim — soft wording, not aggression).
+1. **Класс жилья / комфорта** — куда сдвигается класс (А/Б/В) после MultiFrame; персональный вывод «выше классом».
+2. **Эффективность** — ориентир эффекта (числа/диапазоны, `pre_lab`), шкала + столбцы; как аргумент, не сертификат.
+3. **Эффект барабана** — без системы воздух под натяжным «играет как барабан»; MultiFrame рассеивает энергию → в комнате спокойнее.
+4. **Безопасность** — эко/здоровье, сертификаты как reason-to-believe (мягко).
+5. **Остальное (коротко):** система нового поколения; Flat/Wave и совместимость с натяжным/ГКЛ по смыслу «красивый потолок + тишина»; при необходимости — патент/отличие мягко.
+
+**Монтаж / коммуникации (owner nuance):** клиенту **не** разворачивать технику крепежа и прокладки коммуникаций. Достаточно смысла: **быстро, без долгой стройки** (vendor: 1 мастер, панель ≤1 мин — as soft claim). Details for «для клиента» / профи могут быть глубже later; MVP client-facing copy stays light.
 
 **Для пути «для клиента» (мягко):** высокий спрос на услугу; лояльность; встраивается в монтаж потолка; низкий порог освоения — **без** формулировок про деньги/чек.
 
