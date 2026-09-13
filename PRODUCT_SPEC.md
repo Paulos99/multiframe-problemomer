@@ -459,7 +459,7 @@ None.
 | ------- | ------ | ------- |
 | Example select | Sets active stub within group | Always |
 | До / После | Toggle play with case filter on After | Always when example present |
-| Sticky `К профилю` | Go to Result | Always |
+| Sticky `Смотреть итог` | Go to Result | Always |
 | Sticky `Назад` | Go to Before/After | Always |
 
 **Audio rules (confirmed 2026-09-13)**
