@@ -38,9 +38,16 @@ export function ResultScreen() {
   const sim = session.derived?.simulation ?? deriveSimulation(session.answers);
   const beforeStrict = strictClass(sim.before);
   const afterStrict = strictClass(sim.after);
-  const beforeClass = HYBRID_CLASS_LABELS[beforeStrict];
-  const afterClass = HYBRID_CLASS_LABELS[afterStrict];
   const classRose = scaleIndex(afterStrict) < scaleIndex(beforeStrict);
+  const beforeClass = HYBRID_CLASS_LABELS[beforeStrict];
+  const afterClass = classRose
+    ? HYBRID_CLASS_LABELS[afterStrict]
+    : afterStrict === 'below' &&
+        (sim.after.Rw > sim.before.Rw || sim.after.Lnw < sim.before.Lnw)
+      ? 'Ближе к нормативному классу'
+      : HYBRID_CLASS_LABELS[afterStrict];
+  const scaleAfterMark: ClassLabel =
+    afterStrict !== 'below' ? afterStrict : 'V';
   const [showLead, setShowLead] = useState(false);
   const [sent, setSent] = useState(false);
   const [name, setName] = useState('');
@@ -84,7 +91,7 @@ export function ResultScreen() {
         <div className={styles.scale} aria-label="Шкала комфортности А Б В">
           {SCALE.map((cls) => {
             const isBefore = cls === beforeStrict;
-            const isAfter = cls === afterStrict;
+            const isAfter = cls === (classRose ? afterStrict : scaleAfterMark);
             const name = cls === 'below' ? 'ниже' : classCyr(cls);
             return (
               <div
