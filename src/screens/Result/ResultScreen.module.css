@@ -119,20 +119,6 @@
   background: var(--accent-color);
 }
 
-.metrics {
-  padding: 10px 14px;
-  border-radius: var(--radius-md);
-  background: var(--bg-subtle);
-  border: 1px solid var(--border-color);
-}
-
-.metrics p {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 650;
-  color: var(--text-secondary);
-}
-
 .features {
   display: flex;
   flex-direction: column;

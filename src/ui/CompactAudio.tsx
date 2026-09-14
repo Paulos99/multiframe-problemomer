@@ -42,7 +42,7 @@ export function CompactAudio({ pairs, sim }: Props) {
     <section className={styles.wrap} aria-label="Услышать разницу">
       <header className={styles.head}>
         <h2>Услышать разницу</h2>
-        <p>Один пример на каждый вид шума — сначала «до», затем «после»</p>
+        <p>Три вида шума — нажмите, чтобы сравнить до и после</p>
       </header>
 
       <div className={styles.list}>

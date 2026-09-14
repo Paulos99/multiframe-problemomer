@@ -24,8 +24,6 @@ export function ResultScreen() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
 
-  const airDelta = Math.abs(sim.delta.Rw);
-  const impactDelta = Math.abs(sim.delta.Lnw);
   const roomLabel = room.roomType ? ROOM_TYPE_LABELS[room.roomType] : null;
 
   function onLead(e: FormEvent) {
@@ -81,27 +79,9 @@ export function ResultScreen() {
 
       <CompactAudio pairs={session.audio.pairs} sim={sim} />
 
-      <div className={styles.metrics} aria-label="Ориентиры снижения шума">
-        <p>
-          Ориентир: воздух ≈ −{airDelta} дБ · удар ≈ −{impactDelta} дБ
-        </p>
-      </div>
-
       <div className={styles.features}>
         <h2>Почему MultiFrame</h2>
         <ul>
-          <li>
-            <strong>
-              Сейчас: {beforeClass} → с MultiFrame: {afterClass}
-            </strong>
-            <span>Понятный ориентир по шкале комфортности для вашей комнаты.</span>
-          </li>
-          <li>
-            <strong>
-              Воздух ≈ −{airDelta} дБ, удар ≈ −{impactDelta} дБ
-            </strong>
-            <span>Небольшой минус на логарифмической шкале слышен заметно спокойнее.</span>
-          </li>
           <li>
             <strong>Обычный натяжной усиливает шум сверху, как полотно барабана.</strong>
             <span>MultiFrame рассеивает энергию в панели — комната тише.</span>
