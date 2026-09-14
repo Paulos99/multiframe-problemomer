@@ -121,22 +121,6 @@ export function useDemoPlayer() {
 
   useEffect(() => () => stop(), [stop]);
 
-  const startProgress = useCallback((duration: number) => {
-    durationMs.current = duration;
-    startedAt.current = performance.now();
-    setProgress(prefersReducedMotion() ? 0.5 : 0);
-    if (!prefersReducedMotion()) {
-      const tick = () => {
-        const p = Math.min(1, (performance.now() - startedAt.current) / durationMs.current);
-        setProgress(p);
-        if (p < 1 && stopRef.current) {
-          rafRef.current = requestAnimationFrame(tick);
-        }
-      };
-      rafRef.current = requestAnimationFrame(tick);
-    }
-  }, []);
-
   const play = useCallback(
     async (id: string, src: string) => {
       stop();
@@ -144,8 +128,22 @@ export function useDemoPlayer() {
       const ctx = getCtx();
       if (ctx.state === 'suspended') await ctx.resume();
 
+      durationMs.current = stub?.scene === 'talk' ? 2800 : 2400;
+      startedAt.current = performance.now();
       setActiveId(id);
-      startProgress(stub?.scene === 'talk' ? 2800 : 2400);
+      // Reduced motion: static mid progress — play-state stays clear without bar animation.
+      setProgress(prefersReducedMotion() ? 0.5 : 0);
+
+      if (!prefersReducedMotion()) {
+        const tick = () => {
+          const p = Math.min(1, (performance.now() - startedAt.current) / durationMs.current);
+          setProgress(p);
+          if (p < 1 && stopRef.current) {
+            rafRef.current = requestAnimationFrame(tick);
+          }
+        };
+        rafRef.current = requestAnimationFrame(tick);
+      }
 
       if (stub) {
         stopRef.current = playStub(ctx, stub.kind, stub.scene, () => {
@@ -175,69 +173,8 @@ export function useDemoPlayer() {
         setProgress(0);
       }
     },
-    [startProgress, stop],
+    [stop],
   );
 
-  /** Plays Before then After as one demo (one button per noise type). */
-  const playCompare = useCallback(
-    async (id: string, beforeSrc: string, afterSrc: string) => {
-      stop();
-      const beforeStub = parseStubSrc(beforeSrc);
-      const afterStub = parseStubSrc(afterSrc);
-      const ctx = getCtx();
-      if (ctx.state === 'suspended') await ctx.resume();
-
-      const beforeMs = beforeStub?.scene === 'talk' ? 2800 : 2400;
-      const afterMs = afterStub?.scene === 'talk' ? 2800 : 2400;
-      const gapMs = 280;
-      const totalMs = beforeMs + gapMs + afterMs;
-
-      setActiveId(id);
-      startProgress(totalMs);
-
-      const finish = () => {
-        clearRaf();
-        setActiveId(null);
-        setProgress(0);
-        stopRef.current = null;
-      };
-
-      if (beforeStub && afterStub) {
-        let cancelled = false;
-        let afterCleanup: (() => void) | null = null;
-        let gapTimer: number | null = null;
-
-        const beforeCleanup = playStub(ctx, beforeStub.kind, beforeStub.scene, () => {
-          if (cancelled) return;
-          gapTimer = window.setTimeout(() => {
-            if (cancelled) return;
-            afterCleanup = playStub(ctx, afterStub.kind, afterStub.scene, finish);
-            stopRef.current = () => {
-              cancelled = true;
-              if (gapTimer != null) window.clearTimeout(gapTimer);
-              afterCleanup?.();
-            };
-          }, gapMs);
-          stopRef.current = () => {
-            cancelled = true;
-            if (gapTimer != null) window.clearTimeout(gapTimer);
-          };
-        });
-
-        stopRef.current = () => {
-          cancelled = true;
-          if (gapTimer != null) window.clearTimeout(gapTimer);
-          beforeCleanup();
-          afterCleanup?.();
-        };
-        return;
-      }
-
-      // Fallback: play after only if stubs missing
-      await play(id, afterSrc);
-    },
-    [play, startProgress, stop],
-  );
-
-  return { activeId, progress, play, playCompare, stop };
+  return { activeId, progress, play, stop };
 }

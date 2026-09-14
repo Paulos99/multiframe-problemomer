@@ -36,54 +36,88 @@ type Props = {
 };
 
 export function CompactAudio({ pairs, sim }: Props) {
-  const { activeId, progress, playCompare, stop } = useDemoPlayer();
+  const { activeId, progress, play, stop } = useDemoPlayer();
 
   return (
     <section className={styles.wrap} aria-label="Услышать разницу">
       <header className={styles.head}>
-        <h2>Услышать разницу</h2>
-        <p>Три вида шума — нажмите, чтобы сравнить до и после</p>
+        <div>
+          <h2>Услышать разницу</h2>
+          <p>До и после — ориентир для вашей комнаты</p>
+        </div>
       </header>
 
-      <div className={styles.list}>
-        {GROUPS.map((group) => {
-          const pair = pairs.find((p) => p.group === group);
-          if (!pair) return null;
-          const meta = AUDIO_GROUP_LABELS[group];
-          const playing = activeId === pair.id;
-          return (
-            <button
-              key={pair.id}
-              type="button"
-              className={`${styles.row} ${playing ? styles.playing : ''}`}
-              aria-pressed={playing}
-              aria-label={
-                playing
-                  ? `Пауза: ${meta.title}, ${pair.label}`
-                  : `Слушать до и после: ${meta.title}, ${pair.label}`
-              }
-              onClick={() => {
-                if (playing) stop();
-                else void playCompare(pair.id, pair.beforeSrc, pair.afterSrc);
-              }}
-            >
-              <span className={styles.icon}>
-                <PlayIcon playing={playing} />
-              </span>
-              <span className={styles.copy}>
-                <strong>{meta.title}</strong>
-                <span className={styles.example}>{pair.label}</span>
-              </span>
+      {GROUPS.map((group) => {
+        const groupPairs = pairs.filter((p) => p.group === group);
+        if (!groupPairs.length) return null;
+        const meta = AUDIO_GROUP_LABELS[group];
+        return (
+          <div key={group} className={styles.group}>
+            <div className={styles.groupHead}>
+              <strong>{meta.title}</strong>
               <span className={styles.reduction}>{reductionLine(group, sim)}</span>
-              {playing ? (
-                <span className={styles.bar} aria-hidden>
-                  <span style={{ width: `${Math.round(progress * 100)}%` }} />
-                </span>
-              ) : null}
-            </button>
-          );
-        })}
-      </div>
+            </div>
+
+            <div className={styles.examples}>
+              {groupPairs.map((pair) => {
+                const beforeId = `${pair.id}:before`;
+                const afterId = `${pair.id}:after`;
+                const beforeOn = activeId === beforeId;
+                const afterOn = activeId === afterId;
+                return (
+                  <div key={pair.id} className={styles.example}>
+                    <span className={styles.exampleLabel}>{pair.label}</span>
+                    <div className={styles.controls}>
+                      <button
+                        type="button"
+                        className={`${styles.btn} ${styles.before} ${beforeOn ? styles.playing : ''}`}
+                        aria-pressed={beforeOn}
+                        aria-label={
+                          beforeOn ? `Пауза: До, ${pair.label}` : `Слушать До: ${pair.label}`
+                        }
+                        onClick={() => {
+                          if (beforeOn) stop();
+                          else void play(beforeId, pair.beforeSrc);
+                        }}
+                      >
+                        <PlayIcon playing={beforeOn} />
+                        <span>До</span>
+                        {beforeOn ? (
+                          <span className={styles.bar} aria-hidden>
+                            <span style={{ width: `${Math.round(progress * 100)}%` }} />
+                          </span>
+                        ) : null}
+                      </button>
+                      <button
+                        type="button"
+                        className={`${styles.btn} ${styles.after} ${afterOn ? styles.playing : ''}`}
+                        aria-pressed={afterOn}
+                        aria-label={
+                          afterOn
+                            ? `Пауза: После, ${pair.label}`
+                            : `Слушать После: ${pair.label}`
+                        }
+                        onClick={() => {
+                          if (afterOn) stop();
+                          else void play(afterId, pair.afterSrc);
+                        }}
+                      >
+                        <PlayIcon playing={afterOn} />
+                        <span>После</span>
+                        {afterOn ? (
+                          <span className={styles.bar} aria-hidden>
+                            <span style={{ width: `${Math.round(progress * 100)}%` }} />
+                          </span>
+                        ) : null}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
 
       <p className={styles.footnote}>{LOG_DB_FOOTNOTE}</p>
     </section>

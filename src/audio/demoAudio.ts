@@ -1,10 +1,28 @@
-/** Fixed household demo set — one exemplar per noise group on Result. */
 import type { AudioPair } from '../state/types';
 
+/** Fixed household demo set — three groups (air / impact / mixed). */
 export const DEMO_AUDIO_PAIRS: AudioPair[] = [
   {
     id: 'dog_bark',
     label: 'Лай собаки',
+    group: 'air',
+    beforeLabel: 'До',
+    afterLabel: 'После',
+    beforeSrc: 'stub:before:talk',
+    afterSrc: 'stub:after:talk',
+  },
+  {
+    id: 'music',
+    label: 'Музыка',
+    group: 'air',
+    beforeLabel: 'До',
+    afterLabel: 'После',
+    beforeSrc: 'stub:before:talk',
+    afterSrc: 'stub:after:talk',
+  },
+  {
+    id: 'loud_talk',
+    label: 'Громкие разговоры',
     group: 'air',
     beforeLabel: 'До',
     afterLabel: 'После',
@@ -21,6 +39,24 @@ export const DEMO_AUDIO_PAIRS: AudioPair[] = [
     afterSrc: 'stub:after:steps',
   },
   {
+    id: 'furniture',
+    label: 'Перестановка мебели',
+    group: 'impact',
+    beforeLabel: 'До',
+    afterLabel: 'После',
+    beforeSrc: 'stub:before:steps',
+    afterSrc: 'stub:after:steps',
+  },
+  {
+    id: 'dog_claws',
+    label: 'Цоканье когтей собаки',
+    group: 'impact',
+    beforeLabel: 'До',
+    afterLabel: 'После',
+    beforeSrc: 'stub:before:steps',
+    afterSrc: 'stub:after:steps',
+  },
+  {
     id: 'washer',
     label: 'Стиральная машина',
     group: 'mixed',
@@ -28,6 +64,15 @@ export const DEMO_AUDIO_PAIRS: AudioPair[] = [
     afterLabel: 'После',
     beforeSrc: 'stub:before:steps',
     afterSrc: 'stub:after:talk',
+  },
+  {
+    id: 'vacuum',
+    label: 'Пылесос',
+    group: 'mixed',
+    beforeLabel: 'До',
+    afterLabel: 'После',
+    beforeSrc: 'stub:before:talk',
+    afterSrc: 'stub:after:steps',
   },
 ];
 
@@ -44,7 +89,7 @@ export function parseStubSrc(src: string): { kind: StubKind; scene: StubScene } 
 }
 
 export const AUDIO_GROUP_LABELS = {
-  air: { title: 'Воздух', help: 'Речь, музыка, лай' },
-  impact: { title: 'Удар', help: 'Бег, мебель, когти' },
-  mixed: { title: 'Смешанный', help: 'Бытовая техника' },
+  air: { title: 'Воздушный шум', help: 'Через перекрытие (Rw): речь, музыка, лай.' },
+  impact: { title: 'Ударный шум', help: 'Удар по плите (Lnw): бег, мебель, когти.' },
+  mixed: { title: 'Смешанный шум', help: 'И воздух, и удар сразу — бытовая техника.' },
 } as const;

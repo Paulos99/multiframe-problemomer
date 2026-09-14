@@ -1,7 +1,7 @@
 .wrap {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   padding: 14px;
   border-radius: var(--radius-lg);
   background: var(--bg-card);
@@ -22,69 +22,28 @@
   color: var(--text-secondary);
 }
 
-.list {
+.group {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-color);
 }
 
-.row {
-  position: relative;
-  display: grid;
-  grid-template-columns: 36px 1fr auto;
-  align-items: center;
-  gap: 10px;
-  min-height: 52px;
-  padding: 10px 12px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-color);
-  background: var(--bg-subtle);
-  color: var(--text-primary);
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-  overflow: hidden;
+.group:first-of-type {
+  border-top: none;
+  padding-top: 0;
 }
 
-.row.playing {
-  border-color: rgba(1, 100, 79, 0.4);
-  background: rgba(1, 100, 79, 0.1);
-}
-
-.icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  color: var(--accent-color);
-}
-
-.playing .icon {
-  background: var(--accent-color);
-  border-color: var(--accent-color);
-  color: #fff;
-}
-
-.copy {
+.groupHead {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
 }
 
-.copy strong {
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-
-.example {
-  font-size: 12px;
-  color: var(--text-secondary);
+.groupHead strong {
+  font-size: 13px;
 }
 
 .reduction {
@@ -94,13 +53,64 @@
   white-space: nowrap;
 }
 
+.examples {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.example {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.exampleLabel {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: var(--bg-subtle);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.btn.before.playing {
+  border-color: rgba(180, 60, 40, 0.45);
+  background: rgba(180, 60, 40, 0.1);
+}
+
+.btn.after.playing {
+  border-color: rgba(1, 100, 79, 0.45);
+  background: rgba(1, 100, 79, 0.12);
+}
+
 .playGlyph {
   width: 0;
   height: 0;
   border-style: solid;
   border-width: 5px 0 5px 8px;
   border-color: transparent transparent transparent currentColor;
-  margin-left: 2px;
 }
 
 .pauseGlyph {
@@ -140,11 +150,7 @@
 }
 
 @media (max-width: 380px) {
-  .row {
-    grid-template-columns: 36px 1fr;
-  }
-
-  .reduction {
-    grid-column: 2;
+  .controls {
+    grid-template-columns: 1fr;
   }
 }
