@@ -158,6 +158,40 @@ export function perceivedReductionPct(absDeltaDb: number): number {
   return Math.round(Math.min(70, Math.max(15, pct)));
 }
 
+/**
+ * Combined comfort orientation on the СП 51.13330.2011 А/Б/В ladder (Trofimov):
+ * air margin above the cat-В floor (Rw − 50) plus impact margin below the cat-В cap
+ * (60 − Lnw). Higher = calmer. A ceiling alone cannot bring Lnw to the impact norm,
+ * so «Высокий комфорт (А)» is granted only when the impact index is genuinely in
+ * norm (Lnw ≤ 55) — otherwise the orientation is capped at «Комфорт (Б)». This is a
+ * client-facing comfort orientation, not a lab certificate (pre_lab / marketing).
+ */
+export function comfortScore(Rw: number, Lnw: number): number {
+  return Rw - NORMS.V.Rw + (NORMS.V.Lnw - Lnw);
+}
+
+export function comfortClassFor(Rw: number, Lnw: number): ClassLabel {
+  if (Rw >= NORMS.A.Rw && Lnw <= NORMS.A.Lnw) return 'A';
+  const s = comfortScore(Rw, Lnw);
+  if (s >= 6) return 'B';
+  if (s >= -3) return 'V';
+  return 'below';
+}
+
+function clampPct(v: number): number {
+  return Math.round(Math.min(96, Math.max(4, v)));
+}
+
+/** Quietness 0..100 for a comfort bar (higher = calmer). Air: more isolation (Rw ↑). */
+export function airQuietPct(Rw: number): number {
+  return clampPct(((Rw - 45) / (70 - 45)) * 100);
+}
+
+/** Quietness 0..100 for a comfort bar (higher = calmer). Impact: less transmitted (Lnw ↓). */
+export function impactQuietPct(Lnw: number): number {
+  return clampPct(((82 - Lnw) / (82 - 58)) * 100);
+}
+
 export function deriveSimulation(answers: SessionAnswers): DerivedSimulation {
   const slabKey = resolveSlabKey(answers.room);
   const base = SLABS[slabKey];
