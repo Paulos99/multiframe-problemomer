@@ -8,15 +8,55 @@ import {
   NOISY_NEIGHBORS_OPTIONS,
   OBJECT_STAGE_OPTIONS,
   PLANNED_CEILING_OPTIONS,
+  ROOM_SUBSTEPS,
   ROOM_TYPE_LABELS,
   SLAB_THICKNESS_OPTIONS,
   SLAB_TYPE_OPTIONS,
+  type RoomSubstep,
   type RoomType,
 } from '../../state/types';
-import { roomNextHint } from '../../state/session';
+import { roomNextHint, roomSubstepIndex } from '../../state/session';
 import styles from './RoomScreen.module.css';
 
 const ROOM_TYPES = Object.keys(ROOM_TYPE_LABELS) as RoomType[];
+
+const SUBSTEP_COPY: Record<
+  RoomSubstep,
+  { title: string; subtitle: string }
+> = {
+  basics: {
+    title: 'Тип комнаты и площадь',
+    subtitle: 'Обязательные поля — для профиля и ссылки на калькулятор.',
+  },
+  slabType: {
+    title: 'Тип перекрытия',
+    subtitle: 'Если не уверены — выберите «Не знаю».',
+  },
+  slabThickness: {
+    title: 'Толщина перекрытия',
+    subtitle: 'Ориентир по разбросам; точность не обязательна.',
+  },
+  floorAbove: {
+    title: 'Пол сверху',
+    subtitle: 'Есть ли плавающая схема или шумоизоляция в полу у соседей.',
+  },
+  houseType: {
+    title: 'Тип дома',
+    subtitle: 'Помогает уточнить типичное перекрытие, если оно неизвестно.',
+  },
+  objectStage: {
+    title: 'Стадия объекта',
+    subtitle: 'На каком этапе сейчас квартира или объект.',
+  },
+  plannedCeiling: {
+    title: 'Планируемый потолок',
+    subtitle: 'Планируете натяжной или потолок уже есть.',
+  },
+  noisyNeighbors: {
+    title: 'Шумные соседи сверху',
+    subtitle: 'Как обычно с шумом сверху — по вашему ощущению.',
+  },
+};
 
 export function RoomScreen() {
   const {
@@ -33,49 +73,59 @@ export function RoomScreen() {
     canGoNext,
   } = useSession();
   const room = session.answers.room;
+  const sub = session.roomSubstep;
+  const copy = SUBSTEP_COPY[sub];
   const hint = roomNextHint(session);
+  const idx = roomSubstepIndex(sub);
+  const total = ROOM_SUBSTEPS.length;
 
   return (
-    <Screen
-      stickyHead
-      title="Комната и потолок"
-      subtitle="Опишите помещение. Этаж не спрашиваем — важен потолок и перекрытие сверху."
-    >
-      <div className={styles.grid}>
-        {ROOM_TYPES.map((type) => (
-          <CardSelect
-            key={type}
-            dense
-            title={ROOM_TYPE_LABELS[type]}
-            selected={room.roomType === type}
-            onClick={() => setRoomType(type)}
-          />
-        ))}
-      </div>
+    <Screen stickyHead title={copy.title} subtitle={copy.subtitle}>
+      <p className={styles.stepMeta} aria-live="polite">
+        Вопрос {idx + 1} из {total}
+      </p>
 
-      <Field label="Площадь потолка, м²" hint="Нужна для ссылки на калькулятор MultiFRAME">
-        <TextInput
-          type="number"
-          inputMode="decimal"
-          min={1}
-          step={0.1}
-          placeholder="Например, 18"
-          value={room.ceilingAreaM2 ?? ''}
-          onChange={(e) => {
-            const v = e.target.value;
-            setCeilingArea(v === '' ? null : Number(v));
-          }}
-        />
-      </Field>
+      {sub === 'basics' ? (
+        <>
+          <div className={styles.grid}>
+            {ROOM_TYPES.map((type) => (
+              <CardSelect
+                key={type}
+                dense
+                title={ROOM_TYPE_LABELS[type]}
+                selected={room.roomType === type}
+                onClick={() => setRoomType(type)}
+              />
+            ))}
+          </div>
 
-      {!canGoNext && hint ? (
-        <p className={styles.validation} role="status">
-          {hint}
-        </p>
+          <Field
+            label="Площадь потолка, м²"
+            hint="Нужна для ссылки на калькулятор MultiFRAME"
+          >
+            <TextInput
+              type="number"
+              inputMode="decimal"
+              min={1}
+              step={0.1}
+              placeholder="Например, 18"
+              value={room.ceilingAreaM2 ?? ''}
+              onChange={(e) => {
+                const v = e.target.value;
+                setCeilingArea(v === '' ? null : Number(v));
+              }}
+            />
+          </Field>
+
+          {!canGoNext && hint ? (
+            <p className={styles.validation} role="status">
+              {hint}
+            </p>
+          ) : null}
+        </>
       ) : null}
 
-      <section className={styles.block}>
-        <h2>Тип перекрытия</h2>
+      {sub === 'slabType' ? (
         <div className={styles.grid}>
           {SLAB_TYPE_OPTIONS.map((opt) => (
             <CardSelect
@@ -87,10 +137,9 @@ export function RoomScreen() {
             />
           ))}
         </div>
-      </section>
+      ) : null}
 
-      <section className={styles.block}>
-        <h2>Толщина перекрытия</h2>
+      {sub === 'slabThickness' ? (
         <div className={styles.grid}>
           {SLAB_THICKNESS_OPTIONS.map((opt) => (
             <CardSelect
@@ -102,10 +151,9 @@ export function RoomScreen() {
             />
           ))}
         </div>
-      </section>
+      ) : null}
 
-      <section className={styles.block}>
-        <h2>Пол сверху</h2>
+      {sub === 'floorAbove' ? (
         <div className={styles.grid}>
           {FLOOR_ABOVE_OPTIONS.map((opt) => (
             <CardSelect
@@ -117,10 +165,9 @@ export function RoomScreen() {
             />
           ))}
         </div>
-      </section>
+      ) : null}
 
-      <section className={styles.block}>
-        <h2>Тип дома</h2>
+      {sub === 'houseType' ? (
         <div className={styles.grid}>
           {HOUSE_TYPE_OPTIONS.map((opt) => (
             <CardSelect
@@ -132,10 +179,9 @@ export function RoomScreen() {
             />
           ))}
         </div>
-      </section>
+      ) : null}
 
-      <section className={styles.block}>
-        <h2>Стадия объекта</h2>
+      {sub === 'objectStage' ? (
         <div className={styles.grid}>
           {OBJECT_STAGE_OPTIONS.map((opt) => (
             <CardSelect
@@ -147,10 +193,9 @@ export function RoomScreen() {
             />
           ))}
         </div>
-      </section>
+      ) : null}
 
-      <section className={styles.block}>
-        <h2>Планируемый потолок</h2>
+      {sub === 'plannedCeiling' ? (
         <div className={styles.grid}>
           {PLANNED_CEILING_OPTIONS.map((opt) => (
             <CardSelect
@@ -162,10 +207,9 @@ export function RoomScreen() {
             />
           ))}
         </div>
-      </section>
+      ) : null}
 
-      <section className={styles.block}>
-        <h2>Шумные соседи сверху</h2>
+      {sub === 'noisyNeighbors' ? (
         <div className={styles.grid}>
           {NOISY_NEIGHBORS_OPTIONS.map((opt) => (
             <CardSelect
@@ -177,7 +221,7 @@ export function RoomScreen() {
             />
           ))}
         </div>
-      </section>
+      ) : null}
     </Screen>
   );
 }

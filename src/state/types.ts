@@ -59,6 +59,28 @@ export type NoiseType = 'impact' | 'airborne' | 'mixed';
 /** Flow: Start → Room → Result (audio lives inside Result; no separate Сравнение) */
 export type WizardStep = 'start' | 'room' | 'result';
 
+/** Sub-steps inside Room (one question block per screen) */
+export type RoomSubstep =
+  | 'basics'
+  | 'slabType'
+  | 'slabThickness'
+  | 'floorAbove'
+  | 'houseType'
+  | 'objectStage'
+  | 'plannedCeiling'
+  | 'noisyNeighbors';
+
+export const ROOM_SUBSTEPS: RoomSubstep[] = [
+  'basics',
+  'slabType',
+  'slabThickness',
+  'floorAbove',
+  'houseType',
+  'objectStage',
+  'plannedCeiling',
+  'noisyNeighbors',
+];
+
 export type ClassLabel = 'A' | 'B' | 'V' | 'below';
 export type ClassStatus = 'ok' | 'partial' | 'below';
 
@@ -138,6 +160,8 @@ export interface SessionAnswers {
 export interface SessionState {
   schemaVersion: 2;
   step: WizardStep;
+  /** Active question inside Room; ignored outside step === 'room' */
+  roomSubstep: RoomSubstep;
   answers: SessionAnswers;
   derived: DerivedProfile | null;
   audio: AudioState;

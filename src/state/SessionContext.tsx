@@ -20,10 +20,13 @@ import type {
   SlabTypeOption,
   WizardStep,
 } from './types';
+import { ROOM_SUBSTEPS } from './types';
 import {
   canProceed,
   createInitialSession,
+  nextRoomSubstep,
   nextStep,
+  prevRoomSubstep,
   prevStep,
   withDerived,
 } from './session';
@@ -60,9 +63,21 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const goNext = useCallback(() => {
     setSession((prev) => {
       if (!canProceed(prev)) return prev;
+
+      if (prev.step === 'room') {
+        const nextSub = nextRoomSubstep(prev.roomSubstep);
+        if (nextSub) {
+          return { ...prev, roomSubstep: nextSub };
+        }
+        return withDerived({ ...prev, step: 'result' });
+      }
+
       const n = nextStep(prev.step);
       if (!n) return prev;
       let next = { ...prev, step: n };
+      if (n === 'room') {
+        next = { ...next, roomSubstep: ROOM_SUBSTEPS[0]! };
+      }
       if (n === 'result') {
         next = withDerived(next);
       }
@@ -72,14 +87,34 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   const goBack = useCallback(() => {
     setSession((prev) => {
+      if (prev.step === 'room') {
+        const prevSub = prevRoomSubstep(prev.roomSubstep);
+        if (prevSub) {
+          return { ...prev, roomSubstep: prevSub };
+        }
+        return { ...prev, step: 'start', roomSubstep: ROOM_SUBSTEPS[0]! };
+      }
+
       const p = prevStep(prev.step);
       if (!p) return prev;
+      if (p === 'room') {
+        return {
+          ...prev,
+          step: 'room',
+          roomSubstep: ROOM_SUBSTEPS[ROOM_SUBSTEPS.length - 1]!,
+        };
+      }
       return { ...prev, step: p };
     });
   }, []);
 
   const goTo = useCallback((step: WizardStep) => {
-    setSession((prev) => ({ ...prev, step }));
+    setSession((prev) => ({
+      ...prev,
+      step,
+      roomSubstep:
+        step === 'room' ? prev.roomSubstep : ROOM_SUBSTEPS[0]!,
+    }));
   }, []);
 
   const restart = useCallback(() => {

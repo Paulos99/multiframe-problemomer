@@ -1,5 +1,11 @@
-import type { AudioState, CtaPayload, SessionState, WizardStep } from './types';
-import { WIZARD_STEPS, CALCULATOR_URL } from './types';
+import type {
+  AudioState,
+  CtaPayload,
+  RoomSubstep,
+  SessionState,
+  WizardStep,
+} from './types';
+import { ROOM_SUBSTEPS, WIZARD_STEPS, CALCULATOR_URL } from './types';
 import { deriveProfile } from './derive';
 import { DEMO_AUDIO_PAIRS } from '../audio/demoAudio';
 
@@ -27,6 +33,7 @@ export function createInitialSession(): SessionState {
   return {
     schemaVersion: 2,
     step: 'start',
+    roomSubstep: ROOM_SUBSTEPS[0]!,
     answers: {
       interestFor: 'self',
       room: defaultRoom(),
@@ -39,6 +46,26 @@ export function createInitialSession(): SessionState {
       ceilingAreaM2: null,
     },
   };
+}
+
+export function roomSubstepIndex(sub: RoomSubstep): number {
+  return ROOM_SUBSTEPS.indexOf(sub);
+}
+
+export function nextRoomSubstep(sub: RoomSubstep): RoomSubstep | null {
+  const i = roomSubstepIndex(sub);
+  if (i < 0 || i >= ROOM_SUBSTEPS.length - 1) return null;
+  return ROOM_SUBSTEPS[i + 1]!;
+}
+
+export function prevRoomSubstep(sub: RoomSubstep): RoomSubstep | null {
+  const i = roomSubstepIndex(sub);
+  if (i <= 0) return null;
+  return ROOM_SUBSTEPS[i - 1]!;
+}
+
+export function isLastRoomSubstep(sub: RoomSubstep): boolean {
+  return roomSubstepIndex(sub) === ROOM_SUBSTEPS.length - 1;
 }
 
 export function buildCta(session: SessionState): CtaPayload {
@@ -97,6 +124,7 @@ export function canProceed(session: SessionState): boolean {
 
 export function roomNextHint(session: SessionState): string | null {
   if (session.step !== 'room') return null;
+  if (session.roomSubstep !== 'basics') return null;
   if (session.answers.room.roomType == null) return 'выберите тип';
   if (
     session.answers.room.ceilingAreaM2 == null ||
