@@ -14,6 +14,7 @@ import {
   type ClassLabel,
 } from '../../state/types';
 import {
+  NORMS,
   airQuietPct,
   comfortClassFor,
   deriveSimulation,
@@ -30,6 +31,14 @@ const LADDER_SHORT: Record<ClassLabel, string> = {
   B: 'Комфорт (Б)',
   A: 'Высокий (А)',
 };
+
+/** Comfort norms (СП 51.13330.2011, табл. 2). Rw — не менее; Lnw — не более. */
+const NORM_ROWS: { cls: ClassLabel; rw: string; lnw: string }[] = [
+  { cls: 'A', rw: `≥ ${NORMS.A.Rw}`, lnw: `≤ ${NORMS.A.Lnw}` },
+  { cls: 'B', rw: `≥ ${NORMS.B.Rw}`, lnw: `≤ ${NORMS.B.Lnw}` },
+  { cls: 'V', rw: `≥ ${NORMS.V.Rw}`, lnw: `≤ ${NORMS.V.Lnw}` },
+  { cls: 'below', rw: `< ${NORMS.V.Rw}`, lnw: `> ${NORMS.V.Lnw}` },
+];
 
 function rung(cls: ClassLabel): number {
   return LADDER.indexOf(cls);
@@ -119,6 +128,60 @@ export function ResultScreen() {
         <p className={styles.normNote}>{NORM_FOOTNOTE}</p>
       </div>
 
+      <section className={styles.normTable} aria-label="Классы комфорта в дБ">
+        <h2>Какой уровень шума — какой комфорт</h2>
+        <div className={styles.tableWrap}>
+          <table>
+            <thead>
+              <tr>
+                <th>Уровень комфорта</th>
+                <th>
+                  Воздушный, Rw
+                  <span>чем больше, тем лучше</span>
+                </th>
+                <th>
+                  Ударный, Lnw
+                  <span>чем меньше, тем лучше</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {NORM_ROWS.map((r) => {
+                const isBefore = r.cls === beforeClass;
+                const isAfter = r.cls === afterClass;
+                return (
+                  <tr
+                    key={r.cls}
+                    className={`${isBefore ? styles.rowBefore : ''} ${
+                      isAfter ? styles.rowAfter : ''
+                    }`}
+                  >
+                    <td>
+                      <span className={styles.rowName}>{LADDER_SHORT[r.cls]}</span>
+                      {isBefore ? <span className={styles.rowTagNow}>сейчас</span> : null}
+                      {isAfter ? (
+                        <span className={styles.rowTagMf}>MultiFrame</span>
+                      ) : null}
+                    </td>
+                    <td>
+                      {r.rw} <em>дБ</em>
+                    </td>
+                    <td>
+                      {r.lnw} <em>дБ</em>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        <p className={styles.tableNote}>
+          Категории комфорта — по СП 51.13330.2011 «Защита от шума», табл. 2
+          (межквартирные перекрытия). Ваша комната: Rw {sim.before.Rw} → {sim.after.Rw} дБ ·
+          Lnw {sim.before.Lnw} → {sim.after.Lnw} дБ.
+        </p>
+      </section>
+
       <div className={styles.dual}>
         <article className={`${styles.emotionCard} ${styles.before}`}>
           <span className={styles.tag}>Сейчас</span>
@@ -159,11 +222,13 @@ export function ResultScreen() {
           </div>
           <div className={styles.qMeta}>
             <span className={styles.qHero}>≈ на {sim.perceivedAirPct}% тише</span>
-            <span className={styles.qDb}>
-              изоляция {sim.before.Rw} → {sim.after.Rw} дБ · чем больше, тем тише
-              <em className={styles.qGain}> +{airDb}</em>
+            <span className={styles.qIndex}>
+              <b className={styles.qKey}>Rw</b> {sim.before.Rw} <i>→</i> {sim.after.Rw}
+              <em className={styles.qUnit}>дБ</em>
+              <em className={styles.qGain}>+{airDb}</em>
             </span>
           </div>
+          <p className={styles.qDir}>чем больше Rw — тем тише сверху</p>
         </div>
 
         <div className={styles.qRow}>
@@ -181,11 +246,13 @@ export function ResultScreen() {
           </div>
           <div className={styles.qMeta}>
             <span className={styles.qHero}>≈ на {sim.perceivedImpactPct}% тише</span>
-            <span className={styles.qDb}>
-              ударный фон {sim.before.Lnw} → {sim.after.Lnw} дБ · чем меньше, тем тише
-              <em className={styles.qGain}> −{impactDb}</em>
+            <span className={styles.qIndex}>
+              <b className={styles.qKey}>Lnw</b> {sim.before.Lnw} <i>→</i> {sim.after.Lnw}
+              <em className={styles.qUnit}>дБ</em>
+              <em className={styles.qGain}>−{impactDb}</em>
             </span>
           </div>
+          <p className={styles.qDir}>чем меньше Lnw — тем тише сверху</p>
         </div>
 
         <p className={styles.legend}>

@@ -1,10 +1,10 @@
 import type { AudioPair } from '../state/types';
 
-/** Fixed household demo set — three groups (air / impact / mixed). */
+/** Fixed household demo set — one До/После per noise type (air / impact / mixed). */
 export const DEMO_AUDIO_PAIRS: AudioPair[] = [
   {
-    id: 'dog_bark',
-    label: 'Лай собаки',
+    id: 'air_talk',
+    label: 'Громкие разговоры и музыка',
     group: 'air',
     beforeLabel: 'До',
     afterLabel: 'После',
@@ -12,26 +12,8 @@ export const DEMO_AUDIO_PAIRS: AudioPair[] = [
     afterSrc: 'stub:after:talk',
   },
   {
-    id: 'music',
-    label: 'Музыка',
-    group: 'air',
-    beforeLabel: 'До',
-    afterLabel: 'После',
-    beforeSrc: 'stub:before:talk',
-    afterSrc: 'stub:after:talk',
-  },
-  {
-    id: 'loud_talk',
-    label: 'Громкие разговоры',
-    group: 'air',
-    beforeLabel: 'До',
-    afterLabel: 'После',
-    beforeSrc: 'stub:before:talk',
-    afterSrc: 'stub:after:talk',
-  },
-  {
-    id: 'kids_run',
-    label: 'Детский бег',
+    id: 'impact_steps',
+    label: 'Шаги и детский бег',
     group: 'impact',
     beforeLabel: 'До',
     afterLabel: 'После',
@@ -39,40 +21,13 @@ export const DEMO_AUDIO_PAIRS: AudioPair[] = [
     afterSrc: 'stub:after:steps',
   },
   {
-    id: 'furniture',
-    label: 'Перестановка мебели',
-    group: 'impact',
-    beforeLabel: 'До',
-    afterLabel: 'После',
-    beforeSrc: 'stub:before:steps',
-    afterSrc: 'stub:after:steps',
-  },
-  {
-    id: 'dog_claws',
-    label: 'Цоканье когтей собаки',
-    group: 'impact',
-    beforeLabel: 'До',
-    afterLabel: 'После',
-    beforeSrc: 'stub:before:steps',
-    afterSrc: 'stub:after:steps',
-  },
-  {
-    id: 'washer',
-    label: 'Стиральная машина',
+    id: 'mixed_appliance',
+    label: 'Бытовая техника',
     group: 'mixed',
     beforeLabel: 'До',
     afterLabel: 'После',
     beforeSrc: 'stub:before:steps',
     afterSrc: 'stub:after:talk',
-  },
-  {
-    id: 'vacuum',
-    label: 'Пылесос',
-    group: 'mixed',
-    beforeLabel: 'До',
-    afterLabel: 'После',
-    beforeSrc: 'stub:before:talk',
-    afterSrc: 'stub:after:steps',
   },
 ];
 
