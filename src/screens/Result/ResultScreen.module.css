@@ -8,12 +8,12 @@
   box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .oneLiner {
   margin: 0;
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 750;
   letter-spacing: -0.02em;
   line-height: 1.3;
@@ -21,70 +21,109 @@
 
 .classShift {
   margin: 0;
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--accent-color);
-  line-height: 1.35;
+  font-size: 15px;
+  font-weight: 550;
+  color: var(--text-secondary);
+  line-height: 1.4;
 }
 
-.scale {
+.classShift b {
+  font-weight: 750;
+  color: var(--text-primary);
+}
+
+.classShift .accent {
+  color: var(--accent-color);
+}
+
+.arrow {
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+/* Comfort ladder: worst → best, reads as climbing up */
+.ladder {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 6px;
-  margin-top: 4px;
+  margin: 4px 0 2px;
 }
 
-.scaleStep {
+.ladderTrack {
+  position: absolute;
+  left: 12.5%;
+  right: 12.5%;
+  top: 25px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--border-color);
+}
+
+.rung {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  font-weight: 650;
-  color: var(--text-secondary);
+  gap: 5px;
+  text-align: center;
 }
 
-.scaleDot {
-  width: 10px;
-  height: 10px;
+.rungTag {
+  min-height: 14px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: transparent;
+}
+
+.rungBefore .rungTag {
+  color: #7a8790;
+}
+
+.rungAfter .rungTag {
+  color: var(--accent-color);
+}
+
+.rungDot {
+  position: relative;
+  z-index: 1;
+  width: 13px;
+  height: 13px;
   border-radius: 50%;
   background: var(--border-color);
 }
 
-.scaleBefore .scaleDot {
+.rungBefore .rungDot {
   background: #7a8790;
-  box-shadow: 0 0 0 3px rgba(122, 135, 144, 0.25);
+  box-shadow: 0 0 0 4px rgba(122, 135, 144, 0.22);
 }
 
-.scaleAfter .scaleDot {
+.rungAfter .rungDot {
   background: var(--accent-color);
-  box-shadow: 0 0 0 3px rgba(1, 100, 79, 0.22);
+  box-shadow: 0 0 0 4px var(--accent-soft);
 }
 
-.scaleAfter {
-  color: var(--accent-color);
-}
-
-.normLine,
-.indices {
-  margin: 0;
-  font-size: 12px;
+.rungName {
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.2;
   color: var(--text-secondary);
 }
 
-.indices {
-  font-weight: 650;
-  color: var(--text-primary);
+.rungAfter .rungName {
+  color: var(--accent-color);
+  font-weight: 750;
 }
 
 .roomMeta {
-  margin: 0;
+  margin: 2px 0 0;
   font-size: 13px;
   color: var(--text-secondary);
 }
 
 .normNote {
-  margin: 2px 0 0;
+  margin: 0;
   font-size: 12px;
   color: var(--text-secondary);
 }
@@ -170,99 +209,151 @@
   background: var(--accent-color);
 }
 
-.deltas,
-.charts {
+.cardClass {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.after .cardClass {
+  color: var(--accent-color);
+}
+
+/* «Насколько станет тише» — both channels grow toward calm */
+.quieter {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.deltas > header,
-.charts > header {
+.quieter > header {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.deltas > header h2,
-.charts > header h2,
-.features > h2 {
+.quieter > header h2 {
   margin: 0;
+  font-size: 16px;
+  font-weight: 750;
+}
+
+.quieter > header p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.qRow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  border: 1px solid rgba(1, 100, 79, 0.18);
+  box-shadow: var(--shadow-sm);
+}
+
+.qHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.qName {
   font-size: 15px;
   font-weight: 750;
 }
 
-.deltas > header p,
-.charts > header p {
-  margin: 0;
+.qEx {
   font-size: 12px;
   color: var(--text-secondary);
 }
 
-.deltaGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+.qBar {
+  position: relative;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
 }
 
-@media (max-width: 520px) {
-  .deltaGrid {
-    grid-template-columns: 1fr;
-  }
+.qFillAfter,
+.qFillBefore {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 999px;
 }
 
-.deltaCard {
-  padding: 16px 14px;
-  border-radius: var(--radius-lg);
-  background: var(--bg-card);
-  border: 1px solid rgba(1, 100, 79, 0.22);
-  box-shadow: var(--shadow);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+.qFillAfter {
+  background: linear-gradient(90deg, rgba(1, 100, 79, 0.55), var(--accent-color));
 }
 
-.deltaKind {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
+.qFillBefore {
+  background: #8b969e;
 }
 
-.deltaValue {
-  margin: 0;
+.qMeta {
   display: flex;
   align-items: baseline;
-  gap: 4px;
-  font-size: 44px;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.qHero {
+  font-size: 18px;
   font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1;
+  letter-spacing: -0.02em;
   color: var(--accent-color);
 }
 
-.deltaValue span {
-  font-size: 32px;
-}
-
-.deltaValue small {
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 0;
+.qDb {
+  font-size: 12px;
   color: var(--text-secondary);
 }
 
-.deltaHint {
+.qGain {
+  font-style: normal;
+  font-weight: 800;
+  color: var(--accent-color);
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   margin: 0;
-  font-size: 13px;
-  line-height: 1.4;
+  font-size: 12px;
   color: var(--text-secondary);
 }
 
-.deltaRange {
+.legendBefore,
+.legendAfter {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.legendBefore {
+  background: #8b969e;
+  margin-right: 2px;
+}
+
+.legendAfter {
+  background: var(--accent-color);
+  margin: 0 2px 0 12px;
+}
+
+.qNote {
   margin: 0;
-  font-size: 11px;
+  font-size: 12px;
+  line-height: 1.45;
   color: var(--text-secondary);
 }
 
@@ -275,6 +366,12 @@
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
+}
+
+.features > h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 750;
 }
 
 .features ul {
