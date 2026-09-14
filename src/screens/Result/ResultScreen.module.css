@@ -27,6 +27,56 @@
   line-height: 1.35;
 }
 
+.scale {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.scaleStep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 650;
+  color: var(--text-secondary);
+}
+
+.scaleDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border-color);
+}
+
+.scaleBefore .scaleDot {
+  background: #7a8790;
+  box-shadow: 0 0 0 3px rgba(122, 135, 144, 0.25);
+}
+
+.scaleAfter .scaleDot {
+  background: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(1, 100, 79, 0.22);
+}
+
+.scaleAfter {
+  color: var(--accent-color);
+}
+
+.normLine,
+.indices {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.indices {
+  font-weight: 650;
+  color: var(--text-primary);
+}
+
 .roomMeta {
   margin: 0;
   font-size: 13px;

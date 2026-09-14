@@ -11,18 +11,36 @@ import {
   NORM_FOOTNOTE,
   ROOM_TYPE_LABELS,
   SIMULATION_BADGE,
+  type ClassLabel,
+  type DerivedSimSide,
 } from '../../state/types';
-import { deriveSimulation } from '../../state/simulation';
+import { NORMS, classCyr, deriveSimulation } from '../../state/simulation';
 import { buildAirSpectrum, buildImpactSpectrum } from '../../state/spectrum';
 import styles from './ResultScreen.module.css';
+
+const SCALE: ClassLabel[] = ['A', 'B', 'V', 'below'];
+
+/** Worst-channel class for client-facing official scale (both Rw and Lnw must pass). */
+function strictClass(side: DerivedSimSide): ClassLabel {
+  if (side.Rw >= NORMS.A.Rw && side.Lnw <= NORMS.A.Lnw) return 'A';
+  if (side.Rw >= NORMS.B.Rw && side.Lnw <= NORMS.B.Lnw) return 'B';
+  if (side.Rw >= NORMS.V.Rw && side.Lnw <= NORMS.V.Lnw) return 'V';
+  return 'below';
+}
+
+function scaleIndex(label: ClassLabel): number {
+  return SCALE.indexOf(label);
+}
 
 export function ResultScreen() {
   const { session, restart } = useSession();
   const room = session.answers.room;
   const sim = session.derived?.simulation ?? deriveSimulation(session.answers);
-  const beforeClass = HYBRID_CLASS_LABELS[sim.before.classLabel];
-  const afterClass = HYBRID_CLASS_LABELS[sim.after.classLabel];
-  const classChanged = sim.before.classLabel !== sim.after.classLabel;
+  const beforeStrict = strictClass(sim.before);
+  const afterStrict = strictClass(sim.after);
+  const beforeClass = HYBRID_CLASS_LABELS[beforeStrict];
+  const afterClass = HYBRID_CLASS_LABELS[afterStrict];
+  const classRose = scaleIndex(afterStrict) < scaleIndex(beforeStrict);
   const [showLead, setShowLead] = useState(false);
   const [sent, setSent] = useState(false);
   const [name, setName] = useState('');
@@ -53,14 +71,40 @@ export function ResultScreen() {
     >
       <div className={styles.verdict} role="status">
         <p className={styles.oneLiner}>
-          {classChanged
+          {classRose
             ? 'Уровень комфорта помещения заметно возрастает по официальной классификации.'
-            : 'Запас комфорта помещения растёт — по той же официальной шкале классов.'}
+            : 'По официальным индексам Rw и Lnw комфорт помещения заметно усиливается — комната ближе к нормативным классам.'}
         </p>
         <p className={styles.classShift}>
           Сейчас: {beforeClass}
           <span aria-hidden> → </span>
           с MultiFrame: {afterClass}
+        </p>
+
+        <div className={styles.scale} aria-label="Шкала комфортности А Б В">
+          {SCALE.map((cls) => {
+            const isBefore = cls === beforeStrict;
+            const isAfter = cls === afterStrict;
+            const name = cls === 'below' ? 'ниже' : classCyr(cls);
+            return (
+              <div
+                key={cls}
+                className={`${styles.scaleStep} ${isBefore ? styles.scaleBefore : ''} ${isAfter ? styles.scaleAfter : ''}`}
+              >
+                <span className={styles.scaleDot} />
+                <span>{name}</span>
+              </div>
+            );
+          })}
+        </div>
+
+        <p className={styles.normLine}>
+          Нормы ориентира: Rw ≥ {NORMS.V.Rw}…{NORMS.A.Rw} · Lnw ≤ {NORMS.V.Lnw}…
+          {NORMS.A.Lnw}
+        </p>
+        <p className={styles.indices}>
+          Rw {sim.before.Rw} → {sim.after.Rw} дБ · Lnw {sim.before.Lnw} →{' '}
+          {sim.after.Lnw} дБ
         </p>
         {roomLabel ? (
           <p className={styles.roomMeta}>
