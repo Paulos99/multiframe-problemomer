@@ -6,8 +6,6 @@ import { useSession } from '../state/SessionContext';
 import { buildCalculatorUrl } from '../state/session';
 import { StartScreen } from '../screens/Start/StartScreen';
 import { RoomScreen } from '../screens/Room/RoomScreen';
-import { BeforeAfterScreen } from '../screens/BeforeAfter/BeforeAfterScreen';
-import { AudioDiffScreen } from '../screens/AudioDiff/AudioDiffScreen';
 import { ResultScreen } from '../screens/Result/ResultScreen';
 
 export function AppShell() {
@@ -24,26 +22,12 @@ export function AppShell() {
     case 'room':
       content = <RoomScreen />;
       break;
-    case 'beforeAfter':
-      content = <BeforeAfterScreen />;
-      break;
-    case 'audio':
-      content = <AudioDiffScreen />;
-      break;
     case 'result':
       content = <ResultScreen />;
       break;
   }
 
-  const ctaLabel =
-    step === 'beforeAfter'
-      ? 'Услышать разницу'
-      : step === 'audio'
-        ? 'Смотреть итог'
-        : step === 'result'
-          ? 'Открыть калькулятор MultiFrame'
-          : 'Далее';
-
+  const ctaLabel = isResult ? 'Открыть калькулятор MultiFrame' : 'Далее';
   const calcUrl = isResult ? buildCalculatorUrl(session.cta) : null;
 
   return (

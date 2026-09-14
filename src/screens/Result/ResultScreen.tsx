@@ -4,6 +4,7 @@ import { Button } from '../../ui/Button';
 import { Disclaimer } from '../../ui/Disclaimer';
 import { Field, TextInput } from '../../ui/Field';
 import { SimCompare } from '../../ui/SimCompare';
+import { CompactAudio } from '../../ui/CompactAudio';
 import { useSession } from '../../state/SessionContext';
 import {
   HYBRID_CLASS_LABELS,
@@ -79,6 +80,8 @@ export function ResultScreen() {
           </ul>
         </article>
       </div>
+
+      <CompactAudio pairs={session.audio.pairs} sim={sim} />
 
       <div className={styles.profile}>
         <div className={styles.row}>

@@ -88,8 +88,6 @@ export function canProceed(session: SessionState): boolean {
         session.answers.room.ceilingAreaM2 != null &&
         session.answers.room.ceilingAreaM2 > 0
       );
-    case 'beforeAfter':
-    case 'audio':
     case 'result':
       return true;
     default:

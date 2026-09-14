@@ -63,7 +63,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       const n = nextStep(prev.step);
       if (!n) return prev;
       let next = { ...prev, step: n };
-      if (n === 'beforeAfter' || n === 'audio' || n === 'result') {
+      if (n === 'result') {
         next = withDerived(next);
       }
       return next;

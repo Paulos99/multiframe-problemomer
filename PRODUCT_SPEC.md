@@ -85,6 +85,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Workshop reconcile: product chrome/flow largely locked; still open for owner — exact feature тезис+why lines (beyond drum example). Engineering ASSUMPTIONs OK until Trofimov: dB→% map, mixed EQ blend, Δ model numbers, lead stub endpoint |
 | 2026-09-13 | Start chrome: **no kicker**; H1 kept; lead **E8c**; CTA `Начать` |
 | 2026-09-13 | Result features: drop Flat/Wave from «остальное»; drum-effect rephrased (draft) — air gap under stretch acts like a drum body; MultiFrame dissipates energy in the panel |
+| 2026-09-14 | **Remove Before/After screen** (duplicated Result). **Audio** moves into Result as compact block after «Сейчас / С MultiFrame» cards. Flow: Start → Room → Result |
 
 ---
 

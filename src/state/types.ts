@@ -56,7 +56,8 @@ export type NoiseScenario =
 export type ComfortLevel = 'quiet' | 'ok' | 'bothers';
 export type NoiseType = 'impact' | 'airborne' | 'mixed';
 
-export type WizardStep = 'start' | 'room' | 'beforeAfter' | 'audio' | 'result';
+/** Flow: Start → Room → Result (audio lives inside Result; no separate Сравнение) */
+export type WizardStep = 'start' | 'room' | 'result';
 
 export type ClassLabel = 'A' | 'B' | 'V' | 'below';
 export type ClassStatus = 'ok' | 'partial' | 'below';
@@ -143,13 +144,7 @@ export interface SessionState {
   cta: CtaPayload;
 }
 
-export const WIZARD_STEPS: WizardStep[] = [
-  'start',
-  'room',
-  'beforeAfter',
-  'audio',
-  'result',
-];
+export const WIZARD_STEPS: WizardStep[] = ['start', 'room', 'result'];
 
 export const ROOM_TYPE_LABELS: Record<RoomType, string> = {
   living: 'Гостиная',

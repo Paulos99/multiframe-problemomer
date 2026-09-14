@@ -32,7 +32,7 @@ Live context (do not redesign from this URL alone): https://paulos99.github.io/m
 | Audiences / Start (confirmed 2026-09-13) | На старте только: **«Интересуюсь звукоизоляцией: для себя / для клиента»**. Длинный список ролей/входов — **не UI-опрос**, а **карта JTBD** для полного контента обоснования покупки MultiFrame. |
 | User models = JTBD content map (owner 2026-09-13) | Клиент: таргет / поиск / сайт MultiFrame / сайт партнёра. Профи: менеджер продаж, мастер на объекте, замерщик, дизайнер и аналоги. Нужны не отдельные ветки, а **один полный buy-case**, который закрывает эти работы. |
 | Further Start clarification | **Не делаем.** Зачем не нужно: если результат уже даёт полную аргументацию покупки MultiFrame (исходное состояние + эффект + плюсы + классы/цифры/аудио), доп. вопросы «менеджер / замер / дизайн» только усложняют вход и не добавляют фактов. UTM может менять хук без вопроса. |
-| What is the first user journey that must work end to end? | `для себя`/`для клиента` → комната → сравнение до/после → аудио → профиль + CTA. **Без** опроса сценариев/«что мешает». На результате — полный buy-case; **оба** канала Δ всегда. |
+| What is the first user journey that must work end to end? | `для себя`/`для клиента` → комната → итог (карточки + компактное аудио + buy-case + CTA). **Без** отдельных экранов Сравнение / Звук и без опроса сценариев. |
 | Result evidence depth (confirmed 2026-09-12) | **Показать всё**, аргументированно, понятно, персонально: **цифры + классы А/Б/В + графики + пояснения к ним**. Не выбирать «только ощущение» или «только цифры». Честная рамка pre_lab / marketing_placeholder сохраняется — это ориентиры под комнату, не лаб-сертификат. |
 | Evidence presentation Q4 (confirmed 2026-09-12) | **Всё сразу** на одном скролле: **сверху вывод**, ниже детальные данные. Менеджер и пользователь сами смотрят нужный слой. Не progressive disclosure и не урезание пакета по роли. |
 | Charts (confirmed 2026-09-13) | **C — оба:** сверху шкала классов комфорта А→Б→В (куда сдвинемся), ниже столбцы до/после с ориентирами ΔRw / ΔLnw. Без частотного спектра в MVP. Подписи + рамка pre_lab обязательны. |
@@ -70,6 +70,7 @@ Live context (do not redesign from this URL alone): https://paulos99.github.io/m
 | Effectiveness block (confirmed 2026-09-13) | Сначала **ориентиры Δ** (воздух/удар) с **поясняющими подписями и ощущениями** у каждой дельты; затем графики. Рамка pre_lab. |
 | Result feature order (confirmed 2026-09-13) | **1)** класс жилья/комфорта → **2)** эффективность → **3)** эффект барабана → **4)** безопасность → **5)** остальное. Монтаж клиенту только как **быстро, без долгой стройки** — без техники крепежа/коммуникаций. |
 | Result features copy (2026-09-13) | Без пункта Flat/Wave. Барабан перефразирован (draft): тезис `Под обычным натяжным потолком воздух в зазоре усиливает шум сверху, как полотно барабана.` / why `MultiFrame рассеивает эту энергию в панели, и комната воспринимается спокойнее.` |
+| Flow collapse (confirmed 2026-09-14) | Убрать экран **Сравнение** (дублировал Итог). Аудио До/После — **компактно на Result** сразу после блоков «Сейчас» / «С MultiFrame». Поток: Start → Room → Result. |
 | Result sticky CTA (confirmed 2026-09-13) | **C4:** `Открыть калькулятор MultiFrame` (вместо «Расчёт материалов»). |
 | Result lead (confirmed 2026-09-13) | Заявка = консультация / подбор. Open **P2:** `Запросить консультацию или подбор`. Title: `Заявка на консультацию`. Note: `Разберём ваш случай, подберём материал.` Отдельную disabled-кнопку «Консультация» не показываем. |
 | Feature copy style (confirmed 2026-09-13) | Преимущества на результате — **тезис + 1 фраза обоснования**, премиальным цельным языком. Барабан (draft): «Под обычным натяжным потолком воздух в зазоре усиливает шум сверху, как полотно барабана. MultiFrame рассеивает эту энергию в панели, и комната воспринимается спокойнее.» Не слоганы и не техдамп. Flat/Wave в блоке преимуществ **не** показываем. |
@@ -105,7 +106,7 @@ Ask about product needs, not implementations. Mark what the first version actual
 
 Product capabilities that **are** in the first version (not listed as vibe template toggles above — see ledger):
 
-- 5-step comfort wizard after Start: Room → Before/After → Audio → Result (no scenarios/current quiz)
+- 3-step comfort wizard after Start: Room → Result (audio compact inside Result; no Before/After / Audio screens)
 - Expert qualitative effect model with `marketing_placeholder` ΔRw / ΔLnw and pre_lab disclaimer
 - Before/after emotional contrast + SimCompare (feeling primary, dB tertiary)
 - Audio groups воздух / удар / смешанный with locked household examples; case-specific After (level + frequencies + ≈%)
@@ -190,7 +191,7 @@ A capability with no row is `absent` by default. The State column always holds o
 
 | Capability | State | Note |
 | ---------- | ----- | ---- |
-| Comfort wizard (Start + 4 steps) | included | Start → Room → Before/After → Audio → Result. No scenarios/current quiz. |
+| Comfort wizard (Start + Room + Result) | included | Start → Room → Result. Audio compact on Result after «Сейчас / С MultiFrame». No Before/After or Audio steps. |
 | Ceiling-only / upstairs noise scope | included | `answers.scope: 'ceiling'`. No floor question. |
 | Frameless MultiFrame positioning | included | Only бескаркасная StP MultiFrame; framed systems out of scope. |
 | Room + optional slab input | included | Room type, area m², optional slab key (default solid 180 mm). |
