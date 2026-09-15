@@ -96,29 +96,32 @@ export function floorIndexDelta(floor: 'bare' | 'ordinary' | 'floating'): {
   dRw: number;
   dLnw: number;
 } {
+  // Ordinary finish barely moves Rw in situ; keep a small Lnw credit only.
   if (floor === 'floating') return { dRw: 3, dLnw: -22 };
-  if (floor === 'ordinary') return { dRw: 1, dLnw: -3 };
+  if (floor === 'ordinary') return { dRw: 0, dLnw: -2 };
   return { dRw: 0, dLnw: 0 };
 }
 
 /**
  * In-situ flanking vs laboratory slab (ISO 12354-1 qualitative).
- * Applied only as a spectral Δ on top of Trofimov slab numbers.
+ * Trofimov table = slab alone; RU apartments measure lower R′w.
+ * Unknown house → mass-stock prior (panel-like), not «lab slab».
  */
 export function flankingAirDelta(house: HouseTypeOption): number[] {
   switch (house) {
     case 'panel':
-      return atHz((f) => (f <= 160 ? -4 : f <= 400 ? -2.2 : -1));
+      return atHz((f) => (f <= 160 ? -6 : f <= 400 ? -3.5 : -2));
     case 'block':
-      return atHz((f) => (f <= 160 ? -2.5 : f <= 400 ? -1.2 : -0.6));
+      return atHz((f) => (f <= 160 ? -4.5 : f <= 400 ? -2.5 : -1.4));
     case 'wood':
-      return atHz((f) => (f <= 200 ? -5 : f <= 500 ? -2.5 : -1.2));
+      return atHz((f) => (f <= 200 ? -7 : f <= 500 ? -3.5 : -2));
     case 'brick':
-      return atHz((f) => (f <= 125 ? 0.4 : 0.2));
+      return atHz((f) => (f <= 160 ? -2.5 : f <= 400 ? -1.2 : -0.6));
     case 'monolith':
-      return atHz((f) => (f <= 160 ? -0.4 : 0));
+      return atHz((f) => (f <= 160 ? -2.2 : f <= 400 ? -1 : -0.5));
     default:
-      return atHz(() => 0);
+      // Unknown → conservative mass-housing prior (between panel and block).
+      return atHz((f) => (f <= 160 ? -5 : f <= 400 ? -3 : -1.6));
   }
 }
 
@@ -126,44 +129,66 @@ export function flankingImpactDelta(house: HouseTypeOption): number[] {
   // Positive = louder Ln (worse).
   switch (house) {
     case 'panel':
-      return atHz((f) => (f <= 250 ? 2.5 : 1.2));
+      return atHz((f) => (f <= 250 ? 4 : 2));
     case 'block':
-      return atHz((f) => (f <= 250 ? 1.5 : 0.8));
+      return atHz((f) => (f <= 250 ? 3 : 1.5));
     case 'wood':
-      return atHz((f) => (f <= 200 ? 3 : 1.5));
+      return atHz((f) => (f <= 200 ? 4.5 : 2.2));
+    case 'brick':
+      return atHz((f) => (f <= 250 ? 2 : 1));
+    case 'monolith':
+      return atHz((f) => (f <= 250 ? 1.8 : 0.9));
     default:
-      return atHz(() => 0);
+      return atHz((f) => (f <= 250 ? 3.5 : 1.6));
   }
 }
 
+/** Index flanking on top of Trofimov lab slab (ASSUMPTION for in-situ R′w). */
 export function flankingRwShift(house: HouseTypeOption): number {
   switch (house) {
     case 'panel':
-      return -2;
+      return -4;
     case 'block':
-      return -1;
-    case 'wood':
       return -3;
+    case 'wood':
+      return -4;
     case 'brick':
-      return 0;
+      return -2;
     case 'monolith':
-      return 0;
+      return -2;
     default:
-      return 0;
+      return -3;
   }
 }
 
 export function flankingLnwShift(house: HouseTypeOption): number {
   switch (house) {
     case 'panel':
-      return 2;
+      return 4;
     case 'block':
-      return 1;
+      return 3;
     case 'wood':
+      return 3;
+    case 'brick':
+      return 2;
+    case 'monolith':
       return 2;
     default:
-      return 0;
+      return 3;
   }
+}
+
+/**
+ * Extra in-situ leaks vs lab sample: sockets, gaps, non-ideal junctions.
+ * Applied only in product `buildConstruction`, not Trofimov fixtures.
+ */
+export const INSITU_LEAK_RW = -2;
+export const INSITU_LEAK_LNW = 1;
+
+/** Stretch drum index hit in «сейчас» (stronger than a lab bare-slab story). */
+export function drumRwShift(hasDrum: boolean, lab: boolean): number {
+  if (!hasDrum) return 0;
+  return lab ? 1 : 2;
 }
 
 /**
@@ -293,7 +318,7 @@ export function drumAirDelta(kind: SlabKind): number[] {
     const t = (Math.log(f) - Math.log(200)) / (Math.log(800) - Math.log(200));
     const clamped = Math.min(1, Math.max(0, t));
     const bell = Math.sin(Math.PI * clamped);
-    const skirts = f >= 160 && f <= 1000 && (f < 200 || f > 800) ? 0.35 : 0;
-    return -3.6 * light * (bell + skirts);
+    const skirts = f >= 160 && f <= 1000 && (f < 200 || f > 800) ? 0.45 : 0;
+    return -4.5 * light * (bell + skirts);
   });
 }

@@ -221,6 +221,32 @@ export function assertModelAnchors(): string[] {
     );
   }
 
+  // Product in-situ «сейчас» must look like a complaint case, not a lab pass.
+  const panelLive = buildConstruction(
+    sampleRoom({
+      houseType: 'panel',
+      slabType: 'hollow',
+      slabThickness: 'about_200_250',
+      floorAbove: 'ordinary',
+      objectStage: 'occupied',
+    }),
+  );
+  if (panelLive.Rw >= 50) {
+    errors.push(`panel in-situ before should be Rw < 50 (got ${panelLive.Rw})`);
+  }
+  const defaultLive = buildConstruction(
+    sampleRoom({
+      slabType: 'unknown',
+      slabThickness: 'unknown',
+      houseType: 'unknown',
+      floorAbove: 'unknown',
+      objectStage: 'occupied',
+    }),
+  );
+  if (defaultLive.Rw >= 50) {
+    errors.push(`default occupied unknown before should be Rw < 50 (got ${defaultLive.Rw})`);
+  }
+
   return errors;
 }
 

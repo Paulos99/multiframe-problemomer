@@ -13,6 +13,7 @@ import {
   bareImpactLnShape,
   bareIndices,
   drumAirDelta,
+  drumRwShift,
   flankingAirDelta,
   flankingImpactDelta,
   flankingLnwShift,
@@ -20,6 +21,8 @@ import {
   floorAirDelta,
   floorImpactReduction,
   floorIndexDelta,
+  INSITU_LEAK_LNW,
+  INSITU_LEAK_RW,
   kindTextureDelta,
   type SlabKind,
 } from './materials';
@@ -139,27 +142,36 @@ export function assembleConstruction(
   floor: FloorFinish,
   hasDrum: boolean,
   houseType: HouseTypeOption = 'unknown',
+  /** Lab/Trofimov fixtures: no mass-stock prior, no universal in-situ leak. */
+  lab = false,
 ): ConstructionResult {
   const bare = bareIndices(resolved);
   const fd = floorIndexDelta(floor);
-  const drumRw = hasDrum ? 1 : 0;
-  const flankRw = flankingRwShift(houseType);
-  const flankLnw = flankingLnwShift(houseType);
-  const targetRw = round0(bare.Rw + fd.dRw - drumRw + flankRw);
-  const targetLnw = round0(bare.Lnw + fd.dLnw + flankLnw);
+  const drumRw = drumRwShift(hasDrum, lab);
+  // Lab unknown = pure slab. Product unknown = mass-housing flanking prior.
+  const flankRw = lab && houseType === 'unknown' ? 0 : flankingRwShift(houseType);
+  const flankLnw = lab && houseType === 'unknown' ? 0 : flankingLnwShift(houseType);
+  const leakRw = lab ? 0 : INSITU_LEAK_RW;
+  const leakLnw = lab ? 0 : INSITU_LEAK_LNW;
+  const targetRw = round0(bare.Rw + fd.dRw - drumRw + flankRw + leakRw);
+  const targetLnw = round0(bare.Lnw + fd.dLnw + flankLnw + leakLnw);
 
   let R = calibrateToRw(bareAirborneShape(resolved), SPECTRUM_HZ, bare.Rw);
   R = addBands(R, kindTextureDelta(resolved));
   R = calibrateToRw(R, SPECTRUM_HZ, bare.Rw);
   R = addBands(R, floorAirDelta(floor));
   if (hasDrum) R = addBands(R, drumAirDelta(resolved.kind));
-  R = addBands(R, flankingAirDelta(houseType));
+  if (!(lab && houseType === 'unknown')) {
+    R = addBands(R, flankingAirDelta(houseType));
+  }
   R = calibrateToRw(R, SPECTRUM_HZ, targetRw);
 
   let Ln = calibrateToLnw(bareImpactLnShape(resolved), SPECTRUM_HZ, bare.Lnw);
   const floorRed = floorImpactReduction(floor);
   Ln = Ln.map((v, i) => round1(v - (floorRed[i] ?? 0)));
-  Ln = addBands(Ln, flankingImpactDelta(houseType));
+  if (!(lab && houseType === 'unknown')) {
+    Ln = addBands(Ln, flankingImpactDelta(houseType));
+  }
   Ln = calibrateToLnw(Ln, SPECTRUM_HZ, targetLnw);
 
   return {
@@ -181,6 +193,7 @@ export function buildConstruction(room: RoomAnswers): ConstructionResult {
     resolveFloor(room),
     resolveDrum(room),
     room.houseType,
+    false,
   );
 }
 
@@ -202,5 +215,6 @@ export function constructionFixture(opts: {
     opts.floor ?? 'bare',
     opts.drum ?? false,
     opts.houseType ?? 'unknown',
+    true,
   );
 }

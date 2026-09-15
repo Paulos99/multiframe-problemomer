@@ -173,7 +173,7 @@ Engineering decisions already made / owned by the agent (product terms):
 
 - **Surface:** one public Vite + React + TypeScript SPA (`webapp`). No separate SEO `website`, no backend microservices.
 - **Stack (recorded, do not reopen):** Vite + React SPA, client session state, GitHub Actions → GitHub Pages. No microservices.
-- **Effect model:** two layers — construction R(f)/Rw/Lnw from Trofimov + physics (mass, coincidence, ПК voids, wood, house flanking, floor ΔLn(f)); in-room A-weighted level from L1(f)−R(f)+10log(S/A) (neighbors, room type, area, furnishing). MultiFrame Δ is invented frequency-shaped (`source: marketing_placeholder`, `disclaimer: pre_lab`): typical ΔRw 8…12, ΔLnw 4…9 (2…4 if floating floor). Neighbors do not change Rw. Ceiling alone never takes Lnw to class A. Classes **A/B/V** (UI А/Б/В) unchanged.
+- **Effect model:** two layers — construction R(f)/Rw/Lnw from Trofimov + physics (mass, coincidence, ПК voids, wood, house flanking, floor ΔLn(f)); in-room A-weighted level from L1(f)−R(f)+10log(S/A) (neighbors, room type, area, furnishing). **Product «сейчас» = in-situ** (flanking + leak + drum), not lab Trofimov Rw; lab fixtures stay 180=54/76. MultiFrame Δ is invented frequency-shaped (`source: marketing_placeholder`, `disclaimer: pre_lab`): typical ΔRw 8…12, ΔLnw 4…9 (2…4 if floating floor). Neighbors do not change Rw. Ceiling alone never takes Lnw to class A. Classes **A/B/V** (UI А/Б/В) unchanged.
 - **Audio:** groups воздух / удар / смешанный; locked stubs; After = case Δ (level + EQ); mixed blends both; ≈% from room model; `pre_lab` / ориентир.
 - **CTA:** deep-link to MultiFRAME calculator with query payload; lead = consultation/selection request (MVP may stub delivery — never invent a corporate CRM endpoint).
 - **Mobile:** denser inputs + sticky progress/CTA; touch targets ≥44px; no tech dumps.
@@ -202,7 +202,7 @@ A capability with no row is `absent` by default. The State column always holds o
 | Emotional before/after contrast | included | Feeling bullets on Result cards; hybrid class lives on verdict + ladder + SP table (not repeated in cards). |
 | SimCompare effect UI | included | Quietness bars + large Δ; frequency isolation charts secondary on Result. Hybrid class primary; no `Тихо/Терпимо/Мешает`; pre_lab badge. |
 | marketing_placeholder Δ model | included | Frequency-shaped MultiFrame Δ (`pre_lab`): ΔRw typically 8…12, ΔLnw 4…9 (2…4 with floating floor); range from the room model. Never claim lab guarantees. |
-| Two-layer acoustic model | included | Construction (Trofimov + mass/coincidence/ПК/wood/flanking/floor ΔLn(f) → Rw/Lnw + charts) vs receiving room (L1−R+S/A, A-weighted). Anchors: bare 180=54/76, ПК 220=52/74. |
+| Two-layer acoustic model | included | Construction (Trofimov + mass/coincidence/ПК/wood/flanking/floor ΔLn(f) → Rw/Lnw + charts) vs receiving room (L1−R+S/A, A-weighted). Lab anchors: bare 180=54/76, ПК 220=52/74. Product in-situ «сейчас» typically Rw ~44–48 (panel/unknown), air often вне нормы. |
 | Trofimov-style comfort classes A/B/V | included | Canon A\|B\|V; UI Cyrillic А\|Б\|В. Result shows **independent** air (Rw) and impact (Lnw) levels; full hybrid SP class is secondary. Never promise full Lnw norm from ceiling alone. |
 | Case-specific audio (air / impact / mixed) | included | Locked examples; After cuts level + frequencies from room Δ; mixed = blend; show ≈%; `pre_lab`. |
 | Calculator CTA handoff | included | Opens calculator with `area`, `roomType` (no scenarios). |

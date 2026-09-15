@@ -91,6 +91,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-15 | **Expert material + receiving-room spectra:** R(f)/Ln(f) from mass law, coincidence, ПК voids, wood LF leak, house flanking, frequency-shaped floor ΔLn. In-room dBA = A-weighted L1(f)−R(f)+10log(S/A) (Sabine absorption by room type + furnishing). MultiFrame still invented. |
 | 2026-09-15 | Result fallback when hybrid class does **not** move (impact still > V): do not present `Дискомфорт → Дискомфорт` as “MultiFrame does nothing”. Keep locked L1 + class-shift only when hybrid rises. Otherwise show **air / impact channels** (Rw/Lnw + channel class), explain that full SP class needs both and ceiling alone does not close Lnw ≤ 60. Ladder may follow **air** if air rose. |
 | 2026-09-15 | **Independent channel comfort:** Result always shows separate air (Rw) and impact (Lnw) comfort levels + ladders. Full SP hybrid class is secondary footnote only. Norm table tags sit in Rw / Lnw columns separately. |
+| 2026-09-15 | **In-situ baseline realism:** product «сейчас» is not Trofimov lab Rw. Stronger flanking (panel/unknown mass stock), drum −2 Rw, ordinary floor no +1 Rw, universal leak −2 Rw. Lab fixtures unchanged (180=54/76). |
 
 ---
 
@@ -670,10 +671,11 @@ Two layers so each Room answer moves the right number. Code: `src/state/acoustic
 | Answer | Where it goes |
 | ------ | ------------- |
 | Slab type + thickness | Trofimov **indices** + physics **shape**: mass law (~6 dB/oct), coincidence fc≈c²/(1.8 c_L h) for RC, ПК void dip 100–250 Hz, wood LF leak + deck coincidence ~1.25 kHz. UI mids 150 / 180 / 225 / 260 mm. Wood bare **ASSUMPTION** Rw ~46 / Lnw ~84 (not Trofimov ТС-6.x) |
-| House type | If slab «Не знаю»: panel/block → ПК 220; monolith → solid ~200; brick → solid ~180; wood → wood; else solid 180. **Always** (even if slab known): in-situ flanking ΔR(f) — panel worse at LF, brick slightly tighter, wood house leaky. Not in Trofimov table. |
-| Floor above | Ordinary: ΔLnw ~−3, ΔRw ~+1, mostly HF. Floating: ΔLnw ~−22, ΔRw ~+3 (Trofimov mid) with **weak 100 Hz / strong 250–1600 Hz** ΔLn(f). Newbuild + unknown floor = **bare** slab |
-| Object stage | Floor prior when floor unknown (newbuild = bare). **Also** receiving-room absorption: empty newbuild → louder in the room; occupied furniture raises α |
-| Planned ceiling | Stretch drum dip ~2–4 dB in 200–800 Hz in «сейчас» (stronger on light/wood slabs); MultiFrame removes it. Product context: drum is always in the baseline |
+| House type | If slab «Не знаю»: panel/block → ПК 220; monolith → solid ~200; brick → solid ~180; wood → wood; else solid 180. **Always in product mode:** in-situ flanking — panel/block/unknown mass-stock prior lower R′w; brick/monolith milder but not lab-zero. |
+| Floor above | Ordinary: ΔLnw ~−2, ΔRw ~0 (no fake +1). Floating: ΔLnw ~−22, ΔRw ~+3 (Trofimov mid). Newbuild + unknown floor = **bare** slab |
+| Object stage | Floor prior when floor unknown (newbuild = bare). Receiving-room absorption: empty newbuild louder; occupied furniture raises α |
+| Planned ceiling | Stretch drum in «сейчас»: index ≈ −2 дБ Rw + mid dip; MultiFrame removes it. Product baseline always includes drum vs MultiFrame |
+| In-situ vs lab | Trofimov anchors stay lab fixtures. Product `buildConstruction` adds leak ≈ −2 Rw / +1 Lnw (joints, sockets). Typical panel «сейчас» Rw ~44–48, not 50–54. |
 | Area | Does not change Rw. Enters ISO-style `10·log10(S/A(f))` with S = this ceiling. Size is a small term vs kitchen hardness / emptiness |
 | Room type | Source **spectrum** + absorption: kids → impact 100–250 Hz; kitchen hard α and appliance mid-HF; bedroom more textiles; office speech 250–2000 Hz |
 | Neighbors | Source level + shape only: quiet −4, unknown 0, sometimes +3, often +7 and extra LF (music). Not Rw |
