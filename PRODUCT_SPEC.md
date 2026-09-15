@@ -89,6 +89,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-14 | Result trust pack: large Δ Rw / Δ Lnw; frequency isolation charts (zamer_graph shape, room Δ); **2** client advantages (drum + install); official class ladder. Spectrum is secondary — quietness bars stay primary so Rw↑ does not look «громче». |
 | 2026-09-14 | **Acoustic two-layer model:** construction R(f)/Lnw from Trofimov + answers (slab, house, floor, stage, stretch drum); in-room level from neighbors / room type / area. Neighbors do **not** change Rw/Lnw. MultiFrame ΔR(f) is invented with physical shape (`pre_lab`); never take Lnw to class A by ceiling alone. |
 | 2026-09-15 | **Expert material + receiving-room spectra:** R(f)/Ln(f) from mass law, coincidence, ПК voids, wood LF leak, house flanking, frequency-shaped floor ΔLn. In-room dBA = A-weighted L1(f)−R(f)+10log(S/A) (Sabine absorption by room type + furnishing). MultiFrame still invented. |
+| 2026-09-15 | Result fallback when hybrid class does **not** move (impact still > V): do not present `Дискомфорт → Дискомфорт` as “MultiFrame does nothing”. Keep locked L1 + class-shift only when hybrid rises. Otherwise show **air / impact channels** (Rw/Lnw + channel class), explain that full SP class needs both and ceiling alone does not close Lnw ≤ 60. Ladder may follow **air** if air rose. |
 
 ---
 
@@ -522,6 +523,7 @@ Summarize acoustic profile with **verdict first**, then the full evidence stack 
 ### Visible elements
 
 - **Top verdict (locked):** one-liner **L1** `В этой комнате MultiFrame поднимает комфорт на ступень выше.` + class shift `Сейчас: {label} → с MultiFrame: {label}` + norm footnote `Ориентир по шкале комфортности (норм. документы)`.
+- **Fallback (hybrid class stuck):** if full SP class does not rise because Lnw stays above V, do **not** lead with `Дискомфорт → Дискомфорт`. Show air/impact channel shift + honesty that ceiling alone does not close impact class. L1 + class-shift stay for the case when hybrid **does** rise.
 - Title, subtitle, Before/After summary cards, room/scenario profile, secondary SimCompare, numbers + charts + explanations, «Почему MultiFrame уместен», expert Disclaimer, calculator CTA, demo consultation (disabled), demo lead form, restart.
 - **Charts block:** class scale А→Б→В first; large Δ Rw / Δ Lnw + quietness bars; then frequency isolation charts (secondary, higher = quieter); captions + `pre_lab` badge.
 - Do **not** hide detail behind tabs/accordions as the primary pattern; scroll is the disclosure.

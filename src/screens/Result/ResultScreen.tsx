@@ -15,8 +15,10 @@ import {
 } from '../../state/types';
 import {
   NORMS,
+  airClassFor,
   comfortClassFor,
   deriveSimulation,
+  impactClassFor,
 } from '../../state/simulation';
 import styles from './ResultScreen.module.css';
 
@@ -42,6 +44,11 @@ function rung(cls: ClassLabel): number {
   return LADDER.indexOf(cls);
 }
 
+function channelShort(cls: ClassLabel, kind: 'air' | 'impact'): string {
+  if (cls === 'below' && kind === 'impact') return 'вне нормы';
+  return LADDER_SHORT[cls];
+}
+
 export function ResultScreen() {
   const { session, restart } = useSession();
   const room = session.answers.room;
@@ -49,7 +56,16 @@ export function ResultScreen() {
 
   const beforeClass = comfortClassFor(sim.before.Rw, sim.before.Lnw);
   const afterClass = comfortClassFor(sim.after.Rw, sim.after.Lnw);
-  const rose = rung(afterClass) > rung(beforeClass);
+  const airBeforeClass = airClassFor(sim.before.Rw);
+  const airAfterClass = airClassFor(sim.after.Rw);
+  const impactBeforeClass = impactClassFor(sim.before.Lnw);
+  const impactAfterClass = impactClassFor(sim.after.Lnw);
+  const hybridRose = rung(afterClass) > rung(beforeClass);
+  const airRose = rung(airAfterClass) > rung(airBeforeClass);
+  const ladderBefore = hybridRose || !airRose ? beforeClass : airBeforeClass;
+  const ladderAfter = hybridRose || !airRose ? afterClass : airAfterClass;
+  const ladderByAir = !hybridRose && airRose;
+  const sameLadderRung = ladderBefore === ladderAfter;
 
   const airBefore = sim.quietAirBefore;
   const airAfter = sim.quietAirAfter;
@@ -87,24 +103,89 @@ export function ResultScreen() {
     >
       <div className={styles.verdict} role="status">
         <p className={styles.oneLiner}>
-          {rose
+          {hybridRose
             ? 'В этой комнате MultiFrame поднимает комфорт на ступень выше.'
-            : 'В этой комнате MultiFrame заметно повышает акустический комфорт.'}
+            : airRose
+              ? `MultiFrame нужен: речь и музыка сверху станут заметно тише (воздух → «${HYBRID_CLASS_LABELS[airAfterClass]}»).`
+              : 'В этой комнате MultiFrame заметно смягчает шум сверху — полный класс СП пока держит удар.'}
         </p>
-        <p className={styles.classShift}>
-          Сейчас: <b>{HYBRID_CLASS_LABELS[beforeClass]}</b>
-          <span className={styles.arrow} aria-hidden>
-            {' → '}
-          </span>
-          с MultiFrame: <b className={styles.accent}>{HYBRID_CLASS_LABELS[afterClass]}</b>
-        </p>
+        {hybridRose ? (
+          <p className={styles.classShift}>
+            Сейчас: <b>{HYBRID_CLASS_LABELS[beforeClass]}</b>
+            <span className={styles.arrow} aria-hidden>
+              {' → '}
+            </span>
+            с MultiFrame: <b className={styles.accent}>{HYBRID_CLASS_LABELS[afterClass]}</b>
+          </p>
+        ) : (
+          <>
+            <p className={styles.classShift}>
+              Полный класс СП: <b>{HYBRID_CLASS_LABELS[beforeClass]}</b>
+              {beforeClass === afterClass
+                ? ' — не меняется, пока удар вне нормы'
+                : (
+                    <>
+                      <span className={styles.arrow} aria-hidden>
+                        {' → '}
+                      </span>
+                      с MultiFrame:{' '}
+                      <b className={styles.accent}>{HYBRID_CLASS_LABELS[afterClass]}</b>
+                    </>
+                  )}
+            </p>
+            <ul className={styles.channels}>
+              <li>
+                <span className={styles.channelName}>Воздух</span>
+                {channelShort(airBeforeClass, 'air')}
+                <span className={styles.arrow} aria-hidden>
+                  {' → '}
+                </span>
+                <b className={airRose ? styles.accent : undefined}>
+                  {channelShort(airAfterClass, 'air')}
+                </b>
+                <span className={styles.channelMeta}>
+                  Rw {sim.before.Rw} → {sim.after.Rw}
+                </span>
+              </li>
+              <li>
+                <span className={styles.channelName}>Удар</span>
+                {channelShort(impactBeforeClass, 'impact')}
+                <span className={styles.arrow} aria-hidden>
+                  {' → '}
+                </span>
+                <b>{channelShort(impactAfterClass, 'impact')}</b>
+                <span className={styles.channelMeta}>
+                  Lnw {sim.before.Lnw} → {sim.after.Lnw}
+                </span>
+              </li>
+            </ul>
+            <p className={styles.channelWhy}>
+              Полный класс СП — это «И» по двум каналам. Сейчас удар Lnw {sim.after.Lnw} при норме
+              В ≤ {NORMS.V.Lnw}: MultiFrame смягчает шаги, но норму по удару чаще закрывает пол у
+              соседа сверху. Без потолка воздух останется слабым — материал как раз про него.
+            </p>
+          </>
+        )}
 
-        <div className={styles.ladder} aria-label="Шкала комфортности помещения">
+        <div
+          className={styles.ladder}
+          aria-label={
+            ladderByAir
+              ? 'Шкала по воздушному шуму'
+              : 'Шкала комфортности помещения (полный класс СП)'
+          }
+        >
           <div className={styles.ladderTrack} aria-hidden />
           {LADDER.map((cls) => {
-            const isBefore = cls === beforeClass;
-            const isAfter = cls === afterClass;
-            const tag = isBefore ? 'Сейчас' : isAfter ? 'MultiFrame' : '';
+            const isBefore = cls === ladderBefore;
+            const isAfter = cls === ladderAfter && !sameLadderRung;
+            const tag = sameLadderRung && isBefore
+              ? 'полный класс'
+              : isBefore
+                ? 'Сейчас'
+                : isAfter
+                  ? 'MultiFrame'
+                  : '';
             return (
               <div
                 key={cls}
@@ -119,6 +200,17 @@ export function ResultScreen() {
             );
           })}
         </div>
+        {ladderByAir ? (
+          <p className={styles.ladderCaption}>
+            Шкала по воздушному шуму. Удар: {channelShort(impactBeforeClass, 'impact')} →{' '}
+            {channelShort(impactAfterClass, 'impact')} — норма СП по удару потолком не закрывается.
+          </p>
+        ) : null}
+        {sameLadderRung && !hybridRose && !airRose ? (
+          <p className={styles.ladderCaption}>
+            Полный класс не сдвигается: удар ещё вне нормы СП. Ниже — насколько станет тише.
+          </p>
+        ) : null}
 
         {roomLabel ? (
           <p className={styles.roomMeta}>
@@ -149,19 +241,25 @@ export function ResultScreen() {
             <tbody>
               {NORM_ROWS.map((r) => {
                 const isBefore = r.cls === beforeClass;
-                const isAfter = r.cls === afterClass;
+                const isAfter = r.cls === afterClass && hybridRose;
+                const isStuck = r.cls === afterClass && !hybridRose;
                 return (
                   <tr
                     key={r.cls}
-                    className={`${isBefore ? styles.rowBefore : ''} ${
+                    className={`${isBefore || isStuck ? styles.rowBefore : ''} ${
                       isAfter ? styles.rowAfter : ''
                     }`}
                   >
                     <td>
                       <span className={styles.rowName}>{LADDER_SHORT[r.cls]}</span>
-                      {isBefore ? <span className={styles.rowTagNow}>сейчас</span> : null}
+                      {isBefore && !isStuck ? (
+                        <span className={styles.rowTagNow}>сейчас</span>
+                      ) : null}
                       {isAfter ? (
                         <span className={styles.rowTagMf}>MultiFrame</span>
+                      ) : null}
+                      {isStuck ? (
+                        <span className={styles.rowTagNow}>полный класс</span>
                       ) : null}
                     </td>
                     <td>
@@ -179,6 +277,9 @@ export function ResultScreen() {
         <p className={styles.tableNote}>
           Категории — СП 51.13330.2011 «Защита от шума», табл. 2 (межквартирные
           перекрытия).
+          {!hybridRose
+            ? ` Полный класс требует и Rw, и Lnw. С MultiFrame воздух ${sim.after.Rw} дБ (${channelShort(airAfterClass, 'air')}), удар ${sim.after.Lnw} дБ — норма В по удару ≤ ${NORMS.V.Lnw}, потолок один её не закрывает.`
+            : ''}
         </p>
       </section>
 
@@ -188,6 +289,7 @@ export function ResultScreen() {
           <ul>
             <li>Соседи сверху слышны слишком отчётливо</li>
             <li>Бытовые звуки сверху легко различить</li>
+            <li>Сейчас: {HYBRID_CLASS_LABELS[beforeClass]}</li>
           </ul>
         </article>
         <article className={`${styles.emotionCard} ${styles.after}`}>
@@ -195,6 +297,13 @@ export function ResultScreen() {
           <ul>
             <li>В комнате заметно спокойнее</li>
             <li>Ударный и воздушный шум воспринимаются мягче</li>
+            <li>
+              {hybridRose
+                ? `С MultiFrame: ${HYBRID_CLASS_LABELS[afterClass]}`
+                : airRose
+                  ? `Воздух → ${HYBRID_CLASS_LABELS[airAfterClass]}; полный класс СП ещё держит удар`
+                  : `Тише по ощущению; полный класс СП ещё держит удар`}
+            </li>
           </ul>
         </article>
       </div>

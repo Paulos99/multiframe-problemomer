@@ -202,6 +202,20 @@ export function classCyr(label: ClassLabel): string {
   return CLASS_CYR[label];
 }
 
+export function airClassFor(Rw: number): ClassLabel {
+  if (Rw >= NORMS.A.Rw) return 'A';
+  if (Rw >= NORMS.B.Rw) return 'B';
+  if (Rw >= NORMS.V.Rw) return 'V';
+  return 'below';
+}
+
+export function impactClassFor(Lnw: number): ClassLabel {
+  if (Lnw <= NORMS.A.Lnw) return 'A';
+  if (Lnw <= NORMS.B.Lnw) return 'B';
+  if (Lnw <= NORMS.V.Lnw) return 'V';
+  return 'below';
+}
+
 export function airChip(side: DerivedSimSide): string {
   if (side.Rw >= NORMS.A.Rw) return CLASS_CYR.A;
   if (side.Rw >= NORMS.B.Rw) return CLASS_CYR.B;
