@@ -21,7 +21,7 @@
 
 .classShift {
   margin: 0;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 550;
   color: var(--text-secondary);
   line-height: 1.4;
@@ -42,27 +42,30 @@
   font-weight: 700;
 }
 
-.channels {
-  list-style: none;
-  margin: 2px 0 0;
-  padding: 0;
+.channelGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 2px 0;
+}
+
+.channelCard {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  padding: 12px 12px 10px;
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
 }
 
-.channels li {
-  margin: 0;
+.channelHead {
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 6px;
-  font-size: 14px;
-  line-height: 1.35;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.channelName {
-  min-width: 4.6em;
+.channelTitle {
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.04em;
@@ -70,13 +73,27 @@
   color: var(--text-secondary);
 }
 
-.channelMeta {
-  font-size: 12px;
+.channelShift {
+  margin: 0;
+  font-size: 14px;
   font-weight: 550;
+  line-height: 1.35;
   color: var(--text-secondary);
 }
 
-.channelWhy,
+.channelShift b {
+  font-weight: 750;
+  color: var(--text-primary);
+}
+
+.channelMeta {
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--text-secondary);
+}
+
+.channelNote,
+.hybridNote,
 .ladderCaption {
   margin: 0;
   font-size: 12px;
@@ -84,20 +101,31 @@
   color: var(--text-secondary);
 }
 
+.hybridNote b {
+  font-weight: 750;
+  color: var(--text-primary);
+}
+
+@media (max-width: 640px) {
+  .channelGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Comfort ladder: worst → best, reads as climbing up */
 .ladder {
   position: relative;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
-  margin: 4px 0 2px;
+  gap: 4px;
+  margin: 0;
 }
 
 .ladderTrack {
   position: absolute;
   left: 12.5%;
   right: 12.5%;
-  top: 25px;
+  top: 22px;
   height: 3px;
   border-radius: 999px;
   background: var(--border-color);
@@ -107,54 +135,58 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   text-align: center;
 }
 
 .rungTag {
-  min-height: 14px;
-  font-size: 10px;
+  min-height: 12px;
+  font-size: 9px;
   font-weight: 800;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   color: transparent;
+  white-space: nowrap;
 }
 
 .rungBefore .rungTag {
   color: #7a8790;
 }
 
-.rungAfter .rungTag {
+.rungAfter .rungTag,
+.rungBoth .rungTag {
   color: var(--accent-color);
 }
 
 .rungDot {
   position: relative;
   z-index: 1;
-  width: 13px;
-  height: 13px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
   background: var(--border-color);
 }
 
 .rungBefore .rungDot {
   background: #7a8790;
-  box-shadow: 0 0 0 4px rgba(122, 135, 144, 0.22);
+  box-shadow: 0 0 0 3px rgba(122, 135, 144, 0.22);
 }
 
-.rungAfter .rungDot {
+.rungAfter .rungDot,
+.rungBoth .rungDot {
   background: var(--accent-color);
-  box-shadow: 0 0 0 4px var(--accent-soft);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .rungName {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 650;
-  line-height: 1.2;
+  line-height: 1.15;
   color: var(--text-secondary);
 }
 
-.rungAfter .rungName {
+.rungAfter .rungName,
+.rungBoth .rungName {
   color: var(--accent-color);
   font-weight: 750;
 }
@@ -250,11 +282,19 @@
 }
 
 .rowBefore {
-  background: rgba(122, 135, 144, 0.12);
+  background: rgba(122, 135, 144, 0.1);
 }
 
 .rowAfter {
   background: var(--accent-soft);
+}
+
+.rowHit.rowBefore.rowAfter {
+  background: linear-gradient(
+    90deg,
+    rgba(122, 135, 144, 0.1) 0%,
+    var(--accent-soft) 100%
+  );
 }
 
 .rowAfter .rowName {
@@ -264,10 +304,10 @@
 .rowTagNow,
 .rowTagMf {
   display: inline-block;
-  margin-left: 8px;
-  padding: 1px 8px;
+  margin-left: 6px;
+  padding: 1px 7px;
   border-radius: var(--radius-pill);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.02em;
   text-transform: uppercase;

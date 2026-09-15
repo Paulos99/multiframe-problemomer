@@ -203,7 +203,7 @@ A capability with no row is `absent` by default. The State column always holds o
 | SimCompare effect UI | included | Quietness bars + large Δ; frequency isolation charts secondary on Result. Hybrid class primary; no `Тихо/Терпимо/Мешает`; pre_lab badge. |
 | marketing_placeholder Δ model | included | Frequency-shaped MultiFrame Δ (`pre_lab`): ΔRw typically 8…12, ΔLnw 4…9 (2…4 with floating floor); range from the room model. Never claim lab guarantees. |
 | Two-layer acoustic model | included | Construction (Trofimov + mass/coincidence/ПК/wood/flanking/floor ΔLn(f) → Rw/Lnw + charts) vs receiving room (L1−R+S/A, A-weighted). Anchors: bare 180=54/76, ПК 220=52/74. |
-| Trofimov-style comfort classes A/B/V | included | Canon A\|B\|V; UI Cyrillic А\|Б\|В; partial/below statuses. Never promise full Lnw norm from ceiling alone. |
+| Trofimov-style comfort classes A/B/V | included | Canon A\|B\|V; UI Cyrillic А\|Б\|В. Result shows **independent** air (Rw) and impact (Lnw) levels; full hybrid SP class is secondary. Never promise full Lnw norm from ceiling alone. |
 | Case-specific audio (air / impact / mixed) | included | Locked examples; After cuts level + frequencies from room Δ; mixed = blend; show ≈%; `pre_lab`. |
 | Calculator CTA handoff | included | Opens calculator with `area`, `roomType` (no scenarios). |
 | Consultation / selection lead | available | UI: `Запросить консультацию или подбор` · `Заявка на консультацию` · `Разберём ваш случай, подберём материал.` Delivery may stub until real endpoint; no invented StP CRM. |
