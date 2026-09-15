@@ -1,39 +1,42 @@
 import type { AudioPair } from '../state/types';
 
-/** Fixed household demo set — one До/После per noise type (air / impact / mixed). */
+const base = import.meta.env.BASE_URL;
+
+/** Real household stems in `public/audio/` — same file for До/После; After is processed. */
 export const DEMO_AUDIO_PAIRS: AudioPair[] = [
   {
     id: 'air_talk',
-    label: 'Громкие разговоры и музыка',
+    label: 'Громкие разговоры',
     group: 'air',
     beforeLabel: 'До',
     afterLabel: 'После',
-    beforeSrc: 'stub:before:talk',
-    afterSrc: 'stub:after:talk',
+    beforeSrc: `${base}audio/talk.mp3`,
+    afterSrc: `${base}audio/talk.mp3`,
   },
   {
-    id: 'impact_steps',
-    label: 'Шаги и детский бег',
+    id: 'impact_stomp',
+    label: 'Топот и шаги',
     group: 'impact',
     beforeLabel: 'До',
     afterLabel: 'После',
-    beforeSrc: 'stub:before:steps',
-    afterSrc: 'stub:after:steps',
+    beforeSrc: `${base}audio/stomp.mp3`,
+    afterSrc: `${base}audio/stomp.mp3`,
   },
   {
-    id: 'mixed_appliance',
-    label: 'Бытовая техника',
+    id: 'mixed_vacuum',
+    label: 'Пылесос',
     group: 'mixed',
     beforeLabel: 'До',
     afterLabel: 'После',
-    beforeSrc: 'stub:before:steps',
-    afterSrc: 'stub:after:talk',
+    beforeSrc: `${base}audio/vacuum.mp3`,
+    afterSrc: `${base}audio/vacuum.mp3`,
   },
 ];
 
 export type StubKind = 'before' | 'after';
 export type StubScene = 'steps' | 'talk';
 
+/** Legacy stub URLs — kept so old sessions / tests still parse. */
 export function parseStubSrc(src: string): { kind: StubKind; scene: StubScene } | null {
   if (!src.startsWith('stub:')) return null;
   const parts = src.split(':');

@@ -149,6 +149,13 @@
   color: var(--text-secondary);
 }
 
+.disclaimer {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
 @media (max-width: 380px) {
   .controls {
     grid-template-columns: 1fr;

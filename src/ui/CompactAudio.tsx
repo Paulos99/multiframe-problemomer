@@ -74,7 +74,13 @@ export function CompactAudio({ pairs, sim }: Props) {
                         }
                         onClick={() => {
                           if (beforeOn) stop();
-                          else void play(beforeId, pair.beforeSrc);
+                          else
+                            void play(beforeId, pair.beforeSrc, {
+                              side: 'before',
+                              group: pair.group,
+                              deltaRw: sim.delta.Rw,
+                              deltaLnw: Math.abs(sim.delta.Lnw),
+                            });
                         }}
                       >
                         <PlayIcon playing={beforeOn} />
@@ -96,7 +102,13 @@ export function CompactAudio({ pairs, sim }: Props) {
                         }
                         onClick={() => {
                           if (afterOn) stop();
-                          else void play(afterId, pair.afterSrc);
+                          else
+                            void play(afterId, pair.afterSrc, {
+                              side: 'after',
+                              group: pair.group,
+                              deltaRw: sim.delta.Rw,
+                              deltaLnw: Math.abs(sim.delta.Lnw),
+                            });
                         }}
                       >
                         <PlayIcon playing={afterOn} />
@@ -117,6 +129,10 @@ export function CompactAudio({ pairs, sim }: Props) {
       })}
 
       <p className={styles.footnote}>{LOG_DB_FOOTNOTE}</p>
+      <p className={styles.disclaimer}>
+        Аудио — иллюстрация эффекта модели для этой комнаты, не лабораторный замер.
+        Срезаются громкость и частоты по ориентиру MultiFrame.
+      </p>
     </section>
   );
 }

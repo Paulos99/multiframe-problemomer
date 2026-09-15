@@ -92,6 +92,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-15 | Result fallback when hybrid class does **not** move (impact still > V): do not present `Дискомфорт → Дискомфорт` as “MultiFrame does nothing”. Keep locked L1 + class-shift only when hybrid rises. Otherwise show **air / impact channels** (Rw/Lnw + channel class), explain that full SP class needs both and ceiling alone does not close Lnw ≤ 60. Ladder may follow **air** if air rose. |
 | 2026-09-15 | **Independent channel comfort:** Result always shows separate air (Rw) and impact (Lnw) comfort levels + ladders. Full SP hybrid class is secondary footnote only. Norm table tags sit in Rw / Lnw columns separately. |
 | 2026-09-15 | **In-situ baseline realism:** product «сейчас» is not Trofimov lab Rw. Stronger flanking (panel/unknown mass stock), drum −2 Rw, ordinary floor no +1 Rw, universal leak −2 Rw. Lab fixtures unchanged (180=54/76). |
+| 2026-09-15 | **Real audio stems:** До/После use `public/audio/` MP3 (разговор / топот / пылесос). After = Web Audio level+EQ from this room’s ΔRw/ΔLnw, not a second file. |
 
 ---
 
@@ -500,7 +501,7 @@ None.
 - **Log education (required):** visible footnote that dB is logarithmic — small dB numbers = large sensation change; example `64 → 56` is substantial, not “a few percent”.
 - **Impact honesty:** ceiling softens impact; floating floor above often needed for norm — visible near impact (and mixed if impact-heavy).
 - **Labeling:** keep `ориентир` / `pre_lab` — not lab measurement; drop old «контраст усилен для показа» as the *primary* promise.
-- Mode may stay Web Audio / stubs until real stems exist; behavior must follow rules above.
+- Mode: real MP3 stems in `public/audio/`; After processing via Web Audio (level + EQ from room Δ). Legacy `stub:` synth kept as fallback only.
 
 ### Validation messages
 

@@ -56,7 +56,7 @@ Live context (do not redesign from this URL alone): https://paulos99.github.io/m
 | Before/After bullet copy (confirmed 2026-09-13) | До: `Соседи сверху слышны слишком отчётливо` · `Бытовые звуки сверху легко различить` · `Сейчас: {класс}`. После: `В комнате заметно спокойнее` · `Ударный и воздушный шум воспринимаются мягче` · `С MultiFrame: {класс}`. |
 | Before/After chrome (confirmed 2026-09-13; copy 2026-09-14) | Subtitle **S3:** `Как меняется комфорт комнаты с MultiFrame`. Numbers **N3:** `Оценка в цифрах`. Honesty **H3b:** `Цифры — ориентир, не лабораторный замер. Потолок смягчает удары сверху, а норму по удару часто закрывает пол у соседа.` |
 | Audio concept (confirmed 2026-09-13) | UI-группы: **воздух · удар · смешанный** (физика Rw/Lnw). «После» = снижение **под этот кейс**: **громкость + частоты**; % из Δ комнаты (`pre_lab`). |
-| Audio examples (confirmed 2026-09-13) | Воздух: `Лай собаки` · `Музыка` · `Громкие разговоры`. Удар: `Детский бег` · `Перестановка мебели` · `Цоканье когтей собаки`. Смешанный: `Стиральная машина` · `Пылесос`. |
+| Audio examples (confirmed 2026-09-13) | Воздух: `Лай собаки` · `Музыка` · `Громкие разговоры`. Удар: `Детский бег` · `Перестановка мебели` · `Цоканье когтей собаки`. Смешанный: `Стиральная машина` · `Пылесос`. **MVP stems (2026-09-15):** разговор · топот · пылесос (`public/audio/*.mp3`); After = Web Audio cut by room Δ. |
 | Audio reduction UI (confirmed 2026-09-13) | **C:** `≈ −{n}%` **+** Δ (`ориентир −8 дБ`). % = восприятие, не линейный Δ/уровень. Сноска **F2b:** `Шкала дБ логарифмическая: −8 дБ ≈ вдвое тише по ощущению.` |
 | Audio chrome (confirmed 2026-09-13) | Title **T1:** `Услышать разницу`. Subtitle **S6:** `Сравните звук обычного потолка и потолка с MultiFrame`. Buttons **B2:** `До` · `После`. Sticky **N3:** `Смотреть итог`. |
 | Object stage (confirmed 2026-09-13) | `Новостройка / до заселения` · `Идёт ремонт` · `Уже живут` · `Не знаю`. |
@@ -121,7 +121,7 @@ Product capabilities that **are** in the first version (not listed as vibe templ
 
 ## 5. Files, images, and media
 
-No user uploads in MVP. Audio is generated in-browser (Web Audio demo stubs), not uploaded.
+No user uploads in MVP. Audio uses locked household MP3 stems (`public/audio/`); After is processed in-browser from the room Δ (not a second recording).
 
 | Question                                                                                      | Answer |
 | --------------------------------------------------------------------------------------------- | ------ |
@@ -174,7 +174,7 @@ Engineering decisions already made / owned by the agent (product terms):
 - **Surface:** one public Vite + React + TypeScript SPA (`webapp`). No separate SEO `website`, no backend microservices.
 - **Stack (recorded, do not reopen):** Vite + React SPA, client session state, GitHub Actions → GitHub Pages. No microservices.
 - **Effect model:** two layers — construction R(f)/Rw/Lnw from Trofimov + physics (mass, coincidence, ПК voids, wood, house flanking, floor ΔLn(f)); in-room A-weighted level from L1(f)−R(f)+10log(S/A) (neighbors, room type, area, furnishing). **Product «сейчас» = in-situ** (flanking + leak + drum), not lab Trofimov Rw; lab fixtures stay 180=54/76. MultiFrame Δ is invented frequency-shaped (`source: marketing_placeholder`, `disclaimer: pre_lab`): typical ΔRw 8…12, ΔLnw 4…9 (2…4 if floating floor). Neighbors do not change Rw. Ceiling alone never takes Lnw to class A. Classes **A/B/V** (UI А/Б/В) unchanged.
-- **Audio:** groups воздух / удар / смешанный; locked stubs; After = case Δ (level + EQ); mixed blends both; ≈% from room model; `pre_lab` / ориентир.
+- **Audio:** groups воздух / удар / смешанный; real MP3 stems (talk/stomp/vacuum); After = case Δ (level + EQ); mixed blends both; ≈% from room model; `pre_lab` / ориентир.
 - **CTA:** deep-link to MultiFRAME calculator with query payload; lead = consultation/selection request (MVP may stub delivery — never invent a corporate CRM endpoint).
 - **Mobile:** denser inputs + sticky progress/CTA; touch targets ≥44px; no tech dumps.
 - **Out of scope code paths:** walls, partitions, floors systems, Polyblock, framed systems — do not add.
@@ -204,7 +204,7 @@ A capability with no row is `absent` by default. The State column always holds o
 | marketing_placeholder Δ model | included | Frequency-shaped MultiFrame Δ (`pre_lab`): ΔRw typically 8…12, ΔLnw 4…9 (2…4 with floating floor); range from the room model. Never claim lab guarantees. |
 | Two-layer acoustic model | included | Construction (Trofimov + mass/coincidence/ПК/wood/flanking/floor ΔLn(f) → Rw/Lnw + charts) vs receiving room (L1−R+S/A, A-weighted). Lab anchors: bare 180=54/76, ПК 220=52/74. Product in-situ «сейчас» typically Rw ~44–48 (panel/unknown), air often вне нормы. |
 | Trofimov-style comfort classes A/B/V | included | Canon A\|B\|V; UI Cyrillic А\|Б\|В. Result shows **independent** air (Rw) and impact (Lnw) levels; full hybrid SP class is secondary. Never promise full Lnw norm from ceiling alone. |
-| Case-specific audio (air / impact / mixed) | included | Locked examples; After cuts level + frequencies from room Δ; mixed = blend; show ≈%; `pre_lab`. |
+| Case-specific audio (air / impact / mixed) | included | Stems in `public/audio/`; After cuts level + frequencies from room Δ; mixed = blend; show ≈%; `pre_lab`. |
 | Calculator CTA handoff | included | Opens calculator with `area`, `roomType` (no scenarios). |
 | Consultation / selection lead | available | UI: `Запросить консультацию или подбор` · `Заявка на консультацию` · `Разберём ваш случай, подберём материал.` Delivery may stub until real endpoint; no invented StP CRM. |
 | Sticky mobile chrome | included | Header + progress + sticky Далее/CTA; denser cards on narrow viewports. |

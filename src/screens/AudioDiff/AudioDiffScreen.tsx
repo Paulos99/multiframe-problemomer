@@ -155,7 +155,13 @@ export function AudioDiffScreen() {
                       }
                       onToggle={() => {
                         if (beforeOn) stop();
-                        else void play(beforeId, pair.beforeSrc);
+                        else
+                          void play(beforeId, pair.beforeSrc, {
+                            side: 'before',
+                            group: pair.group,
+                            deltaRw: sim.delta.Rw,
+                            deltaLnw: Math.abs(sim.delta.Lnw),
+                          });
                       }}
                     />
                     <SideButton
@@ -171,7 +177,13 @@ export function AudioDiffScreen() {
                       }
                       onToggle={() => {
                         if (afterOn) stop();
-                        else void play(afterId, pair.afterSrc);
+                        else
+                          void play(afterId, pair.afterSrc, {
+                            side: 'after',
+                            group: pair.group,
+                            deltaRw: sim.delta.Rw,
+                            deltaLnw: Math.abs(sim.delta.Lnw),
+                          });
                       }}
                     />
                   </div>

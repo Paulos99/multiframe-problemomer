@@ -25,7 +25,7 @@ function defaultRoom() {
 
 export function createInitialSession(): SessionState {
   const audio: AudioState = {
-    mode: 'demo_stub',
+    mode: 'mapped',
     pairs: DEMO_AUDIO_PAIRS,
     demoSet: true,
   };
@@ -82,7 +82,7 @@ export function withDerived(session: SessionState): SessionState {
     derived,
     cta: buildCta(session),
     audio: {
-      mode: 'demo_stub',
+      mode: 'mapped',
       pairs: DEMO_AUDIO_PAIRS,
       demoSet: true,
     },
