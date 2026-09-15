@@ -18,14 +18,11 @@ function PlayIcon({ playing }: { playing: boolean }) {
 function reductionLine(group: AudioPair['group'], sim: DerivedSimulation): string {
   const airPct = sim.perceivedAirPct;
   const impactPct = sim.perceivedImpactPct;
-  const airDb = Math.abs(sim.delta.Rw);
-  const impactDb = Math.abs(sim.delta.Lnw);
 
-  if (group === 'air') return `≈ −${airPct}% · −${airDb} дБ`;
-  if (group === 'impact') return `≈ −${impactPct}% · −${impactDb} дБ`;
+  if (group === 'air') return `≈ на ${airPct}% тише`;
+  if (group === 'impact') return `≈ на ${impactPct}% тише`;
   const pct = Math.round((airPct + impactPct) / 2);
-  const db = Math.round((airDb + impactDb) / 2);
-  return `≈ −${pct}% · −${db} дБ`;
+  return `≈ на ${pct}% тише`;
 }
 
 const GROUPS: Array<AudioPair['group']> = ['air', 'impact', 'mixed'];

@@ -78,10 +78,13 @@
 }
 
 .themeIcon {
-  font-size: 15px;
-  line-height: 1;
-  font-weight: 800;
+  display: grid;
+  place-items: center;
   color: var(--text-primary);
+}
+
+.themeIcon svg {
+  display: block;
 }
 
 @media (max-width: 420px) {

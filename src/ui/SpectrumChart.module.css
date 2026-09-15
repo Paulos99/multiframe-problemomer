@@ -1,0 +1,101 @@
+.wrap {
+  margin: 0;
+  padding: 10px 10px 8px;
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wrap figcaption {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.wrap figcaption strong {
+  font-size: 13px;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+
+.wrap figcaption span {
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--text-secondary);
+}
+
+.svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.grid {
+  stroke: var(--border-color);
+  stroke-width: 1;
+}
+
+.tick {
+  fill: var(--text-secondary);
+  font-size: 9px;
+}
+
+.axisLabel {
+  fill: var(--text-secondary);
+  font-size: 9px;
+}
+
+.gain {
+  fill: var(--accent-color);
+  opacity: 0.18;
+}
+
+.before {
+  stroke: #7a8790;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.after {
+  stroke: var(--accent-color);
+  stroke-width: 2.4;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.legend {
+  margin: 0;
+  padding: 0 2px 2px;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatchBefore,
+.swatchAfter {
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.swatchBefore {
+  background: #7a8790;
+}
+
+.swatchAfter {
+  background: var(--accent-color);
+}

@@ -35,25 +35,25 @@ Live context (do not redesign from this URL alone): https://paulos99.github.io/m
 | What is the first user journey that must work end to end? | `для себя`/`для клиента` → комната → итог (карточки + компактное аудио + buy-case + CTA). **Без** отдельных экранов Сравнение / Звук и без опроса сценариев. |
 | Result evidence depth (confirmed 2026-09-12) | **Показать всё**, аргументированно, понятно, персонально: **цифры + классы А/Б/В + графики + пояснения к ним**. Не выбирать «только ощущение» или «только цифры». Честная рамка pre_lab / marketing_placeholder сохраняется — это ориентиры под комнату, не лаб-сертификат. |
 | Evidence presentation Q4 (confirmed 2026-09-12) | **Всё сразу** на одном скролле: **сверху вывод**, ниже детальные данные. Менеджер и пользователь сами смотрят нужный слой. Не progressive disclosure и не урезание пакета по роли. |
-| Charts (confirmed 2026-09-13) | **C — оба:** сверху шкала классов комфорта А→Б→В (куда сдвинемся), ниже столбцы до/после с ориентирами ΔRw / ΔLnw. Без частотного спектра в MVP. Подписи + рамка pre_lab обязательны. |
+| Charts (confirmed 2026-09-13; spectrum restored 2026-09-14) | Шкала А→Б→В сверху; крупные Δ Rw / Δ Lnw + полосы «тише»; **частотные графики изоляции** (форма zamer_graph) ниже как вторичное доказательство. Обе кривые — изоляция, выше = тише. Подписи + pre_lab. |
 | Result trust pack (confirmed 2026-09-14) | Крупно показать **Δ Rw** и **Δ удар (Lnw)**; **частотные графики** Rw/изоляция по Гц по форме замеров (реф. zamer_graph); **2** понятных преимущества клиенту; ясно, что **класс комфорта растёт** по официальной шкале. Не вырезать доверие ради «пустоты». |
 | Numbers policy (confirmed 2026-09-13) | **Показываем полные числа сейчас** как рабочую модель эффекта MultiFrame — пока **неподтверждённые** (`pre_lab` / `marketing_placeholder`). После техподтверждения **заменим** на корректные. Не прятать цифры в MVP. Не выдавать за лаб-гарантию. |
 | MultiFrame features (presentation 2026-09-13 + stp-multiframe.ru) | Эффект барабана под натяжным → MultiFrame рассеивает; до ~17 дБ; AEROCELL / перфорация / SmartLock / шип-паз; Flat+Wave; для клиента монтаж = «быстро, без долгой стройки» (не техника крепежа/коммуникаций); потолок+стены; эко/сертификаты; патент. UI: **понятно + аргументированно** (тезис + короткое почему/как), не голые слоганы и не техдамп; **без** «за что платим». Источник: `docs/sources/06-multiframe-presentation.pdf`. |
 | Norm footnote (confirmed 2026-09-13) | Под сдвигом класса: `Ориентир по шкале комфортности (норм. документы)`. |
 | Class shift verdict line (confirmed 2026-09-13) | Формат: `Сейчас: {класс} → с MultiFrame: {класс}` (пример: `Сейчас: Дискомфорт → с MultiFrame: Комфорт (Б)`). |
 | Result one-liner (confirmed 2026-09-13) | **L1:** `В этой комнате MultiFrame поднимает комфорт на ступень выше.` — рядом со строкой класса; одна фраза для всех путей. |
-| Result chrome (confirmed 2026-09-13) | Title: `Акустический профиль`. Subtitle **R1:** `Ориентир комфорта для вашей комнаты и следующий шаг к расчёту`. |
+| Result chrome (confirmed 2026-09-13; title 2026-09-14) | Title: `Акустический профиль помещения`. Subtitle **R1:** `Ориентир комфорта для вашей комнаты и следующий шаг к расчёту`. |
 | Result summary cards (confirmed 2026-09-13) | **A:** те же 2 фразы + класс, что на Before/After. До: `Соседи сверху слышны слишком отчётливо` · `Бытовые звуки сверху легко различить` · `Сейчас: {класс}`. После: `В комнате заметно спокойнее` · `Ударный и воздушный шум воспринимаются мягче` · `С MultiFrame: {класс}`. Без старых «тип шума» / «вдвое спокойнее» chips. |
 | Comfort class labels (confirmed 2026-09-13) | UI: `Высокий комфорт (А)` · `Комфорт (Б)` · `Допустимый (В)` · **`Дискомфорт`** (когда даже до В не дотягивает — часто). Мягкая отсылка к нормативному документу. А — верх шкалы, не «эконом». |
 | Slab thickness ranges (confirmed 2026-09-13) | `До ~160 мм` · `Около 160–200 мм` · `Около 200–250 мм` · `Толще ~250 мм` · `Не знаю`. В модели — mid ASSUMPTION. |
 | Slab type ≠ thickness (confirmed 2026-09-13) | Тип и толщина — **два пункта**, не матрица. Толщина — **разбросы** (`До ~160` · `160–200` · `200–250` · `Толще ~250` · `Не знаю`), не точечные мм. |
 | Planned ceiling (confirmed 2026-09-13) | `Планируем натяжной` · `Потолок уже есть` · `Не знаю` (вариант B, без строительного жаргона). |
-| Noisy neighbors (confirmed 2026-09-13) | `Не знаю` · `Обычно тихо` · `Сверху бывает шумно` (вариант B — мягче, не «шумные соседи»). Не опрос «мешает ли». |
+| Noisy neighbors (confirmed 2026-09-13; +часто 2026-09-14) | `Не знаю` · `Обычно тихо` · `Сверху бывает шумно` · `Сверху часто шумно`. Не опрос «мешает ли». |
 | Before/After «До» comfort (confirmed 2026-09-13) | В буллете карточки «Сейчас типично» — **гибридный класс из модели** (вариант A): `Сейчас: Дискомфорт` / `Допустимый (В)` / `Комфорт (Б)` / `Высокий комфорт (А)`. Не `Тихо/Терпимо/Мешает`. |
 | Before/After «После» comfort (confirmed 2026-09-13) | Симметрично: последний буллет `С MultiFrame: {hybrid class}`. Старые chips `Тихо/Терпимо/Мешает` и прежние эмоциональные буллеты Before/After — **устарели**; пишем заново. |
 | Before/After bullet frame (confirmed 2026-09-13) | Вариант A: **2 фразы + класс** в каждой карточке. Не одна фраза и не «только класс». |
 | Before/After bullet copy (confirmed 2026-09-13) | До: `Соседи сверху слышны слишком отчётливо` · `Бытовые звуки сверху легко различить` · `Сейчас: {класс}`. После: `В комнате заметно спокойнее` · `Ударный и воздушный шум воспринимаются мягче` · `С MultiFrame: {класс}`. |
-| Before/After chrome (confirmed 2026-09-13) | Subtitle **S3:** `Как меняется комфорт комнаты с MultiFrame`. Numbers **N3:** `Оценка в цифрах`. Honesty **H3b:** `Цифры — ориентир до лабораторных данных. Ударный шум потолком становится мягче; пол сверху часто дополняет результат.` |
+| Before/After chrome (confirmed 2026-09-13; copy 2026-09-14) | Subtitle **S3:** `Как меняется комфорт комнаты с MultiFrame`. Numbers **N3:** `Оценка в цифрах`. Honesty **H3b:** `Цифры — ориентир, не лабораторный замер. Потолок смягчает удары сверху, а норму по удару часто закрывает пол у соседа.` |
 | Audio concept (confirmed 2026-09-13) | UI-группы: **воздух · удар · смешанный** (физика Rw/Lnw). «После» = снижение **под этот кейс**: **громкость + частоты**; % из Δ комнаты (`pre_lab`). |
 | Audio examples (confirmed 2026-09-13) | Воздух: `Лай собаки` · `Музыка` · `Громкие разговоры`. Удар: `Детский бег` · `Перестановка мебели` · `Цоканье когтей собаки`. Смешанный: `Стиральная машина` · `Пылесос`. |
 | Audio reduction UI (confirmed 2026-09-13) | **C:** `≈ −{n}%` **+** Δ (`ориентир −8 дБ`). % = восприятие, не линейный Δ/уровень. Сноска **F2b:** `Шкала дБ логарифмическая: −8 дБ ≈ вдвое тише по ощущению.` |
@@ -172,7 +172,7 @@ Engineering decisions already made / owned by the agent (product terms):
 
 - **Surface:** one public Vite + React + TypeScript SPA (`webapp`). No separate SEO `website`, no backend microservices.
 - **Stack (recorded, do not reopen):** Vite + React SPA, client session state, GitHub Actions → GitHub Pages. No microservices.
-- **Effect model:** `source: marketing_placeholder`, center ΔRw **+10** (UI range 8–12), ΔLnw **−8** (UI range 6–10), classes **A/B/V** (UI Cyrillic А/Б/В) from Trofimov-style comfort grading; always `pre_lab` / expert disclaimers.
+- **Effect model:** two layers — construction R(f)/Rw/Lnw from Trofimov + physics (mass, coincidence, ПК voids, wood, house flanking, floor ΔLn(f)); in-room A-weighted level from L1(f)−R(f)+10log(S/A) (neighbors, room type, area, furnishing). MultiFrame Δ is invented frequency-shaped (`source: marketing_placeholder`, `disclaimer: pre_lab`): typical ΔRw 8…12, ΔLnw 4…9 (2…4 if floating floor). Neighbors do not change Rw. Ceiling alone never takes Lnw to class A. Classes **A/B/V** (UI А/Б/В) unchanged.
 - **Audio:** groups воздух / удар / смешанный; locked stubs; After = case Δ (level + EQ); mixed blends both; ≈% from room model; `pre_lab` / ориентир.
 - **CTA:** deep-link to MultiFRAME calculator with query payload; lead = consultation/selection request (MVP may stub delivery — never invent a corporate CRM endpoint).
 - **Mobile:** denser inputs + sticky progress/CTA; touch targets ≥44px; no tech dumps.
@@ -198,9 +198,10 @@ A capability with no row is `absent` by default. The State column always holds o
 | Room + optional slab input | included | Room type, area m², optional slab key (default solid 180 mm). |
 | Noise scenario multi-select | removed | Owner 2026-09-13: do not quiz «что мешает». |
 | Current comfort + noise type | removed | Owner 2026-09-13: no complaint quiz; class from model. |
-| Emotional before/after contrast | included | Hybrid class on both cards + top verdict; emotional bullets rewritten from scratch (old copy obsolete). |
-| SimCompare effect UI | included | Hybrid class primary; no `Тихо/Терпимо/Мешает`; Rw/Lnw tertiary; pre_lab badge. |
-| marketing_placeholder Δ model | included | ΔRw +10 (range 8–12), ΔLnw −8 (range 6–10); `source: marketing_placeholder`; `disclaimer: pre_lab`. Never claim lab guarantees. |
+| Emotional before/after contrast | included | Feeling bullets on Result cards; hybrid class lives on verdict + ladder + SP table (not repeated in cards). |
+| SimCompare effect UI | included | Quietness bars + large Δ; frequency isolation charts secondary on Result. Hybrid class primary; no `Тихо/Терпимо/Мешает`; pre_lab badge. |
+| marketing_placeholder Δ model | included | Frequency-shaped MultiFrame Δ (`pre_lab`): ΔRw typically 8…12, ΔLnw 4…9 (2…4 with floating floor); range from the room model. Never claim lab guarantees. |
+| Two-layer acoustic model | included | Construction (Trofimov + mass/coincidence/ПК/wood/flanking/floor ΔLn(f) → Rw/Lnw + charts) vs receiving room (L1−R+S/A, A-weighted). Anchors: bare 180=54/76, ПК 220=52/74. |
 | Trofimov-style comfort classes A/B/V | included | Canon A\|B\|V; UI Cyrillic А\|Б\|В; partial/below statuses. Never promise full Lnw norm from ceiling alone. |
 | Case-specific audio (air / impact / mixed) | included | Locked examples; After cuts level + frequencies from room Δ; mixed = blend; show ≈%; `pre_lab`. |
 | Calculator CTA handoff | included | Opens calculator with `area`, `roomType` (no scenarios). |

@@ -36,7 +36,7 @@ export type ObjectStageOption = 'newbuild' | 'renovation' | 'occupied' | 'unknow
 
 export type PlannedCeilingOption = 'stretch_planned' | 'ceiling_exists' | 'unknown';
 
-export type NoisyNeighborsOption = 'unknown' | 'usually_quiet' | 'sometimes_noisy';
+export type NoisyNeighborsOption = 'unknown' | 'usually_quiet' | 'sometimes_noisy' | 'often_noisy';
 
 /** Legacy noise tags — still used for audio demo grouping, not a survey */
 export type NoiseScenario =
@@ -92,6 +92,14 @@ export interface DerivedSimSide {
   label?: string;
 }
 
+export interface SpectrumSeries {
+  hz: readonly number[];
+  before: number[];
+  after: number[];
+  /** Mean uplift shown on the curve (matches model Δ center) */
+  targetDelta: number;
+}
+
 export interface DerivedSimulation {
   before: DerivedSimSide;
   after: DerivedSimSide;
@@ -105,9 +113,18 @@ export interface DerivedSimulation {
   feelingBefore: ComfortLevel;
   feelingAfter: ComfortLevel;
   honestLines: string[];
-  /** Perceived loudness reduction % from Δ (log map, not linear) */
+  /** Perceived loudness reduction % from received Δ (log map, not linear) */
   perceivedAirPct: number;
   perceivedImpactPct: number;
+  /** Construction spectra for Result charts (isolation, higher = quieter). */
+  airSpectrum: SpectrumSeries;
+  impactSpectrum: SpectrumSeries;
+  quietAirBefore: number;
+  quietAirAfter: number;
+  quietImpactBefore: number;
+  quietImpactAfter: number;
+  receivedAirDb: { before: number; after: number };
+  receivedImpactDb: { before: number; after: number };
 }
 
 export interface DerivedProfile {
@@ -226,6 +243,7 @@ export const NOISY_NEIGHBORS_OPTIONS: { id: NoisyNeighborsOption; label: string 
   { id: 'unknown', label: 'Не знаю' },
   { id: 'usually_quiet', label: 'Обычно тихо' },
   { id: 'sometimes_noisy', label: 'Сверху бывает шумно' },
+  { id: 'often_noisy', label: 'Сверху часто шумно' },
 ];
 
 /** Hybrid comfort class labels (UI) */
@@ -244,7 +262,7 @@ export const DISCLAIMER_EXPERT =
 export const SIMULATION_BADGE = 'Оценка до лабораторных данных';
 
 export const DISCLAIMER_SIMULATION =
-  'Цифры — ориентир до лабораторных данных. Ударный шум потолком становится мягче; пол сверху часто дополняет результат.';
+  'Цифры — ориентир, не лабораторный замер. Потолок смягчает удары сверху, а норму по удару часто закрывает пол у соседа.';
 
 export const NORM_FOOTNOTE = 'Ориентир по шкале комфортности (норм. документы)';
 

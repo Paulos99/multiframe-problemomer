@@ -7,6 +7,7 @@ export function Screen({
   children,
   hero,
   stickyHead,
+  dense,
 }: {
   title?: string;
   subtitle?: string;
@@ -14,9 +15,13 @@ export function Screen({
   hero?: boolean;
   /** Keep question header visible while scrolling options (mobile input steps) */
   stickyHead?: boolean;
+  /** Tighter vertical rhythm (Result evidence pack) */
+  dense?: boolean;
 }) {
   return (
-    <section className={`${styles.screen} ${hero ? styles.hero : ''}`}>
+    <section
+      className={`${styles.screen} ${hero ? styles.hero : ''} ${dense ? styles.dense : ''}`}
+    >
       {title ? (
         <header className={`${styles.head} ${stickyHead ? styles.headSticky : ''}`}>
           <h1>{title}</h1>

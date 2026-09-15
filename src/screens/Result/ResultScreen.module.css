@@ -157,7 +157,7 @@
 
 .normTable th,
 .normTable td {
-  padding: 9px 12px;
+  padding: 7px 10px;
   text-align: left;
   border-bottom: 1px solid var(--border-color);
 }
@@ -261,8 +261,8 @@
 }
 
 .emotionCard {
-  padding: 14px;
-  border-radius: var(--radius-lg);
+  padding: 12px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow);
 }
@@ -299,11 +299,11 @@
 }
 
 .emotionCard ul {
-  margin: 10px 0 0;
+  margin: 8px 0 0;
   padding: 0;
   list-style: none;
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .emotionCard li {
@@ -327,15 +327,6 @@
 
 .after li::before {
   background: var(--accent-color);
-}
-
-.cardClass {
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.after .cardClass {
-  color: var(--accent-color);
 }
 
 /* «Насколько станет тише» — both channels grow toward calm */
@@ -363,12 +354,73 @@
   color: var(--text-secondary);
 }
 
+.deltaGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+@media (max-width: 520px) {
+  .deltaGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.deltaCard {
+  padding: 12px 12px 10px;
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  border: 1px solid rgba(1, 100, 79, 0.22);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.deltaKind {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text-secondary);
+}
+
+.deltaValue {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--accent-color);
+}
+
+.deltaValue span {
+  font-size: 26px;
+}
+
+.deltaValue small {
+  margin-left: 4px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--text-secondary);
+}
+
+.deltaHint {
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--text-secondary);
+}
+
 .qRow {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 14px;
-  border-radius: var(--radius-lg);
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
   background: var(--bg-card);
   border: 1px solid rgba(1, 100, 79, 0.18);
   box-shadow: var(--shadow-sm);
@@ -418,65 +470,30 @@
   background: #8b969e;
 }
 
-.qMeta {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
 .qHero {
-  font-size: 18px;
+  margin: 0;
+  font-size: 15px;
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--accent-color);
 }
 
-/* Large Rw / Lnw for people who read the indices */
-.qIndex {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 5px;
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  color: var(--text-primary);
+.charts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.qKey {
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  color: var(--text-secondary);
-}
-
-.qIndex i {
-  font-style: normal;
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-
-.qUnit {
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 700;
-  color: var(--text-secondary);
-}
-
-.qGain {
-  font-style: normal;
-  font-weight: 800;
-  font-size: 14px;
-  color: #fff;
-  background: var(--accent-color);
-  border-radius: var(--radius-pill);
-  padding: 1px 8px;
-}
-
-.qDir {
+.charts > header h3 {
   margin: 0;
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.charts > header p {
+  margin: 2px 0 0;
   font-size: 12px;
+  line-height: 1.4;
   color: var(--text-secondary);
 }
 
@@ -516,8 +533,8 @@
 .features {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 14px;
+  gap: 8px;
+  padding: 12px;
   border-radius: var(--radius-md);
   background: var(--bg-card);
   border: 1px solid var(--border-color);

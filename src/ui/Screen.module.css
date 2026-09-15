@@ -60,3 +60,11 @@
   flex-direction: column;
   gap: 16px;
 }
+
+.dense {
+  gap: 14px;
+}
+
+.dense .body {
+  gap: 12px;
+}

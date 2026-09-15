@@ -14,10 +14,10 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 - On Before/After + Profile: show the **full evidence pack** — personal room story, classes А/Б/В, numbers, charts, and plain-language explanations of each (owner 2026-09-12: «показать всё, аргументированно, понятно, персонально»).
 - **Evidence layout (Q4, owner 2026-09-12):** everything on one scroll — **conclusion / verdict on top**, detailed data below. Not progressive disclosure; not audience-trimmed packs. Anyone skims what they need. Same full stack for all user models (context may still change copy/CTA emphasis).
 - **Result must include (owner 2026-09-13):** (1) baseline state of *this* ceiling/room, (2) MultiFrame acoustic effect (full unconfirmed model), (3) **system features & reasons-to-believe** from MultiFRAME presentation/site (comfort, install, versatility, safety, patents) — plain language, **понятно + аргументированно**, **no price-forward copy**.
-- **Charts (owner 2026-09-13):** **both** — comfort **class scale А→Б→В** (arrow “where we move”) **above**; **before/after bars** for oriented ΔRw / ΔLnw **below**. Not spectrum/frequency charts in MVP. Always with plain-language captions + `pre_lab` framing.
+- **Charts (owner 2026-09-13 + trust pack 2026-09-14):** class **scale А→Б→В** on top; **large Δ Rw / Δ Lnw** + quietness bars; **frequency isolation charts** (R(f) / удар по Гц, форма как [zamer_graph](https://pavelantsibor.github.io/zamer_graph/)) **below** as secondary evidence. Both frequency series are **изоляция** (выше = тише в комнате) so «после» never reads as louder. Captions + `pre_lab` required. Not the primary visual.
 - **Numbers policy (owner 2026-09-13):** show a **full working MultiFrame effect model** with complete numbers now — currently **unconfirmed** (`marketing_placeholder` / `pre_lab`). After Trofimov (or lab) confirmation, **replace** values with correct ones; do not redesign the UX around hiding numbers. Never present placeholders as lab guarantees or certificates.
 - Effect source: `marketing_placeholder`; disclaimer: `pre_lab` / expert qualitative — never lab guarantees. Charts/numbers are **oriented arguments**, not certificates.
-- ΔRw center **+10** (show range **+8…+12**); ΔLnw center **−8** (show range **−6…−10** as absolute 6…10 in UI copy). **ASSUMPTION** until technical confirmation.
+- MultiFrame Δ is **frequency-shaped** (`marketing_placeholder` / `pre_lab`): typical ΔRw **+8…+12** (more on a light slab), ΔLnw **−4…−9** without a floating floor and **−2…−4** if the floor above already floats. UI range is **computed from the room model**, not hardcoded +10/−8. Never present as a lab certificate.
 - Classes **А/Б/В** (Trofimov / SP-style): **А** = высокая комфортность, **Б** = комфортная, **В** = предельно допустимая. UI = **hybrid plain label + letter** (`Высокий комфорт (А)`, `Комфорт (Б)`, `Допустимый (В)`) plus below-scale **`Дискомфорт`** when even В is not reached (owner: this is common). Soft footnote **`Ориентир по шкале комфортности (норм. документы)`** — not a legal certificate. “пониженный → выше классом” remains required. **ASSUMPTION on everyday synonyms:** prefer Trofimov plain words; avoid mapping «эконом» to **А** (А is the top, not economy).
 - «примерно вдвое спокойнее» **only for air (воздух)**; impact (удар) = quieter + floor often needed — never claim Lnw norm from ceiling alone.
 - Audio = **три группы примеров:** воздух · удар · смешанный; After = case-specific MultiFrame cut of **level + frequencies** with ≈% for this room (`pre_lab`); not showroom volume-duck alone.
@@ -70,14 +70,14 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Before/After copy rewrite: owner — previous emotional bullets / feeling chips are **obsolete**; rebuild from hybrid class + new copy (not patch old `Тихо/Терпимо/Мешает` SPA) |
 | 2026-09-13 | Before/After bullet frame (A): **2 phrases + hybrid class** per card (not one phrase only, not class-only) |
 | 2026-09-13 | Before/After bullet copy locked: Before `Соседи сверху слышны слишком отчётливо` · `Бытовые звуки сверху легко различить` · `Сейчас: {class}`; After `В комнате заметно спокойнее` · `Ударный и воздушный шум воспринимаются мягче` · `С MultiFrame: {class}` |
-| 2026-09-13 | Before/After chrome: subtitle **S3** `Как меняется комфорт комнаты с MultiFrame`; numbers **N3** `Оценка в цифрах`; honesty **H3b** `Цифры — ориентир до лабораторных данных. Ударный шум потолком становится мягче; пол сверху часто дополняет результат.` |
+| 2026-09-13 | Before/After chrome: subtitle **S3** `Как меняется комфорт комнаты с MultiFrame`; numbers **N3** `Оценка в цифрах`; honesty **H3b** `Цифры — ориентир, не лабораторный замер. Потолок смягчает удары сверху, а норму по удару часто закрывает пол у соседа.` |
 | 2026-09-13 | **Audio rewrite (Trofimov + owner):** channels воздух / удар (+ UI group **смешанный**); After = case-specific MultiFrame reduction — cut **level and frequencies**; % tied to this room’s Δ (`pre_lab`) |
 | 2026-09-13 | Audio examples locked (D): **воздух** — лай собаки · музыка · громкие разговоры; **удар** — детский бег · перестановка мебели · цоканье когтей собаки; **смешанный** — стиральная машина · пылесос |
 | 2026-09-13 | Audio reduction UI **C:** `≈ −{n}%` + Δ caption; log footnote **F2b:** `Шкала дБ логарифмическая: −8 дБ ≈ вдвое тише по ощущению.` |
 | 2026-09-13 | Audio chrome locked: title **T1** `Услышать разницу`; subtitle **S6** `Сравните звук обычного потолка и потолка с MultiFrame`; buttons **B2** `До` · `После`; sticky **N3** `Смотреть итог` |
 | 2026-09-13 | Result top verdict line reconfirmed (A): `Сейчас: {класс} → с MultiFrame: {класс}` (e.g. `Сейчас: Дискомфорт → с MultiFrame: Комфорт (Б)`) |
 | 2026-09-13 | Result one-liner **L1:** `В этой комнате MultiFrame поднимает комфорт на ступень выше.` (with class line; same for self/client) |
-| 2026-09-13 | Result chrome: title kept `Акустический профиль`; subtitle **R1** `Ориентир комфорта для вашей комнаты и следующий шаг к расчёту` |
+| 2026-09-13 | Result chrome: title `Акустический профиль помещения` (locked 2026-09-14); subtitle **R1** `Ориентир комфорта для вашей комнаты и следующий шаг к расчёту` |
 | 2026-09-13 | Result summary cards **A:** same 2 phrases + class as Before/After; drop old noise-type / «вдвое спокойнее» card copy |
 | 2026-09-13 | Result feature order reconfirmed (A): **1** class → **2** effectiveness → **3** drum-effect → **4** safety → **5** rest |
 | 2026-09-13 | Result sticky CTA **C4:** `Открыть калькулятор MultiFrame` (replaces «Расчёт материалов») |
@@ -86,6 +86,9 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-13 | Start chrome: **no kicker**; H1 kept; lead **E8c**; CTA `Начать` |
 | 2026-09-13 | Result features: drop Flat/Wave from «остальное»; drum-effect rephrased (draft) — air gap under stretch acts like a drum body; MultiFrame dissipates energy in the panel |
 | 2026-09-14 | **Remove Before/After screen** (duplicated Result). **Audio** moves into Result as compact block after «Сейчас / С MultiFrame» cards. Flow: Start → Room → Result |
+| 2026-09-14 | Result trust pack: large Δ Rw / Δ Lnw; frequency isolation charts (zamer_graph shape, room Δ); **2** client advantages (drum + install); official class ladder. Spectrum is secondary — quietness bars stay primary so Rw↑ does not look «громче». |
+| 2026-09-14 | **Acoustic two-layer model:** construction R(f)/Lnw from Trofimov + answers (slab, house, floor, stage, stretch drum); in-room level from neighbors / room type / area. Neighbors do **not** change Rw/Lnw. MultiFrame ΔR(f) is invented with physical shape (`pre_lab`); never take Lnw to class A by ceiling alone. |
+| 2026-09-15 | **Expert material + receiving-room spectra:** R(f)/Ln(f) from mass law, coincidence, ПК voids, wood LF leak, house flanking, frequency-shaped floor ΔLn. In-room dBA = A-weighted L1(f)−R(f)+10log(S/A) (Sabine absorption by room type + furnishing). MultiFrame still invented. |
 
 ---
 
@@ -345,7 +348,7 @@ Owner: do **not** put «пока без чистового пола» under floo
 | Тип дома | Proxy when slab unknown; typical construction | `Панельный` · `Блочный` · `Кирпичный` · `Монолит` (в т.ч. монолит-кирпич) · `Деревянный / по балкам` · `Не знаю` | Common RU apartment stock. Сталинка → usually `Кирпичный` (hint, not separate card). Skip rare types. | `Панельный` · `Блочный` · `Кирпичный` · `Монолит` (в т.ч. монолит-кирпич) · `Деревянный / по балкам` · `Не знаю` | |
 | Стадия объекта | Narrative without «мешает ли» | `Новостройка / до заселения` · `Идёт ремонт` · `Уже живут` · `Не знаю` | Confirmed | `Новостройка / до заселения` · `Идёт ремонт` · `Уже живут` · `Не знаю` | |
 | Планируемый потолок | Fit story for MultiFrame under finish | `Планируем натяжной` · `Потолок уже есть` · `Не знаю` | Owner chose plain **B** — no ГКЛ/«черновой» jargon | `Планируем натяжной` · `Потолок уже есть` · `Не знаю` | |
-| Шумные соседи сверху | Expectation of upstairs activity (not “does it bother you”) | `Не знаю` · `Обычно тихо` · `Сверху бывает шумно` | Owner chose **B** — softer third label. Replaces «кто сверху». Must **not** sound like complaint quiz |
+| Шумные соседи сверху | Expectation of upstairs activity (not “does it bother you”) | `Не знаю` · `Обычно тихо` · `Сверху бывает шумно` · `Сверху часто шумно` | Owner chose **B** — softer third label. Fourth step = frequent noise. Replaces «кто сверху». Must **not** sound like complaint quiz |
 
 **Field order on Room (confirmed):** тип → площадь → **тип перекрытия** → **толщина перекрытия** → пол сверху → тип дома → стадия → планируемый потолок → шумные соседи.
 
@@ -405,7 +408,7 @@ Show the comfort shift for this room: ordinary stretch ceiling vs MultiFrame. **
 | After h2 | `Бескаркасная акустика` |
 | After bullets | `В комнате заметно спокойнее` · `Ударный и воздушный шум воспринимаются мягче` · `С MultiFrame: {hybrid class}` |
 | Numbers section title | `Оценка в цифрах` |
-| Honesty note | `Цифры — ориентир до лабораторных данных. Ударный шум потолком становится мягче; пол сверху часто дополняет результат.` |
+| Honesty note | `Цифры — ориентир, не лабораторный замер. Потолок смягчает удары сверху, а норму по удару часто закрывает пол у соседа.` |
 | Sticky next | `Услышать разницу` |
 
 **Class rule (confirmed):** Before and After cards both end with the hybrid class from the Room model. Same vocabulary as the top verdict strip. No `Тихо` / `Терпимо` / `Мешает`.
@@ -520,14 +523,14 @@ Summarize acoustic profile with **verdict first**, then the full evidence stack 
 
 - **Top verdict (locked):** one-liner **L1** `В этой комнате MultiFrame поднимает комфорт на ступень выше.` + class shift `Сейчас: {label} → с MultiFrame: {label}` + norm footnote `Ориентир по шкале комфортности (норм. документы)`.
 - Title, subtitle, Before/After summary cards, room/scenario profile, secondary SimCompare, numbers + charts + explanations, «Почему MultiFrame уместен», expert Disclaimer, calculator CTA, demo consultation (disabled), demo lead form, restart.
-- **Charts block (C):** class scale А→Б→В first, then before/after bars (ΔRw / ΔLnw); captions + `pre_lab` badge; no frequency spectrum.
+- **Charts block:** class scale А→Б→В first; large Δ Rw / Δ Lnw + quietness bars; then frequency isolation charts (secondary, higher = quieter); captions + `pre_lab` badge.
 - Do **not** hide detail behind tabs/accordions as the primary pattern; scroll is the disclosure.
 
 ### Exact primary copy (RU)
 
 | Role | Text |
 | ---- | ---- |
-| Title | `Акустический профиль` |
+| Title | `Акустический профиль помещения` |
 | Subtitle | `Ориентир комфорта для вашей комнаты и следующий шаг к расчёту` |
 | Verdict one-liner | `В этой комнате MultiFrame поднимает комфорт на ступень выше.` |
 | Verdict class line | `Сейчас: {класс} → с MultiFrame: {класс}` |
@@ -625,12 +628,12 @@ Separate disabled «Консультация (недоступно в демо)�
 - **Chart A — class scale:** visual А→Б→В showing before→after move; primary scannable chart
 - **Chart B — bars:** before/after bars for oriented ΔRw (воздух) and ΔLnw (удар); secondary to class scale; always captioned
 - Channels: `Воздух` / `Удар` with caption + sensation + tertiary dB / Δ
-- Range line when useful: e.g. `ориентир Δ воздух +8…+12 · удар −6…−10`
+- Range line when useful: from **this room’s** `deltaRange` (not a global +8…+12 / −6…−10)
 - `honestLines` + `DISCLAIMER_SIMULATION`
 
 **Must NOT render (MVP)**
 
-- Frequency / spectrum charts as the primary evidence visual
+- Frequency / spectrum charts **as the primary** evidence visual (they sit under Δ + quietness bars on Result)
 - Feeling chips `Тихо` / `Терпимо` / `Мешает`
 
 **Must NOT**
@@ -639,18 +642,48 @@ Separate disabled «Консультация (недоступно в демо)�
 - Use «вдвое спокойнее» on impact hero
 - Claim full Lnw norm from ceiling alone
 
-**Effect model (normative numbers)**
+**Effect model (two layers — see Acoustic room model below)**
 
 | Item | Value |
 | ---- | ----- |
-| Default slab | 180 → Rw 54 / Lnw 76 (before) |
-| Other slabs | 140→50/80; 160→52/78; 200→55/74; pk220→52/74; mono250→56/74 |
-| DELTA | Rw +10, Lnw −8 |
-| UI range | Rw [8,12], Lnw [6,10] |
+| Construction anchors (bare, no drum) | solid 180 → Rw 54 / Lnw 76; ПК 220 → 52/74 (Trofimov) |
+| Other solid (Trofimov) | 100→47/82 … 250→56/74 |
+| MultiFrame Δ | Invented frequency ΔR(f), typical ΔRw 8…12, ΔLnw 4…9 (2…4 if floating floor). **Not** a flat +10/−8 |
+| UI range | From the room model (`deltaRange`), not hardcoded |
 | NORMS (Rw min / Lnw max) | A 54/55; B 52/58; V 50/60 |
-| Grade labels | `премиум-комфорт` · `комфорт` · `базовый` · partial / below strings as in simulation |
 | source | `marketing_placeholder` |
 | disclaimer | `pre_lab` |
+
+---
+
+## Acoustic room model
+
+Two layers so each Room answer moves the right number. Code: `src/state/acoustic/*` + facade `deriveSimulation`.
+
+**Construction** (slab type/thickness, house as slab proxy *and* flanking, floor above, object stage, stretch drum) → Rw / Lnw and R(f) / impact isolation. This drives the SP class table and frequency charts. Charts are **material-shaped** (not one zamer curve globally shifted).
+
+**Source / room** (neighbors, room type, area, furnishing from stage) → received band levels, then A-weighted dBA. This drives quietness bars, perceived %, and audio copy. Neighbors **never** change slab Rw/Lnw.
+
+| Answer | Where it goes |
+| ------ | ------------- |
+| Slab type + thickness | Trofimov **indices** + physics **shape**: mass law (~6 dB/oct), coincidence fc≈c²/(1.8 c_L h) for RC, ПК void dip 100–250 Hz, wood LF leak + deck coincidence ~1.25 kHz. UI mids 150 / 180 / 225 / 260 mm. Wood bare **ASSUMPTION** Rw ~46 / Lnw ~84 (not Trofimov ТС-6.x) |
+| House type | If slab «Не знаю»: panel/block → ПК 220; monolith → solid ~200; brick → solid ~180; wood → wood; else solid 180. **Always** (even if slab known): in-situ flanking ΔR(f) — panel worse at LF, brick slightly tighter, wood house leaky. Not in Trofimov table. |
+| Floor above | Ordinary: ΔLnw ~−3, ΔRw ~+1, mostly HF. Floating: ΔLnw ~−22, ΔRw ~+3 (Trofimov mid) with **weak 100 Hz / strong 250–1600 Hz** ΔLn(f). Newbuild + unknown floor = **bare** slab |
+| Object stage | Floor prior when floor unknown (newbuild = bare). **Also** receiving-room absorption: empty newbuild → louder in the room; occupied furniture raises α |
+| Planned ceiling | Stretch drum dip ~2–4 dB in 200–800 Hz in «сейчас» (stronger on light/wood slabs); MultiFrame removes it. Product context: drum is always in the baseline |
+| Area | Does not change Rw. Enters ISO-style `10·log10(S/A(f))` with S = this ceiling. Size is a small term vs kitchen hardness / emptiness |
+| Room type | Source **spectrum** + absorption: kids → impact 100–250 Hz; kitchen hard α and appliance mid-HF; bedroom more textiles; office speech 250–2000 Hz |
+| Neighbors | Source level + shape only: quiet −4, unknown 0, sometimes +3, often +7 and extra LF (music). Not Rw |
+
+**Frequency curves:** 1/3-octave 100…5000 Hz. Airborne from Sharp/Cremer mass law + coincidence + kind texture, then calibrated so ISO 717 Rw matches Trofimov (+ floor/drum/flanking). Impact Ln from RC tapping prototype + mass/kind, then floor ΔLn(f), then Lnw calibration. Anchors: bare 180 mm = 54/76; ПК 220 = 52/74.
+
+**In-room level:** `L2(f) = L1(f) − R(f) + 10·log10(S/A(f))` (air); impact `Ln(f) + 10·log10(10/A) + source`. Displayed loudness = A-weighted energy sum (IEC 61672). A(f) from room type α and stage furnishing (Sabine surfaces, h=2.7 m).
+
+**MultiFrame** (`pre_lab` invention with physical shape): ΔR(f) from zamer_graph MultiFrame vs slab + perforation peak 100–500 Hz. Mean ΔRw 8…12 (less if slab Rw already ≥56). Mean |ΔLnw| 4…9 without floating floor, 2…4 with it. **Never** take Lnw to class A (55) by the ceiling alone. Swap only the Δ tables when lab curves exist — do not change UX.
+
+**Honesty on Result:** indices are about the floor/ceiling construction (and house flanking); loudness in the room also depends on how noisy it is upstairs, room finish, and area. Ceiling softens impact; the Lnw A-norm often needs the neighbor’s floating floor.
+
+Golden anchors: `npx tsx src/state/acoustic/check.ts` (180=54/76; ПК 220=52/74; wood weak at 100 Hz; floating ΔI larger at 500 than 100; panel Rw < brick; kitchen louder than bedroom; neighbors do not change Rw; MultiFrame does not reach Lnw A on a bare slab).
 
 ---
 

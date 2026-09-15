@@ -23,7 +23,7 @@ function whyFor(noiseType: NoiseType, comfort: ComfortLevel): string[] {
 
 function inferNoiseType(answers: SessionAnswers): NoiseType {
   const n = answers.room.noisyNeighbors;
-  if (n === 'sometimes_noisy') return 'mixed';
+  if (n === 'often_noisy' || n === 'sometimes_noisy') return 'mixed';
   if (n === 'usually_quiet') return 'airborne';
   return 'mixed';
 }
