@@ -92,7 +92,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-15 | Result fallback when hybrid class does **not** move (impact still > V): do not present `Дискомфорт → Дискомфорт` as “MultiFrame does nothing”. Keep locked L1 + class-shift only when hybrid rises. Otherwise show **air / impact channels** (Rw/Lnw + channel class), explain that full SP class needs both and ceiling alone does not close Lnw ≤ 60. Ladder may follow **air** if air rose. |
 | 2026-09-15 | **Independent channel comfort:** Result always shows separate air (Rw) and impact (Lnw) comfort levels + ladders. Full SP hybrid class is secondary footnote only. Norm table tags sit in Rw / Lnw columns separately. |
 | 2026-09-15 | **Verdict declutter:** drop nested gray cards and duplicate captions; short one-liner + two lean channel columns (Д/В/Б/А) + hybrid one-liner. |
-| 2026-09-15 | **Features block:** title `Чем MultiFrame отличается` + lead; two cards with tiny SVG contrast (барабан vs панель · быстрый монтаж); still claim + why, no price talk. |
+| 2026-09-15 | **Features block:** title `Чем MultiFrame отличается` + lead; two text cards (барабан · быстрый монтаж); claim + why, no price talk. |
 | 2026-09-15 | **In-situ baseline realism:** product «сейчас» is not Trofimov lab Rw. Stronger flanking (panel/unknown mass stock), drum −2 Rw, ordinary floor no +1 Rw, universal leak −2 Rw. Lab fixtures unchanged (180=54/76). |
 | 2026-09-15 | **Real audio stems:** До/После use `public/audio/` MP3 (разговор / топот / пылесос). After = Web Audio level+EQ from this room’s ΔRw/ΔLnw, not a second file. |
 

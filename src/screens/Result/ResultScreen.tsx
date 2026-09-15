@@ -441,30 +441,6 @@ export function ResultScreen() {
 
         <div className={styles.featureGrid}>
           <article className={styles.featureCard}>
-            <div className={styles.featureVisual} aria-hidden>
-              <svg viewBox="0 0 120 56" className={styles.featureSvg}>
-                <rect x="8" y="8" width="48" height="40" rx="6" className={styles.svgMuted} />
-                <path
-                  d="M16 28c6-10 14-10 20 0s14 10 20 0"
-                  className={styles.svgWave}
-                  fill="none"
-                  strokeWidth="2.5"
-                />
-                <text x="32" y="50" textAnchor="middle" className={styles.svgCaption}>
-                  обычный
-                </text>
-                <rect x="64" y="8" width="48" height="40" rx="6" className={styles.svgAccentBox} />
-                <circle cx="76" cy="22" r="2.2" className={styles.svgDot} />
-                <circle cx="88" cy="22" r="2.2" className={styles.svgDot} />
-                <circle cx="100" cy="22" r="2.2" className={styles.svgDot} />
-                <circle cx="76" cy="34" r="2.2" className={styles.svgDot} />
-                <circle cx="88" cy="34" r="2.2" className={styles.svgDot} />
-                <circle cx="100" cy="34" r="2.2" className={styles.svgDot} />
-                <text x="88" y="50" textAnchor="middle" className={styles.svgCaptionAccent}>
-                  MultiFrame
-                </text>
-              </svg>
-            </div>
             <span className={styles.featureEyebrow}>Без «барабана»</span>
             <strong>Обычный натяжной усиливает шум сверху — воздух в зазоре работает как барабан.</strong>
             <span>
@@ -473,30 +449,6 @@ export function ResultScreen() {
           </article>
 
           <article className={styles.featureCard}>
-            <div className={styles.featureVisual} aria-hidden>
-              <svg viewBox="0 0 120 56" className={styles.featureSvg}>
-                <rect x="18" y="10" width="84" height="8" rx="2" className={styles.svgMuted} />
-                <rect x="18" y="22" width="84" height="18" rx="4" className={styles.svgAccentBox} />
-                <path
-                  d="M30 31h12M48 31h12M66 31h12M84 31h8"
-                  className={styles.svgAccentStroke}
-                  fill="none"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M92 14v28M88 38l4 4 4-4"
-                  className={styles.svgAccentStroke}
-                  fill="none"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <text x="60" y="52" textAnchor="middle" className={styles.svgCaptionAccent}>
-                  монтаж ≈ обычный натяжной
-                </text>
-              </svg>
-            </div>
             <span className={styles.featureEyebrow}>Быстрый монтаж</span>
             <strong>Ставится так же быстро, как обычный натяжной потолок.</strong>
             <span>На объекте без долгой стройки и без лишней потери высоты комнаты.</span>
