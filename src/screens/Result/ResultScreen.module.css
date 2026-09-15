@@ -1,22 +1,22 @@
 .verdict {
-  padding: 18px 16px;
+  padding: 16px 14px;
   border-radius: var(--radius-lg);
   background:
-    linear-gradient(155deg, rgba(1, 100, 79, 0.16), transparent 50%),
+    linear-gradient(155deg, rgba(1, 100, 79, 0.12), transparent 48%),
     var(--bg-card);
-  border: 1px solid rgba(1, 100, 79, 0.28);
-  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(1, 100, 79, 0.22);
+  box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .oneLiner {
   margin: 0;
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 750;
   letter-spacing: -0.02em;
-  line-height: 1.3;
+  line-height: 1.28;
 }
 
 .classShift {
@@ -45,39 +45,44 @@
 .channelGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin: 2px 0;
+  gap: 0;
+  margin: 0;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .channelCard {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   padding: 12px 12px 10px;
-  border-radius: var(--radius-md);
-  background: var(--bg-subtle);
-  border: 1px solid var(--border-color);
+  background: transparent;
+  border: none;
+}
+
+.channelCard + .channelCard {
+  border-left: 1px solid var(--border-color);
 }
 
 .channelHead {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .channelTitle {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: 0.01em;
+  color: var(--text-primary);
 }
 
 .channelShift {
   margin: 0;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 550;
-  line-height: 1.35;
+  line-height: 1.3;
   color: var(--text-secondary);
 }
 
@@ -89,7 +94,9 @@
 .channelMeta {
   font-size: 12px;
   font-weight: 650;
+  font-variant-numeric: tabular-nums;
   color: var(--text-secondary);
+  white-space: nowrap;
 }
 
 .channelNote,
@@ -97,7 +104,7 @@
 .ladderCaption {
   margin: 0;
   font-size: 12px;
-  line-height: 1.45;
+  line-height: 1.4;
   color: var(--text-secondary);
 }
 
@@ -110,23 +117,28 @@
   .channelGrid {
     grid-template-columns: 1fr;
   }
+
+  .channelCard + .channelCard {
+    border-left: none;
+    border-top: 1px solid var(--border-color);
+  }
 }
 
-/* Comfort ladder: worst → best, reads as climbing up */
+/* Comfort ladder: Д → В → Б → А */
 .ladder {
   position: relative;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 4px;
-  margin: 0;
+  gap: 2px;
+  margin: 2px 0 0;
 }
 
 .ladderTrack {
   position: absolute;
   left: 12.5%;
   right: 12.5%;
-  top: 22px;
-  height: 3px;
+  top: 18px;
+  height: 2px;
   border-radius: 999px;
   background: var(--border-color);
 }
@@ -135,13 +147,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   text-align: center;
 }
 
 .rungTag {
-  min-height: 12px;
-  font-size: 9px;
+  min-height: 11px;
+  font-size: 8px;
   font-weight: 800;
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -161,27 +173,27 @@
 .rungDot {
   position: relative;
   z-index: 1;
-  width: 11px;
-  height: 11px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   background: var(--border-color);
 }
 
 .rungBefore .rungDot {
   background: #7a8790;
-  box-shadow: 0 0 0 3px rgba(122, 135, 144, 0.22);
+  box-shadow: 0 0 0 2px rgba(122, 135, 144, 0.22);
 }
 
 .rungAfter .rungDot,
 .rungBoth .rungDot {
   background: var(--accent-color);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  box-shadow: 0 0 0 2px var(--accent-soft);
 }
 
 .rungName {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 650;
-  line-height: 1.15;
+  line-height: 1;
   color: var(--text-secondary);
 }
 
@@ -192,8 +204,9 @@
 }
 
 .roomMeta {
-  margin: 2px 0 0;
-  font-size: 13px;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
   color: var(--text-secondary);
 }
 
@@ -529,7 +542,7 @@
 
 .qBar {
   position: relative;
-  height: 16px;
+  height: 22px;
   border-radius: 999px;
   background: var(--bg-subtle);
   border: 1px solid var(--border-color);
@@ -546,11 +559,30 @@
 }
 
 .qFillAfter {
-  background: linear-gradient(90deg, rgba(1, 100, 79, 0.55), var(--accent-color));
+  background: linear-gradient(90deg, rgba(1, 100, 79, 0.45), var(--accent-color));
 }
 
 .qFillBefore {
   background: #8b969e;
+}
+
+.qMark {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  width: 3px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: #5c6770;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.7);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.qMarkMf {
+  background: #014f3f;
+  width: 4px;
+  margin-left: -2px;
 }
 
 .qHero {
@@ -616,45 +648,125 @@
 .features {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-  border-radius: var(--radius-md);
+  gap: 12px;
+  padding: 14px;
+  border-radius: var(--radius-lg);
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
 }
 
-.features > h2 {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 750;
-}
-
-.features ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 12px;
-}
-
-.features li {
+.featuresHead {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
 }
 
-.features strong {
-  font-size: 14px;
+.featuresHead h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+
+.featuresHead p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.featureGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.featureCard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  border: 1px solid transparent;
+}
+
+.featureVisual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  margin: 0 0 2px;
+}
+
+.featureSvg {
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+}
+
+.svgMuted {
+  fill: #d8dee3;
+}
+
+.svgAccentBox {
+  fill: rgba(1, 100, 79, 0.14);
+  stroke: rgba(1, 100, 79, 0.45);
+  stroke-width: 1.25;
+}
+
+.svgWave {
+  stroke: #7a8790;
+}
+
+.svgDot {
+  fill: var(--accent-color);
+}
+
+.svgAccentStroke {
+  stroke: var(--accent-color);
+}
+
+.svgCaption,
+.svgCaptionAccent {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.svgCaption {
+  fill: #7a8790;
+}
+
+.svgCaptionAccent {
+  fill: var(--accent-color);
+}
+
+.featureEyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent-color);
+}
+
+.featureCard strong {
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: -0.01em;
   line-height: 1.35;
 }
 
-.features span {
-  font-size: 13px;
+.featureCard > span:last-child {
+  font-size: 12px;
   line-height: 1.4;
   color: var(--text-secondary);
+}
+
+@media (max-width: 640px) {
+  .featureGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .actions {

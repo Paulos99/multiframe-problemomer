@@ -14,6 +14,8 @@ export type AudioPlayOptions = {
 
 let sharedCtx: AudioContext | null = null;
 const bufferCache = new Map<string, AudioBuffer>();
+/** In-flight decode promises so parallel loads share one fetch. */
+const pendingLoads = new Map<string, Promise<AudioBuffer>>();
 
 function prefersReducedMotion(): boolean {
   return (
@@ -31,12 +33,7 @@ function dbToGain(db: number): number {
   return Math.pow(10, db / 20);
 }
 
-/**
- * Demo contrast is intentionally exaggerated so the sell difference is obvious
- * on laptop speakers / phone (release blocker). UI shows «контраст усилен».
- * BEFORE ≈ loud; AFTER ≈ clearly quieter (~−16…−20 dB level + darker filter).
- * Kept only as fallback for legacy `stub:` URLs.
- */
+/** Legacy synth contrast — only for `stub:` URLs. */
 const DEMO_CONTRAST = {
   master: 0.5,
   beforePeak: 0.9,
@@ -58,6 +55,7 @@ function playStub(
   const duration = scene === 'steps' ? 2.4 : 2.8;
   const isAfter = kind === 'after';
   const peak = isAfter ? DEMO_CONTRAST.afterPeak : DEMO_CONTRAST.beforePeak;
+  const nodes: AudioScheduledSourceNode[] = [];
 
   if (scene === 'steps') {
     for (const t of [0, 0.45, 0.9, 1.35, 1.8]) {
@@ -76,6 +74,7 @@ function playStub(
       g.connect(master);
       osc.start(now + t);
       osc.stop(now + t + 0.32);
+      nodes.push(osc);
     }
   } else {
     const bufferSize = Math.floor(ctx.sampleRate * duration);
@@ -97,11 +96,33 @@ function playStub(
     f.connect(master);
     src.start(now);
     src.stop(now + duration);
+    nodes.push(src);
   }
 
-  const timer = window.setTimeout(onEnd, duration * 1000 + 50);
+  let ended = false;
+  const finish = () => {
+    if (ended) return;
+    ended = true;
+    onEnd();
+  };
+  const timer = window.setTimeout(finish, duration * 1000 + 50);
+
   return () => {
     window.clearTimeout(timer);
+    ended = true;
+    try {
+      master.gain.cancelScheduledValues(ctx.currentTime);
+      master.gain.setValueAtTime(0, ctx.currentTime);
+    } catch {
+      /* ignore */
+    }
+    for (const n of nodes) {
+      try {
+        n.stop();
+      } catch {
+        /* ignore */
+      }
+    }
     try {
       master.disconnect();
     } catch {
@@ -113,17 +134,28 @@ function playStub(
 async function loadBuffer(ctx: AudioContext, url: string): Promise<AudioBuffer> {
   const hit = bufferCache.get(url);
   if (hit) return hit;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`audio fetch ${res.status}`);
-  const raw = await res.arrayBuffer();
-  const buf = await ctx.decodeAudioData(raw.slice(0));
-  bufferCache.set(url, buf);
-  return buf;
+  const pending = pendingLoads.get(url);
+  if (pending) return pending;
+
+  const job = (async () => {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`audio fetch ${res.status}`);
+    const raw = await res.arrayBuffer();
+    const buf = await ctx.decodeAudioData(raw.slice(0));
+    bufferCache.set(url, buf);
+    pendingLoads.delete(url);
+    return buf;
+  })().catch((err) => {
+    pendingLoads.delete(url);
+    throw err;
+  });
+
+  pendingLoads.set(url, job);
+  return job;
 }
 
 /**
  * Case-oriented After: cut level from room Δ and darken spectrum (ASSUMPTION EQ).
- * Air → more mid/HF cut (speech). Impact → more LF softening. Mixed → blend.
  */
 function afterProcess(
   ctx: AudioContext,
@@ -206,10 +238,26 @@ function playStem(
     src.connect(master);
   }
 
-  src.onended = () => onEnd();
+  let stopped = false;
+  const finish = () => {
+    if (stopped) return;
+    stopped = true;
+    onEnd();
+  };
+
+  src.onended = finish;
   src.start(0);
 
   return () => {
+    if (stopped) return;
+    stopped = true;
+    src.onended = null;
+    try {
+      master.gain.cancelScheduledValues(ctx.currentTime);
+      master.gain.setValueAtTime(0, ctx.currentTime);
+    } catch {
+      /* ignore */
+    }
     try {
       src.stop();
     } catch {
@@ -230,6 +278,9 @@ export function useDemoPlayer() {
   const [progress, setProgress] = useState(0);
   const stopRef = useRef<(() => void) | null>(null);
   const rafRef = useRef<number | null>(null);
+  /** Bumps on every stop/play so stale async loads never start audio. */
+  const generationRef = useRef(0);
+  const activeIdRef = useRef<string | null>(null);
   const startedAt = useRef(0);
   const durationMs = useRef(2400);
 
@@ -241,9 +292,11 @@ export function useDemoPlayer() {
   };
 
   const stop = useCallback(() => {
+    generationRef.current += 1;
     stopRef.current?.();
     stopRef.current = null;
     clearRaf();
+    activeIdRef.current = null;
     setActiveId(null);
     setProgress(0);
   }, []);
@@ -252,19 +305,39 @@ export function useDemoPlayer() {
 
   const play = useCallback(
     async (id: string, src: string, opts?: AudioPlayOptions) => {
-      stop();
+      // Invalidate any in-flight load / playing graph first.
+      generationRef.current += 1;
+      const gen = generationRef.current;
+      stopRef.current?.();
+      stopRef.current = null;
+      clearRaf();
+
       const stub = parseStubSrc(src);
       const ctx = getCtx();
       if (ctx.state === 'suspended') await ctx.resume();
+      if (gen !== generationRef.current) return;
 
       startedAt.current = performance.now();
+      activeIdRef.current = id;
       setActiveId(id);
       setProgress(prefersReducedMotion() ? 0.5 : 0);
 
+      const clearUiIfMine = () => {
+        if (gen !== generationRef.current) return;
+        if (activeIdRef.current !== id) return;
+        clearRaf();
+        activeIdRef.current = null;
+        setActiveId(null);
+        setProgress(0);
+        stopRef.current = null;
+      };
+
       const startProgress = (ms: number) => {
+        if (gen !== generationRef.current) return;
         durationMs.current = ms;
         if (prefersReducedMotion()) return;
         const tick = () => {
+          if (gen !== generationRef.current) return;
           const p = Math.min(1, (performance.now() - startedAt.current) / durationMs.current);
           setProgress(p);
           if (p < 1 && stopRef.current) {
@@ -275,33 +348,26 @@ export function useDemoPlayer() {
       };
 
       if (stub) {
-        durationMs.current = stub.scene === 'talk' ? 2800 : 2400;
-        startProgress(durationMs.current);
-        stopRef.current = playStub(ctx, stub.kind, stub.scene, () => {
-          clearRaf();
-          setActiveId(null);
-          setProgress(0);
-          stopRef.current = null;
-        });
+        startProgress(stub.scene === 'talk' ? 2800 : 2400);
+        if (gen !== generationRef.current) return;
+        stopRef.current = playStub(ctx, stub.kind, stub.scene, clearUiIfMine);
         return;
       }
 
       try {
         const buffer = await loadBuffer(ctx, src);
+        if (gen !== generationRef.current) return;
         startProgress(buffer.duration * 1000);
-        stopRef.current = playStem(ctx, buffer, opts, () => {
-          clearRaf();
-          setActiveId(null);
-          setProgress(0);
-          stopRef.current = null;
-        });
+        stopRef.current = playStem(ctx, buffer, opts, clearUiIfMine);
       } catch {
+        if (gen !== generationRef.current) return;
+        activeIdRef.current = null;
         setActiveId(null);
         setProgress(0);
         stopRef.current = null;
       }
     },
-    [stop],
+    [],
   );
 
   return { activeId, progress, play, stop };

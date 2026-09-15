@@ -44,11 +44,29 @@ function rung(cls: ClassLabel): number {
   return LADDER.indexOf(cls);
 }
 
+/** Zoom quietness so «после» sits near the right edge; прирост читается сразу. */
+function quietBarScale(before: number, after: number): { beforePct: number; afterPct: number } {
+  const lo = Math.max(0, Math.min(before, after) - Math.max(6, (after - before) * 0.2));
+  const targetAfter = 90;
+  const span = Math.max(1, (Math.max(after, before + 1) - lo) / (targetAfter / 100));
+  const map = (v: number) => Math.round(((v - lo) / span) * 1000) / 10;
+  const beforePct = Math.min(92, Math.max(8, map(before)));
+  const afterPct = Math.min(96, Math.max(beforePct + 10, map(after)));
+  return { beforePct, afterPct };
+}
+
 function channelLabel(cls: ClassLabel, kind: 'air' | 'impact'): string {
   if (cls === 'below' && kind === 'impact') return 'Вне нормы';
   if (cls === 'below') return 'Дискомфорт';
   return HYBRID_CLASS_LABELS[cls];
 }
+
+const LADDER_TINY: Record<ClassLabel, string> = {
+  below: 'Д',
+  V: 'В',
+  B: 'Б',
+  A: 'А',
+};
 
 function ChannelLadder({
   title,
@@ -65,28 +83,32 @@ function ChannelLadder({
 }) {
   const rose = rung(after) > rung(before);
   const same = before === after;
+  const stuckImpact = same && kind === 'impact' && after === 'below';
+
   return (
-    <article className={styles.channelCard} aria-label={`${title}: ${channelLabel(before, kind)} → ${channelLabel(after, kind)}`}>
+    <article
+      className={styles.channelCard}
+      aria-label={`${title}: ${channelLabel(before, kind)} → ${channelLabel(after, kind)}`}
+    >
       <header className={styles.channelHead}>
-        <div>
-          <span className={styles.channelTitle}>{title}</span>
-          <p className={styles.channelShift}>
-            {channelLabel(before, kind)}
-            <span className={styles.arrow} aria-hidden>
-              {' → '}
-            </span>
-            <b className={rose ? styles.accent : undefined}>{channelLabel(after, kind)}</b>
-          </p>
-        </div>
+        <span className={styles.channelTitle}>{title}</span>
         <span className={styles.channelMeta}>{meta}</span>
       </header>
+
+      <p className={styles.channelShift}>
+        {channelLabel(before, kind)}
+        <span className={styles.arrow} aria-hidden>
+          {' → '}
+        </span>
+        <b className={rose ? styles.accent : undefined}>{channelLabel(after, kind)}</b>
+      </p>
+
       <div className={styles.ladder} aria-hidden>
         <div className={styles.ladderTrack} />
         {LADDER.map((cls) => {
           const isBefore = cls === before;
           const isAfter = cls === after && !same;
           const both = same && isBefore;
-          const tag = both ? 'сейчас · MF' : isBefore ? 'Сейчас' : isAfter ? 'MF' : '';
           return (
             <div
               key={cls}
@@ -94,25 +116,18 @@ function ChannelLadder({
                 isAfter ? styles.rungAfter : ''
               } ${both ? styles.rungBoth : ''}`}
             >
-              <span className={styles.rungTag}>{tag}</span>
+              <span className={styles.rungTag}>
+                {both ? 'сейчас · MF' : isBefore ? 'сейчас' : isAfter ? 'MF' : ''}
+              </span>
               <span className={styles.rungDot} />
-              <span className={styles.rungName}>{LADDER_SHORT[cls]}</span>
+              <span className={styles.rungName}>{LADDER_TINY[cls]}</span>
             </div>
           );
         })}
       </div>
-      {same && kind === 'impact' && after === 'below' ? (
-        <p className={styles.channelNote}>
-          Норма В по удару — Lnw ≤ {NORMS.V.Lnw}. Потолок смягчает, полную норму чаще закрывает пол
-          сверху.
-        </p>
-      ) : null}
-      {rose ? (
-        <p className={styles.channelNote}>
-          {kind === 'air'
-            ? 'Воздух поднялся по шкале комфорта СП.'
-            : 'Удар стал мягче по шкале комфорта СП.'}
-        </p>
+
+      {stuckImpact ? (
+        <p className={styles.channelNote}>Полную норму по удару чаще закрывает пол сверху.</p>
       ) : null}
     </article>
   );
@@ -137,6 +152,8 @@ export function ResultScreen() {
   const airAfter = sim.quietAirAfter;
   const impactBefore = sim.quietImpactBefore;
   const impactAfter = sim.quietImpactAfter;
+  const airBar = quietBarScale(airBefore, airAfter);
+  const impactBar = quietBarScale(impactBefore, impactAfter);
 
   const airDb = Math.abs(sim.delta.Rw);
   const impactDb = Math.abs(sim.delta.Lnw);
@@ -163,15 +180,15 @@ export function ResultScreen() {
 
   const oneLiner = (() => {
     if (airRose && impactRose) {
-      return 'В этой комнате MultiFrame поднимает комфорт и по воздуху, и по удару.';
+      return 'MultiFrame поднимает комфорт и по воздуху, и по удару.';
     }
     if (airRose) {
-      return `MultiFrame заметно поднимает комфорт по воздуху → «${channelLabel(airAfterClass, 'air')}».`;
+      return `По воздуху — до «${channelLabel(airAfterClass, 'air')}».`;
     }
     if (impactRose) {
-      return `MultiFrame смягчает удар → «${channelLabel(impactAfterClass, 'impact')}».`;
+      return `По удару — до «${channelLabel(impactAfterClass, 'impact')}».`;
     }
-    return 'В этой комнате MultiFrame делает шум сверху мягче — смотрите уровни по каналам.';
+    return 'Шум сверху становится мягче — смотрите уровни по каналам.';
   })();
 
   return (
@@ -182,21 +199,17 @@ export function ResultScreen() {
     >
       <div className={styles.verdict} role="status">
         <p className={styles.oneLiner}>{oneLiner}</p>
-        <p className={styles.classShift}>
-          Уровни комфорта считаются <b>отдельно</b> для воздуха (Rw) и удара (Lnw) — так честнее, чем
-          один общий класс.
-        </p>
 
         <div className={styles.channelGrid}>
           <ChannelLadder
-            title="Воздушный шум"
+            title="Воздух"
             before={airBeforeClass}
             after={airAfterClass}
             kind="air"
             meta={`Rw ${sim.before.Rw} → ${sim.after.Rw}`}
           />
           <ChannelLadder
-            title="Ударный шум"
+            title="Удар"
             before={impactBeforeClass}
             after={impactAfterClass}
             kind="impact"
@@ -205,7 +218,8 @@ export function ResultScreen() {
         </div>
 
         <p className={styles.hybridNote}>
-          Полный класс СП (оба канала сразу): <b>{HYBRID_CLASS_LABELS[beforeClass]}</b>
+          Полный класс СП:{' '}
+          <b>{HYBRID_CLASS_LABELS[beforeClass]}</b>
           {hybridRose ? (
             <>
               <span className={styles.arrow} aria-hidden>
@@ -216,16 +230,15 @@ export function ResultScreen() {
           ) : (
             <> — {HYBRID_CLASS_LABELS[afterClass]}</>
           )}
-          . Требует Rw и Lnw вместе; потолок один редко закрывает норму по удару.
         </p>
 
-        {roomLabel ? (
-          <p className={styles.roomMeta}>
-            {roomLabel}
-            {room.ceilingAreaM2 ? ` · ${room.ceilingAreaM2} м²` : ''}
-          </p>
-        ) : null}
-        <p className={styles.normNote}>{NORM_FOOTNOTE}</p>
+        <p className={styles.roomMeta}>
+          {[roomLabel, room.ceilingAreaM2 ? `${room.ceilingAreaM2} м²` : null]
+            .filter(Boolean)
+            .join(' · ')}
+          {roomLabel || room.ceilingAreaM2 ? ' · ' : ''}
+          {NORM_FOOTNOTE}
+        </p>
       </div>
 
       <section className={styles.normTable} aria-label="Классы комфорта в дБ">
@@ -356,8 +369,10 @@ export function ResultScreen() {
             role="img"
             aria-label={`Воздушный шум: тише примерно на ${sim.perceivedAirPct}%`}
           >
-            <span className={styles.qFillAfter} style={{ width: `${airAfter}%` }} />
-            <span className={styles.qFillBefore} style={{ width: `${airBefore}%` }} />
+            <span className={styles.qFillAfter} style={{ width: `${airBar.afterPct}%` }} />
+            <span className={styles.qFillBefore} style={{ width: `${airBar.beforePct}%` }} />
+            <span className={styles.qMark} style={{ left: `${airBar.beforePct}%` }} />
+            <span className={`${styles.qMark} ${styles.qMarkMf}`} style={{ left: `${airBar.afterPct}%` }} />
           </div>
           <p className={styles.qHero}>≈ на {sim.perceivedAirPct}% тише по ощущению</p>
         </div>
@@ -372,8 +387,13 @@ export function ResultScreen() {
             role="img"
             aria-label={`Ударный шум: тише примерно на ${sim.perceivedImpactPct}%`}
           >
-            <span className={styles.qFillAfter} style={{ width: `${impactAfter}%` }} />
-            <span className={styles.qFillBefore} style={{ width: `${impactBefore}%` }} />
+            <span className={styles.qFillAfter} style={{ width: `${impactBar.afterPct}%` }} />
+            <span className={styles.qFillBefore} style={{ width: `${impactBar.beforePct}%` }} />
+            <span className={styles.qMark} style={{ left: `${impactBar.beforePct}%` }} />
+            <span
+              className={`${styles.qMark} ${styles.qMarkMf}`}
+              style={{ left: `${impactBar.afterPct}%` }}
+            />
           </div>
           <p className={styles.qHero}>≈ на {sim.perceivedImpactPct}% тише по ощущению</p>
         </div>
@@ -413,22 +433,76 @@ export function ResultScreen() {
 
       <CompactAudio pairs={session.audio.pairs} sim={sim} />
 
-      <div className={styles.features}>
-        <h2>Почему именно MultiFrame</h2>
-        <ul>
-          <li>
-            <strong>Обычный натяжной потолок усиливает шум сверху, как полотно барабана.</strong>
+      <section className={styles.features} aria-label="Чем MultiFrame отличается">
+        <header className={styles.featuresHead}>
+          <h2>Чем MultiFrame отличается</h2>
+          <p>Два момента, которые обычно решают выбор потолка</p>
+        </header>
+
+        <div className={styles.featureGrid}>
+          <article className={styles.featureCard}>
+            <div className={styles.featureVisual} aria-hidden>
+              <svg viewBox="0 0 120 56" className={styles.featureSvg}>
+                <rect x="8" y="8" width="48" height="40" rx="6" className={styles.svgMuted} />
+                <path
+                  d="M16 28c6-10 14-10 20 0s14 10 20 0"
+                  className={styles.svgWave}
+                  fill="none"
+                  strokeWidth="2.5"
+                />
+                <text x="32" y="50" textAnchor="middle" className={styles.svgCaption}>
+                  обычный
+                </text>
+                <rect x="64" y="8" width="48" height="40" rx="6" className={styles.svgAccentBox} />
+                <circle cx="76" cy="22" r="2.2" className={styles.svgDot} />
+                <circle cx="88" cy="22" r="2.2" className={styles.svgDot} />
+                <circle cx="100" cy="22" r="2.2" className={styles.svgDot} />
+                <circle cx="76" cy="34" r="2.2" className={styles.svgDot} />
+                <circle cx="88" cy="34" r="2.2" className={styles.svgDot} />
+                <circle cx="100" cy="34" r="2.2" className={styles.svgDot} />
+                <text x="88" y="50" textAnchor="middle" className={styles.svgCaptionAccent}>
+                  MultiFrame
+                </text>
+              </svg>
+            </div>
+            <span className={styles.featureEyebrow}>Без «барабана»</span>
+            <strong>Обычный натяжной усиливает шум сверху — воздух в зазоре работает как барабан.</strong>
             <span>
-              MultiFrame рассеивает энергию в самой панели — комната воспринимается спокойнее,
-              без тяжёлого каркаса.
+              MultiFrame рассеивает эту энергию в панели: комната спокойнее, без тяжёлого каркаса.
             </span>
-          </li>
-          <li>
-            <strong>Монтаж идёт так же быстро, как у обычного натяжного потолка.</strong>
-            <span>Быстро собирается на объекте: без долгой стройки и лишней потери высоты.</span>
-          </li>
-        </ul>
-      </div>
+          </article>
+
+          <article className={styles.featureCard}>
+            <div className={styles.featureVisual} aria-hidden>
+              <svg viewBox="0 0 120 56" className={styles.featureSvg}>
+                <rect x="18" y="10" width="84" height="8" rx="2" className={styles.svgMuted} />
+                <rect x="18" y="22" width="84" height="18" rx="4" className={styles.svgAccentBox} />
+                <path
+                  d="M30 31h12M48 31h12M66 31h12M84 31h8"
+                  className={styles.svgAccentStroke}
+                  fill="none"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M92 14v28M88 38l4 4 4-4"
+                  className={styles.svgAccentStroke}
+                  fill="none"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <text x="60" y="52" textAnchor="middle" className={styles.svgCaptionAccent}>
+                  монтаж ≈ обычный натяжной
+                </text>
+              </svg>
+            </div>
+            <span className={styles.featureEyebrow}>Быстрый монтаж</span>
+            <strong>Ставится так же быстро, как обычный натяжной потолок.</strong>
+            <span>На объекте без долгой стройки и без лишней потери высоты комнаты.</span>
+          </article>
+        </div>
+      </section>
 
       <div className={styles.actions}>
         <Button variant="secondary" fullWidth onClick={() => setShowLead((v) => !v)}>
