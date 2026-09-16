@@ -175,6 +175,7 @@ Engineering decisions already made / owned by the agent (product terms):
 - **Stack (recorded, do not reopen):** Vite + React SPA, client session state, GitHub Actions → GitHub Pages. No microservices.
 - **Effect model:** two layers — construction R(f)/Rw/Lnw from Trofimov + physics (mass, coincidence, ПК voids, wood, house flanking, floor ΔLn(f)); in-room A-weighted level from L1(f)−R(f)+10log(S/A) (neighbors, room type, area, furnishing). **Product «сейчас» = in-situ** (flanking + leak + drum), not lab Trofimov Rw; lab fixtures stay 180=54/76. MultiFrame Δ is invented frequency-shaped (`source: marketing_placeholder`, `disclaimer: pre_lab`): typical ΔRw 8…12, ΔLnw 4…9 (2…4 if floating floor). Neighbors do not change Rw. Ceiling alone never takes Lnw to class A. Classes **A/B/V** (UI А/Б/В) unchanged.
 - **Audio:** groups воздух / удар / смешанный; real MP3 stems (talk/stomp/vacuum); After = case Δ (level + EQ); mixed blends both; ≈% from room model; `pre_lab` / ориентир.
+- **Result JTBD arc (2026-09-16):** narrative ribbon (5 params) + whyMultiFrame + hot funnel (calc/lead/client summary); `interestFor` tone; premium stagger; no Room skip.
 - **CTA:** deep-link to MultiFRAME calculator with query payload; lead = consultation/selection request (MVP may stub delivery — never invent a corporate CRM endpoint).
 - **Mobile:** denser inputs + sticky progress/CTA; touch targets ≥44px; no tech dumps.
 - **Out of scope code paths:** walls, partitions, floors systems, Polyblock, framed systems — do not add.
@@ -205,6 +206,7 @@ A capability with no row is `absent` by default. The State column always holds o
 | Two-layer acoustic model | included | Construction (Trofimov + mass/coincidence/ПК/wood/flanking/floor ΔLn(f) → Rw/Lnw + charts) vs receiving room (L1−R+S/A, A-weighted). Lab anchors: bare 180=54/76, ПК 220=52/74. Product in-situ «сейчас» typically Rw ~44–48 (panel/unknown), air often вне нормы. |
 | Trofimov-style comfort classes A/B/V | included | Canon A\|B\|V; UI Cyrillic А\|Б\|В. Result shows **independent** air (Rw) and impact (Lnw) levels; full hybrid SP class is secondary. Never promise full Lnw norm from ceiling alone. |
 | Case-specific audio (air / impact / mixed) | included | Stems in `public/audio/`; After cuts level + frequencies from room Δ; mixed = blend; show ≈%; `pre_lab`. |
+| JTBD Result narrative + hot funnel | included | 5-param ribbon; whyMultiFrame UI; «Следующий шаг» dual CTA; lead handoff + client summary copy; interestFor copy. |
 | Calculator CTA handoff | included | Opens calculator with `area`, `roomType` (no scenarios). |
 | Consultation / selection lead | available | UI: `Запросить консультацию или подбор` · `Заявка на консультацию` · `Разберём ваш случай, подберём материал.` Delivery may stub until real endpoint; no invented StP CRM. |
 | Sticky mobile chrome | included | Header + progress + sticky Далее/CTA; denser cards on narrow viewports. |

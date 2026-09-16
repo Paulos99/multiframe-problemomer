@@ -2,11 +2,13 @@ import { Screen } from '../../ui/Screen';
 import { Button } from '../../ui/Button';
 import { CardSelect } from '../../ui/CardSelect';
 import { useSession } from '../../state/SessionContext';
+import { copyForInterest } from '../../state/interestCopy';
 import styles from './StartScreen.module.css';
 
 export function StartScreen() {
   const { session, goNext, setInterestFor } = useSession();
   const interest = session.answers.interestFor;
+  const copy = copyForInterest(interest);
 
   return (
     <Screen hero>
@@ -35,6 +37,9 @@ export function StartScreen() {
           уровень комфорта сейчас, ожидаемый эффект после и что важно учесть до выбора
           потолка.
         </p>
+        {copy.startClientHint ? (
+          <p className={styles.clientHint}>{copy.startClientHint}</p>
+        ) : null}
         <div className={styles.cta}>
           <Button onClick={goNext} fullWidth>
             Начать

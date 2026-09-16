@@ -109,8 +109,24 @@
 }
 
 .dense:hover:not(:disabled) {
-  transform: none;
-  box-shadow: none;
+  transform: scale(1.01);
+  box-shadow: var(--shadow-sm);
+}
+
+.dense.selected:hover:not(:disabled) {
+  transform: scale(1.01);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .dense {
+    transition: border-color var(--duration-fast), background var(--duration-fast);
+  }
+
+  .card:hover:not(:disabled),
+  .dense:hover:not(:disabled) {
+    transform: none;
+  }
 }
 
 .dense .lead {

@@ -95,6 +95,8 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-15 | **Features block:** title `Чем MultiFrame отличается` + lead; two text cards (барабан · быстрый монтаж); claim + why, no price talk. |
 | 2026-09-15 | **In-situ baseline realism:** product «сейчас» is not Trofimov lab Rw. Stronger flanking (panel/unknown mass stock), drum −2 Rw, ordinary floor no +1 Rw, universal leak −2 Rw. Lab fixtures unchanged (180=54/76). |
 | 2026-09-15 | **Real audio stems:** До/После use `public/audio/` MP3 (разговор / топот / пылесос). After = Web Audio level+EQ from this room’s ΔRw/ΔLnw, not a second file. |
+| 2026-09-16 | **JTBD Result arc:** reorder — verdict → emotion → quieter → audio → whyMultiFrame → features+safety → **narrative ribbon (5 params)** → SP table+charts → **«Следующий шаг»** (calc + lead + client summary copy). `interestFor` copy on Start/Room/Result. |
+| 2026-09-16 | **Hot funnel:** in-body calculator; structured `buildLeadHandoff` (room+sim+why); client «Скопировать сводку»; premium stagger reveal + Room progress bar; `prefers-reduced-motion` respected. |
 
 ---
 
@@ -529,8 +531,9 @@ Summarize acoustic profile with **verdict first**, then the full evidence stack 
 
 - **Top verdict:** one-liner from which channel(s) rose + **two independent comfort levels** (воздух Rw / удар Lnw) each with before→after and its own А/Б/В ladder. Full SP hybrid class is a short secondary note only.
 - **Fallback (hybrid class stuck):** obsolete as primary pattern — channels are always primary.
-- Title, subtitle, Before/After summary cards, room/scenario profile, secondary SimCompare, numbers + charts + explanations, «Почему MultiFrame уместен», expert Disclaimer, calculator CTA, demo consultation (disabled), demo lead form, restart.
-- **Charts block:** class scale А→Б→В first; large Δ Rw / Δ Lnw + quietness bars; then frequency isolation charts (secondary, higher = quieter); captions + `pre_lab` badge.
+- **Scroll order (2026-09-16):** verdict → emotion cards → quieter (Δ + bars + disclaimer) → compact audio → «Почему MultiFrame уместен» (`whyMultiFrame`) → «Чем MultiFrame отличается» + safety one-liner → **«Итог для вашей/комнаты клиента»** (5-parameter ribbon + closing line) → SP dB table + frequency charts (secondary) → **«Следующий шаг»** (calculator + lead + optional client summary copy) → restart.
+- Title, subtitle (`interestFor`-aware), Before/After emotion cards (2 bullets each), numbers + charts + explanations, expert Disclaimer, calculator CTA (in-body + sticky), lead form, restart.
+- **Charts block:** large Δ Rw / Δ Lnw + quietness bars first (in quieter); frequency isolation charts later as secondary evidence.
 - Do **not** hide detail behind tabs/accordions as the primary pattern; scroll is the disclosure.
 
 ### Exact primary copy (RU)
@@ -538,27 +541,27 @@ Summarize acoustic profile with **verdict first**, then the full evidence stack 
 | Role | Text |
 | ---- | ---- |
 | Title | `Акустический профиль помещения` |
-| Subtitle | `Ориентир комфорта для вашей комнаты и следующий шаг к расчёту` |
-| Verdict one-liner | `В этой комнате MultiFrame поднимает комфорт на ступень выше.` |
-| Verdict class line | `Сейчас: {класс} → с MultiFrame: {класс}` |
+| Subtitle (self) | `Ориентир комфорта для вашей комнаты и следующий шаг к расчёту` |
+| Subtitle (client) | `Ориентир комфорта для комнаты клиента и следующий шаг к расчёту` |
+| Verdict one-liner | Dynamic from channel rise (air / impact / both) |
 | Norm footnote | `Ориентир по шкале комфортности (норм. документы)` |
 | Before card tag | `Сейчас` |
-| Before card title | `Без MultiFrame` |
-| Before card bullets | `Соседи сверху слышны слишком отчётливо` · `Бытовые звуки сверху легко различить` · `Сейчас: {hybrid class}` |
+| Before card bullets | `Соседи сверху слышны слишком отчётливо` · `Бытовые звуки сверху легко различить` |
 | After card tag | `С MultiFrame` |
-| After card title | `С MultiFrame` |
-| After card bullets | `В комнате заметно спокойнее` · `Ударный и воздушный шум воспринимаются мягче` · `С MultiFrame: {hybrid class}` |
-| Profile | `Комната` · `{room} · {N} м²` (no scenario chips) |
-| Numbers title | `Оценка в цифрах` |
+| After card bullets | `В комнате заметно спокойнее` · `Ударный и воздушный шум воспринимаются мягче` |
 | Why title | `Почему MultiFrame уместен` |
+| Features title | `Чем MultiFrame отличается` |
+| Ribbon title (self/client) | `Итог для вашей комнаты` / `Итог для комнаты клиента` |
+| Next-step title | `Следующий шаг` |
 | Calculator CTA | `Открыть калькулятор MultiFrame` |
 | Lead open | `Запросить консультацию или подбор` |
 | Lead title | `Заявка на консультацию` |
-| Lead help | `Разберём ваш случай, подберём материал.` |
+| Lead help (self) | `Разберём ваш случай, подберём материал.` |
+| Lead help (client) | `Разберём случай клиента, подберём материал.` |
+| Client summary | `Скопировать сводку для клиента` |
 | Name | `Имя` / placeholder `Как к вам обращаться` |
 | Phone | `Телефон` / placeholder `+7 …` |
 | Submit | `Отправить` → success `Заявка принята` (MVP: demo stub / console — no real StP CRM; do not invent corporate endpoint) |
-| Payload caption | `CTA payload (schemaVersion 1)` |
 | Restart | `Пройти ещё раз` |
 | Sticky next | `Открыть калькулятор MultiFrame` (opens calculator; always enabled) |
 
@@ -731,13 +734,22 @@ Base: `https://paulos99.github.io/MF_StP/`
 
 Visible/export shape includes: `{ schemaVersion, answers, derived, audio, cta }` where `cta` carries `{ roomType, ceilingAreaM2 }` (no scenarios).
 
+### Lead handoff (`buildLeadHandoff`, 2026-09-16)
+
+MVP `console.info('[lead-demo]', handoff)` shape:
+
+`{ source: 'problemomer', timestamp, interestFor, name?, phone?, room, cta, sim: { before, after, delta, perceivedAirPct, perceivedImpactPct }, whyMultiFrame }`
+
+Client path also: `buildClientSummary(session)` — plain-text digest for clipboard / менеджер.
+
 ### Lead form behavior
 
 - Purpose: request **consultation or material selection** (not a “demo toy” label in UI).
 - Fields: name, phone.
-- Open: `Запросить консультацию или подбор` · Title: `Заявка на консультацию` · Help: `Разберём ваш случай, подберём материал.`
-- On submit (MVP): may still be a `console` stub until real endpoint exists — **do not invent** StP CRM URL. Success UI: `Заявка принята`.
+- Open: `Запросить консультацию или подбор` · Title: `Заявка на консультацию` · Help: interest-aware (`ваш` / `клиента`).
+- On submit (MVP): may still be a `console` stub until real endpoint exists — **do not invent** StP CRM URL. Success UI: `Заявка принята` + optional calc link; client notes summary for менеджер.
 - No separate disabled «Консультация» button.
+- Premium motion: Result section stagger + Room progress; honor `prefers-reduced-motion`.
 
 ---
 

@@ -16,6 +16,7 @@ import {
   type RoomType,
 } from '../../state/types';
 import { roomNextHint, roomSubstepIndex } from '../../state/session';
+import { copyForInterest } from '../../state/interestCopy';
 import styles from './RoomScreen.module.css';
 
 const ROOM_TYPES = Object.keys(ROOM_TYPE_LABELS) as RoomType[];
@@ -54,7 +55,7 @@ const SUBSTEP_COPY: Record<
   },
   noisyNeighbors: {
     title: 'Шумные соседи сверху',
-    subtitle: 'Как обычно с шумом сверху — по вашему ощущению.',
+    subtitle: 'Как обычно шумят сверху — не оценка «мешает ли».',
   },
 };
 
@@ -74,13 +75,23 @@ export function RoomScreen() {
   } = useSession();
   const room = session.answers.room;
   const sub = session.roomSubstep;
-  const copy = SUBSTEP_COPY[sub];
+  const interestCopy = copyForInterest(session.answers.interestFor);
+  const copy =
+    sub === 'basics'
+      ? { ...SUBSTEP_COPY.basics, subtitle: interestCopy.roomBasicsSubtitle }
+      : SUBSTEP_COPY[sub];
   const hint = roomNextHint(session);
   const idx = roomSubstepIndex(sub);
   const total = ROOM_SUBSTEPS.length;
+  const progressPct = Math.round(((idx + 1) / total) * 100);
 
   return (
     <Screen stickyHead title={copy.title} subtitle={copy.subtitle}>
+      <div className={styles.progressWrap} aria-hidden>
+        <div className={styles.progressTrack}>
+          <div className={styles.progressFill} style={{ width: `${progressPct}%` }} />
+        </div>
+      </div>
       <p className={styles.stepMeta} aria-live="polite">
         Вопрос {idx + 1} из {total}
       </p>

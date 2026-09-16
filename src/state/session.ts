@@ -1,13 +1,43 @@
 import type {
   AudioState,
+  ClassLabel,
   CtaPayload,
-  RoomSubstep,
   SessionState,
   WizardStep,
+  RoomSubstep,
 } from './types';
-import { ROOM_SUBSTEPS, WIZARD_STEPS, CALCULATOR_URL } from './types';
+import {
+  ROOM_SUBSTEPS,
+  WIZARD_STEPS,
+  CALCULATOR_URL,
+  HYBRID_CLASS_LABELS,
+  ROOM_TYPE_LABELS,
+} from './types';
 import { deriveProfile } from './derive';
 import { DEMO_AUDIO_PAIRS } from '../audio/demoAudio';
+import {
+  airClassFor,
+  comfortClassFor,
+  impactClassFor,
+} from './simulation';
+
+export type LeadHandoff = {
+  source: 'problemomer';
+  timestamp: string;
+  interestFor: SessionState['answers']['interestFor'];
+  name?: string;
+  phone?: string;
+  room: SessionState['answers']['room'];
+  cta: CtaPayload;
+  sim: {
+    before: { Rw: number; Lnw: number; air: ClassLabel; impact: ClassLabel; hybrid: ClassLabel };
+    after: { Rw: number; Lnw: number; air: ClassLabel; impact: ClassLabel; hybrid: ClassLabel };
+    delta: { Rw: number; Lnw: number };
+    perceivedAirPct: number;
+    perceivedImpactPct: number;
+  };
+  whyMultiFrame: string[];
+};
 
 function defaultRoom() {
   return {
@@ -157,4 +187,61 @@ export function toSessionJson(session: SessionState): string {
     null,
     2,
   );
+}
+
+function classSide(Rw: number, Lnw: number) {
+  return {
+    Rw,
+    Lnw,
+    air: airClassFor(Rw),
+    impact: impactClassFor(Lnw),
+    hybrid: comfortClassFor(Rw, Lnw),
+  };
+}
+
+/** Structured lead payload for CRM handoff (MVP: console stub). */
+export function buildLeadHandoff(
+  session: SessionState,
+  contact?: { name?: string; phone?: string },
+): LeadHandoff {
+  const full = withDerived(session);
+  const sim = full.derived!.simulation;
+  return {
+    source: 'problemomer',
+    timestamp: new Date().toISOString(),
+    interestFor: full.answers.interestFor,
+    name: contact?.name,
+    phone: contact?.phone,
+    room: full.answers.room,
+    cta: full.cta,
+    sim: {
+      before: classSide(sim.before.Rw, sim.before.Lnw),
+      after: classSide(sim.after.Rw, sim.after.Lnw),
+      delta: sim.delta,
+      perceivedAirPct: sim.perceivedAirPct,
+      perceivedImpactPct: sim.perceivedImpactPct,
+    },
+    whyMultiFrame: full.derived!.whyMultiFrame,
+  };
+}
+
+/** Plain-text digest for WhatsApp / менеджер (client path). */
+export function buildClientSummary(session: SessionState): string {
+  const handoff = buildLeadHandoff(session);
+  const room = handoff.room;
+  const roomName = room.roomType ? ROOM_TYPE_LABELS[room.roomType] : 'комната';
+  const area = room.ceilingAreaM2 != null ? `${room.ceilingAreaM2} м²` : 'площадь н/д';
+  const b = handoff.sim.before;
+  const a = handoff.sim.after;
+  const lines = [
+    'Сводка Проблемомер · MultiFrame',
+    `${roomName} · ${area}`,
+    `Сейчас: воздух ${HYBRID_CLASS_LABELS[b.air]}, удар ${HYBRID_CLASS_LABELS[b.impact]} (Rw ${b.Rw} / Lnw ${b.Lnw})`,
+    `С MultiFrame: воздух ${HYBRID_CLASS_LABELS[a.air]}, удар ${HYBRID_CLASS_LABELS[a.impact]} (Rw ${a.Rw} / Lnw ${a.Lnw})`,
+    `Δ: +${Math.abs(handoff.sim.delta.Rw)} дБ воздух · −${Math.abs(handoff.sim.delta.Lnw)} дБ удар`,
+    `Ощущение: ≈ −${handoff.sim.perceivedAirPct}% воздух · ≈ −${handoff.sim.perceivedImpactPct}% удар`,
+    ...handoff.whyMultiFrame.slice(0, 2).map((w) => `• ${w}`),
+    'Ориентир до лабораторных данных · не гарантия',
+  ];
+  return lines.join('\n');
 }
