@@ -68,7 +68,15 @@ function channelLabel(cls: ClassLabel, kind: 'air' | 'impact'): string {
   return HYBRID_CLASS_LABELS[cls];
 }
 
-const LADDER_TINY: Record<ClassLabel, string> = {
+/** Short human words under the official letter. */
+const LADDER_WORD: Record<ClassLabel, string> = {
+  below: 'Дискомфорт',
+  V: 'Допустимый',
+  B: 'Комфорт',
+  A: 'Высокий',
+};
+
+const LADDER_LETTER: Record<ClassLabel, string> = {
   below: 'Д',
   V: 'В',
   B: 'Б',
@@ -77,20 +85,27 @@ const LADDER_TINY: Record<ClassLabel, string> = {
 
 function ChannelLadder({
   title,
+  help,
   before,
   after,
   kind,
-  meta,
+  beforeValue,
+  afterValue,
+  unitHint,
 }: {
   title: string;
+  help: string;
   before: ClassLabel;
   after: ClassLabel;
   kind: 'air' | 'impact';
-  meta: string;
+  beforeValue: number;
+  afterValue: number;
+  unitHint: string;
 }) {
   const rose = rung(after) > rung(before);
   const same = before === after;
   const stuckImpact = same && kind === 'impact' && after === 'below';
+  const softer = !rose && !same && kind === 'impact' && afterValue < beforeValue;
 
   return (
     <article
@@ -98,17 +113,30 @@ function ChannelLadder({
       aria-label={`${title}: ${channelLabel(before, kind)} → ${channelLabel(after, kind)}`}
     >
       <header className={styles.channelHead}>
-        <span className={styles.channelTitle}>{title}</span>
-        <span className={styles.channelMeta}>{meta}</span>
+        <div>
+          <span className={styles.channelTitle}>{title}</span>
+          <p className={styles.channelHelp}>{help}</p>
+        </div>
       </header>
 
       <p className={styles.channelShift}>
-        {channelLabel(before, kind)}
+        <span className={styles.channelWas}>Было: {channelLabel(before, kind)}</span>
         <span className={styles.arrow} aria-hidden>
           {' → '}
         </span>
-        <b className={rose ? styles.accent : undefined}>{channelLabel(after, kind)}</b>
+        <b className={rose ? styles.accent : undefined}>
+          Стало: {channelLabel(after, kind)}
+        </b>
       </p>
+
+      {rose ? (
+        <p className={styles.channelNoteOk}>По шкале комфортности — заметный шаг вверх.</p>
+      ) : null}
+      {softer || (stuckImpact && beforeValue !== afterValue) ? (
+        <p className={styles.channelNote}>
+          Цифра стала лучше ({beforeValue} → {afterValue}), но уровень по норме ещё не закрыт.
+        </p>
+      ) : null}
 
       <div className={styles.ladder} aria-hidden>
         <div className={styles.ladderTrack} />
@@ -127,14 +155,22 @@ function ChannelLadder({
                 {both ? 'сейчас · MF' : isBefore ? 'сейчас' : isAfter ? 'MF' : ''}
               </span>
               <span className={styles.rungDot} />
-              <span className={styles.rungName}>{LADDER_TINY[cls]}</span>
+              <span className={styles.rungLetter}>{LADDER_LETTER[cls]}</span>
+              <span className={styles.rungName}>{LADDER_WORD[cls]}</span>
             </div>
           );
         })}
       </div>
 
+      <p className={styles.channelMeta}>
+        {unitHint}: {beforeValue} → {afterValue} дБ
+      </p>
+
       {stuckImpact ? (
-        <p className={styles.channelNote}>Полную норму по удару чаще закрывает пол сверху.</p>
+        <p className={styles.channelNote}>
+          Полную норму по удару чаще закрывает пол у соседа сверху — потолок смягчает, но не
+          заменяет пол.
+        </p>
       ) : null}
     </article>
   );
@@ -205,24 +241,24 @@ export function ResultScreen() {
 
   const oneLiner = (() => {
     if (airRose && impactRose) {
-      return 'MultiFrame поднимает комфорт и по воздуху, и по удару.';
+      return 'С MultiFrame в этой комнате станет заметно спокойнее и по голосам сверху, и по шагам.';
     }
     if (airRose) {
-      return `По воздуху — до «${channelLabel(airAfterClass, 'air')}».`;
+      return `С MultiFrame голоса, ТВ и музыка сверху — до уровня «${channelLabel(airAfterClass, 'air')}».`;
     }
     if (impactRose) {
-      return `По удару — до «${channelLabel(impactAfterClass, 'impact')}».`;
+      return `С MultiFrame шаги и топот сверху — до уровня «${channelLabel(impactAfterClass, 'impact')}».`;
     }
-    return 'Шум сверху становится мягче — смотрите уровни по каналам.';
+    return 'С MultiFrame шум сверху становится мягче — смотрите два типа шума ниже.';
   })();
 
   const effectLine = (() => {
     if (airRose && impactRose) {
-      return `MultiFrame поднимает воздух (+${airDb} дБ) и смягчает удар (−${impactDb} дБ).`;
+      return `MultiFrame поднимает комфорт по воздуху (+${airDb} дБ) и смягчает удар (−${impactDb} дБ).`;
     }
-    if (airRose) return `Потолок MultiFrame поднимает воздух примерно на +${airDb} дБ Rw.`;
-    if (impactRose) return `MultiFrame смягчает удар примерно на −${impactDb} дБ Lnw.`;
-    return `Ориентир эффекта: +${airDb} дБ по воздуху и −${impactDb} дБ по удару.`;
+    if (airRose) return `Потолок MultiFrame сильнее гасит голоса и музыку сверху (примерно +${airDb} дБ).`;
+    if (impactRose) return `MultiFrame смягчает шаги и удары сверху (примерно −${impactDb} дБ).`;
+    return `Ориентир эффекта: воздух +${airDb} дБ, удар −${impactDb} дБ.`;
   })();
 
   const feelPct = Math.round((sim.perceivedAirPct + sim.perceivedImpactPct) / 2);
@@ -233,34 +269,52 @@ export function ResultScreen() {
       <div className={`${styles.verdict} ${styles.reveal}`} role="status">
         <p className={styles.oneLiner}>{oneLiner}</p>
 
+        <p className={styles.scaleGuide}>
+          <b>Шкала комфортности</b> — официальные уровни по нормам (не наша придумка): от
+          Дискомфорта до Высокого (А). Серый маркер — сейчас, зелёный — с MultiFrame.
+        </p>
+
         <div className={styles.channelGrid}>
           <ChannelLadder
-            title="Воздух"
+            title="Голоса, ТВ, музыка"
+            help="Воздушный шум сверху · чем выше по шкале — тем тише"
             before={airBeforeClass}
             after={airAfterClass}
             kind="air"
-            meta={`Rw ${sim.before.Rw} → ${sim.after.Rw}`}
+            beforeValue={sim.before.Rw}
+            afterValue={sim.after.Rw}
+            unitHint="Изоляция перекрытия (Rw)"
           />
           <ChannelLadder
-            title="Удар"
+            title="Шаги, топот, удары"
+            help="Ударный шум по плите · чем выше по шкале — тем мягче"
             before={impactBeforeClass}
             after={impactAfterClass}
             kind="impact"
-            meta={`Lnw ${sim.before.Lnw} → ${sim.after.Lnw}`}
+            beforeValue={sim.before.Lnw}
+            afterValue={sim.after.Lnw}
+            unitHint="Уровень удара (Lnw, меньше — лучше)"
           />
         </div>
 
         <p className={styles.hybridNote}>
-          Полный класс СП: <b>{HYBRID_CLASS_LABELS[beforeClass]}</b>
           {hybridRose ? (
             <>
+              Норма сразу по обоим типам шума:{' '}
+              <b>{HYBRID_CLASS_LABELS[beforeClass]}</b>
               <span className={styles.arrow} aria-hidden>
                 {' → '}
               </span>
-              <b className={styles.accent}>{HYBRID_CLASS_LABELS[afterClass]}</b>
+              <b className={styles.accent}>{HYBRID_CLASS_LABELS[afterClass]}</b>.
             </>
           ) : (
-            <> — {HYBRID_CLASS_LABELS[afterClass]}</>
+            <>
+              Норма сразу по обоим типам шума пока:{' '}
+              <b>{HYBRID_CLASS_LABELS[afterClass]}</b>
+              {impactAfterClass === 'below'
+                ? ' — удар ещё вне нормы, пол у соседа сверху часто нужен.'
+                : '.'}
+            </>
           )}
         </p>
 

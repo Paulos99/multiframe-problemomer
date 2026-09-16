@@ -19,6 +19,18 @@
   line-height: 1.28;
 }
 
+.scaleGuide {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.scaleGuide b {
+  font-weight: 750;
+  color: var(--text-primary);
+}
+
 .classShift {
   margin: 0;
   font-size: 14px;
@@ -55,7 +67,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: 12px 12px 10px;
+  padding: 12px 10px 12px;
   background: transparent;
   border: none;
 }
@@ -66,23 +78,33 @@
 
 .channelHead {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .channelTitle {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 750;
-  letter-spacing: 0.01em;
+  letter-spacing: -0.01em;
   color: var(--text-primary);
+}
+
+.channelHelp {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--text-secondary);
 }
 
 .channelShift {
   margin: 0;
   font-size: 13px;
   font-weight: 550;
-  line-height: 1.3;
+  line-height: 1.35;
+  color: var(--text-secondary);
+}
+
+.channelWas {
   color: var(--text-secondary);
 }
 
@@ -92,20 +114,27 @@
 }
 
 .channelMeta {
-  font-size: 12px;
-  font-weight: 650;
+  margin: 2px 0 0;
+  font-size: 11px;
+  font-weight: 550;
   font-variant-numeric: tabular-nums;
   color: var(--text-secondary);
-  white-space: nowrap;
+  line-height: 1.35;
 }
 
 .channelNote,
+.channelNoteOk,
 .hybridNote,
 .ladderCaption {
   margin: 0;
   font-size: 12px;
   line-height: 1.4;
   color: var(--text-secondary);
+}
+
+.channelNoteOk {
+  color: var(--accent-color);
+  font-weight: 650;
 }
 
 .hybridNote b {
@@ -124,13 +153,14 @@
   }
 }
 
-/* Comfort ladder: Д → В → Б → А */
+/* Comfort ladder: Д → В → Б → А with word labels */
 .ladder {
   position: relative;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 2px;
-  margin: 2px 0 0;
+  margin: 4px 0 0;
+  padding-top: 2px;
 }
 
 .ladderTrack {
@@ -147,7 +177,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
   text-align: center;
 }
 
@@ -190,17 +220,31 @@
   box-shadow: 0 0 0 2px var(--accent-soft);
 }
 
-.rungName {
-  font-size: 11px;
-  font-weight: 650;
+.rungLetter {
+  font-size: 12px;
+  font-weight: 800;
   line-height: 1;
   color: var(--text-secondary);
 }
 
+.rungName {
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--text-secondary);
+  max-width: 4.6em;
+}
+
+.rungAfter .rungLetter,
+.rungBoth .rungLetter,
 .rungAfter .rungName,
 .rungBoth .rungName {
   color: var(--accent-color);
   font-weight: 750;
+}
+
+.rungBefore .rungLetter {
+  color: #5c6770;
 }
 
 .roomMeta {
