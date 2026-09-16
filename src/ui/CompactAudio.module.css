@@ -1,18 +1,21 @@
 .wrap {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-  border-radius: var(--radius-lg);
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-color);
 }
 
-.head h2 {
-  margin: 0 0 2px;
-  font-size: 15px;
-  font-weight: 750;
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.head h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
   letter-spacing: -0.01em;
 }
 
@@ -22,35 +25,35 @@
   color: var(--text-secondary);
 }
 
+.groups {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+}
+
 .group {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding-top: 8px;
-  border-top: 1px solid var(--border-color);
+  min-width: 0;
+  padding: 0 10px;
 }
 
-.group:first-of-type {
-  border-top: none;
-  padding-top: 0;
+.group:first-child {
+  padding-left: 0;
 }
 
-.groupHead {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
+.group:last-child {
+  padding-right: 0;
 }
 
-.groupHead strong {
+.group + .group {
+  border-left: 1px solid var(--border-color);
+}
+
+.groupTitle {
   font-size: 13px;
-}
-
-.reduction {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--accent-color);
-  white-space: nowrap;
+  font-weight: 750;
 }
 
 .examples {
@@ -142,22 +145,29 @@
   background: var(--accent-color);
 }
 
-.footnote {
-  margin: 0;
-  font-size: 11px;
-  line-height: 1.4;
-  color: var(--text-secondary);
-}
+@media (max-width: 640px) {
+  .groups {
+    grid-template-columns: 1fr;
+  }
 
-.disclaimer {
-  margin: 0;
-  font-size: 11px;
-  line-height: 1.4;
-  color: var(--text-secondary);
+  .group,
+  .group:first-child,
+  .group:last-child {
+    padding: 10px 0;
+  }
+
+  .group:first-child {
+    padding-top: 0;
+  }
+
+  .group + .group {
+    border-top: 1px solid var(--border-color);
+    border-left: 0;
+  }
 }
 
 @media (max-width: 380px) {
   .controls {
-    grid-template-columns: 1fr;
+    gap: 6px;
   }
 }

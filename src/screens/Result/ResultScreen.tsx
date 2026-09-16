@@ -6,10 +6,8 @@ import { CompactAudio } from '../../ui/CompactAudio';
 import { SpectrumChart } from '../../ui/SpectrumChart';
 import { useSession } from '../../state/SessionContext';
 import {
-  DISCLAIMER_SIMULATION,
   HYBRID_CLASS_LABELS,
   LOG_DB_FOOTNOTE,
-  NORM_FOOTNOTE,
   ROOM_TYPE_LABELS,
   SIMULATION_BADGE,
   type ClassLabel,
@@ -17,7 +15,6 @@ import {
 import {
   NORMS,
   airClassFor,
-  comfortClassFor,
   deriveSimulation,
   impactClassFor,
 } from '../../state/simulation';
@@ -33,7 +30,7 @@ import styles from './ResultScreen.module.css';
 const LADDER: ClassLabel[] = ['below', 'V', 'B', 'A'];
 
 const LADDER_SHORT: Record<ClassLabel, string> = {
-  below: 'Дискомфорт',
+  below: 'Ниже В',
   V: 'Допустимый (В)',
   B: 'Комфорт (Б)',
   A: 'Высокий (А)',
@@ -62,117 +59,161 @@ function quietBarScale(before: number, after: number): { beforePct: number; afte
   return { beforePct, afterPct };
 }
 
-function channelLabel(cls: ClassLabel, kind: 'air' | 'impact'): string {
-  if (cls === 'below' && kind === 'impact') return 'Вне нормы';
-  if (cls === 'below') return 'Дискомфорт';
+function channelLabel(cls: ClassLabel): string {
+  if (cls === 'below') return 'Ниже В';
   return HYBRID_CLASS_LABELS[cls];
 }
 
-/** Short human words under the official letter. */
-const LADDER_WORD: Record<ClassLabel, string> = {
-  below: 'Дискомфорт',
-  V: 'Допустимый',
-  B: 'Комфорт',
-  A: 'Высокий',
+const SCALE_STEP: Record<ClassLabel, { letter: string; label: string }> = {
+  below: { letter: '', label: 'Ниже В' },
+  V: { letter: 'В', label: 'Допустимый' },
+  B: { letter: 'Б', label: 'Комфорт' },
+  A: { letter: 'А', label: 'Высокий' },
 };
 
-const LADDER_LETTER: Record<ClassLabel, string> = {
-  below: 'Д',
-  V: 'В',
-  B: 'Б',
-  A: 'А',
-};
+function scaleStepLabel(cls: ClassLabel): string {
+  const step = SCALE_STEP[cls];
+  return step.letter ? `${step.letter} · ${step.label}` : step.label;
+}
 
-function ChannelLadder({
+function ScaleRow({
   title,
-  help,
+  example,
   before,
   after,
-  kind,
   beforeValue,
   afterValue,
-  unitHint,
+  metric,
+  lowerIsBetter = false,
 }: {
   title: string;
-  help: string;
+  example: string;
   before: ClassLabel;
   after: ClassLabel;
-  kind: 'air' | 'impact';
   beforeValue: number;
   afterValue: number;
-  unitHint: string;
+  metric: string;
+  lowerIsBetter?: boolean;
 }) {
-  const rose = rung(after) > rung(before);
   const same = before === after;
-  const stuckImpact = same && kind === 'impact' && after === 'below';
-  const softer = !rose && !same && kind === 'impact' && afterValue < beforeValue;
+  const changed = beforeValue !== afterValue;
+  const summary = same
+    ? changed
+      ? 'Уровень стал лучше, класс пока тот же'
+      : 'Класс без изменений'
+    : `${scaleStepLabel(before)} → ${scaleStepLabel(after)}`;
 
   return (
-    <article
-      className={styles.channelCard}
-      aria-label={`${title}: ${channelLabel(before, kind)} → ${channelLabel(after, kind)}`}
-    >
-      <header className={styles.channelHead}>
+    <article className={styles.scaleRow}>
+      <header className={styles.scaleRowHead}>
         <div>
-          <span className={styles.channelTitle}>{title}</span>
-          <p className={styles.channelHelp}>{help}</p>
+          <strong>{title}</strong>
+          <span>{example}</span>
         </div>
+        <b>{summary}</b>
       </header>
 
-      <p className={styles.channelShift}>
-        <span className={styles.channelWas}>Было: {channelLabel(before, kind)}</span>
-        <span className={styles.arrow} aria-hidden>
-          {' → '}
-        </span>
-        <b className={rose ? styles.accent : undefined}>
-          Стало: {channelLabel(after, kind)}
-        </b>
-      </p>
-
-      {rose ? (
-        <p className={styles.channelNoteOk}>По шкале комфортности — заметный шаг вверх.</p>
-      ) : null}
-      {softer || (stuckImpact && beforeValue !== afterValue) ? (
-        <p className={styles.channelNote}>
-          Цифра стала лучше ({beforeValue} → {afterValue}), но уровень по норме ещё не закрыт.
-        </p>
-      ) : null}
-
-      <div className={styles.ladder} aria-hidden>
-        <div className={styles.ladderTrack} />
+      <div
+        className={styles.scaleTrack}
+        role="img"
+        aria-label={`${title}: сейчас ${scaleStepLabel(before)}, с MultiFrame ${scaleStepLabel(after)}`}
+      >
+        <span className={styles.scaleLine} aria-hidden />
         {LADDER.map((cls) => {
           const isBefore = cls === before;
-          const isAfter = cls === after && !same;
+          const isAfter = cls === after;
           const both = same && isBefore;
           return (
-            <div
-              key={cls}
-              className={`${styles.rung} ${isBefore || both ? styles.rungBefore : ''} ${
-                isAfter ? styles.rungAfter : ''
-              } ${both ? styles.rungBoth : ''}`}
-            >
-              <span className={styles.rungTag}>
-                {both ? 'сейчас · MF' : isBefore ? 'сейчас' : isAfter ? 'MF' : ''}
+            <span className={styles.scaleCell} key={cls}>
+              <span className={styles.markerCaption}>
+                {both ? 'Сейчас + MF' : isBefore ? 'Сейчас' : isAfter ? 'MultiFrame' : ''}
               </span>
-              <span className={styles.rungDot} />
-              <span className={styles.rungLetter}>{LADDER_LETTER[cls]}</span>
-              <span className={styles.rungName}>{LADDER_WORD[cls]}</span>
-            </div>
+              <span
+                className={`${styles.scaleDot} ${isBefore ? styles.scaleDotNow : ''} ${
+                  isAfter ? styles.scaleDotAfter : ''
+                } ${both ? styles.scaleDotBoth : ''}`}
+              />
+            </span>
           );
         })}
       </div>
 
-      <p className={styles.channelMeta}>
-        {unitHint}: {beforeValue} → {afterValue} дБ
+      <p className={styles.scaleMetric}>
+        {metric}: {beforeValue} → {afterValue} дБ
+        {lowerIsBetter ? ' · меньше — лучше' : ' · больше — лучше'}
       </p>
+    </article>
+  );
+}
 
-      {stuckImpact ? (
-        <p className={styles.channelNote}>
-          Полную норму по удару чаще закрывает пол у соседа сверху — потолок смягчает, но не
-          заменяет пол.
+function ComfortScale({
+  airBefore,
+  airAfter,
+  impactBefore,
+  impactAfter,
+  airBeforeValue,
+  airAfterValue,
+  impactBeforeValue,
+  impactAfterValue,
+}: {
+  airBefore: ClassLabel;
+  airAfter: ClassLabel;
+  impactBefore: ClassLabel;
+  impactAfter: ClassLabel;
+  airBeforeValue: number;
+  airAfterValue: number;
+  impactBeforeValue: number;
+  impactAfterValue: number;
+}) {
+  return (
+    <section className={styles.comfortScale} aria-label="Официальная шкала комфортности">
+      <header className={styles.scaleIntro}>
+        <h2>Шкала комфортности</h2>
+        <p>
+          Основана на СП 51.13330.2011: <b>А</b> — высокий комфорт, <b>Б</b> — комфорт,
+          <b> В</b> — допустимый уровень. «Ниже В» означает, что минимальный уровень ещё не
+          достигнут.
+        </p>
+      </header>
+
+      <div className={styles.scaleAxis} aria-hidden>
+        {LADDER.map((cls) => (
+          <span key={cls}>
+            {SCALE_STEP[cls].letter ? <b>{SCALE_STEP[cls].letter}</b> : null}
+            <small>{SCALE_STEP[cls].label}</small>
+          </span>
+        ))}
+      </div>
+
+      <div className={styles.scaleRows}>
+        <ScaleRow
+          title="Голоса и музыка"
+          example="речь, телевизор, лай сверху"
+          before={airBefore}
+          after={airAfter}
+          beforeValue={airBeforeValue}
+          afterValue={airAfterValue}
+          metric="Изоляция Rw"
+        />
+        <ScaleRow
+          title="Шаги и удары"
+          example="топот, бег, падения предметов"
+          before={impactBefore}
+          after={impactAfter}
+          beforeValue={impactBeforeValue}
+          afterValue={impactAfterValue}
+          metric="Уровень Lnw"
+          lowerIsBetter
+        />
+      </div>
+
+      {impactAfter === 'below' ? (
+        <p className={styles.scaleLimit}>
+          <b>Почему шаги всё ещё ниже В:</b> потолок смягчает ударный шум, но минимальную норму
+          обычно обеспечивает ещё и звукоизолированный пол у соседа сверху.
         </p>
       ) : null}
-    </article>
+    </section>
   );
 }
 
@@ -184,15 +225,12 @@ export function ResultScreen() {
   const sim = session.derived?.simulation ?? deriveSimulation(session.answers);
   const whyLines = session.derived?.whyMultiFrame ?? [];
 
-  const beforeClass = comfortClassFor(sim.before.Rw, sim.before.Lnw);
-  const afterClass = comfortClassFor(sim.after.Rw, sim.after.Lnw);
   const airBeforeClass = airClassFor(sim.before.Rw);
   const airAfterClass = airClassFor(sim.after.Rw);
   const impactBeforeClass = impactClassFor(sim.before.Lnw);
   const impactAfterClass = impactClassFor(sim.after.Lnw);
   const airRose = rung(airAfterClass) > rung(airBeforeClass);
   const impactRose = rung(impactAfterClass) > rung(impactBeforeClass);
-  const hybridRose = rung(afterClass) > rung(beforeClass);
 
   const airBefore = sim.quietAirBefore;
   const airAfter = sim.quietAirAfter;
@@ -207,6 +245,10 @@ export function ResultScreen() {
   const airSpectrum = sim.airSpectrum;
   const impactSpectrum = sim.impactSpectrum;
   const calcUrl = buildCalculatorUrl(session.cta);
+  const roomReason =
+    whyLines.find((line) => !line.toLocaleLowerCase('ru').includes('каркас')) ??
+    whyLines[0] ??
+    'Система работает с шумом, который приходит сверху через перекрытие.';
 
   const [showLead, setShowLead] = useState(false);
   const [sent, setSent] = useState(false);
@@ -228,392 +270,178 @@ export function ResultScreen() {
 
   async function onCopySummary() {
     const text = buildClientSummary(session);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 2500);
     try {
       await navigator.clipboard.writeText(text);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2500);
     } catch {
       console.info('[summary-copy-fallback]', text);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2500);
     }
   }
 
-  const oneLiner = (() => {
+  const verdictTitle = (() => {
     if (airRose && impactRose) {
-      return 'С MultiFrame в этой комнате станет заметно спокойнее и по голосам сверху, и по шагам.';
+      return 'MultiFrame заметно снизит и голоса, и шаги сверху.';
     }
     if (airRose) {
-      return `С MultiFrame голоса, ТВ и музыка сверху — до уровня «${channelLabel(airAfterClass, 'air')}».`;
+      return 'MultiFrame заметно снизит голоса и музыку сверху.';
     }
     if (impactRose) {
-      return `С MultiFrame шаги и топот сверху — до уровня «${channelLabel(impactAfterClass, 'impact')}».`;
+      return 'MultiFrame заметно смягчит шаги и удары сверху.';
     }
-    return 'С MultiFrame шум сверху становится мягче — смотрите два типа шума ниже.';
+    return 'MultiFrame сделает шум сверху мягче.';
   })();
 
-  const effectLine = (() => {
-    if (airRose && impactRose) {
-      return `MultiFrame поднимает комфорт по воздуху (+${airDb} дБ) и смягчает удар (−${impactDb} дБ).`;
-    }
-    if (airRose) return `Потолок MultiFrame сильнее гасит голоса и музыку сверху (примерно +${airDb} дБ).`;
-    if (impactRose) return `MultiFrame смягчает шаги и удары сверху (примерно −${impactDb} дБ).`;
-    return `Ориентир эффекта: воздух +${airDb} дБ, удар −${impactDb} дБ.`;
-  })();
-
-  const feelPct = Math.round((sim.perceivedAirPct + sim.perceivedImpactPct) / 2);
+  const verdictLead =
+    impactAfterClass === 'below'
+      ? `По голосам результат поднимается до «${channelLabel(airAfterClass)}». Шаги станут мягче на ${impactDb} дБ, но минимальную норму по ним обычно дополняет пол у соседа сверху.`
+      : `По голосам — «${channelLabel(airAfterClass)}», по шагам — «${channelLabel(impactAfterClass)}».`;
 
   return (
-    <Screen dense title="Акустический профиль помещения" subtitle={copy.resultSubtitle}>
-      {/* 1. Verdict */}
-      <div className={`${styles.verdict} ${styles.reveal}`} role="status">
-        <p className={styles.oneLiner}>{oneLiner}</p>
+    <Screen
+      dense
+      title={copy.isClient ? 'Результат для комнаты клиента' : 'Результат для вашей комнаты'}
+      subtitle={copy.resultSubtitle}
+    >
+      <section
+        className={styles.verdict}
+        aria-label={copy.isClient ? 'Результат для клиента' : 'Ваш результат'}
+      >
+        <span className={styles.resultEyebrow}>
+          {copy.isClient ? 'Результат для клиента' : 'Ваш результат'}
+        </span>
+        <h2 className={styles.oneLiner}>{verdictTitle}</h2>
+        <p className={styles.verdictLead}>{verdictLead}</p>
 
-        <p className={styles.scaleGuide}>
-          <b>Шкала комфортности</b> — официальные уровни по нормам (не наша придумка): от
-          Дискомфорта до Высокого (А). Серый маркер — сейчас, зелёный — с MultiFrame.
-        </p>
-
-        <div className={styles.channelGrid}>
-          <ChannelLadder
-            title="Голоса, ТВ, музыка"
-            help="Воздушный шум сверху · чем выше по шкале — тем тише"
-            before={airBeforeClass}
-            after={airAfterClass}
-            kind="air"
-            beforeValue={sim.before.Rw}
-            afterValue={sim.after.Rw}
-            unitHint="Изоляция перекрытия (Rw)"
-          />
-          <ChannelLadder
-            title="Шаги, топот, удары"
-            help="Ударный шум по плите · чем выше по шкале — тем мягче"
-            before={impactBeforeClass}
-            after={impactAfterClass}
-            kind="impact"
-            beforeValue={sim.before.Lnw}
-            afterValue={sim.after.Lnw}
-            unitHint="Уровень удара (Lnw, меньше — лучше)"
-          />
-        </div>
-
-        <p className={styles.hybridNote}>
-          {hybridRose ? (
-            <>
-              Норма сразу по обоим типам шума:{' '}
-              <b>{HYBRID_CLASS_LABELS[beforeClass]}</b>
-              <span className={styles.arrow} aria-hidden>
-                {' → '}
-              </span>
-              <b className={styles.accent}>{HYBRID_CLASS_LABELS[afterClass]}</b>.
-            </>
-          ) : (
-            <>
-              Норма сразу по обоим типам шума пока:{' '}
-              <b>{HYBRID_CLASS_LABELS[afterClass]}</b>
-              {impactAfterClass === 'below'
-                ? ' — удар ещё вне нормы, пол у соседа сверху часто нужен.'
-                : '.'}
-            </>
-          )}
-        </p>
+        <ComfortScale
+          airBefore={airBeforeClass}
+          airAfter={airAfterClass}
+          impactBefore={impactBeforeClass}
+          impactAfter={impactAfterClass}
+          airBeforeValue={sim.before.Rw}
+          airAfterValue={sim.after.Rw}
+          impactBeforeValue={sim.before.Lnw}
+          impactAfterValue={sim.after.Lnw}
+        />
 
         <p className={styles.roomMeta}>
           {[roomLabel, room.ceilingAreaM2 ? `${room.ceilingAreaM2} м²` : null]
             .filter(Boolean)
             .join(' · ')}
-          {roomLabel || room.ceilingAreaM2 ? ' · ' : ''}
-          {NORM_FOOTNOTE}
-        </p>
-      </div>
-
-      {/* 2. Emotion cards — simplified bullets */}
-      <div className={`${styles.dual} ${styles.reveal} ${styles.revealDelay1}`}>
-        <article className={`${styles.emotionCard} ${styles.before}`}>
-          <span className={styles.tag}>Сейчас</span>
-          <ul>
-            <li>Соседи сверху слышны слишком отчётливо</li>
-            <li>Бытовые звуки сверху легко различить</li>
-          </ul>
-        </article>
-        <article className={`${styles.emotionCard} ${styles.after}`}>
-          <span className={styles.tag}>С MultiFrame</span>
-          <ul>
-            <li>В комнате заметно спокойнее</li>
-            <li>Ударный и воздушный шум воспринимаются мягче</li>
-          </ul>
-        </article>
-      </div>
-
-      {/* 3. How much quieter */}
-      <section
-        className={`${styles.quieter} ${styles.reveal} ${styles.revealDelay2}`}
-        aria-label="Насколько станет тише"
-      >
-        <header>
-          <h2>Насколько станет тише</h2>
-          <p>{SIMULATION_BADGE}</p>
-        </header>
-
-        <div className={styles.deltaGrid}>
-          <article className={styles.deltaCard}>
-            <span className={styles.deltaKind}>Звукоизоляция воздушного шума</span>
-            <p className={styles.deltaValue}>
-              <span>+</span>
-              {airDb}
-              <small>дБ</small>
-            </p>
-            <p className={styles.deltaHint}>
-              Rw {sim.before.Rw} → {sim.after.Rw}: чем больше — тем тише речь и музыка сверху.
-            </p>
-          </article>
-          <article className={styles.deltaCard}>
-            <span className={styles.deltaKind}>Уровень ударного шума</span>
-            <p className={styles.deltaValue}>
-              <span>−</span>
-              {impactDb}
-              <small>дБ</small>
-            </p>
-            <p className={styles.deltaHint}>
-              Lnw {sim.before.Lnw} → {sim.after.Lnw}: чем меньше — тем мягче шаги и удары.
-            </p>
-          </article>
-        </div>
-
-        <div className={styles.qRow}>
-          <div className={styles.qHead}>
-            <span className={styles.qName}>Воздушный шум</span>
-            <span className={styles.qEx}>голоса, ТВ, музыка сверху</span>
-          </div>
-          <div
-            className={styles.qBar}
-            role="img"
-            aria-label={`Воздушный шум: тише примерно на ${sim.perceivedAirPct}%`}
-          >
-            <span className={styles.qFillAfter} style={{ width: `${airBar.afterPct}%` }} />
-            <span className={styles.qFillBefore} style={{ width: `${airBar.beforePct}%` }} />
-            <span className={styles.qMark} style={{ left: `${airBar.beforePct}%` }} />
-            <span className={`${styles.qMark} ${styles.qMarkMf}`} style={{ left: `${airBar.afterPct}%` }} />
-          </div>
-          <p className={styles.qHero}>≈ на {sim.perceivedAirPct}% тише по ощущению</p>
-        </div>
-
-        <div className={styles.qRow}>
-          <div className={styles.qHead}>
-            <span className={styles.qName}>Ударный шум</span>
-            <span className={styles.qEx}>шаги, бег детей, падения предметов</span>
-          </div>
-          <div
-            className={styles.qBar}
-            role="img"
-            aria-label={`Ударный шум: тише примерно на ${sim.perceivedImpactPct}%`}
-          >
-            <span className={styles.qFillAfter} style={{ width: `${impactBar.afterPct}%` }} />
-            <span className={styles.qFillBefore} style={{ width: `${impactBar.beforePct}%` }} />
-            <span className={styles.qMark} style={{ left: `${impactBar.beforePct}%` }} />
-            <span
-              className={`${styles.qMark} ${styles.qMarkMf}`}
-              style={{ left: `${impactBar.afterPct}%` }}
-            />
-          </div>
-          <p className={styles.qHero}>≈ на {sim.perceivedImpactPct}% тише по ощущению</p>
-        </div>
-
-        <p className={styles.legend}>
-          <span className={styles.legendBefore} /> сейчас
-          <span className={styles.legendAfter} /> с MultiFrame
-        </p>
-
-        <p className={styles.qNote}>
-          {DISCLAIMER_SIMULATION} {LOG_DB_FOOTNOTE}
         </p>
       </section>
 
-      {/* 4. Audio */}
-      <div className={`${styles.reveal} ${styles.revealDelay3}`}>
+      <section className={styles.effect} aria-label="Что изменится на слух">
+        <header className={styles.sectionHead}>
+          <h2>Что изменится на слух</h2>
+          <p>Два типа шума, которые чаще всего приходят через потолок.</p>
+        </header>
+
+        <div className={styles.effectGrid}>
+          <article className={styles.effectCard}>
+            <header>
+              <div>
+                <strong>Голоса и музыка</strong>
+                <span>речь, телевизор, лай сверху</span>
+              </div>
+              <b>≈ {sim.perceivedAirPct}% тише</b>
+            </header>
+            <div
+              className={styles.qBar}
+              role="img"
+              aria-label={`Голоса и музыка: примерно на ${sim.perceivedAirPct}% тише`}
+            >
+              <span className={styles.qFillAfter} style={{ width: `${airBar.afterPct}%` }} />
+              <span className={styles.qFillBefore} style={{ width: `${airBar.beforePct}%` }} />
+              <span className={styles.qMark} style={{ left: `${airBar.beforePct}%` }} />
+              <span
+                className={`${styles.qMark} ${styles.qMarkMf}`}
+                style={{ left: `${airBar.afterPct}%` }}
+              />
+            </div>
+            <p>
+              <b>+{airDb} дБ к изоляции.</b> Разговоры и телевизор сверху будут различаться
+              заметно меньше.
+            </p>
+          </article>
+
+          <article className={styles.effectCard}>
+            <header>
+              <div>
+                <strong>Шаги и удары</strong>
+                <span>топот, бег, падения предметов</span>
+              </div>
+              <b>≈ {sim.perceivedImpactPct}% тише</b>
+            </header>
+            <div
+              className={styles.qBar}
+              role="img"
+              aria-label={`Шаги и удары: примерно на ${sim.perceivedImpactPct}% тише`}
+            >
+              <span className={styles.qFillAfter} style={{ width: `${impactBar.afterPct}%` }} />
+              <span className={styles.qFillBefore} style={{ width: `${impactBar.beforePct}%` }} />
+              <span className={styles.qMark} style={{ left: `${impactBar.beforePct}%` }} />
+              <span
+                className={`${styles.qMark} ${styles.qMarkMf}`}
+                style={{ left: `${impactBar.afterPct}%` }}
+              />
+            </div>
+            <p>
+              <b>−{impactDb} дБ уровня удара.</b> Шаги станут мягче, хотя пол сверху по-прежнему
+              влияет сильнее потолка.
+            </p>
+          </article>
+        </div>
+
         <CompactAudio pairs={session.audio.pairs} sim={sim} />
-      </div>
 
-      {/* 5. Why MultiFrame fits this room */}
-      {whyLines.length > 0 ? (
-        <section
-          className={`${styles.whyFit} ${styles.reveal} ${styles.revealDelay3}`}
-          aria-label="Почему MultiFrame уместен"
-        >
-          <h2>Почему MultiFrame уместен</h2>
-          <ul>
-            {whyLines.slice(0, 3).map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      {/* 6. Features + safety */}
-      <section
-        className={`${styles.features} ${styles.reveal} ${styles.revealDelay4}`}
-        aria-label="Чем MultiFrame отличается"
-      >
-        <header className={styles.featuresHead}>
-          <h2>Чем MultiFrame отличается</h2>
-          <p>Два момента, которые обычно решают выбор потолка</p>
-        </header>
-
-        <div className={styles.featureGrid}>
-          <article className={styles.featureCard}>
-            <span className={styles.featureEyebrow}>Без «барабана»</span>
-            <strong>
-              Обычный натяжной усиливает шум сверху — воздух в зазоре работает как барабан.
-            </strong>
-            <span>
-              MultiFrame рассеивает эту энергию в панели: комната спокойнее, без тяжёлого каркаса.
-            </span>
-          </article>
-
-          <article className={styles.featureCard}>
-            <span className={styles.featureEyebrow}>Быстрый монтаж</span>
-            <strong>Ставится так же быстро, как обычный натяжной потолок.</strong>
-            <span>На объекте без долгой стройки и без лишней потери высоты комнаты.</span>
-          </article>
-        </div>
-        <p className={styles.safetyLine}>
-          Состав и сертификаты подтверждают, что система уместна в жилом интерьере.
+        <p className={styles.effectNote}>
+          {LOG_DB_FOOTNOTE} Значения — {SIMULATION_BADGE.toLowerCase()}.
         </p>
       </section>
 
-      {/* 7. Narrative ribbon — synthesis */}
-      <section
-        className={`${styles.ribbon} ${styles.reveal} ${styles.revealDelay4}`}
-        aria-label={copy.ribbonTitle}
-      >
-        <header>
-          <h2>{copy.ribbonTitle}</h2>
-          <p>Пять параметров — один вывод</p>
+      <section className={styles.reasons} aria-label="Почему MultiFrame подходит">
+        <header className={styles.sectionHead}>
+          <h2>Почему MultiFrame подходит</h2>
+          <p>Три причины для этой комнаты — без повторения расчёта.</p>
         </header>
-        <ol className={styles.ribbonList}>
-          <li>
-            <span className={styles.ribbonLabel}>Комфорт сейчас</span>
-            <span>
-              Воздух — {channelLabel(airBeforeClass, 'air')}, удар —{' '}
-              {channelLabel(impactBeforeClass, 'impact')}; полный СП —{' '}
-              {HYBRID_CLASS_LABELS[beforeClass]}.
-            </span>
-          </li>
-          <li>
-            <span className={styles.ribbonLabel}>Эффект MultiFrame</span>
-            <span>{effectLine}</span>
-          </li>
-          <li>
-            <span className={styles.ribbonLabel}>Ощущение в комнате</span>
-            <span>
-              На слух и по модели — заметно спокойнее (≈ на {feelPct}% тише по ощущению).
-            </span>
-          </li>
-          <li>
-            <span className={styles.ribbonLabel}>Обычный натяжной vs MF</span>
-            <span>Плёнка одна не снимает барабан; панель рассеивает энергию в системе.</span>
-          </li>
-          <li>
-            <span className={styles.ribbonLabel}>Практичность</span>
-            <span>Без каркаса, монтаж как у натяжного, для жилого интерьера.</span>
-          </li>
-        </ol>
-        <p className={styles.ribbonClose}>{copy.ribbonClose}</p>
-      </section>
 
-      {/* 8. Secondary evidence — SP table + charts */}
-      <section
-        className={`${styles.normTable} ${styles.reveal} ${styles.revealDelay5}`}
-        aria-label="Классы комфорта в дБ"
-      >
-        <h2>Классы комфорта в дБ</h2>
-        <div className={styles.tableWrap}>
-          <table>
-            <thead>
-              <tr>
-                <th>Уровень комфорта</th>
-                <th>
-                  Воздушный, Rw
-                  <span>чем больше, тем лучше</span>
-                </th>
-                <th>
-                  Ударный, Lnw
-                  <span>чем меньше, тем лучше</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {NORM_ROWS.map((r) => {
-                const airNow = r.cls === airBeforeClass;
-                const airMf = r.cls === airAfterClass;
-                const impNow = r.cls === impactBeforeClass;
-                const impMf = r.cls === impactAfterClass;
-                const rowHit = airNow || airMf || impNow || impMf;
-                return (
-                  <tr
-                    key={r.cls}
-                    className={`${rowHit ? styles.rowHit : ''} ${
-                      airMf || impMf ? styles.rowAfter : ''
-                    } ${airNow || impNow ? styles.rowBefore : ''}`}
-                  >
-                    <td>
-                      <span className={styles.rowName}>{LADDER_SHORT[r.cls]}</span>
-                    </td>
-                    <td>
-                      {r.rw} <em>дБ</em>
-                      {airNow && !airMf ? <span className={styles.rowTagNow}>сейчас</span> : null}
-                      {airMf && !airNow ? <span className={styles.rowTagMf}>MultiFrame</span> : null}
-                      {airNow && airMf ? (
-                        <span className={styles.rowTagMf}>сейчас · MF</span>
-                      ) : null}
-                    </td>
-                    <td>
-                      {r.lnw} <em>дБ</em>
-                      {impNow && !impMf ? <span className={styles.rowTagNow}>сейчас</span> : null}
-                      {impMf && !impNow ? <span className={styles.rowTagMf}>MultiFrame</span> : null}
-                      {impNow && impMf ? (
-                        <span className={styles.rowTagMf}>сейчас · MF</span>
-                      ) : null}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        <div className={styles.reasonList}>
+          <article>
+            <span>01</span>
+            <div>
+              <strong>Под ваш потолок</strong>
+              <p>{roomReason}</p>
+            </div>
+          </article>
+          <article>
+            <span>02</span>
+            <div>
+              <strong>Без эффекта барабана</strong>
+              <p>
+                Обычная плёнка сама по себе не решает проблему; MultiFrame рассеивает энергию
+                шума в панели.
+              </p>
+            </div>
+          </article>
+          <article>
+            <span>03</span>
+            <div>
+              <strong>Без тяжёлого каркаса</strong>
+              <p>
+                Монтаж в темпе натяжного потолка, без долгой стройки и лишней потери высоты.
+              </p>
+            </div>
+          </article>
         </div>
-        <p className={styles.tableNote}>
-          Категории — СП 51.13330.2011 «Защита от шума», табл. 2. Метки в колонках — где стоит ваш
-          воздух и ваш удар по отдельности, не один общий класс.
+
+        <p className={styles.reasonConclusion}>
+          Для этой комнаты MultiFrame объединяет акустический эффект и привычный формат
+          натяжного потолка.
         </p>
       </section>
 
-      <div className={`${styles.charts} ${styles.reveal} ${styles.revealDelay5}`}>
-        <header>
-          <h3>Изоляция по частотам</h3>
-          <p>
-            Кривые — изоляция этой конструкции (плита, дом, пол, натяжной). «После» — с частотным Δ
-            MultiFrame. Чем выше линия — тем лучше изоляция (тише в комнате).
-          </p>
-        </header>
-        <SpectrumChart
-          title="Воздушный шум"
-          subtitle="R(f), дБ · чем выше — тем тише речь и музыка сверху"
-          series={airSpectrum}
-          yLabel="дБ"
-        />
-        <SpectrumChart
-          title="Ударный шум"
-          subtitle="По полосам Гц · чем выше — тем мягче шаги и удары"
-          series={impactSpectrum}
-          yLabel="дБ"
-        />
-      </div>
-
-      {/* 9. Hot funnel — next step */}
-      <section
-        className={`${styles.nextStep} ${styles.reveal} ${styles.revealDelay5}`}
-        aria-label="Следующий шаг"
-      >
+      <section className={styles.nextStep} aria-label="Следующий шаг">
         <header>
           <h2>Следующий шаг</h2>
           <p>{copy.nextStepHint}</p>
@@ -667,6 +495,113 @@ export function ResultScreen() {
             ) : null}
           </form>
         ) : null}
+      </section>
+
+      <section className={styles.technical} aria-label="Расчёт и нормы">
+        <header className={styles.technicalHead}>
+          <span>Подробности</span>
+          <h2>Расчёт и нормы</h2>
+          <p>
+            Для тех, кому нужны цифры: сначала пороги официальной шкалы, затем изоляция по
+            частотам.
+          </p>
+        </header>
+
+        <section className={styles.normTable} aria-label="Классы комфорта в дБ">
+          <h3>Пороги шкалы в децибелах</h3>
+          <div className={styles.tableWrap}>
+            <table>
+              <thead>
+                <tr>
+                  <th>Уровень</th>
+                  <th>
+                    Голоса, Rw
+                    <span>больше — лучше</span>
+                  </th>
+                  <th>
+                    Шаги, Lnw
+                    <span>меньше — лучше</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {NORM_ROWS.map((r) => {
+                  const airNow = r.cls === airBeforeClass;
+                  const airMf = r.cls === airAfterClass;
+                  const impNow = r.cls === impactBeforeClass;
+                  const impMf = r.cls === impactAfterClass;
+                  const rowHit = airNow || airMf || impNow || impMf;
+                  return (
+                    <tr
+                      key={r.cls}
+                      className={`${rowHit ? styles.rowHit : ''} ${
+                        airMf || impMf ? styles.rowAfter : ''
+                      } ${airNow || impNow ? styles.rowBefore : ''}`}
+                    >
+                      <td>
+                        <span className={styles.rowName}>{LADDER_SHORT[r.cls]}</span>
+                      </td>
+                      <td>
+                        {r.rw} <em>дБ</em>
+                        {airNow && !airMf ? (
+                          <span className={styles.rowTagNow}>сейчас</span>
+                        ) : null}
+                        {airMf && !airNow ? (
+                          <span className={styles.rowTagMf}>MultiFrame</span>
+                        ) : null}
+                        {airNow && airMf ? (
+                          <span className={styles.rowTagMf}>сейчас · MF</span>
+                        ) : null}
+                      </td>
+                      <td>
+                        {r.lnw} <em>дБ</em>
+                        {impNow && !impMf ? (
+                          <span className={styles.rowTagNow}>сейчас</span>
+                        ) : null}
+                        {impMf && !impNow ? (
+                          <span className={styles.rowTagMf}>MultiFrame</span>
+                        ) : null}
+                        {impNow && impMf ? (
+                          <span className={styles.rowTagMf}>сейчас · MF</span>
+                        ) : null}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <p className={styles.tableNote}>
+            А, Б и В — уровни по СП 51.13330.2011. «Ниже В» — не отдельный класс, а состояние
+            ниже минимального порога.
+          </p>
+        </section>
+
+        <div className={styles.charts}>
+          <header>
+            <h3>Изоляция по частотам</h3>
+            <p>
+              Чем выше линия, тем лучше конструкция сдерживает соответствующие частоты шума.
+            </p>
+          </header>
+          <SpectrumChart
+            title="Голоса и музыка"
+            subtitle="R(f), дБ · воздушный шум сверху"
+            series={airSpectrum}
+            yLabel="дБ"
+          />
+          <SpectrumChart
+            title="Шаги и удары"
+            subtitle="Изоляция по полосам Гц · ударный шум"
+            series={impactSpectrum}
+            yLabel="дБ"
+          />
+        </div>
+
+        <p className={styles.technicalNote}>
+          Rw показывает изоляцию от голосов и музыки: больше — лучше. Lnw показывает уровень
+          ударного шума: меньше — лучше.
+        </p>
       </section>
 
       <Button variant="ghost" onClick={restart}>

@@ -13,15 +13,15 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 - Feeling + comfort-class story first on early screens; **no numbers on Start**.
 - On Before/After + Profile: show the **full evidence pack** — personal room story, classes А/Б/В, numbers, charts, and plain-language explanations of each (owner 2026-09-12: «показать всё, аргументированно, понятно, персонально»).
 - **Evidence layout (Q4, owner 2026-09-12):** everything on one scroll — **conclusion / verdict on top**, detailed data below. Not progressive disclosure; not audience-trimmed packs. Anyone skims what they need. Same full stack for all user models (context may still change copy/CTA emphasis).
-- **Result must include (owner 2026-09-13):** (1) baseline state of *this* ceiling/room, (2) MultiFrame acoustic effect (full unconfirmed model), (3) **system features & reasons-to-believe** from MultiFRAME presentation/site (comfort, install, versatility, safety, patents) — plain language, **понятно + аргументированно**, **no price-forward copy**.
-- **Charts (owner 2026-09-13 + trust pack 2026-09-14):** class **scale А→Б→В** on top; **large Δ Rw / Δ Lnw** + quietness bars; **frequency isolation charts** (R(f) / удар по Гц, форма как [zamer_graph](https://pavelantsibor.github.io/zamer_graph/)) **below** as secondary evidence. Both frequency series are **изоляция** (выше = тише в комнате) so «после» never reads as louder. Captions + `pre_lab` required. Not the primary visual.
+- **Result must include (owner 2026-09-16):** (1) one direct verdict for *this* ceiling/room, (2) one shared official scale with separate rows for voices and impacts, (3) one combined effect + audio block, (4) three concise reasons-to-believe, (5) next step, then (6) open technical evidence. Do not repeat the same conclusion in summary cards or a narrative ribbon.
+- **Charts (owner 2026-09-16):** the primary visual is one shared scale **Ниже В → В → Б → А** plus two quietness cards where perceived percentage leads and Δ Rw / Δ Lnw is secondary. **Frequency isolation charts** (R(f) / удар по Гц, форма как [zamer_graph](https://pavelantsibor.github.io/zamer_graph/)) stay open below the CTA inside neutral **«Расчёт и нормы»**. Both frequency series are **изоляция** (выше = тише в комнате). Captions + one `pre_lab` disclaimer required.
 - **Numbers policy (owner 2026-09-13):** show a **full working MultiFrame effect model** with complete numbers now — currently **unconfirmed** (`marketing_placeholder` / `pre_lab`). After Trofimov (or lab) confirmation, **replace** values with correct ones; do not redesign the UX around hiding numbers. Never present placeholders as lab guarantees or certificates.
 - Effect source: `marketing_placeholder`; disclaimer: `pre_lab` / expert qualitative — never lab guarantees. Charts/numbers are **oriented arguments**, not certificates.
 - MultiFrame Δ is **frequency-shaped** (`marketing_placeholder` / `pre_lab`): typical ΔRw **+8…+12** (more on a light slab), ΔLnw **−4…−9** without a floating floor and **−2…−4** if the floor above already floats. UI range is **computed from the room model**, not hardcoded +10/−8. Never present as a lab certificate.
-- Classes **А/Б/В** (Trofimov / SP-style): **А** = высокая комфортность, **Б** = комфортная, **В** = предельно допустимая. UI = **hybrid plain label + letter** (`Высокий комфорт (А)`, `Комфорт (Б)`, `Допустимый (В)`) plus below-scale **`Дискомфорт`** when even В is not reached (owner: this is common). Soft footnote **`Ориентир по шкале комфортности (норм. документы)`** — not a legal certificate. “пониженный → выше классом” remains required. **ASSUMPTION on everyday synonyms:** prefer Trofimov plain words; avoid mapping «эконом» to **А** (А is the top, not economy).
+- Classes **А/Б/В** (СП 51.13330.2011): **А** = высокий комфорт, **Б** = комфорт, **В** = допустимый уровень. Below-scale UI is only **`Ниже В`**: it has no letter and must never be presented as a fictional class «Д». Use one common axis with two independently marked rows: voices/music (Rw) and steps/impacts (Lnw).
 - «примерно вдвое спокойнее» **only for air (воздух)**; impact (удар) = quieter + floor often needed — never claim Lnw norm from ceiling alone.
 - Audio = **три группы примеров:** воздух · удар · смешанный; After = case-specific MultiFrame cut of **level + frequencies** with ≈% for this room (`pre_lab`); not showroom volume-duck alone.
-- Mobile: denser inputs + sticky question/CTA; pack stays one scroll with sticky verdict readable above the fold when possible. No raw tech dumps without explanation.
+- Mobile: denser inputs + sticky question/CTA; both noise rows remain on the same shared scale axis and keep their everyday labels. No raw tech dumps without explanation.
 - **Premium tone (owner 2026-09-13):** never UI phrases like «за что платим», «за что ~500 тыс.», blunt cost/price push. Show features and effects so the user **infers** value. Soft B2B benefits OK («для клиента» path) without «средний чек» / money-first language.
 - Out of scope: walls, partitions, floors systems, Polyblock, framed systems, fake lab guarantees, floor-level question.
 
@@ -97,6 +97,9 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-15 | **Real audio stems:** До/После use `public/audio/` MP3 (разговор / топот / пылесос). After = Web Audio level+EQ from this room’s ΔRw/ΔLnw, not a second file. |
 | 2026-09-16 | **JTBD Result arc:** reorder — verdict → emotion → quieter → audio → whyMultiFrame → features+safety → **narrative ribbon (5 params)** → SP table+charts → **«Следующий шаг»** (calc + lead + client summary copy). `interestFor` copy on Start/Room/Result. |
 | 2026-09-16 | **Hot funnel:** in-body calculator; structured `buildLeadHandoff` (room+sim+why); client «Скопировать сводку»; premium stagger reveal + Room progress bar; `prefers-reduced-motion` respected. |
+| 2026-09-16 | **Result simplification (supersedes the two rows above):** verdict → one shared official scale with two rows → combined effect+audio → three MultiFrame reasons → next step → open «Расчёт и нормы». Remove emotion cards, separate Δ cards, `whyFit` duplication, features duplication and the five-step ribbon. |
+| 2026-09-16 | **Official-scale correction:** only А/Б/В are classes. The fourth axis position is written `Ниже В`, never «Д». If a class does not change, use one combined marker and explain the numeric improvement below it. |
+| 2026-09-16 | **Motion correction:** no section stagger on Result. Animate only scale markers and effect bars; `prefers-reduced-motion` disables both. CTA precedes technical evidence; existing sticky calculator CTA remains. |
 
 ---
 
@@ -142,10 +145,11 @@ May lightly change pronoun/CTA tone («вам» / «клиенту»). **Must no
 | **А** | высокая комфортность | `Высокий комфорт (А)` |
 | **Б** | комфортная | `Комфорт (Б)` |
 | **В** | предельно допустимая | `Допустимый (В)` |
-| — (below scale) | ниже предельно допустимой / вне категорий А–В | `Дискомфорт` |
+| — (below scale) | ниже предельно допустимой / вне категорий А–В | `Ниже В` |
 
 - Owner (2026-09-13): **В** = only `Допустимый (В)` (not «Базовый»). Below V is common → always support a fourth UI state.
 - Show **plain name + letter** together (below-scale has **no letter**).
+- Owner correction (2026-09-16): below-scale is **`Ниже В`**, not an invented class «Д».
 - Soft footnote/link: e.g. `Ориентир по шкале комфортности (нормативные документы / материалы StP)` — not “мы сертифицировали вашу квартиру”.
 - Owner intent: mix official scale with everyday words. **Do not** call **А** «эконом» — that would invert the official ladder (А is best).
 - Chart still uses А→Б→В movement with these hybrid captions.
@@ -614,7 +618,7 @@ Separate disabled «Консультация (недоступно в демо)�
 - Sticky header + progress + bottom CTA; content padded above footer (`safe-area` aware).
 - Touch targets ≥44px on primary actions.
 - Progress labels may hide; product name may hide ≤420px.
-- SimCompare stacks to one column on narrow widths; audio Before/After stack on very narrow.
+- The shared comfort axis stays common to both rows on narrow widths; audio keeps large `До` / `После` controls.
 - No desktop-only tech dumps; same one flow for showroom phone handoff.
 
 ---
@@ -633,9 +637,9 @@ Separate disabled «Консультация (недоступно в демо)�
 
 - Badge = `Оценка до лабораторных данных` (or equivalent pre_lab frame)
 - Columns: `Сейчас` · `С MultiFrame`
-- **Hybrid class labels (primary):** `Высокий комфорт (А)` · `Комфорт (Б)` · `Допустимый (В)` · `Дискомфорт` — plus soft norm hint
+- **Hybrid class labels (primary):** `Высокий комфорт (А)` · `Комфорт (Б)` · `Допустимый (В)` · `Ниже В` — plus soft norm hint
 - **Do NOT render** old feeling chips `Тихо` · `Терпимо` · `Мешает` (obsolete)
-- **Chart A — class scale:** visual А→Б→В showing before→after move; primary scannable chart
+- **Chart A — class scale:** visual `Ниже В → В → Б → А` showing before→after move; below-scale has no fictional letter
 - **Chart B — bars:** before/after bars for oriented ΔRw (воздух) and ΔLnw (удар); secondary to class scale; always captioned
 - Channels: `Воздух` / `Удар` with caption + sensation + tertiary dB / Δ
 - Range line when useful: from **this room’s** `deltaRange` (not a global +8…+12 / −6…−10)
@@ -703,11 +707,11 @@ Golden anchors: `npx tsx src/state/acoustic/check.ts` (180=54/76; ПК 220=52/74
 | Rule | Spec |
 | ---- | ---- |
 | Purpose | Hear **case-specific** MultiFrame effect on household noises (Trofimov Rw/Lnw + mixed UI group) |
-| UI groups | **Воздух** · **Удар** · **Смешанный** |
+| UI groups | **Голоса и музыка** · **Шаги и удары** · **Бытовой шум** |
 | Examples (locked) | Air: `Лай собаки` · `Музыка` · `Громкие разговоры`. Impact: `Детский бег` · `Перестановка мебели` · `Цоканье когтей собаки`. Mixed: `Стиральная машина` · `Пылесос` |
 | After processing | Apply this room’s oriented Δ: cut **level + frequencies** (mixed = blend air+impact ASSUMPTION) |
-| Reduction UI (C) | Always `≈ −{n}%` **+** `ориентир {Δ} дБ`. `%` = perceived map from Δ — **not** linear Δ/level. ~−8 dB ≈ large drop (~2× quieter sensation ASSUMPTION) |
-| Log footnote | Required **F2b:** `Шкала дБ логарифмическая: −8 дБ ≈ вдвое тише по ощущению.` |
+| Reduction UI | Parent block `Что изменится на слух` shows `≈ {n}% тише` as primary, oriented `{Δ} дБ` as secondary and one bar per noise type. Compact audio controls do not repeat percentages or Δ. |
+| Log footnote | Shown once for the combined effect + audio block: `Шкала дБ логарифмическая: −8 дБ ≈ вдвое тише по ощущению.` |
 | Impact honesty | Near impact (and mixed if needed): ceiling softens; floor above often complements |
 | Sources | Web Audio / procedural stubs OK until real stems; must obey processing rules |
 | Labels | `ориентир` / not lab; drop primary promise of «контраст усилен» |
@@ -749,7 +753,7 @@ Client path also: `buildClientSummary(session)` — plain-text digest for clipbo
 - Open: `Запросить консультацию или подбор` · Title: `Заявка на консультацию` · Help: interest-aware (`ваш` / `клиента`).
 - On submit (MVP): may still be a `console` stub until real endpoint exists — **do not invent** StP CRM URL. Success UI: `Заявка принята` + optional calc link; client notes summary for менеджер.
 - No separate disabled «Консультация» button.
-- Premium motion: Result section stagger + Room progress; honor `prefers-reduced-motion`.
+- Result motion is limited to scale markers and effect bars; Room progress remains. Honor `prefers-reduced-motion`.
 
 ---
 
@@ -759,19 +763,19 @@ Client path also: `buildClientSummary(session)` — plain-text digest for clipbo
 
 1. Open Start: pick `для себя`, emotional H1, **no dB**, tap `Начать`.
 2. Room + area > 0; optional slab; `Далее`.
-3. Before/After: class shift + **both** Δ (воздух/удар) with captions/sensations; charts; floor honesty for impact. **No** «что мешает» quiz.
-4. Audio: воздух / удар / смешанный with locked examples; After = case Δ (level + frequencies) + ≈%; difference audible; `ориентир`/`pre_lab`.
-5. Result: full pack; both Δ; «вдвое» only on air; calculator `area` (+ `roomType`); optional demo lead.
-6. Restart works.
-7. Must **not** present Scenarios or Current complaint screens.
+3. Result opens with a direct human verdict and one official `Ниже В / В / Б / А` axis with separate rows for voices and impacts.
+4. `Что изменится на слух` combines both perceived percentages, secondary Δ, bars and the three `До` / `После` audio examples; impact limitation and one `pre_lab` frame remain visible.
+5. Three MultiFrame arguments lead directly to calculator / consultation; open `Расчёт и нормы` follows as secondary evidence.
+6. Calculator preserves `area` (+ `roomType`); optional demo lead and restart work.
+7. Must **not** present Scenarios, Current complaint or standalone Before/After and Audio screens.
 
 **Pass:** completes without tech dumps; never promises Lnw norm from ceiling alone; sticky CTA OK on phone.
 
 ### B — Pro with client ≤ 3 minutes
 
 1. Pick `для клиента`; default slab OK.
-2. Room → Before/After (both Δ) → Audio quickly.
-3. Result full pack; CTA calculator or demo lead.
+2. Room → Result quickly.
+3. Result full pack; copyable client summary; CTA calculator or demo lead appears before technical evidence.
 4. ≤3 min without scenario/complaint quiz.
 
 **Pass:** path ≤3 min; audio shows case-specific two-channel difference; full evidence under verdict; calculator CTA works.
