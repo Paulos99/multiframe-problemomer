@@ -6,11 +6,13 @@ import { CompactAudio } from '../../ui/CompactAudio';
 import { SpectrumChart } from '../../ui/SpectrumChart';
 import { useSession } from '../../state/SessionContext';
 import {
+  EVERYDAY_COMFORT_LABELS,
   HYBRID_CLASS_LABELS,
   LOG_DB_FOOTNOTE,
   ROOM_TYPE_LABELS,
   SIMULATION_BADGE,
   type ClassLabel,
+  type RoomWishOption,
 } from '../../state/types';
 import {
   NORMS,
@@ -23,7 +25,6 @@ import {
   buildClientSummary,
   buildLeadHandoff,
 } from '../../state/session';
-import { copyForInterest } from '../../state/interestCopy';
 import styles from './ResultScreen.module.css';
 
 /** Comfort ladder, worst → best (so «выше» reads left → right). */
@@ -59,9 +60,34 @@ function quietBarScale(before: number, after: number): { beforePct: number; afte
   return { beforePct, afterPct };
 }
 
-function channelLabel(cls: ClassLabel): string {
-  if (cls === 'below') return 'Ниже В';
-  return HYBRID_CLASS_LABELS[cls];
+function everyday(cls: ClassLabel): string {
+  return EVERYDAY_COMFORT_LABELS[cls];
+}
+
+function currentHeadline(air: ClassLabel, impact: ClassLabel): string {
+  if (air === 'below' && impact === 'below') {
+    return 'Сейчас комфорт в этом помещении ниже допустимого — и по голосам, и по шагам.';
+  }
+  if (air === 'below') {
+    return `Сейчас по голосам уровень «${everyday(air)}» — ниже допустимого по шкале комфортности.`;
+  }
+  if (impact === 'below') {
+    return `Сейчас по шагам уровень «${everyday(impact)}» — ниже допустимого. Голоса ближе к «${everyday(air)}».`;
+  }
+  return `Сейчас в помещении ориентир «${everyday(air)}» по голосам и «${everyday(impact)}» по шагам.`;
+}
+
+function wishLead(wish: RoomWishOption): string | null {
+  switch (wish) {
+    case 'music':
+      return 'Вы отметили музыку — ниже смотрите, как изменятся голоса и бас сверху.';
+    case 'tv':
+      return 'Вы отметили телевизор — ниже смотрите воздушный шум: речь и звук сверху.';
+    case 'child_sleep':
+      return 'Вы отметили сон ребёнка — важны и шаги, и голоса.';
+    default:
+      return null;
+  }
 }
 
 const SCALE_STEP: Record<ClassLabel, { letter: string; label: string }> = {
@@ -223,8 +249,6 @@ function ComfortScale({
 export function ResultScreen() {
   const { session, restart } = useSession();
   const room = session.answers.room;
-  const interest = session.answers.interestFor;
-  const copy = copyForInterest(interest);
   const sim = session.derived?.simulation ?? deriveSimulation(session.answers);
   const whyLines = session.derived?.whyMultiFrame ?? [];
 
@@ -252,6 +276,7 @@ export function ResultScreen() {
     whyLines.find((line) => !line.toLocaleLowerCase('ru').includes('каркас')) ??
     whyLines[0] ??
     'Система работает с шумом, который приходит сверху через перекрытие.';
+  const wishNote = wishLead(room.roomWish);
 
   const [showLead, setShowLead] = useState(false);
   const [sent, setSent] = useState(false);
@@ -282,50 +307,51 @@ export function ResultScreen() {
     }
   }
 
-  const verdictTitle = (() => {
+  const mfTitle = (() => {
     if (airRose && impactRose) {
-      return 'MultiFrame заметно снизит и голоса, и шаги сверху.';
+      return 'С MultiFrame заметно тише и голоса, и шаги сверху.';
     }
     if (airRose) {
-      return 'MultiFrame заметно снизит голоса и музыку сверху.';
+      return 'С MultiFrame заметно тише голоса и музыка сверху.';
     }
     if (impactRose) {
-      return 'MultiFrame заметно смягчит шаги и удары сверху.';
+      return 'С MultiFrame заметно мягче шаги и удары сверху.';
     }
-    return 'MultiFrame сделает шум сверху мягче.';
+    return 'С MultiFrame шум сверху воспринимается мягче.';
   })();
 
-  const verdictLead =
+  const mfLead =
     impactAfterClass === 'below'
-      ? `По голосам результат поднимается до «${channelLabel(airAfterClass)}». Шаги станут мягче на ${impactDb} дБ, но минимальную норму по ним обычно дополняет пол у соседа сверху.`
-      : `По голосам — «${channelLabel(airAfterClass)}», по шагам — «${channelLabel(impactAfterClass)}».`;
+      ? `По голосам ориентир поднимается до «${everyday(airAfterClass)}». Шаги станут мягче примерно на ${sim.perceivedImpactPct}%, но полную норму по удару потолок один закрывает редко.`
+      : `По голосам — «${everyday(airAfterClass)}», по шагам — «${everyday(impactAfterClass)}».`;
 
   return (
     <Screen
       dense
-      title={copy.isClient ? 'Результат для комнаты клиента' : 'Результат для вашей комнаты'}
-      subtitle={copy.resultSubtitle}
+      title="Акустический профиль помещения"
+      subtitle="Ориентир комфорта для вашего объекта и следующий шаг к расчёту"
     >
-      <section
-        className={styles.verdict}
-        aria-label={copy.isClient ? 'Результат для клиента' : 'Ваш результат'}
-      >
-        <span className={styles.resultEyebrow}>
-          {copy.isClient ? 'Результат для клиента' : 'Ваш результат'}
-        </span>
-        <h2 className={styles.oneLiner}>{verdictTitle}</h2>
-        <p className={styles.verdictLead}>{verdictLead}</p>
+      <section className={styles.verdict} aria-label="Текущая ситуация без MultiFrame">
+        <span className={styles.resultEyebrow}>Текущая ситуация</span>
+        <h2 className={styles.oneLiner}>{currentHeadline(airBeforeClass, impactBeforeClass)}</h2>
+        <p className={styles.verdictLead}>
+          Без MultiFrame. Простыми словами: как сейчас слышны голоса и шаги сверху. Ориентир по
+          СП 51.13330.2011, не лабораторный замер.
+        </p>
+        {wishNote ? <p className={styles.verdictLead}>{wishNote}</p> : null}
 
-        <ComfortScale
-          airBefore={airBeforeClass}
-          airAfter={airAfterClass}
-          impactBefore={impactBeforeClass}
-          impactAfter={impactAfterClass}
-          airBeforeValue={sim.before.Rw}
-          airAfterValue={sim.after.Rw}
-          impactBeforeValue={sim.before.Lnw}
-          impactAfterValue={sim.after.Lnw}
-        />
+        <div className={styles.nowGrid}>
+          <article className={styles.nowCard} data-level={airBeforeClass}>
+            <span>Голоса и музыка</span>
+            <strong>{everyday(airBeforeClass)}</strong>
+            <p>Речь, телевизор, лай. Сейчас: {HYBRID_CLASS_LABELS[airBeforeClass]}.</p>
+          </article>
+          <article className={styles.nowCard} data-level={impactBeforeClass}>
+            <span>Шаги и удары</span>
+            <strong>{everyday(impactBeforeClass)}</strong>
+            <p>Шаги, мебель, падения. Сейчас: {HYBRID_CLASS_LABELS[impactBeforeClass]}.</p>
+          </article>
+        </div>
 
         <p className={styles.roomMeta}>
           {[roomLabel, room.ceilingAreaM2 ? `${room.ceilingAreaM2} м²` : null]
@@ -334,10 +360,11 @@ export function ResultScreen() {
         </p>
       </section>
 
-      <section className={styles.effect} aria-label="Что изменится на слух">
+      <section className={styles.effect} aria-label="Эффект MultiFrame">
         <header className={styles.sectionHead}>
-          <h2>Что изменится на слух</h2>
-          <p>Два типа шума, которые чаще всего приходят через потолок.</p>
+          <span className={styles.resultEyebrow}>С MultiFrame</span>
+          <h2>{mfTitle}</h2>
+          <p>{mfLead}</p>
         </header>
 
         <div className={styles.effectGrid}>
@@ -345,7 +372,9 @@ export function ResultScreen() {
             <header>
               <div>
                 <strong>Голоса и музыка</strong>
-                <span>речь, телевизор, лай сверху</span>
+                <span>
+                  сейчас «{everyday(airBeforeClass)}» → «{everyday(airAfterClass)}»
+                </span>
               </div>
               <b>≈ {sim.perceivedAirPct}% тише</b>
             </header>
@@ -372,7 +401,9 @@ export function ResultScreen() {
             <header>
               <div>
                 <strong>Шаги и удары</strong>
-                <span>топот, бег, падения предметов</span>
+                <span>
+                  сейчас «{everyday(impactBeforeClass)}» → «{everyday(impactAfterClass)}»
+                </span>
               </div>
               <b>≈ {sim.perceivedImpactPct}% тише</b>
             </header>
@@ -390,8 +421,8 @@ export function ResultScreen() {
               />
             </div>
             <p>
-              <b>−{impactDb} дБ уровня удара.</b> Шаги станут мягче, хотя пол сверху по-прежнему
-              влияет сильнее потолка.
+              <b>−{impactDb} дБ уровня удара.</b> Шаги станут мягче; полную норму по удару потолок
+              один закрывает редко.
             </p>
           </article>
         </div>
@@ -406,7 +437,7 @@ export function ResultScreen() {
       <section className={styles.reasons} aria-label="Почему MultiFrame подходит">
         <header className={styles.sectionHead}>
           <h2>Почему MultiFrame подходит</h2>
-          <p>Три причины для этой комнаты — без повторения расчёта.</p>
+          <p>Три причины для этого помещения — без повторения расчёта.</p>
         </header>
 
         <div className={styles.reasonList}>
@@ -430,7 +461,7 @@ export function ResultScreen() {
           <article>
             <span>03</span>
             <div>
-              <strong>Без тяжёлого каркаса</strong>
+              <strong>Без тяжёлой стройки</strong>
               <p>
                 Монтаж в темпе натяжного потолка, без долгой стройки и лишней потери высоты.
               </p>
@@ -439,7 +470,7 @@ export function ResultScreen() {
         </div>
 
         <p className={styles.reasonConclusion}>
-          Для этой комнаты MultiFrame объединяет акустический эффект и привычный формат
+          Для этого помещения MultiFrame объединяет акустический эффект и привычный формат
           натяжного потолка.
         </p>
       </section>
@@ -449,10 +480,21 @@ export function ResultScreen() {
           <span>Подробности</span>
           <h2>Расчёт и нормы</h2>
           <p>
-            Для тех, кому нужны цифры: сначала пороги официальной шкалы, затем изоляция по
-            частотам.
+            Сравнение сейчас и с MultiFrame по официальной шкале, затем изоляция по частотам
+            на вашем перекрытии.
           </p>
         </header>
+
+        <ComfortScale
+          airBefore={airBeforeClass}
+          airAfter={airAfterClass}
+          impactBefore={impactBeforeClass}
+          impactAfter={impactAfterClass}
+          airBeforeValue={sim.before.Rw}
+          airAfterValue={sim.after.Rw}
+          impactBeforeValue={sim.before.Lnw}
+          impactAfterValue={sim.after.Lnw}
+        />
 
         <section className={styles.normTable} aria-label="Классы комфорта в дБ">
           <h3>Пороги шкалы в децибелах</h3>
@@ -486,7 +528,9 @@ export function ResultScreen() {
                       } ${airNow || impNow ? styles.rowBefore : ''}`}
                     >
                       <td>
-                        <span className={styles.rowName}>{LADDER_SHORT[r.cls]}</span>
+                        <span className={styles.rowName}>
+                          {everyday(r.cls)} · {LADDER_SHORT[r.cls]}
+                        </span>
                       </td>
                       <td>
                         {r.rw} <em>дБ</em>
@@ -519,8 +563,7 @@ export function ResultScreen() {
             </table>
           </div>
           <p className={styles.tableNote}>
-            А, Б и В — уровни по СП 51.13330.2011. «Ниже В» — не отдельный класс, а состояние
-            ниже минимального порога.
+            А, Б и В — уровни по СП 51.13330.2011. «Некомфортно» — ниже минимального порога В.
           </p>
         </section>
 
@@ -529,6 +572,7 @@ export function ResultScreen() {
             <h3>Изоляция по частотам</h3>
             <p>
               Чем выше линия, тем лучше конструкция сдерживает соответствующие частоты шума.
+              Это опора вывода MultiFrame, не первый экран.
             </p>
           </header>
           <SpectrumChart
@@ -554,7 +598,7 @@ export function ResultScreen() {
       <section className={styles.nextStep} aria-label="Следующий шаг">
         <header>
           <h2>Следующий шаг</h2>
-          <p>{copy.nextStepHint}</p>
+          <p>Вы уже видите профиль помещения — в калькуляторе останется уточнить комплектацию.</p>
         </header>
 
         <div className={styles.nextActions}>
@@ -564,17 +608,15 @@ export function ResultScreen() {
           <Button variant="secondary" fullWidth onClick={() => setShowLead((v) => !v)}>
             Запросить консультацию или подбор
           </Button>
-          {copy.isClient ? (
-            <Button variant="ghost" fullWidth onClick={() => void onCopySummary()}>
-              {copied ? 'Сводка скопирована' : 'Скопировать сводку для клиента'}
-            </Button>
-          ) : null}
+          <Button variant="ghost" fullWidth onClick={() => void onCopySummary()}>
+            {copied ? 'Сводка скопирована' : 'Скопировать сводку'}
+          </Button>
         </div>
 
         {showLead ? (
           <form className={styles.form} onSubmit={onLead}>
             <h3>Заявка на консультацию</h3>
-            <p>{copy.leadHelp}</p>
+            <p>Разберём ваш случай, подберём материал.</p>
             <Field label="Имя">
               <TextInput
                 required
@@ -597,7 +639,6 @@ export function ResultScreen() {
             </Button>
             {sent ? (
               <div className={styles.leadSuccess}>
-                {copy.leadSuccessExtra ? <p>{copy.leadSuccessExtra}</p> : null}
                 <button type="button" className={styles.inlineLink} onClick={openCalc}>
                   Открыть калькулятор MultiFrame
                 </button>

@@ -38,6 +38,9 @@ export type PlannedCeilingOption = 'stretch_planned' | 'ceiling_exists' | 'unkno
 
 export type NoisyNeighborsOption = 'unknown' | 'usually_quiet' | 'sometimes_noisy' | 'often_noisy';
 
+/** Internal «что важно в комнате» — wishes, not a complaint quiz */
+export type RoomWishOption = 'unknown' | 'music' | 'tv' | 'child_sleep' | 'not_important';
+
 /** Legacy noise tags — still used for audio demo grouping, not a survey */
 export type NoiseScenario =
   | 'steps'
@@ -59,27 +62,45 @@ export type NoiseType = 'impact' | 'airborne' | 'mixed';
 /** Flow: Start → Room → Result (audio lives inside Result; no separate Сравнение) */
 export type WizardStep = 'start' | 'room' | 'result';
 
-/** Sub-steps inside Room (one question block per screen) */
+/** Sub-steps inside Room (one question block per screen). External first, then internal. */
 export type RoomSubstep =
-  | 'basics'
+  | 'houseType'
   | 'slabType'
   | 'slabThickness'
-  | 'floorAbove'
-  | 'houseType'
-  | 'objectStage'
+  | 'basics'
   | 'plannedCeiling'
-  | 'noisyNeighbors';
+  | 'objectStage'
+  | 'noisyNeighbors'
+  | 'roomWish';
+
+export type RoomFactorGroup = 'external' | 'internal';
 
 export const ROOM_SUBSTEPS: RoomSubstep[] = [
-  'basics',
+  'houseType',
   'slabType',
   'slabThickness',
-  'floorAbove',
-  'houseType',
-  'objectStage',
+  'basics',
   'plannedCeiling',
+  'objectStage',
   'noisyNeighbors',
+  'roomWish',
 ];
+
+export const ROOM_FACTOR_GROUP: Record<RoomSubstep, RoomFactorGroup> = {
+  houseType: 'external',
+  slabType: 'external',
+  slabThickness: 'external',
+  basics: 'internal',
+  plannedCeiling: 'internal',
+  objectStage: 'internal',
+  noisyNeighbors: 'internal',
+  roomWish: 'internal',
+};
+
+export const ROOM_FACTOR_GROUP_LABEL: Record<RoomFactorGroup, string> = {
+  external: 'Внешние факторы',
+  internal: 'Внутренние факторы',
+};
 
 export type ClassLabel = 'A' | 'B' | 'V' | 'below';
 export type ClassStatus = 'ok' | 'partial' | 'below';
@@ -166,6 +187,7 @@ export interface RoomAnswers {
   objectStage: ObjectStageOption;
   plannedCeiling: PlannedCeilingOption;
   noisyNeighbors: NoisyNeighborsOption;
+  roomWish: RoomWishOption;
 }
 
 export interface SessionAnswers {
@@ -245,6 +267,22 @@ export const NOISY_NEIGHBORS_OPTIONS: { id: NoisyNeighborsOption; label: string 
   { id: 'sometimes_noisy', label: 'Сверху бывает шумно' },
   { id: 'often_noisy', label: 'Сверху часто шумно' },
 ];
+
+export const ROOM_WISH_OPTIONS: { id: RoomWishOption; label: string; hint: string }[] = [
+  { id: 'music', label: 'Музыка', hint: 'слушать и заниматься музыкой' },
+  { id: 'tv', label: 'Телевизор', hint: 'смотреть кино и передачи спокойно' },
+  { id: 'child_sleep', label: 'Сон ребёнка', hint: 'чтобы сверху меньше мешало засыпать' },
+  { id: 'not_important', label: 'Пока не важно', hint: 'без отдельного сценария' },
+  { id: 'unknown', label: 'Не знаю', hint: 'достаточно общих ориентиров' },
+];
+
+/** Everyday first-layer labels (workshop 2026-09-16). SP letters stay secondary. */
+export const EVERYDAY_COMFORT_LABELS: Record<ClassLabel, string> = {
+  A: 'Тихо',
+  B: 'Комфортно',
+  V: 'Допустимо',
+  below: 'Некомфортно',
+};
 
 /** Hybrid comfort class labels (UI) */
 export const HYBRID_CLASS_LABELS: Record<ClassLabel, string> = {

@@ -19,6 +19,7 @@ function sampleRoom(over: Partial<RoomAnswers> = {}): RoomAnswers {
     objectStage: 'newbuild',
     plannedCeiling: 'stretch_planned',
     noisyNeighbors: 'unknown',
+    roomWish: 'unknown',
     ...over,
   };
 }

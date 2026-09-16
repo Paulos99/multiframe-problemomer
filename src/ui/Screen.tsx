@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 export function Screen({
   title,
   subtitle,
+  eyebrow,
   children,
   hero,
   stickyHead,
@@ -11,6 +12,7 @@ export function Screen({
 }: {
   title?: string;
   subtitle?: string;
+  eyebrow?: string;
   children: ReactNode;
   hero?: boolean;
   /** Keep question header visible while scrolling options (mobile input steps) */
@@ -24,6 +26,7 @@ export function Screen({
     >
       {title ? (
         <header className={`${styles.head} ${stickyHead ? styles.headSticky : ''}`}>
+          {eyebrow ? <p className={styles.eyebrow}>{eyebrow}</p> : null}
           <h1>{title}</h1>
           {subtitle ? <p>{subtitle}</p> : null}
         </header>

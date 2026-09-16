@@ -7,14 +7,13 @@ import {
   type ReactNode,
 } from 'react';
 import type {
-  FloorAboveOption,
   HouseTypeOption,
-  InterestFor,
   NoisyNeighborsOption,
   ObjectStageOption,
   PlannedCeilingOption,
   RoomAnswers,
   RoomType,
+  RoomWishOption,
   SessionState,
   SlabThicknessOption,
   SlabTypeOption,
@@ -37,17 +36,16 @@ interface SessionApi {
   goBack: () => void;
   goTo: (step: WizardStep) => void;
   restart: () => void;
-  setInterestFor: (v: InterestFor) => void;
   setRoomType: (roomType: RoomType) => void;
   setCeilingArea: (area: number | null) => void;
   patchRoom: (patch: Partial<RoomAnswers>) => void;
   setSlabType: (v: SlabTypeOption) => void;
   setSlabThickness: (v: SlabThicknessOption) => void;
-  setFloorAbove: (v: FloorAboveOption) => void;
   setHouseType: (v: HouseTypeOption) => void;
   setObjectStage: (v: ObjectStageOption) => void;
   setPlannedCeiling: (v: PlannedCeilingOption) => void;
   setNoisyNeighbors: (v: NoisyNeighborsOption) => void;
+  setRoomWish: (v: RoomWishOption) => void;
   canGoNext: boolean;
 }
 
@@ -121,16 +119,6 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     setSession(createInitialSession());
   }, []);
 
-  const setInterestFor = useCallback(
-    (interestFor: InterestFor) => {
-      patch((s) => ({
-        ...s,
-        answers: { ...s.answers, interestFor },
-      }));
-    },
-    [patch],
-  );
-
   const patchRoom = useCallback(
     (roomPatch: Partial<RoomAnswers>) => {
       patch((s) => ({
@@ -162,10 +150,6 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     (slabThickness: SlabThicknessOption) => patchRoom({ slabThickness }),
     [patchRoom],
   );
-  const setFloorAbove = useCallback(
-    (floorAbove: FloorAboveOption) => patchRoom({ floorAbove }),
-    [patchRoom],
-  );
   const setHouseType = useCallback(
     (houseType: HouseTypeOption) => patchRoom({ houseType }),
     [patchRoom],
@@ -182,6 +166,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     (noisyNeighbors: NoisyNeighborsOption) => patchRoom({ noisyNeighbors }),
     [patchRoom],
   );
+  const setRoomWish = useCallback(
+    (roomWish: RoomWishOption) => patchRoom({ roomWish }),
+    [patchRoom],
+  );
 
   const value = useMemo<SessionApi>(
     () => ({
@@ -190,17 +178,16 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       goBack,
       goTo,
       restart,
-      setInterestFor,
       setRoomType,
       setCeilingArea,
       patchRoom,
       setSlabType,
       setSlabThickness,
-      setFloorAbove,
       setHouseType,
       setObjectStage,
       setPlannedCeiling,
       setNoisyNeighbors,
+      setRoomWish,
       canGoNext: canProceed(session),
     }),
     [
@@ -209,17 +196,16 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       goBack,
       goTo,
       restart,
-      setInterestFor,
       setRoomType,
       setCeilingArea,
       patchRoom,
       setSlabType,
       setSlabThickness,
-      setFloorAbove,
       setHouseType,
       setObjectStage,
       setPlannedCeiling,
       setNoisyNeighbors,
+      setRoomWish,
     ],
   );
 

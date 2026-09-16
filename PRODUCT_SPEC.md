@@ -4,9 +4,9 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 
 **Related:** `CHECKLIST.md` (intake + ledger) · live context `https://paulos99.github.io/multiframe-problemomer/` (do not redesign from the live site alone).
 
-**Audiences (confirmed 2026-09-13):** Start asks only **«Интересуюсь звукоизоляцией: для себя / для клиента»**. The long role/entry list is **not** a Start picker — it is the **JTBD map** for what purchase-justifying content the shared result must cover. **One diagnostic flow** → everyone gets the **full MultiFrame buy case** (baseline + acoustic effect + other advantages). No further role grilling on Start.
+**Audiences (superseded 2026-09-16):** Start has **no role picker**. One site visitor path: check acoustic comfort **on this object / room**. «Для себя / для клиента» removed — it confused people («для себя» = «для меня»). Specialists (sales, installer, measurer, designer) reuse the **same** object → result flow. The long JTBD list is still a content map, not UI.
 
-**Core value (owner-confirmed direction):** show that in *this* room comfort is lower than assumed; MultiFrame can raise comfort class (often by a step+); let user feel how much quieter; present system features (comfort, install, versatility, safety) so value is **inferred**, not priced aloud; give anyone helping a client a ready argument. Still **not** a materials calculator and **not** a lab certificate.
+**Core value (owner-confirmed direction):** show that in *this* room comfort is lower than assumed; MultiFrame can raise comfort class (often by a step+); let user feel how much quieter; present system features (comfort, install, versatility, safety) so value is **inferred**, not priced aloud. Specialists get the same pack as a ready argument. Still **not** a materials calculator and **not** a lab certificate.
 
 **Global product rules**
 
@@ -102,6 +102,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-16 | **Motion correction:** no section stagger on Result. Animate only scale markers and effect bars; `prefers-reduced-motion` disables both. Existing sticky calculator CTA remains. |
 | 2026-09-16 | **Scale/table merge:** replace the abstract dot-and-line scale with a compact table: official levels are columns, everyday noise types are rows, and state badges sit in their actual cells. Technical thresholds remain below as a second layer. |
 | 2026-09-16 | **Final CTA order:** open table and frequency graphs come before the in-body `Следующий шаг`; the conversion block is the last substantive section on Result. |
+| 2026-09-16 | **Workshop (transcript 07):** drop Start «для себя / для клиента»; site path = comfort on **your object**. Room = **external → internal** (house/slab first; room type later). Hide **пол сверху**. Result = scare current state first, then MultiFrame %; everyday labels «Некомфортно / Допустимо / Комфортно / Тихо». Wishes (музыка / ТВ / сон ребёнка) as internal factor, not «что мешает». Both air+impact channels stay. |
 
 ---
 
@@ -126,18 +127,18 @@ Owner listed ads / search / MultiFrame site / partner site / sales manager / ins
 | Measurer | Extra sale at measurement | Same pack + clear CTA to materials calc |
 | Designer | Put ЗИ in the project and justify to client | Baseline vs MultiFrame story + advantages (height, frameless, speed) for project talk |
 
-### Start segmentation (confirmed direction)
+### Start segmentation (superseded 2026-09-16)
 
-**Only one Start choice:**
+**No Start role choice.** Workshop 16.09: «для себя / для клиента» путает; на сайте StP проверяют комфорт **своего объекта / помещения**. `interestFor` may remain in the session payload as unused `'self'`. Tone is always «ваш объект». Specialists walk the same flow.
 
-`Интересуюсь звукоизоляцией:` · `для себя` · `для клиента`
+Everyday first-layer labels on Result (alongside SP letters):
 
-| Choice | Meaning |
-| ------ | ------- |
-| `для себя` | End customer deciding for own room |
-| `для клиента` | Anyone helping a client (sales, site, measure, design, …) |
-
-May lightly change pronoun/CTA tone («вам» / «клиенту»). **Must not** trim evidence. **No Q2 role drill-down on Start.**
+| SP | Everyday |
+| -- | -------- |
+| below | `Некомфортно` |
+| В | `Допустимо` |
+| Б | `Комфортно` |
+| А | `Тихо` |
 
 
 ### Comfort class labels (hybrid — confirmed direction 2026-09-13)
@@ -214,7 +215,7 @@ Must **not** appear: calculator links, dB values, lead form, Polyblock, floor qu
 | Step key | Progress label |
 | -------- | -------------- |
 | `start` | Старт |
-| `room` | Комната |
+| `room` | Объект |
 | `beforeAfter` | Сравнение |
 | `audio` | Звук |
 | `result` | Профиль |
@@ -253,32 +254,28 @@ Must **not** appear: calculator links, dB values, lead form, Polyblock, floor qu
 
 ### Goal
 
-One light choice **для себя / для клиента** + emotional hook: create demand for acoustic comfort with a stretch ceiling. Push into the wizard. No numbers. Same full diagnostic and buy-case content for every JTBD.
+Create demand for acoustic comfort **on this object**. No role question. No numbers. Same full diagnostic for every JTBD.
 
 ### Visible elements
 
-- Interest line + two options: `Интересуюсь звукоизоляцией:` `для себя` / `для клиента`
 - H1, lead, primary CTA `Начать`, three scope bullets
-- Header (no progress, no sticky CTA, **no kicker**)
-- Optional UTM/referrer hook copy (**ASSUMPTION** — no extra question)
+- Header (no progress, no sticky CTA, **no kicker**, **no «для себя / для клиента»**)
 
 ### Exact primary copy (RU)
 
 | Role | Text |
 | ---- | ---- |
-| Interest | `Интересуюсь звукоизоляцией:` · `для себя` · `для клиента` |
-| H1 | `Проверьте уровень акустического комфорта перед выбором натяжного потолка` |
-| Lead | `Проблемомер показывает исходное состояние потолка и эффект MultiFrame — уровень комфорта сейчас, ожидаемый эффект после и что важно учесть до выбора потолка.` |
-| Bullet 1 | `Только потолок и шум сверху через перекрытие` |
-| Bullet 2 | `Полная картина: комфорт сейчас → эффект MultiFrame → плюсы системы` |
-| Bullet 3 | `Далее — расчёт материалов MultiFRAME` |
+| H1 | `Проверьте уровень акустического комфорта на своём объекте` |
+| Lead | `Проблемомер показывает ориентир уровня шума по типу перекрытия, строительным материалам и внешним и внутренним факторам. Следующий шаг — как изменится акустический комфорт после монтажа MultiFrame.` |
+| Bullet 1 | `Сначала внешнее: дом и перекрытие — то, на что нельзя повлиять` |
+| Bullet 2 | `Затем внутреннее: комната, потолок, что важно именно вам` |
+| Bullet 3 | `Сначала текущий комфорт без MultiFrame, потом эффект системы` |
 | Primary CTA | `Начать` |
 
 ### Controls
 
 | Control | Action | Enabled |
 | ------- | ------ | ------- |
-| `для себя` / `для клиента` | Sets `interestFor: self \| client` (tone/CTA only; does **not** trim evidence) | Always; default **ASSUMPTION:** `для себя` or last used |
 | `Начать` | Go to Room | Always |
 
 ### Validation messages
@@ -287,7 +284,7 @@ None.
 
 ### Must NOT appear
 
-Long role catalog (sales / site / designer / …) on Start; kicker/eyebrow brand strip; further “уточняющие” role questions; Rw/Lnw, ΔdB, class chips, slab picker, lead form, Polyblock, walls, floor question, audio player, technical SP references.
+Role picker `для себя` / `для клиента`; long role catalog; Rw/Lnw, ΔdB, class chips, slab picker, lead form, Polyblock, walls, floor-above question, audio player.
 
 ---
 
@@ -295,12 +292,13 @@ Long role catalog (sales / site / designer / …) on Start; kicker/eyebrow brand
 
 ### Goal
 
-**Primary diagnostic block:** drives presumed comfort on the object. Locked: type + area + slab. Add: floor above, house type, object stage, planned ceiling, noisy-neighbors check (`Не знаю` · `Обычно тихо` · `Сверху бывает шумно`). Year of build: **not in MVP**.
+Diagnostic from **general to particular**. External factors first (house, slab type, slab thickness). Then internal (room + area, ceiling, stage, neighbors, wishes). **Пол сверху is not asked** (model keeps `unknown`). Year of build: **not in MVP**. Room type is **not** the first question.
 
 ### Visible elements
 
-- Title, subtitle; then: room type → area → slab type → slab thickness → floor above → house type → stage → planned ceiling → noisy neighbors (`Не знаю` OK on optionals).
-- Progress + sticky `Назад` / `Далее`.
+- Eyebrow `Внешние факторы` / `Внутренние факторы`
+- Order: house type → slab type → slab thickness → room type + area → planned ceiling → object stage → noisy neighbors → room wish
+- Progress + sticky `Назад` / `Далее`. Required to leave `basics` (and to reach Result): room type + area > 0.
 
 ### Exact primary copy (RU)
 
@@ -364,7 +362,7 @@ Owner: do **not** put «пока без чистового пола» under floo
 | Планируемый потолок | Fit story for MultiFrame under finish | `Планируем натяжной` · `Потолок уже есть` · `Не знаю` | Owner chose plain **B** — no ГКЛ/«черновой» jargon | `Планируем натяжной` · `Потолок уже есть` · `Не знаю` | |
 | Шумные соседи сверху | Expectation of upstairs activity (not “does it bother you”) | `Не знаю` · `Обычно тихо` · `Сверху бывает шумно` · `Сверху часто шумно` | Owner chose **B** — softer third label. Fourth step = frequent noise. Replaces «кто сверху». Must **not** sound like complaint quiz |
 
-**Field order on Room (confirmed):** тип → площадь → **тип перекрытия** → **толщина перекрытия** → пол сверху → тип дома → стадия → планируемый потолок → шумные соседи.
+**Field order on Room (2026-09-16):** тип дома → тип перекрытия → толщина перекрытия → тип комнаты + площадь → планируемый потолок → стадия → шумные соседи → что важно. **Пол сверху снят с UI.**
 
 **Room required vs optional (confirmed 2026-09-13):**
 - **Required to proceed:** `roomType` + `area` (> 0).
@@ -531,14 +529,14 @@ None.
 
 ### Goal
 
-Summarize acoustic profile with **verdict first**, then the full evidence stack on one page (owner Q4: вывод сверху, данные ниже). Restate why MultiFrame fits; CTA to MultiFRAME calculator and demo lead.
+Two-beat conclusion on one scroll (workshop 16.09): **first scare the current state without MultiFrame**, then show MultiFrame with everyday labels and percentages. Official SP scale and frequency charts sit below as support. CTA to calculator and consultation.
 
 ### Visible elements
 
-- **Top verdict:** one-liner from which channel(s) rose + one shared table-scale. Official levels are columns (`Ниже В / В / Б / А`), the two everyday noise types are rows, and `Сейчас` / `MultiFrame` are placed directly in the corresponding cells. Rw/Lnw remain secondary in row captions.
-- **Fallback (hybrid class stuck):** obsolete as primary pattern — channels are always primary.
-- **Scroll order (2026-09-16):** verdict + table-scale → combined quieter + compact audio → three reasons MultiFrame fits → open SP dB table + frequency charts (secondary) → **«Следующий шаг»** (calculator + lead + optional client summary copy) → restart.
-- Title and subtitle (`interestFor`-aware), table-scale, numbers + charts + explanations, one expert disclaimer, calculator CTA (in-body + sticky), lead form, restart.
+- **Top — текущая ситуация only:** everyday labels `Некомфортно / Допустимо / Комфортно / Тихо` for air and impact; SP letters secondary. No MultiFrame mixed into the first block.
+- **Then — с MultiFrame:** % quieter, after labels, compact audio.
+- **Then** three reasons → open SP dB table + frequency charts → **«Следующий шаг»** → restart.
+- Title `Акустический профиль помещения`. Subtitle about **your object**. Copy summary available to everyone (same flow for specialists).
 - **Charts block:** large Δ Rw / Δ Lnw + quietness bars first (in quieter); frequency isolation charts later as secondary evidence.
 - Do **not** hide detail behind tabs/accordions as the primary pattern; scroll is the disclosure.
 
@@ -546,9 +544,11 @@ Summarize acoustic profile with **verdict first**, then the full evidence stack 
 
 | Role | Text |
 | ---- | ---- |
-| Title (self/client) | `Результат для вашей комнаты` / `Результат для комнаты клиента` |
-| Subtitle (self) | `Ориентир комфорта для вашей комнаты и следующий шаг к расчёту` |
-| Subtitle (client) | `Ориентир комфорта для комнаты клиента и следующий шаг к расчёту` |
+| Title | `Акустический профиль помещения` |
+| Subtitle | `Ориентир комфорта для вашего объекта и следующий шаг к расчёту` |
+| Now eyebrow | `Текущая ситуация` |
+| Everyday labels | `Некомфортно` · `Допустимо` · `Комфортно` · `Тихо` |
+| Effect eyebrow | `С MultiFrame` |
 | Verdict one-liner | Dynamic from channel rise (air / impact / both) |
 | Scale title | `Шкала комфортности` |
 | Scale columns | `Ниже В` · `В Допустимый` · `Б Комфорт` · `А Высокий` |
@@ -560,9 +560,8 @@ Summarize acoustic profile with **verdict first**, then the full evidence stack 
 | Calculator CTA | `Открыть калькулятор MultiFrame` |
 | Lead open | `Запросить консультацию или подбор` |
 | Lead title | `Заявка на консультацию` |
-| Lead help (self) | `Разберём ваш случай, подберём материал.` |
-| Lead help (client) | `Разберём случай клиента, подберём материал.` |
-| Client summary | `Скопировать сводку для клиента` |
+| Lead help | `Разберём ваш случай, подберём материал.` |
+| Summary | `Скопировать сводку` |
 | Name | `Имя` / placeholder `Как к вам обращаться` |
 | Phone | `Телефон` / placeholder `+7 …` |
 | Submit | `Отправить` → success `Заявка принята` (MVP: demo stub / console — no real StP CRM; do not invent corporate endpoint) |
@@ -759,26 +758,25 @@ Client path also: `buildClientSummary(session)` — plain-text digest for clipbo
 
 ## Acceptance tests
 
-### A — Client for themselves
+### A — Visitor on StP site
 
-1. Open Start: pick `для себя`, emotional H1, **no dB**, tap `Начать`.
-2. Room + area > 0; optional slab; `Далее`.
-3. Result opens with a direct human verdict and one official `Ниже В / В / Б / А` axis with separate rows for voices and impacts.
-4. `Что изменится на слух` combines both perceived percentages, secondary Δ, bars and the three `До` / `После` audio examples; impact limitation and one `pre_lab` frame remain visible.
-5. Three MultiFrame arguments lead directly to calculator / consultation; open `Расчёт и нормы` follows as secondary evidence.
-6. Calculator preserves `area` (+ `roomType`); optional demo lead and restart work.
-7. Must **not** present Scenarios, Current complaint or standalone Before/After and Audio screens.
+1. Open Start: **no** role picker, object H1, **no dB**, tap `Начать`.
+2. Room: house/slab first, then room + area > 0; **no** «пол сверху»; optional wish; `Далее`.
+3. Result opens with **current state only** (scare), then MultiFrame % and audio.
+4. Everyday labels first; SP table and frequency charts below.
+5. Calculator preserves `area` (+ `roomType`); optional demo lead, copy summary, restart work.
+6. Must **not** present role split, Scenarios, Current complaint, floor-above, or standalone Before/After and Audio screens.
 
 **Pass:** completes without tech dumps; never promises Lnw norm from ceiling alone; sticky CTA OK on phone.
 
-### B — Pro with client ≤ 3 minutes
+### B — Specialist with client ≤ 3 minutes
 
-1. Pick `для клиента`; default slab OK.
-2. Room → Result quickly.
-3. Result full pack; copyable client summary; open technical evidence appears before the final calculator / lead block.
+1. Same Start (no role). Default slab OK (`Не знаю`).
+2. External factors quickly → room/area → Result.
+3. Result full pack; copyable summary; technical evidence before the final calculator / lead block.
 4. ≤3 min without scenario/complaint quiz.
 
-**Pass:** path ≤3 min; audio shows case-specific two-channel difference; full evidence under verdict; calculator CTA works.
+**Pass:** path ≤3 min; audio shows case-specific two-channel difference; current then MultiFrame; calculator CTA works.
 
 ---
 

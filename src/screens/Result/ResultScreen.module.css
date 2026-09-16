@@ -1638,6 +1638,51 @@
   }
 }
 
+.nowGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.nowCard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: color-mix(in srgb, var(--bg-page) 55%, var(--bg-card));
+}
+
+.nowCard span {
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--text-secondary);
+}
+
+.nowCard strong {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.nowCard[data-level='below'] strong {
+  color: #9a6700;
+}
+
+.nowCard p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 640px) {
+  .nowGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .scaleStateNow,
   .scaleStateAfter,
