@@ -96,53 +96,42 @@ function ScaleRow({
   lowerIsBetter?: boolean;
 }) {
   const same = before === after;
-  const changed = beforeValue !== afterValue;
-  const summary = same
-    ? changed
-      ? 'Уровень стал лучше, класс пока тот же'
-      : 'Класс без изменений'
-    : `${scaleStepLabel(before)} → ${scaleStepLabel(after)}`;
 
   return (
-    <article className={styles.scaleRow}>
-      <header className={styles.scaleRowHead}>
-        <div>
-          <strong>{title}</strong>
-          <span>{example}</span>
-        </div>
-        <b>{summary}</b>
-      </header>
-
-      <div
-        className={styles.scaleTrack}
-        role="img"
-        aria-label={`${title}: сейчас ${scaleStepLabel(before)}, с MultiFrame ${scaleStepLabel(after)}`}
-      >
-        <span className={styles.scaleLine} aria-hidden />
-        {LADDER.map((cls) => {
-          const isBefore = cls === before;
-          const isAfter = cls === after;
-          const both = same && isBefore;
-          return (
-            <span className={styles.scaleCell} key={cls}>
-              <span className={styles.markerCaption}>
-                {both ? 'Сейчас + MF' : isBefore ? 'Сейчас' : isAfter ? 'MultiFrame' : ''}
+    <tr
+      className={styles.resultScaleRow}
+      role="row"
+      aria-label={`${title}: сейчас ${scaleStepLabel(before)}, с MultiFrame ${scaleStepLabel(after)}`}
+    >
+      <th scope="row" role="rowheader">
+        <strong>{title}</strong>
+        <span>{example}</span>
+        <small>
+          {metric}: {beforeValue} → {afterValue} дБ
+          <i>{lowerIsBetter ? 'меньше — лучше' : 'больше — лучше'}</i>
+        </small>
+      </th>
+      {LADDER.map((cls) => {
+        const isBefore = cls === before;
+        const isAfter = cls === after;
+        const both = same && isBefore;
+        return (
+          <td key={cls} data-level={cls} role="cell">
+            {both ? (
+              <span className={styles.scaleStateBoth}>
+                <b>Сейчас + MF</b>
+                <small>класс тот же</small>
               </span>
-              <span
-                className={`${styles.scaleDot} ${isBefore ? styles.scaleDotNow : ''} ${
-                  isAfter ? styles.scaleDotAfter : ''
-                } ${both ? styles.scaleDotBoth : ''}`}
-              />
-            </span>
-          );
-        })}
-      </div>
-
-      <p className={styles.scaleMetric}>
-        {metric}: {beforeValue} → {afterValue} дБ
-        {lowerIsBetter ? ' · меньше — лучше' : ' · больше — лучше'}
-      </p>
-    </article>
+            ) : (
+              <>
+                {isBefore ? <span className={styles.scaleStateNow}>Сейчас</span> : null}
+                {isAfter ? <span className={styles.scaleStateAfter}>MultiFrame</span> : null}
+              </>
+            )}
+          </td>
+        );
+      })}
+    </tr>
   );
 }
 
@@ -176,35 +165,49 @@ function ComfortScale({
         </p>
       </header>
 
-      <div className={styles.scaleAxis} aria-hidden>
-        {LADDER.map((cls) => (
-          <span key={cls}>
-            {SCALE_STEP[cls].letter ? <b>{SCALE_STEP[cls].letter}</b> : null}
-            <small>{SCALE_STEP[cls].label}</small>
-          </span>
-        ))}
+      <div className={styles.scaleDirection} aria-hidden>
+        Комфорт растёт <span>→</span>
       </div>
 
-      <div className={styles.scaleRows}>
-        <ScaleRow
-          title="Голоса и музыка"
-          example="речь, телевизор, лай сверху"
-          before={airBefore}
-          after={airAfter}
-          beforeValue={airBeforeValue}
-          afterValue={airAfterValue}
-          metric="Изоляция Rw"
-        />
-        <ScaleRow
-          title="Шаги и удары"
-          example="топот, бег, падения предметов"
-          before={impactBefore}
-          after={impactAfter}
-          beforeValue={impactBeforeValue}
-          afterValue={impactAfterValue}
-          metric="Уровень Lnw"
-          lowerIsBetter
-        />
+      <div className={styles.resultScaleWrap}>
+        <table
+          className={styles.resultScale}
+          role="table"
+          aria-label="Результат по шкале комфортности"
+        >
+          <thead role="rowgroup">
+            <tr role="row">
+              <th role="columnheader">Что слышно</th>
+              {LADDER.map((cls) => (
+                <th key={cls} scope="col" role="columnheader">
+                  <b>{SCALE_STEP[cls].letter || 'Ниже В'}</b>
+                  <span>{cls === 'below' ? 'ниже нормы' : SCALE_STEP[cls].label}</span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody role="rowgroup">
+            <ScaleRow
+              title="Голоса и музыка"
+              example="речь, телевизор, лай"
+              before={airBefore}
+              after={airAfter}
+              beforeValue={airBeforeValue}
+              afterValue={airAfterValue}
+              metric="Rw"
+            />
+            <ScaleRow
+              title="Шаги и удары"
+              example="топот, бег, падения"
+              before={impactBefore}
+              after={impactAfter}
+              beforeValue={impactBeforeValue}
+              afterValue={impactAfterValue}
+              metric="Lnw"
+              lowerIsBetter
+            />
+          </tbody>
+        </table>
       </div>
 
       {impactAfter === 'below' ? (
@@ -441,62 +444,6 @@ export function ResultScreen() {
         </p>
       </section>
 
-      <section className={styles.nextStep} aria-label="Следующий шаг">
-        <header>
-          <h2>Следующий шаг</h2>
-          <p>{copy.nextStepHint}</p>
-        </header>
-
-        <div className={styles.nextActions}>
-          <Button fullWidth onClick={openCalc}>
-            Открыть калькулятор MultiFrame
-          </Button>
-          <Button variant="secondary" fullWidth onClick={() => setShowLead((v) => !v)}>
-            Запросить консультацию или подбор
-          </Button>
-          {copy.isClient ? (
-            <Button variant="ghost" fullWidth onClick={() => void onCopySummary()}>
-              {copied ? 'Сводка скопирована' : 'Скопировать сводку для клиента'}
-            </Button>
-          ) : null}
-        </div>
-
-        {showLead ? (
-          <form className={styles.form} onSubmit={onLead}>
-            <h3>Заявка на консультацию</h3>
-            <p>{copy.leadHelp}</p>
-            <Field label="Имя">
-              <TextInput
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Как к вам обращаться"
-              />
-            </Field>
-            <Field label="Телефон">
-              <TextInput
-                required
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+7 …"
-              />
-            </Field>
-            <Button type="submit" fullWidth disabled={sent}>
-              {sent ? 'Заявка принята' : 'Отправить'}
-            </Button>
-            {sent ? (
-              <div className={styles.leadSuccess}>
-                {copy.leadSuccessExtra ? <p>{copy.leadSuccessExtra}</p> : null}
-                <button type="button" className={styles.inlineLink} onClick={openCalc}>
-                  Открыть калькулятор MultiFrame
-                </button>
-              </div>
-            ) : null}
-          </form>
-        ) : null}
-      </section>
-
       <section className={styles.technical} aria-label="Расчёт и нормы">
         <header className={styles.technicalHead}>
           <span>Подробности</span>
@@ -602,6 +549,62 @@ export function ResultScreen() {
           Rw показывает изоляцию от голосов и музыки: больше — лучше. Lnw показывает уровень
           ударного шума: меньше — лучше.
         </p>
+      </section>
+
+      <section className={styles.nextStep} aria-label="Следующий шаг">
+        <header>
+          <h2>Следующий шаг</h2>
+          <p>{copy.nextStepHint}</p>
+        </header>
+
+        <div className={styles.nextActions}>
+          <Button fullWidth onClick={openCalc}>
+            Открыть калькулятор MultiFrame
+          </Button>
+          <Button variant="secondary" fullWidth onClick={() => setShowLead((v) => !v)}>
+            Запросить консультацию или подбор
+          </Button>
+          {copy.isClient ? (
+            <Button variant="ghost" fullWidth onClick={() => void onCopySummary()}>
+              {copied ? 'Сводка скопирована' : 'Скопировать сводку для клиента'}
+            </Button>
+          ) : null}
+        </div>
+
+        {showLead ? (
+          <form className={styles.form} onSubmit={onLead}>
+            <h3>Заявка на консультацию</h3>
+            <p>{copy.leadHelp}</p>
+            <Field label="Имя">
+              <TextInput
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Как к вам обращаться"
+              />
+            </Field>
+            <Field label="Телефон">
+              <TextInput
+                required
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+7 …"
+              />
+            </Field>
+            <Button type="submit" fullWidth disabled={sent}>
+              {sent ? 'Заявка принята' : 'Отправить'}
+            </Button>
+            {sent ? (
+              <div className={styles.leadSuccess}>
+                {copy.leadSuccessExtra ? <p>{copy.leadSuccessExtra}</p> : null}
+                <button type="button" className={styles.inlineLink} onClick={openCalc}>
+                  Открыть калькулятор MultiFrame
+                </button>
+              </div>
+            ) : null}
+          </form>
+        ) : null}
       </section>
 
       <Button variant="ghost" onClick={restart}>

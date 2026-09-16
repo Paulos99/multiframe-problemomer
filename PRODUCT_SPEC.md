@@ -13,8 +13,8 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 - Feeling + comfort-class story first on early screens; **no numbers on Start**.
 - On Before/After + Profile: show the **full evidence pack** — personal room story, classes А/Б/В, numbers, charts, and plain-language explanations of each (owner 2026-09-12: «показать всё, аргументированно, понятно, персонально»).
 - **Evidence layout (Q4, owner 2026-09-12):** everything on one scroll — **conclusion / verdict on top**, detailed data below. Not progressive disclosure; not audience-trimmed packs. Anyone skims what they need. Same full stack for all user models (context may still change copy/CTA emphasis).
-- **Result must include (owner 2026-09-16):** (1) one direct verdict for *this* ceiling/room, (2) one shared official scale with separate rows for voices and impacts, (3) one combined effect + audio block, (4) three concise reasons-to-believe, (5) next step, then (6) open technical evidence. Do not repeat the same conclusion in summary cards or a narrative ribbon.
-- **Charts (owner 2026-09-16):** the primary visual is one shared scale **Ниже В → В → Б → А** plus two quietness cards where perceived percentage leads and Δ Rw / Δ Lnw is secondary. **Frequency isolation charts** (R(f) / удар по Гц, форма как [zamer_graph](https://pavelantsibor.github.io/zamer_graph/)) stay open below the CTA inside neutral **«Расчёт и нормы»**. Both frequency series are **изоляция** (выше = тише в комнате). Captions + one `pre_lab` disclaimer required.
+- **Result must include (owner 2026-09-16):** (1) one direct verdict for *this* ceiling/room, (2) one shared official scale presented as a table with levels in columns and noise types in rows, (3) one combined effect + audio block, (4) three concise reasons-to-believe, (5) open technical evidence, then (6) the next step at the very bottom. Do not repeat the same conclusion in summary cards or a narrative ribbon.
+- **Charts (owner 2026-09-16):** the primary visual combines scale and table logic: columns **Ниже В → В → Б → А**, rows **Голоса и музыка / Шаги и удары**, with `Сейчас` and `MultiFrame` directly inside the matching cells. Two quietness cards follow, where perceived percentage leads and Δ Rw / Δ Lnw is secondary. **Frequency isolation charts** (R(f) / удар по Гц, форма как [zamer_graph](https://pavelantsibor.github.io/zamer_graph/)) stay open inside neutral **«Расчёт и нормы»** above the final CTA. Both frequency series are **изоляция** (выше = тише в комнате). Captions + one `pre_lab` disclaimer required.
 - **Numbers policy (owner 2026-09-13):** show a **full working MultiFrame effect model** with complete numbers now — currently **unconfirmed** (`marketing_placeholder` / `pre_lab`). After Trofimov (or lab) confirmation, **replace** values with correct ones; do not redesign the UX around hiding numbers. Never present placeholders as lab guarantees or certificates.
 - Effect source: `marketing_placeholder`; disclaimer: `pre_lab` / expert qualitative — never lab guarantees. Charts/numbers are **oriented arguments**, not certificates.
 - MultiFrame Δ is **frequency-shaped** (`marketing_placeholder` / `pre_lab`): typical ΔRw **+8…+12** (more on a light slab), ΔLnw **−4…−9** without a floating floor and **−2…−4** if the floor above already floats. UI range is **computed from the room model**, not hardcoded +10/−8. Never present as a lab certificate.
@@ -99,7 +99,9 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-16 | **Hot funnel:** in-body calculator; structured `buildLeadHandoff` (room+sim+why); client «Скопировать сводку»; premium stagger reveal + Room progress bar; `prefers-reduced-motion` respected. |
 | 2026-09-16 | **Result simplification (supersedes the two rows above):** verdict → one shared official scale with two rows → combined effect+audio → three MultiFrame reasons → next step → open «Расчёт и нормы». Remove emotion cards, separate Δ cards, `whyFit` duplication, features duplication and the five-step ribbon. |
 | 2026-09-16 | **Official-scale correction:** only А/Б/В are classes. The fourth axis position is written `Ниже В`, never «Д». If a class does not change, use one combined marker and explain the numeric improvement below it. |
-| 2026-09-16 | **Motion correction:** no section stagger on Result. Animate only scale markers and effect bars; `prefers-reduced-motion` disables both. CTA precedes technical evidence; existing sticky calculator CTA remains. |
+| 2026-09-16 | **Motion correction:** no section stagger on Result. Animate only scale markers and effect bars; `prefers-reduced-motion` disables both. Existing sticky calculator CTA remains. |
+| 2026-09-16 | **Scale/table merge:** replace the abstract dot-and-line scale with a compact table: official levels are columns, everyday noise types are rows, and state badges sit in their actual cells. Technical thresholds remain below as a second layer. |
+| 2026-09-16 | **Final CTA order:** open table and frequency graphs come before the in-body `Следующий шаг`; the conversion block is the last substantive section on Result. |
 
 ---
 
@@ -533,10 +535,10 @@ Summarize acoustic profile with **verdict first**, then the full evidence stack 
 
 ### Visible elements
 
-- **Top verdict:** one-liner from which channel(s) rose + **two independent comfort levels** (воздух Rw / удар Lnw) each with before→after and its own А/Б/В ladder. Full SP hybrid class is a short secondary note only.
+- **Top verdict:** one-liner from which channel(s) rose + one shared table-scale. Official levels are columns (`Ниже В / В / Б / А`), the two everyday noise types are rows, and `Сейчас` / `MultiFrame` are placed directly in the corresponding cells. Rw/Lnw remain secondary in row captions.
 - **Fallback (hybrid class stuck):** obsolete as primary pattern — channels are always primary.
-- **Scroll order (2026-09-16):** verdict → emotion cards → quieter (Δ + bars + disclaimer) → compact audio → «Почему MultiFrame уместен» (`whyMultiFrame`) → «Чем MultiFrame отличается» + safety one-liner → **«Итог для вашей/комнаты клиента»** (5-parameter ribbon + closing line) → SP dB table + frequency charts (secondary) → **«Следующий шаг»** (calculator + lead + optional client summary copy) → restart.
-- Title, subtitle (`interestFor`-aware), Before/After emotion cards (2 bullets each), numbers + charts + explanations, expert Disclaimer, calculator CTA (in-body + sticky), lead form, restart.
+- **Scroll order (2026-09-16):** verdict + table-scale → combined quieter + compact audio → three reasons MultiFrame fits → open SP dB table + frequency charts (secondary) → **«Следующий шаг»** (calculator + lead + optional client summary copy) → restart.
+- Title and subtitle (`interestFor`-aware), table-scale, numbers + charts + explanations, one expert disclaimer, calculator CTA (in-body + sticky), lead form, restart.
 - **Charts block:** large Δ Rw / Δ Lnw + quietness bars first (in quieter); frequency isolation charts later as secondary evidence.
 - Do **not** hide detail behind tabs/accordions as the primary pattern; scroll is the disclosure.
 
@@ -544,18 +546,16 @@ Summarize acoustic profile with **verdict first**, then the full evidence stack 
 
 | Role | Text |
 | ---- | ---- |
-| Title | `Акустический профиль помещения` |
+| Title (self/client) | `Результат для вашей комнаты` / `Результат для комнаты клиента` |
 | Subtitle (self) | `Ориентир комфорта для вашей комнаты и следующий шаг к расчёту` |
 | Subtitle (client) | `Ориентир комфорта для комнаты клиента и следующий шаг к расчёту` |
 | Verdict one-liner | Dynamic from channel rise (air / impact / both) |
-| Norm footnote | `Ориентир по шкале комфортности (норм. документы)` |
-| Before card tag | `Сейчас` |
-| Before card bullets | `Соседи сверху слышны слишком отчётливо` · `Бытовые звуки сверху легко различить` |
-| After card tag | `С MultiFrame` |
-| After card bullets | `В комнате заметно спокойнее` · `Ударный и воздушный шум воспринимаются мягче` |
-| Why title | `Почему MultiFrame уместен` |
-| Features title | `Чем MultiFrame отличается` |
-| Ribbon title (self/client) | `Итог для вашей комнаты` / `Итог для комнаты клиента` |
+| Scale title | `Шкала комфортности` |
+| Scale columns | `Ниже В` · `В Допустимый` · `Б Комфорт` · `А Высокий` |
+| Scale rows | `Голоса и музыка` · `Шаги и удары`; badges `Сейчас` / `MultiFrame` |
+| Effect title | `Что изменится на слух` |
+| Why title | `Почему MultiFrame подходит` |
+| Technical title | `Расчёт и нормы` |
 | Next-step title | `Следующий шаг` |
 | Calculator CTA | `Открыть калькулятор MultiFrame` |
 | Lead open | `Запросить консультацию или подбор` |
@@ -775,7 +775,7 @@ Client path also: `buildClientSummary(session)` — plain-text digest for clipbo
 
 1. Pick `для клиента`; default slab OK.
 2. Room → Result quickly.
-3. Result full pack; copyable client summary; CTA calculator or demo lead appears before technical evidence.
+3. Result full pack; copyable client summary; open technical evidence appears before the final calculator / lead block.
 4. ≤3 min without scenario/complaint quiz.
 
 **Pass:** path ≤3 min; audio shows case-specific two-channel difference; full evidence under verdict; calculator CTA works.

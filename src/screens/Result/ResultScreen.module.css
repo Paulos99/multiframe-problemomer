@@ -1053,161 +1053,213 @@
   color: var(--text-primary);
 }
 
-.scaleAxis {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0;
-  padding: 8px 0 2px;
-  border-top: 1px solid var(--border-color);
-}
-
-.scaleAxis > span {
+.scaleDirection {
   display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 4px;
-  min-width: 0;
-  text-align: center;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  margin: -2px 0 -6px;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent-color);
 }
 
-.scaleAxis b {
-  font-size: 14px;
+.scaleDirection span {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.resultScaleWrap {
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+}
+
+.resultScale {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.resultScale th,
+.resultScale td {
+  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.resultScale tr > :last-child {
+  border-right: 0;
+}
+
+.resultScale tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.resultScale thead th {
+  padding: 8px 5px;
+  text-align: center;
+  vertical-align: bottom;
+  background: var(--bg-subtle);
+}
+
+.resultScale thead th:first-child {
+  width: 28%;
+  padding-left: 10px;
+  text-align: left;
+  font-size: 10px;
+  font-weight: 750;
+  color: var(--text-secondary);
+}
+
+.resultScale thead th:nth-child(3) {
+  background: color-mix(in srgb, var(--accent-soft) 30%, var(--bg-subtle));
+}
+
+.resultScale thead th:nth-child(4) {
+  background: color-mix(in srgb, var(--accent-soft) 55%, var(--bg-subtle));
+}
+
+.resultScale thead th:nth-child(5) {
+  background: color-mix(in srgb, var(--accent-soft) 82%, var(--bg-subtle));
+}
+
+.resultScale thead b,
+.resultScale thead span {
+  display: block;
+}
+
+.resultScale thead b {
+  font-size: 12px;
   font-weight: 850;
+  line-height: 1.15;
   color: var(--text-primary);
 }
 
-.scaleAxis small {
-  font-size: 10px;
+.resultScale thead span {
+  margin-top: 2px;
+  font-size: 8px;
+  font-weight: 550;
   line-height: 1.15;
   color: var(--text-secondary);
 }
 
-.scaleRows {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.resultScale tbody th {
+  padding: 10px;
+  text-align: left;
+  vertical-align: middle;
+  background: var(--bg-card);
 }
 
-.scaleRow {
-  padding: 10px 0 0;
-  border-top: 1px solid var(--border-color);
+.resultScale tbody th strong,
+.resultScale tbody th > span,
+.resultScale tbody th small,
+.resultScale tbody th i {
+  display: block;
 }
 
-.scaleRowHead {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.scaleRowHead > div {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  min-width: 0;
-}
-
-.scaleRowHead strong {
-  font-size: 13px;
+.resultScale tbody th strong {
+  font-size: 12px;
   font-weight: 800;
+  line-height: 1.25;
 }
 
-.scaleRowHead span {
-  font-size: 10px;
+.resultScale tbody th > span {
+  margin-top: 2px;
+  font-size: 8px;
+  font-weight: 550;
+  line-height: 1.25;
   color: var(--text-secondary);
 }
 
-.scaleRowHead > b {
-  font-size: 11px;
-  line-height: 1.25;
-  text-align: right;
-  color: var(--accent-color);
+.resultScale tbody th small {
+  margin-top: 6px;
+  font-size: 9px;
+  font-weight: 700;
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.3;
+  color: var(--text-primary);
 }
 
-.scaleTrack {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  min-height: 38px;
-  margin-top: 4px;
+.resultScale tbody th i {
+  margin-top: 1px;
+  font-size: 8px;
+  font-weight: 550;
+  font-style: normal;
+  color: var(--text-secondary);
 }
 
-.scaleLine {
-  position: absolute;
-  z-index: 0;
-  left: 12.5%;
-  right: 12.5%;
-  top: 24px;
-  height: 3px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #aeb6bc, #6f9f94 58%, var(--accent-color));
-  opacity: 0.65;
+.resultScale td {
+  height: 72px;
+  padding: 7px 5px;
+  text-align: center;
+  vertical-align: middle;
 }
 
-.scaleCell {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
+.resultScale td[data-level='below'] {
+  background: rgba(122, 135, 144, 0.05);
+}
+
+.resultScale td[data-level='V'] {
+  background: color-mix(in srgb, var(--accent-soft) 22%, var(--bg-card));
+}
+
+.resultScale td[data-level='B'] {
+  background: color-mix(in srgb, var(--accent-soft) 42%, var(--bg-card));
+}
+
+.resultScale td[data-level='A'] {
+  background: color-mix(in srgb, var(--accent-soft) 65%, var(--bg-card));
+}
+
+.scaleStateNow,
+.scaleStateAfter,
+.scaleStateBoth {
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
-}
-
-.markerCaption {
-  min-height: 13px;
+  justify-content: center;
+  min-height: 24px;
+  padding: 4px 7px;
+  border-radius: var(--radius-pill);
   font-size: 8px;
   font-weight: 850;
-  letter-spacing: 0.025em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  color: var(--text-secondary);
-}
-
-.scaleDot {
-  width: 8px;
-  height: 8px;
-  border: 2px solid var(--bg-card);
-  border-radius: 50%;
-  background: #c8ced2;
-  box-shadow: 0 0 0 1px rgba(95, 107, 115, 0.22);
-}
-
-.scaleDotNow,
-.scaleDotAfter,
-.scaleDotBoth {
+  letter-spacing: 0.015em;
+  line-height: 1.1;
   animation: markerIn 360ms var(--ease-out) both;
 }
 
-.scaleDotNow {
-  width: 12px;
-  height: 12px;
-  margin-top: -2px;
+.scaleStateNow {
+  color: #fff;
   background: #68757e;
-  box-shadow: 0 0 0 2px rgba(104, 117, 126, 0.18);
 }
 
-.scaleDotAfter {
-  width: 14px;
-  height: 14px;
-  margin-top: -3px;
+.scaleStateAfter {
+  color: #fff;
   background: var(--accent-color);
-  box-shadow: 0 0 0 3px rgba(1, 100, 79, 0.16);
+  box-shadow: 0 3px 10px rgba(1, 100, 79, 0.18);
 }
 
-.scaleDotBoth {
-  width: 14px;
-  height: 14px;
-  margin-top: -3px;
-  background: var(--accent-color);
-  box-shadow:
-    0 0 0 3px var(--bg-card),
-    0 0 0 5px #7a8790;
+.scaleStateBoth {
+  flex-direction: column;
+  gap: 2px;
+  padding-block: 5px;
+  color: var(--accent-color);
+  background: var(--bg-card);
+  border: 1px solid rgba(1, 100, 79, 0.35);
 }
 
-.scaleMetric {
-  margin: 2px 0 0;
-  font-size: 10px;
-  font-variant-numeric: tabular-nums;
+.scaleStateBoth b {
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.scaleStateBoth small {
+  font-size: 7px;
+  font-weight: 650;
+  white-space: nowrap;
   color: var(--text-secondary);
 }
 
@@ -1479,28 +1531,77 @@
     gap: 4px;
   }
 
-  .scaleAxis > span {
-    flex-direction: column;
-    align-items: center;
-    gap: 1px;
+  .resultScale,
+  .resultScale thead,
+  .resultScale tbody {
+    display: block;
   }
 
-  .scaleAxis small {
+  .resultScale thead tr,
+  .resultScale tbody tr {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .resultScale thead th:first-child {
+    display: none;
+  }
+
+  .resultScale thead th {
+    padding: 8px 3px;
+  }
+
+  .resultScale thead b {
+    font-size: 11px;
+  }
+
+  .resultScale thead span {
+    font-size: 8px;
+  }
+
+  .resultScale tbody th {
+    grid-column: 1 / -1;
+    padding: 9px 10px;
+    border-right: 0;
+    background: var(--bg-subtle);
+  }
+
+  .resultScale tbody th strong {
+    font-size: 12px;
+  }
+
+  .resultScale tbody th > span {
+    font-size: 8px;
+  }
+
+  .resultScale tbody th small {
+    margin-top: 4px;
     font-size: 9px;
   }
 
-  .scaleRowHead {
-    align-items: start;
+  .resultScale td {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 60px;
+    padding: 5px 3px;
   }
 
-  .scaleRowHead > div {
-    flex-direction: column;
-    align-items: start;
-    gap: 1px;
+  .resultScale tbody tr:last-child > th {
+    border-bottom: 1px solid var(--border-color);
   }
 
-  .scaleRowHead > b {
-    max-width: 48%;
+  .scaleStateNow,
+  .scaleStateAfter,
+  .scaleStateBoth {
+    max-width: 100%;
+    padding-inline: 7px;
+    font-size: 8px;
+    letter-spacing: 0;
+  }
+
+  .scaleStateBoth b {
+    font-size: 8px;
   }
 
   .effectGrid,
@@ -1519,13 +1620,17 @@
     padding: 11px 8px;
   }
 
-  .markerCaption {
+  .resultScale tbody th > span {
     font-size: 7px;
-    letter-spacing: 0;
   }
 
-  .scaleAxis small {
-    max-width: 62px;
+  .resultScale tbody th small {
+    font-size: 8px;
+  }
+
+  .resultScale tbody th i,
+  .scaleStateBoth small {
+    font-size: 7px;
   }
 
   .effectCard > header {
@@ -1534,9 +1639,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .scaleDotNow,
-  .scaleDotAfter,
-  .scaleDotBoth,
+  .scaleStateNow,
+  .scaleStateAfter,
+  .scaleStateBoth,
   .effectCard .qFillAfter,
   .effectCard .qFillBefore {
     animation: none;
