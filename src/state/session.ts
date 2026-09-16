@@ -50,6 +50,7 @@ function defaultRoom() {
     objectStage: 'unknown' as const,
     plannedCeiling: 'unknown' as const,
     noisyNeighbors: 'unknown' as const,
+    roomWish: 'unknown' as const,
   };
 }
 
@@ -135,16 +136,23 @@ export function prevStep(step: WizardStep): WizardStep | null {
   return WIZARD_STEPS[i - 1]!;
 }
 
+export function roomBasicsComplete(session: SessionState): boolean {
+  return (
+    session.answers.room.roomType != null &&
+    session.answers.room.ceilingAreaM2 != null &&
+    session.answers.room.ceilingAreaM2 > 0
+  );
+}
+
 export function canProceed(session: SessionState): boolean {
   switch (session.step) {
     case 'start':
       return true;
     case 'room':
-      return (
-        session.answers.room.roomType != null &&
-        session.answers.room.ceilingAreaM2 != null &&
-        session.answers.room.ceilingAreaM2 > 0
-      );
+      if (session.roomSubstep === 'basics' || isLastRoomSubstep(session.roomSubstep)) {
+        return roomBasicsComplete(session);
+      }
+      return true;
     case 'result':
       return true;
     default:

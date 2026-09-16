@@ -29,10 +29,10 @@ Live context (do not redesign from this URL alone): https://paulos99.github.io/m
 | --------------------------------------------------------- | ------ |
 | What product do you want to build first?                  | **MultiFrame Проблемомер** — веб-инструмент спроса на **акустический комфорт** при выборе натяжного потолка с бескаркасной системой **StP MultiFrame**. Это **не** калькулятор материалов и **не** инженерный расчёт звукоизоляции. MVP: только потолок; шум сверху через перекрытие; только frameless MultiFrame. |
 | Core value (owner, 2026-09-12; tone 2026-09-13) | Ближе к «без акустики покупаю красивую плёнку, а шум сверху останется», но шире: **в моей/клиентской комнате** понять, что комфорт сейчас понижен; MultiFrame может поднять класс на ступень+; проверить ориентиры; **почувствовать** насколько тише; увидеть **особенности системы** (комфорт, монтаж, универсальность, безопасность) так, чтобы ценность выводилась **сама**; путь «для клиента» — готовый аргумент. **UI без** «за что платим» / давления ценой. |
-| Audiences / Start (confirmed 2026-09-13) | На старте только: **«Интересуюсь звукоизоляцией: для себя / для клиента»**. Длинный список ролей/входов — **не UI-опрос**, а **карта JTBD** для полного контента обоснования покупки MultiFrame. |
-| User models = JTBD content map (owner 2026-09-13) | Клиент: таргет / поиск / сайт MultiFrame / сайт партнёра. Профи: менеджер продаж, мастер на объекте, замерщик, дизайнер и аналоги. Нужны не отдельные ветки, а **один полный buy-case**, который закрывает эти работы. |
-| Further Start clarification | **Не делаем.** Зачем не нужно: если результат уже даёт полную аргументацию покупки MultiFrame (исходное состояние + эффект + плюсы + классы/цифры/аудио), доп. вопросы «менеджер / замер / дизайн» только усложняют вход и не добавляют фактов. UTM может менять хук без вопроса. |
-| What is the first user journey that must work end to end? | `для себя`/`для клиента` → комната → итог (карточки + компактное аудио + buy-case + CTA). **Без** отдельных экранов Сравнение / Звук и без опроса сценариев. |
+| Audiences / Start (superseded 2026-09-16) | Старт **без роли**. Путь сайта: комфорт **на своём объекте**. «Для себя / для клиента» убрано — путает. Специалисты идут тем же потоком. Длинный список ролей — карта JTBD, не UI. |
+| User models = JTBD content map (owner 2026-09-13; UI 2026-09-16) | Клиент с сайта StP; профи: менеджер, мастер, замерщик, дизайнер. Не отдельные ветки, а **один** buy-case. |
+| Further Start clarification | **Не делаем.** Роль на старте снята 16.09. |
+| What is the first user journey that must work end to end? | Старт без роли → внешние факторы (дом/перекрытие) → внутренние (комната, потолок, хотелки) → итог: сначала текущее без MultiFrame, затем эффект. **Без** «пола сверху», без экранов Сравнение / Звук и без опроса «что мешает». |
 | Result evidence depth (confirmed 2026-09-12) | **Показать всё**, аргументированно, понятно, персонально: **цифры + классы А/Б/В + графики + пояснения к ним**. Не выбирать «только ощущение» или «только цифры». Честная рамка pre_lab / marketing_placeholder сохраняется — это ориентиры под комнату, не лаб-сертификат. |
 | Evidence presentation Q4 (confirmed 2026-09-12) | **Всё сразу** на одном скролле: **сверху вывод**, ниже детальные данные. Менеджер и пользователь сами смотрят нужный слой. Не progressive disclosure и не урезание пакета по роли. |
 | Charts (confirmed 2026-09-13; spectrum restored 2026-09-14) | Шкала А→Б→В сверху; крупные Δ Rw / Δ Lnw + полосы «тише»; **частотные графики изоляции** (форма zamer_graph) ниже как вторичное доказательство. Обе кривые — изоляция, выше = тише. Подписи + pre_lab. |
@@ -61,11 +61,12 @@ Live context (do not redesign from this URL alone): https://paulos99.github.io/m
 | Audio chrome (confirmed 2026-09-13) | Title **T1:** `Услышать разницу`. Subtitle **S6:** `Сравните звук обычного потолка и потолка с MultiFrame`. Buttons **B2:** `До` · `После`. Sticky **N3:** `Смотреть итог`. |
 | Object stage (confirmed 2026-09-13) | `Новостройка / до заселения` · `Идёт ремонт` · `Уже живут` · `Не знаю`. |
 | House type options (confirmed 2026-09-13) | `Панельный` · `Блочный` · `Кирпичный` · `Монолит` (в т.ч. монолит-кирпич) · `Деревянный / по балкам` · `Не знаю`. Сталинка ≈ кирпичный (подсказка). |
-| Room field order (confirmed 2026-09-13) | тип → площадь → тип перекрытия → толщина перекрытия → пол сверху → тип дома → стадия → потолок → соседи. |
-| Room required fields (confirmed 2026-09-13) | Обязательны только **тип комнаты** и **площадь**. Тип/толщина перекрытия, пол сверху, тип дома, стадия, потолок, соседи — можно `Не знаю`. |
-| Floor-above options (confirmed 2026-09-13) | Подписи ОК: `Не знаю` · `Обычный пол (без плавающей схемы)` · `Есть плавающий пол / шумоизоляция в полу`. «Без чистового» — не сюда. |
-| Floor above unknown OK (confirmed 2026-09-13) | «Не знаю» по полу сверху — нормальный ответ; не блокирует шаг. Модель берёт консервативное ASSUMPTION. |
-| Room = primary diagnostic (2026-09-13) | Обязательно: тип + площадь. Перекрытие = **тип** и **толщина** отдельно (не матрица). Плюс: пол сверху, тип дома, стадия, потолок, шумные соседи. Везде опционально `Не знаю`. Год — не в MVP. |
+| Room field order (2026-09-16) | дом → тип перекрытия → толщина → тип+площадь → потолок → стадия → соседи → хотелки. Пол сверху **не в UI**. |
+| Room required fields (confirmed 2026-09-13) | Обязательны только **тип комнаты** и **площадь** (на шаге internals). Остальное — можно `Не знаю`. |
+| Floor above (2026-09-16) | Вопрос снят с MVP. Модель держит `unknown` (консервативное ASSUMPTION). |
+| Room = primary diagnostic (2026-09-16) | Фокус клиента на перекрытии. Тип комнаты не первый вопрос. |
+| Room wishes (2026-09-16) | Внутренний шаг «что важно»: музыка / телевизор / сон ребёнка / пока не важно / не знаю. Не квиз «мешает ли». |
+| Start chrome (2026-09-16) | Без роли. H1: `Проверьте уровень акустического комфорта на своём объекте`. CTA: `Начать`. |
 | Always both Δ channels (confirmed 2026-09-13) | На эффективности всегда **воздух и удар**, у каждого — пояснение + ощущение. |
 | Scenarios survey (removed 2026-09-13) | Убрать вопрос «что слышите/мешает»: клиент мог не жить в квартире и не задумываться о шуме; опрос провоцирует «мне ничего не мешает». |
 | Current complaint survey (removed 2026-09-13) | Убрать вместе со сценариями (тот же антипаттерн). Класс до/после считает модель, не самооценка «мешает». |
@@ -76,7 +77,7 @@ Live context (do not redesign from this URL alone): https://paulos99.github.io/m
 | Result sticky CTA (confirmed 2026-09-13) | **C4:** `Открыть калькулятор MultiFrame` (вместо «Расчёт материалов»). |
 | Result lead (confirmed 2026-09-13) | Заявка = консультация / подбор. Open **P2:** `Запросить консультацию или подбор`. Title: `Заявка на консультацию`. Note: `Разберём ваш случай, подберём материал.` Отдельную disabled-кнопку «Консультация» не показываем. |
 | Feature copy style (confirmed 2026-09-13) | Преимущества на результате — **тезис + 1 фраза обоснования**, премиальным цельным языком. Барабан (draft): «Под обычным натяжным потолком воздух в зазоре усиливает шум сверху, как полотно барабана. MultiFrame рассеивает эту энергию в панели, и комната воспринимается спокойнее.» Не слоганы и не техдамп. Flat/Wave в блоке преимуществ **не** показываем. |
-| Start chrome (confirmed 2026-09-13) | Без kicker. H1: `Проверьте уровень акустического комфорта перед выбором натяжного потолка`. Lead **E8c:** `Проблемомер показывает исходное состояние потолка и эффект MultiFrame — уровень комфорта сейчас, ожидаемый эффект после и что важно учесть до выбора потолка.` CTA: `Начать`. |
+| Start chrome (confirmed 2026-09-13) | **Superseded 2026-09-16** — see Start chrome (2026-09-16). |
 
 ## 3. Active surfaces
 
@@ -175,7 +176,7 @@ Engineering decisions already made / owned by the agent (product terms):
 - **Stack (recorded, do not reopen):** Vite + React SPA, client session state, GitHub Actions → GitHub Pages. No microservices.
 - **Effect model:** two layers — construction R(f)/Rw/Lnw from Trofimov + physics (mass, coincidence, ПК voids, wood, house flanking, floor ΔLn(f)); in-room A-weighted level from L1(f)−R(f)+10log(S/A) (neighbors, room type, area, furnishing). **Product «сейчас» = in-situ** (flanking + leak + drum), not lab Trofimov Rw; lab fixtures stay 180=54/76. MultiFrame Δ is invented frequency-shaped (`source: marketing_placeholder`, `disclaimer: pre_lab`): typical ΔRw 8…12, ΔLnw 4…9 (2…4 if floating floor). Neighbors do not change Rw. Ceiling alone never takes Lnw to class A. Classes **A/B/V** (UI А/Б/В) unchanged.
 - **Audio:** groups воздух / удар / смешанный; real MP3 stems (talk/stomp/vacuum); After = case Δ (level + EQ); mixed blends both; ≈% from room model; `pre_lab` / ориентир.
-- **Result JTBD arc (2026-09-16):** narrative ribbon (5 params) + whyMultiFrame + hot funnel (calc/lead/client summary); `interestFor` tone; premium stagger; no Room skip.
+- **Result JTBD arc (2026-09-16 + workshop):** current-state scare first, then MultiFrame %; no `interestFor` UI; copy summary for everyone; Room external→internal; no floor-above question.
 - **CTA:** deep-link to MultiFRAME calculator with query payload; lead = consultation/selection request (MVP may stub delivery — never invent a corporate CRM endpoint).
 - **Mobile:** denser inputs + sticky progress/CTA; touch targets ≥44px; no tech dumps.
 - **Out of scope code paths:** walls, partitions, floors systems, Polyblock, framed systems — do not add.
@@ -206,7 +207,10 @@ A capability with no row is `absent` by default. The State column always holds o
 | Two-layer acoustic model | included | Construction (Trofimov + mass/coincidence/ПК/wood/flanking/floor ΔLn(f) → Rw/Lnw + charts) vs receiving room (L1−R+S/A, A-weighted). Lab anchors: bare 180=54/76, ПК 220=52/74. Product in-situ «сейчас» typically Rw ~44–48 (panel/unknown), air often вне нормы. |
 | Trofimov-style comfort classes A/B/V | included | Canon A\|B\|V; UI Cyrillic А\|Б\|В. Result shows **independent** air (Rw) and impact (Lnw) levels; full hybrid SP class is secondary. Never promise full Lnw norm from ceiling alone. |
 | Case-specific audio (air / impact / mixed) | included | Stems in `public/audio/`; After cuts level + frequencies from room Δ; mixed = blend; show ≈%; `pre_lab`. |
-| JTBD Result narrative + hot funnel | included | 5-param ribbon; whyMultiFrame UI; «Следующий шаг» dual CTA; lead handoff + client summary copy; interestFor copy. |
+| JTBD Result narrative + hot funnel | included | Current then MultiFrame; whyMultiFrame UI; «Следующий шаг» CTA; lead handoff + summary copy. No role split. |
+| Floor-above survey | removed | Workshop 2026-09-16: too expert; model keeps unknown. |
+| Start role picker self/client | removed | Workshop 2026-09-16: confuses visitors. |
+| Room external/internal survey | included | House/slab first; wishes as internal factor. |
 | Calculator CTA handoff | included | Opens calculator with `area`, `roomType` (no scenarios). |
 | Consultation / selection lead | available | UI: `Запросить консультацию или подбор` · `Заявка на консультацию` · `Разберём ваш случай, подберём материал.` Delivery may stub until real endpoint; no invented StP CRM. |
 | Sticky mobile chrome | included | Header + progress + sticky Далее/CTA; denser cards on narrow viewports. |

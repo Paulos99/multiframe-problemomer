@@ -5,7 +5,7 @@ import { stepIndex } from '../state/session';
 
 const LABELS: Record<WizardStep, string> = {
   start: 'Старт',
-  room: 'Комната',
+  room: 'Объект',
   result: 'Итог',
 };
 
