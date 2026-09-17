@@ -1295,7 +1295,7 @@
 .sectionHead {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 8px;
 }
 
 .sectionHead h2 {
@@ -1816,10 +1816,24 @@
   color: var(--accent-color);
 }
 
+.feltDb {
+  margin: -2px 0 0;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--text-secondary);
+}
+
+.feltDb b {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
 .feltTrack {
   position: relative;
-  height: 64px;
-  margin: 4px 8px 0;
+  height: 72px;
+  margin: 10px 2px 0;
+  overflow: visible;
 }
 
 .feltLine {
@@ -1840,23 +1854,43 @@
 .feltStep {
   position: absolute;
   top: 0;
+  bottom: 0;
+  width: 0;
   transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 4.6em;
-  gap: 4px;
+}
+
+.feltStep[data-edge='start'] {
+  transform: none;
+}
+
+.feltStep[data-edge='end'] {
+  transform: translateX(-100%);
 }
 
 .feltDot {
+  position: absolute;
+  top: 24px;
+  left: 50%;
   width: 11px;
   height: 11px;
-  margin-top: 23px;
+  margin: 0;
   border-radius: 50%;
   background: #9aa4ab;
   border: 2px solid var(--bg-card);
   box-shadow: 0 0 0 1px rgba(122, 135, 144, 0.35);
+  transform: translateX(-50%);
   z-index: 1;
+}
+
+.feltStep[data-edge='start'] .feltDot {
+  left: 0;
+  transform: none;
+}
+
+.feltStep[data-edge='end'] .feltDot {
+  left: auto;
+  right: 0;
+  transform: none;
 }
 
 .feltDot[data-danger] {
@@ -1869,11 +1903,29 @@
 }
 
 .feltLabel {
+  position: absolute;
+  top: 42px;
+  left: 50%;
+  width: 5.4em;
   font-size: 9px;
   font-weight: 650;
   line-height: 1.15;
   text-align: center;
   color: var(--text-secondary);
+  transform: translateX(-50%);
+}
+
+.feltStep[data-edge='start'] .feltLabel {
+  left: 0;
+  transform: none;
+  text-align: left;
+}
+
+.feltStep[data-edge='end'] .feltLabel {
+  left: auto;
+  right: 0;
+  transform: none;
+  text-align: right;
 }
 
 .feltStepActive .feltLabel {
@@ -1891,15 +1943,30 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 18px;
-  padding: 2px 6px;
+  min-height: 20px;
+  padding: 3px 8px;
   border-radius: var(--radius-pill);
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 850;
   letter-spacing: 0.02em;
   white-space: nowrap;
   animation: markerIn 360ms var(--ease-out) both;
   z-index: 2;
+}
+
+.feltStep[data-edge='start'] .feltMark,
+.feltStep[data-edge='start'] .feltMarkMf,
+.feltStep[data-edge='start'] .feltMarkBoth {
+  left: 0;
+  transform: none;
+}
+
+.feltStep[data-edge='end'] .feltMark,
+.feltStep[data-edge='end'] .feltMarkMf,
+.feltStep[data-edge='end'] .feltMarkBoth {
+  left: auto;
+  right: 0;
+  transform: none;
 }
 
 .feltMark {
@@ -1908,8 +1975,6 @@
 }
 
 .feltMarkMf {
-  top: auto;
-  bottom: -2px;
   color: #fff;
   background: var(--accent-color);
   box-shadow: 0 3px 10px rgba(1, 100, 79, 0.18);
@@ -1919,6 +1984,11 @@
   color: var(--accent-color);
   background: var(--bg-card);
   border: 1px solid rgba(1, 100, 79, 0.35);
+}
+
+/* If both markers land on one step (shouldn't with combined), stack them */
+.feltStep .feltMark + .feltMarkMf {
+  top: 22px;
 }
 
 .block .charts {
@@ -1932,23 +2002,20 @@
   }
 
   .feltTrack {
-    margin-inline: 2px;
-    height: 72px;
-  }
-
-  .feltStep {
-    width: 3.8em;
+    margin-inline: 0;
+    height: 76px;
   }
 
   .feltLabel {
+    width: 4.6em;
     font-size: 8px;
   }
 
   .feltMark,
   .feltMarkMf,
   .feltMarkBoth {
-    font-size: 7px;
-    padding-inline: 5px;
+    font-size: 8px;
+    padding-inline: 6px;
   }
 
   .normTableSimple {

@@ -228,17 +228,20 @@ export const FELT_STEPS: FeltStep[] = [
 ];
 
 export const FELT_STEP_LABELS: Record<FeltStep, string> = {
-  danger: 'Опасно',
+  danger: 'Очень шумно',
   uncomfortable: 'Некомфортно',
   acceptable: 'Приемлемо',
   comfort: 'Комфортно',
   quiet: 'Тихо',
 };
 
-/** Far-below-V thresholds for the «опасно» felt step. */
+/**
+ * Far-below-V thresholds for the worst felt step.
+ * Typical in-situ ПК / brick (~Rw 46, Lnw 75) must land on «некомфортно», not the edge.
+ */
 export const FELT_DANGER = {
-  RwBelow: 47,
-  LnwAbove: 68,
+  RwBelow: 44,
+  LnwAbove: 76,
 } as const;
 
 export function airFeltStep(Rw: number): FeltStep {

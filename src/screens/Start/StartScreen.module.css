@@ -44,34 +44,6 @@
   margin-top: 6px;
 }
 
-.points {
-  margin: 8px 0 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 8px;
-  position: relative;
-}
-
-.points li {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-.points li::before {
-  content: '';
-  width: 8px;
-  height: 8px;
-  margin-top: 5px;
-  border-radius: 50%;
-  background: var(--accent-color);
-  flex: 0 0 auto;
-  box-shadow: 0 0 0 4px var(--accent-soft);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .hero {
     animation: none;

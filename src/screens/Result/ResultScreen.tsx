@@ -57,16 +57,22 @@ function FeltScale({
   after,
   quieterPct,
   mode,
+  nowDb,
+  afterDb,
 }: {
   title: string;
   now: FeltStep;
   after?: FeltStep;
   quieterPct?: number;
   mode: 'nowOnly' | 'nowAndAfter';
+  nowDb: number;
+  afterDb?: number;
 }) {
   const nowIdx = feltIndex(now);
   const afterIdx = after ? feltIndex(after) : -1;
   const same = mode === 'nowAndAfter' && after && now === after;
+  const nowDbLabel = Math.round(nowDb);
+  const afterDbLabel = afterDb != null ? Math.round(afterDb) : null;
 
   return (
     <div
@@ -74,10 +80,12 @@ function FeltScale({
       role="img"
       aria-label={
         mode === 'nowOnly'
-          ? `${title}: сейчас ${FELT_STEP_LABELS[now]}`
-          : `${title}: сейчас ${FELT_STEP_LABELS[now]}, с MultiFrame ${
+          ? `${title}: сейчас ${FELT_STEP_LABELS[now]}, около ${nowDbLabel} дБ`
+          : `${title}: сейчас ${FELT_STEP_LABELS[now]}, около ${nowDbLabel} дБ; с MultiFrame ${
               after ? FELT_STEP_LABELS[after] : ''
-            }${quieterPct != null ? `, примерно на ${quieterPct}% тише` : ''}`
+            }${afterDbLabel != null ? `, около ${afterDbLabel} дБ` : ''}${
+              quieterPct != null ? `, примерно на ${quieterPct}% тише` : ''
+            }`
       }
     >
       <div className={styles.feltHead}>
@@ -87,30 +95,46 @@ function FeltScale({
         ) : null}
       </div>
 
+      <p className={styles.feltDb}>
+        {mode === 'nowOnly' || afterDbLabel == null ? (
+          <>
+            Сейчас в комнате: <b>≈ {nowDbLabel} дБ</b>
+          </>
+        ) : (
+          <>
+            Сейчас: <b>≈ {nowDbLabel} дБ</b>
+            <span aria-hidden> → </span>
+            с MultiFrame: <b>≈ {afterDbLabel} дБ</b>
+          </>
+        )}
+      </p>
+
       <div className={styles.feltTrack} aria-hidden>
         <span className={styles.feltLine} />
         {FELT_STEPS.map((step, i) => {
           const isNow = i === nowIdx;
           const isAfter = mode === 'nowAndAfter' && i === afterIdx;
           const both = same && isNow;
+          const edge = i === 0 ? 'start' : i === FELT_STEPS.length - 1 ? 'end' : 'mid';
           return (
             <span
               key={step}
               className={`${styles.feltStep} ${isNow || isAfter || both ? styles.feltStepActive : ''}`}
+              data-edge={edge}
               style={{ left: `${(i / (FELT_STEPS.length - 1)) * 100}%` }}
             >
-              <span className={styles.feltDot} data-danger={step === 'danger' ? '' : undefined} />
-              <span className={styles.feltLabel}>{FELT_STEP_LABELS[step]}</span>
               {both ? (
-                <span className={`${styles.feltMark} ${styles.feltMarkBoth}`}>Сейчас · MF</span>
+                <span className={`${styles.feltMark} ${styles.feltMarkBoth}`}>Сейчас · После</span>
               ) : (
                 <>
                   {isNow ? <span className={styles.feltMark}>Сейчас</span> : null}
                   {isAfter ? (
-                    <span className={`${styles.feltMark} ${styles.feltMarkMf}`}>MultiFrame</span>
+                    <span className={`${styles.feltMark} ${styles.feltMarkMf}`}>После</span>
                   ) : null}
                 </>
               )}
+              <span className={styles.feltDot} data-danger={step === 'danger' ? '' : undefined} />
+              <span className={styles.feltLabel}>{FELT_STEP_LABELS[step]}</span>
             </span>
           );
         })}
@@ -192,9 +216,14 @@ export function ResultScreen() {
         <header className={styles.sectionHead}>
           <h2>Нормы комфорта в стройке</h2>
           <p>
-            Классы <b>А / Б / В</b> по СП 51.13330.2011 — та же шкала, по которой ниже отмечен
-            уровень комфорта «сейчас» и «с MultiFrame». Rw — изоляция от воздушного шума (больше
-            лучше); Lnw — уровень ударного шума (меньше лучше).
+            Чтобы понять, насколько тихо в вашей комнате, сравниваем её с официальной шкалой
+            акустического комфорта жилья — классами <b>А / Б / В</b> по СП 51.13330.2011. Ниже —
+            пороги этой шкалы; дальше по ним отметим, где вы сейчас и куда можно выйти с
+            MultiFrame.
+          </p>
+          <p>
+            <b>Rw</b> — насколько перекрытие держит воздушный шум (голоса, музыка): больше —
+            лучше. <b>Lnw</b> — насколько громко проходят шаги и удары: меньше — лучше.
           </p>
         </header>
 
@@ -241,6 +270,11 @@ export function ResultScreen() {
       <section className={styles.block} aria-label="Текущая ситуация">
         <header className={styles.sectionHead}>
           <h2>Текущая ситуация</h2>
+          <p>
+            Ориентир того, как сейчас слышны голоса и шаги сверху в этой комнате — до монтажа
+            MultiFrame. Цифры в дБ — ориентировочная громкость в помещении; шкала рядом — бытовая
+            оценка по тем же нормам А/Б/В.
+          </p>
           <p className={styles.officialHead}>
             Сейчас: уровень комфорта по нормам «{beforeOfficial}»
           </p>
@@ -250,11 +284,13 @@ export function ResultScreen() {
           <FeltScale
             title="Воздушный шум (голоса и музыка)"
             now={airNowFelt}
+            nowDb={sim.receivedAirDb.before}
             mode="nowOnly"
           />
           <FeltScale
             title="Ударный шум (шаги и падения)"
             now={impactNowFelt}
+            nowDb={sim.receivedImpactDb.before}
             mode="nowOnly"
           />
         </div>
@@ -263,6 +299,10 @@ export function ResultScreen() {
       <section className={styles.block} aria-label="С MultiFrame">
         <header className={styles.sectionHead}>
           <h2>С MultiFrame</h2>
+          <p>
+            Тот же ориентир после монтажа системы: насколько тише станет в комнате и куда
+            сдвинется класс по нормам. Сравните дБ «сейчас» и «после» на каждом канале.
+          </p>
           <p className={styles.officialHead}>
             С MultiFrame: уровень комфорта по нормам «{afterOfficial}»
           </p>
@@ -273,6 +313,8 @@ export function ResultScreen() {
             title="Воздушный шум (голоса и музыка)"
             now={airNowFelt}
             after={airAfterFelt}
+            nowDb={sim.receivedAirDb.before}
+            afterDb={sim.receivedAirDb.after}
             quieterPct={sim.perceivedAirPct}
             mode="nowAndAfter"
           />
@@ -280,6 +322,8 @@ export function ResultScreen() {
             title="Ударный шум (шаги и падения)"
             now={impactNowFelt}
             after={impactAfterFelt}
+            nowDb={sim.receivedImpactDb.before}
+            afterDb={sim.receivedImpactDb.after}
             quieterPct={sim.perceivedImpactPct}
             mode="nowAndAfter"
           />

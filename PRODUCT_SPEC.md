@@ -14,7 +14,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 - On Before/After + Profile: show the **full evidence pack** — personal room story, classes А/Б/В, numbers, charts, and plain-language explanations of each (owner 2026-09-12: «показать всё, аргументированно, понятно, персонально»).
 - **Evidence layout (Q4, owner 2026-09-12):** everything on one scroll — **conclusion / verdict on top**, detailed data below. Not progressive disclosure; not audience-trimmed packs. Anyone skims what they need. Same full stack for all user models (context may still change copy/CTA emphasis).
 - **Result chain (owner 2026-09-17):** (1) **Нормы комфорта в стройке** — СП А/Б/В + Rw/Lnw + construction context, (2) **Текущая ситуация** — official hybrid SP header + two felt 5-step axes (now only), (3) **С MultiFrame** — official hybrid after + felt axes with now/after + % + audio + frequency charts, (4) **Почему MultiFrame подходит**, (5) **Следующий шаг**. No top ComfortScale table, no separate «Что изменится на слух», no «Расчёт и нормы / подробности», no `LOG_DB_FOOTNOTE`.
-- **Felt vs official (owner 2026-09-17):** headers use official hybrid via `comfortClassFor` + `HYBRID_CLASS_LABELS` / «ниже допустимого (В)» (never «Д», never felt words in headers). Axes use **опасно → некомфортно → приемлемо → комфортно → тихо** (тихо=А, комфортно=Б, приемлемо=В, некомфортно=below V, опасно=far below: Rw&lt;~47 / Lnw&gt;~68).
+- **Felt vs official (owner 2026-09-17):** headers use official hybrid via `comfortClassFor` + `HYBRID_CLASS_LABELS` / «ниже допустимого (В)» (never «Д», never felt words in headers). Axes use **очень шумно → некомфортно → приемлемо → комфортно → тихо** (тихо=А, комфортно=Б, приемлемо=В, некомфортно=below V, очень шумно=far below: Rw&lt;~44 / Lnw&gt;~76). Typical brick+ПК lands on «некомфортно», not the edge. Scales also show received-room dB now (and after under MultiFrame).
 - **Channel names (owner 2026-09-17):** `Воздушный шум (голоса и музыка)` · `Ударный шум (шаги и падения)`; audio `Воздушный шум` · `Ударный шум` · `Смешанный шум`.
 - **Numbers policy (owner 2026-09-13):** show a **full working MultiFrame effect model** with complete numbers now — currently **unconfirmed** (`marketing_placeholder` / `pre_lab`). After Trofimov (or lab) confirmation, **replace** values with correct ones; do not redesign the UX around hiding numbers. Never present placeholders as lab guarantees or certificates.
 - Effect source: `marketing_placeholder`; disclaimer: `pre_lab` / expert qualitative — never lab guarantees. Charts/numbers are **oriented arguments**, not certificates.
@@ -260,7 +260,7 @@ Create demand for acoustic comfort **on this object**. No role question. No numb
 
 ### Visible elements
 
-- H1, lead, primary CTA `Начать`, three scope bullets
+- H1, lead, primary CTA `Начать`
 - Header (no progress, no sticky CTA, **no kicker**, **no «для себя / для клиента»**)
 
 ### Exact primary copy (RU)
@@ -268,10 +268,7 @@ Create demand for acoustic comfort **on this object**. No role question. No numb
 | Role | Text |
 | ---- | ---- |
 | H1 | `Проверьте уровень акустического комфорта на своём объекте` |
-| Lead | `Проблемомер показывает средний уровень шума исходя из типа перекрытия и строительных материалов, а также внутренних и внешних факторов. Следующий расчет показывает, как изменится звукоизоляция и акустический комфорт после монтажа системы MultiFrame.` |
-| Bullet 1 | `Сначала внешнее: дом и перекрытие — то, на что нельзя повлиять` |
-| Bullet 2 | `Затем внутреннее: комната, потолок, что важно именно вам` |
-| Bullet 3 | `Сначала текущий комфорт без MultiFrame, потом эффект системы` |
+| Lead | `Проблемомер показывает средний уровень шума исходя из типа перекрытия и строительных материалов, а также внутренних и внешних факторов.` + абзац `Следующий расчет показывает, как изменится звукоизоляция и акустический комфорт после монтажа системы MultiFrame.` |
 | Primary CTA | `Начать` |
 
 ### Controls
@@ -555,7 +552,8 @@ Walk **norms → current → MultiFrame → why → CTA** on one scroll. Officia
 | MF title | `С MultiFrame` |
 | MF header | `С MultiFrame: уровень комфорта по нормам «{official}»` |
 | Channel axes | `Воздушный шум (голоса и музыка)` · `Ударный шум (шаги и падения)` |
-| Felt steps | `Опасно` · `Некомфортно` · `Приемлемо` · `Комфортно` · `Тихо` |
+| Felt steps | `Очень шумно` · `Некомфортно` · `Приемлемо` · `Комфортно` · `Тихо` |
+| Level in room | `Сейчас: ≈ N дБ` · under MultiFrame also `→ с MultiFrame: ≈ M дБ` |
 | Audio groups | `Воздушный шум` · `Ударный шум` · `Смешанный шум` |
 | Why title | `Почему MultiFrame подходит` |
 | Next-step title | `Следующий шаг` |
