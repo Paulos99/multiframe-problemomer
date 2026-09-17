@@ -15,6 +15,7 @@ export function AppShell() {
   const isProcessing = step === 'processing';
   const showNav = step !== 'start' && !isProcessing;
   const showProgress = step !== 'start' && !isProcessing;
+  const showHeader = !isProcessing;
   const isResult = step === 'result';
 
   let content = null;
@@ -37,10 +38,14 @@ export function AppShell() {
   const calcUrl = isResult ? buildCalculatorUrl(session.cta) : null;
 
   return (
-    <div className={`${styles.shell} ${showNav ? styles.withFooter : ''}`}>
-      <Header />
+    <div
+      className={`${styles.shell} ${showNav ? styles.withFooter : ''} ${isProcessing ? styles.processing : ''}`}
+    >
+      {showHeader ? <Header /> : null}
       {showProgress ? <ProgressDots /> : null}
-      <main className={styles.main}>{content}</main>
+      <main className={`${styles.main} ${isProcessing ? styles.mainProcessing : ''}`}>
+        {content}
+      </main>
       {showNav ? (
         <StickyCta
           onBack={goBack}

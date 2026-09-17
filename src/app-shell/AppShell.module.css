@@ -15,8 +15,24 @@
   flex: 1;
 }
 
+.mainProcessing {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.processing {
+  /* Full-bleed green ceremony owns the viewport */
+  background: #01644f;
+}
+
 @media (min-width: 640px) {
   .main {
     padding: 28px 24px 40px;
+  }
+
+  .mainProcessing {
+    padding: 0;
   }
 }
