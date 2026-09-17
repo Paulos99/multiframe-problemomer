@@ -39,23 +39,11 @@ const NORM_ROWS: { cls: Exclude<ClassLabel, 'below'>; label: string; rw: string;
     { cls: 'V', label: 'Допустимый (В)', rw: `≥ ${NORMS.V.Rw}`, lnw: `≤ ${NORMS.V.Lnw}` },
   ];
 
-/** Site positioning: эффективно / быстро / экологично — claim + why, no mount tech. */
-const MULTIFRAME_ADVANTAGES = [
-  {
-    n: '01',
-    title: 'Тише за счёт панели, а не плёнки',
-    text: 'Обычный натяжной почти не изолирует: воздух в зазоре усиливает шаги и голоса, как полотно барабана. MultiFrame рассеивает эту энергию в панели и работает сразу по воздушному и ударному шуму.',
-  },
-  {
-    n: '02',
-    title: 'Быстро, без тяжёлого каркаса',
-    text: 'Панели ставятся в темпе натяжного потолка: без двух дней каркасной стройки и без лишней потери высоты. Система подходит к любому перекрытию и к любой стадии ремонта.',
-  },
-  {
-    n: '03',
-    title: 'Безопасно для жилой комнаты',
-    text: 'Без минеральной ваты и строительной пыли. Материалы сертифицированы и рассчитаны на жилые помещения — в том числе кухню и ванную.',
-  },
+/** Contrast vs ordinary stretch ceiling — short cells, no essays. */
+const UNIQUENESS_ROWS = [
+  { axis: 'Шум', before: 'Только плёнка', after: 'Воздух и удар' },
+  { axis: 'Монтаж', before: 'Каркас и стройка', after: 'Как натяжной' },
+  { axis: 'Состав', before: 'Минвата и пыль', after: 'Без ваты' },
 ] as const;
 
 function optionLabel<T extends string>(
@@ -367,28 +355,29 @@ export function ResultScreen() {
       <section className={styles.reasons} aria-label="Уникальность системы MultiFrame">
         <header className={styles.sectionHead}>
           <h2>Уникальность системы MultiFrame</h2>
-          <p>
-            Модульная система StP: снижает воздушный и ударный шум, ставится в темпе натяжного
-            потолка и без минеральной ваты.
-          </p>
         </header>
 
-        <div className={styles.reasonList}>
-          {MULTIFRAME_ADVANTAGES.map((item) => (
-            <article key={item.n}>
-              <span>{item.n}</span>
-              <div>
-                <strong>{item.title}</strong>
-                <p>{item.text}</p>
-              </div>
-            </article>
-          ))}
-        </div>
-
-        <p className={styles.reasonConclusion}>
-          Для этой комнаты это привычный формат натяжного потолка — с акустикой внутри
-          системы, а не надеждой на одну плёнку.
-        </p>
+        <table className={styles.uniqTable}>
+          <caption className="srOnly">Обычный натяжной и MultiFrame</caption>
+          <thead>
+            <tr>
+              <th scope="col">
+                <span className="srOnly">Критерий</span>
+              </th>
+              <th scope="col">Обычный натяжной</th>
+              <th scope="col">MultiFrame</th>
+            </tr>
+          </thead>
+          <tbody>
+            {UNIQUENESS_ROWS.map((row) => (
+              <tr key={row.axis}>
+                <th scope="row">{row.axis}</th>
+                <td data-label="Обычный натяжной">{row.before}</td>
+                <td data-label="MultiFrame">{row.after}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </section>
 
       <section className={styles.nextStep} aria-label="Следующий шаг">

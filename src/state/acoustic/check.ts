@@ -178,16 +178,44 @@ export function assertModelAnchors(): string[] {
       `audio beforeGain should rise with loud neighbors (${shapeLoud.beforeGainDb} vs ${shapeQuiet.beforeGainDb})`,
     );
   }
-  if (playbackGainForReceivedDb(simLoud.receivedAirDb.before) <= playbackGainForReceivedDb(simQuiet.receivedAirDb.before)) {
+  if (
+    playbackGainForReceivedDb(simLoud.receivedAirDb.before, 'air') <=
+    playbackGainForReceivedDb(simQuiet.receivedAirDb.before, 'air')
+  ) {
     errors.push('playbackGainForReceivedDb not monotonic with received dBA');
-  }
-  const meanDelta =
-    shapeLoud.deltaEqDb.reduce((a, b) => a + b, 0) / Math.max(1, shapeLoud.deltaEqDb.length);
-  if (meanDelta >= 0) {
-    errors.push(`MultiFrame air ΔL EQ should cut on average (got ${meanDelta})`);
   }
   if (shapeLoud.afterGainDb >= 0) {
     errors.push(`MultiFrame afterGainDb should be negative (got ${shapeLoud.afterGainDb})`);
+  }
+  if (shapeLoud.afterGainDb < -10) {
+    errors.push(`После afterGainDb should be capped (≥ −10), got ${shapeLoud.afterGainDb}`);
+  }
+  if (shapeLoud.deltaEqDb.some((g) => g !== 0)) {
+    errors.push('deltaEqDb should be flat zeros while stems are through-wall demos');
+  }
+
+  const simGoodMono = deriveSimulation(
+    sampleAnswers({
+      slabType: 'monolith',
+      slabThickness: 'over_250',
+      houseType: 'monolith',
+      roomType: 'office',
+      ceilingAreaM2: 10,
+      noisyNeighbors: 'usually_quiet',
+      floorAbove: 'ordinary',
+      objectStage: 'occupied',
+    }),
+  );
+  const shapeGoodAir = buildRoomAudioShape(simGoodMono, 'air', 'talk');
+  if (shapeGoodAir.beforeGainDb > -5) {
+    errors.push(
+      `good monolith office «До» should cut stem hard (beforeGain ${shapeGoodAir.beforeGainDb}, L2 ${shapeGoodAir.targetBeforeDb})`,
+    );
+  }
+  if (shapeGoodAir.beforeGainDb >= shapeLoud.beforeGainDb) {
+    errors.push(
+      `good mono До must be quieter than loud neighbors (${shapeGoodAir.beforeGainDb} vs ${shapeLoud.beforeGainDb})`,
+    );
   }
 
   const simKitchen = deriveSimulation(

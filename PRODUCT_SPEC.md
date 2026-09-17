@@ -13,7 +13,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 - Feeling + comfort-class story first on early screens; **no numbers on Start**.
 - On Before/After + Profile: show the **full evidence pack** — personal room story, classes А/Б/В, numbers, charts, and plain-language explanations of each (owner 2026-09-12: «показать всё, аргументированно, понятно, персонально»).
 - **Evidence layout (Q4, owner 2026-09-12):** everything on one scroll — **conclusion / verdict on top**, detailed data below. Not progressive disclosure; not audience-trimmed packs. Anyone skims what they need. Same full stack for all user models (context may still change copy/CTA emphasis).
-- **Result chain (owner 2026-09-17):** (1) **Нормы комфорта в стройке** — СП А/Б/В + Rw/Lnw + construction context, (2) **Текущая ситуация** — official hybrid SP header + two felt 5-step axes (now only), (3) **С MultiFrame** — official hybrid after + felt axes with now/after + % + audio + frequency charts, (4) **Уникальность системы MultiFrame** — site positioning (эффективно / быстро / экологично) as three claim+why cards, (5) **Следующий шаг**. No top ComfortScale table, no separate «Что изменится на слух», no «Расчёт и нормы / подробности», no `LOG_DB_FOOTNOTE`.
+- **Result chain (owner 2026-09-17):** (1) **Нормы комфорта в стройке** — СП А/Б/В + Rw/Lnw + construction context, (2) **Текущая ситуация** — official hybrid SP header + two felt 5-step axes (now only), (3) **С MultiFrame** — official hybrid after + felt axes with now/after + % + audio + frequency charts, (4) **Уникальность системы MultiFrame** — short contrast table vs ordinary stretch ceiling (шум / монтаж / состав), no essays, (5) **Следующий шаг**. No top ComfortScale table, no separate «Что изменится на слух», no «Расчёт и нормы / подробности», no `LOG_DB_FOOTNOTE`.
 - **Felt vs official (owner 2026-09-17):** headers use official hybrid via `comfortClassFor` + `HYBRID_CLASS_LABELS` / «ниже допустимого (В)» (never «Д», never felt words in headers). Axes use **очень шумно → некомфортно → приемлемо → комфортно → тихо** (тихо=А, комфортно=Б, приемлемо=В, некомфортно=below V, очень шумно=far below: Rw&lt;~44 / Lnw&gt;~76). Typical brick+ПК lands on «некомфортно», not the edge. Scales also show received-room dB now (and after under MultiFrame).
 - **Channel names (owner 2026-09-17):** `Воздушный шум (голоса и музыка)` · `Ударный шум (шаги и падения)`; audio `Воздушный шум` · `Ударный шум` · `Смешанный шум`.
 - **Numbers policy (owner 2026-09-13):** show a **full working MultiFrame effect model** with complete numbers now — currently **unconfirmed** (`marketing_placeholder` / `pre_lab`). After Trofimov (or lab) confirmation, **replace** values with correct ones; do not redesign the UX around hiding numbers. Never present placeholders as lab guarantees or certificates.
@@ -108,6 +108,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-17 | **Result structure rewrite:** norms → current → MultiFrame (felt axes + % + audio + charts) → why → CTA. Official SP hybrid in headers; everyday 5-step felt on axes only. Channel renames; Start lead updated; noisyNeighbors subtitle removed; drop technical/подробности and LOG_DB footnotes. |
 | 2026-09-17 | **Processing ceremony:** after last Room question, fullscreen StP-green loading (~7s, skippable) before Result. Center: rotating status lines + thin progress bar. No chips/equalizer/classes/dB. Header and sticky CTA hidden. Back from Result skips replaying it. |
 | 2026-09-17 | **Features block rename:** `Почему MultiFrame подходит` → `Уникальность системы MultiFrame`. Three cards from stp-multiframe.ru positioning (эффективно / быстро / экологично): panel vs film+drum, fast frameless install + any slab/stage, eco/no mineral wool. Drop dynamic `Под ваш потолок` why-line from the UI; `whyMultiFrame` stays in lead handoff only. |
+| 2026-09-17 | **Uniqueness block rewrite (owner):** drop three essay columns. Concept = contrast table `Обычный натяжной` vs `MultiFrame`: Шум `Только плёнка` / `Воздух и удар`; Монтаж `Каркас и стройка` / `Как натяжной`; Состав `Минвата и пыль` / `Без ваты`. No lead, no closer, no numbered cards. |
 
 ---
 
@@ -545,8 +546,8 @@ None.
 
 - **Structure:** UI = three example groups (воздух / удар / смешанный); model still Rw + Lnw.
 - **Examples:** locked list above — do not invent extra stubs without owner.
-- **Personalization:** **До** is shaped to this room’s received L2/dBA (neighbors, area, slab, absorption). **После** applies the MultiFrame transfer `ΔL(f)` from the same receiving bands — not a fixed exaggerated duck and not identical raw MP3 for every room.
-- **Processing:** MP3 stems are already authored as quiet through-wall «До» (frozen RMS + HF roll-off). Playback = optional stem trim (≤0) → relative room gain from L2_before → После broadband + ΔL(f) cuts only; soft limiter. **No** upward normalize and **no** before-EQ (that made muffled stems loud/bright). Mixed = blend of air+impact bands. Exact Δ remains `pre_lab` until lab confirmation.
+- **Personalization:** **До** scales from authored stem level by received L2/dBA with **group-specific refs** (air / impact / mixed): quiet good rooms (thick monolith office) cut almost 1:1; loud rooms only gently boost. **После** = one broadband Δ(dBA) capped ≈ −10 dB.
+- **Processing:** MP3 stems are already authored as quiet through-wall «До» (frozen RMS + HF roll-off). Playback = optional stem trim (≤0) → relative room gain from L2_before → После = **one** broadband Δ(dBA) capped ≈ −10 dB (no peaking ΔL(f) on top — that double-cut muffled stems). Soft limiter. Mixed = blend of air+impact bands. Exact Δ remains `pre_lab` until lab confirmation.
 - **Reduction UI (C):** always show **both** `≈ −{n}%` and short Δ caption (`ориентир −8 дБ` / case Δ). `%` = **perceived loudness** map from Δ (rule of thumb ASSUMPTION: ~−10 dB ≈ half as loud → ~−50%; ~−8 dB ≈ ~−40…−45% perceived — tune with Trofimov). **Never** compute % as linear `(64−56)/64` or `8/64`.
 - **Log education (required):** visible footnote that dB is logarithmic — small dB numbers = large sensation change; example `64 → 56` is substantial, not “a few percent”.
 - **Impact honesty:** ceiling softens impact; floating floor above often needed for norm — visible near impact (and mixed if impact-heavy).
@@ -578,7 +579,7 @@ Walk **norms → current → MultiFrame → why → CTA** on one scroll. Officia
 - **1. Нормы комфорта в стройке:** short SP explanation + А/Б/В Rw/Lnw table + construction context (перекрытие + тип дома).
 - **2. Текущая ситуация:** header `Сейчас: уровень комфорта по нормам «…»` + two felt axes (now only).
 - **3. С MultiFrame:** header `С MultiFrame: уровень комфорта по нормам «…»` + felt axes with now/after + % quieter + compact audio + frequency charts.
-- **4. Уникальность системы MultiFrame:** three claim+why cards (panel vs film / fast frameless / eco) + closing line.
+- **4. Уникальность системы MultiFrame:** contrast table vs ordinary stretch ceiling (3 short rows). No essays, no closer.
 - **5. Следующий шаг:** calculator + lead + summary copy + restart.
 - Title `Акустический профиль помещения`. Subtitle about **your object**.
 - Do **not** show: top ComfortScale table, separate «Что изменится на слух», «Расчёт и нормы / подробности», `LOG_DB_FOOTNOTE`, long verdictLead.
@@ -599,11 +600,8 @@ Walk **norms → current → MultiFrame → why → CTA** on one scroll. Officia
 | Level in room | `Сейчас: ≈ N дБ` · under MultiFrame also `→ с MultiFrame: ≈ M дБ` |
 | Audio groups | `Воздушный шум` · `Ударный шум` · `Смешанный шум` |
 | Why title | `Уникальность системы MultiFrame` |
-| Why lead | `Модульная система StP: снижает воздушный и ударный шум, ставится в темпе натяжного потолка и без минеральной ваты.` |
-| Why 01 | `Тише за счёт панели, а не плёнки` — плёнка почти не изолирует (барабан в зазоре); панель рассеивает энергию и работает по воздуху и удару. |
-| Why 02 | `Быстро, без тяжёлого каркаса` — темп натяжного потолка; без двух дней стройки и лишней потери высоты; любой тип перекрытия и стадия ремонта. |
-| Why 03 | `Безопасно для жилой комнаты` — без минеральной ваты и пыли; сертифицированные материалы для жилых помещений (кухня, ванная). |
-| Why closer | `Для этой комнаты это привычный формат натяжного потолка — с акустикой внутри системы, а не надеждой на одну плёнку.` |
+| Why cols | `Обычный натяжной` · `MultiFrame` |
+| Why rows | Шум: `Только плёнка` / `Воздух и удар` · Монтаж: `Каркас и стройка` / `Как натяжной` · Состав: `Минвата и пыль` / `Без ваты` |
 | Next-step title | `Следующий шаг` |
 | Calculator CTA | `Открыть калькулятор MultiFrame` |
 | Lead open | `Запросить консультацию или подбор` |

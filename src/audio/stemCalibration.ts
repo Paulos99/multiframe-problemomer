@@ -63,9 +63,16 @@ export const STEM_CALIBRATION: Record<StemId, StemCalibration> = {
 export const STEM_NORM_TARGET_DBFS = -33;
 
 /**
- * Received-room dBA that maps to ~unity room gain (stem played near authored level).
+ * Stem authored loudness ≈ this received air dBA (typical annoying upstairs talk).
+ * Quieter rooms cut almost 1:1 from here; louder rooms only gently boost.
  */
-export const PLAYBACK_REF_DBA = 54;
+export const PLAYBACK_REF_DBA_AIR = 56;
+/** Stem stomp ≈ this impact dBA — impact L2 sits far above air, needs its own anchor. */
+export const PLAYBACK_REF_DBA_IMPACT = 74;
+export const PLAYBACK_REF_DBA_MIXED = 65;
+
+/** @deprecated Use PLAYBACK_REF_DBA_AIR — kept for old imports. */
+export const PLAYBACK_REF_DBA = PLAYBACK_REF_DBA_AIR;
 
 /** Global demo headroom (linear). Stems are already quiet; keep modest attenuation. */
 export const MASTER_PLAYBACK_GAIN = 0.55;

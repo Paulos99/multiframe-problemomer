@@ -3,14 +3,17 @@
  *
  * Stems in public/audio are already «До through wall». Shape only:
  * - relative room loudness (mostly cuts),
- * - MultiFrame После broadband + ΔL(f) cuts.
+ * - MultiFrame После: one broadband Δ(dBA) only (stems already through-wall;
+ *   applying full ΔL(f) EQ on top double-cut / killed the demo).
  * Never re-EQ the stem toward the model spectrum on «До» — that brightened muffled files.
  */
 import { SPECTRUM_HZ, clamp, round1 } from '../state/acoustic/bands';
 import type { AudioPair, DerivedSimulation } from '../state/types';
 import {
   KEY_BAND_INDICES,
-  PLAYBACK_REF_DBA,
+  PLAYBACK_REF_DBA_AIR,
+  PLAYBACK_REF_DBA_IMPACT,
+  PLAYBACK_REF_DBA_MIXED,
   STEM_CALIBRATION,
   stemIdFromPairId,
   stemIdFromSrc,
@@ -23,11 +26,17 @@ export type RoomAudioShape = {
   stemId: StemId;
   /** Broadband room offset vs authored stem level (dB) — До. */
   beforeGainDb: number;
-  /** Extra broadband cut for После = targetAfter − targetBefore (dB, ≤ 0). */
+  /**
+   * Broadband После cut ≈ A-weighted L2_after − L2_before (dB, ≤ 0).
+   * This is the only overall loudness drop — do not also apply full band Δ as EQ.
+   */
   afterGainDb: number;
   /** Always zeros: stem timbre is already through-wall. */
   beforeEqDb: number[];
-  /** Peaking EQ for MultiFrame transfer ΔL(f) = after − before (dB, cuts). */
+  /**
+   * Reserved for lab-shaped ΔL(f). Currently zeros — stems are already muffled;
+   * peaking MultiFrame EQ stacked with afterGain made «После» too quiet.
+   */
   deltaEqDb: number[];
   /** Target A-weighted levels used for UI honesty / debug. */
   targetBeforeDb: number;
@@ -68,13 +77,24 @@ function pickBands(
   };
 }
 
+function playbackRefDb(group: AudioPlayGroup): number {
+  if (group === 'impact') return PLAYBACK_REF_DBA_IMPACT;
+  if (group === 'mixed') return PLAYBACK_REF_DBA_MIXED;
+  return PLAYBACK_REF_DBA_AIR;
+}
+
 /**
  * Map received-room dBA → playback offset from authored stem level.
- * Compressed and mostly cuts — stems already encode a typical upstairs level.
+ * Stems ≈ ref for that group. Good (quiet) rooms must cut almost 1:1 — a thick
+ * monolith office must not play the stem at near-full authored loudness.
  */
-export function playbackGainForReceivedDb(receivedDba: number): number {
-  const raw = (receivedDba - PLAYBACK_REF_DBA) * 0.35;
-  return clamp(round1(raw), -8, 1);
+export function playbackGainForReceivedDb(
+  receivedDba: number,
+  group: AudioPlayGroup = 'air',
+): number {
+  const delta = receivedDba - playbackRefDb(group);
+  if (delta <= 0) return clamp(round1(delta * 0.95), -16, 0);
+  return clamp(round1(delta * 0.3), 0, 4);
 }
 
 export function buildRoomAudioShape(
@@ -83,16 +103,13 @@ export function buildRoomAudioShape(
   stemId: StemId,
 ): RoomAudioShape {
   void STEM_CALIBRATION[stemId];
-  const { before, after, targetBeforeDb, targetAfterDb } = pickBands(sim, group);
+  const { targetBeforeDb, targetAfterDb } = pickBands(sim, group);
 
-  // Do not reshape stem spectrum on «До» — files are already muffled through-wall.
   const beforeEqDb = KEY_BAND_INDICES.map(() => 0);
-  const deltaEqDb = KEY_BAND_INDICES.map((i) =>
-    clamp(round1((after[i] ?? 0) - (before[i] ?? 0)), -16, 0),
-  );
+  const afterGainDb = clamp(round1(targetAfterDb - targetBeforeDb), -10, 0);
+  const deltaEqDb = KEY_BAND_INDICES.map(() => 0);
 
-  const beforeGainDb = playbackGainForReceivedDb(targetBeforeDb);
-  const afterGainDb = clamp(round1(targetAfterDb - targetBeforeDb), -16, 0);
+  const beforeGainDb = playbackGainForReceivedDb(targetBeforeDb, group);
 
   return {
     stemId,

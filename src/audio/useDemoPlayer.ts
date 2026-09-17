@@ -308,48 +308,19 @@ function roomProcess(
   };
 }
 
+/**
+ * Legacy fallback when shape is missing: broadband only (no stacked EQ).
+ */
 function legacyAfterGain(opts: AudioPlayOptions): number {
-  const air = Math.max(4, Math.min(12, Math.abs(opts.deltaRw ?? 8)));
-  const imp = Math.max(3, Math.min(10, Math.abs(opts.deltaLnw ?? 6)));
+  const air = Math.max(4, Math.min(10, Math.abs(opts.deltaRw ?? 8)));
+  const imp = Math.max(3, Math.min(8, Math.abs(opts.deltaLnw ?? 6)));
   if (opts.group === 'air') return -air;
   if (opts.group === 'impact') return -imp;
   return -((air + imp) / 2);
 }
 
-/** Fallback when shape is missing: mild scalar Δ as peaking tilt (legacy). */
-function legacyDeltaEq(opts: AudioPlayOptions): number[] {
-  const atten = Math.abs(legacyAfterGain(opts));
-  if (opts.group === 'impact') {
-    return [
-      -atten * 0.35,
-      -atten * 0.55,
-      -atten * 0.7,
-      -atten * 0.45,
-      -atten * 0.25,
-      -atten * 0.15,
-      -atten * 0.1,
-    ];
-  }
-  if (opts.group === 'air') {
-    return [
-      -atten * 0.15,
-      -atten * 0.25,
-      -atten * 0.35,
-      -atten * 0.5,
-      -atten * 0.7,
-      -atten * 0.85,
-      -atten * 0.95,
-    ];
-  }
-  return [
-    -atten * 0.25,
-    -atten * 0.4,
-    -atten * 0.5,
-    -atten * 0.5,
-    -atten * 0.55,
-    -atten * 0.6,
-    -atten * 0.65,
-  ];
+function legacyDeltaEq(_opts: AudioPlayOptions): number[] {
+  return [0, 0, 0, 0, 0, 0, 0];
 }
 
 function playStem(
