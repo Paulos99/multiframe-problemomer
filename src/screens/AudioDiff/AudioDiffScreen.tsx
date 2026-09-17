@@ -1,7 +1,8 @@
+import { useEffect } from 'react';
 import { Screen } from '../../ui/Screen';
 import { Disclaimer } from '../../ui/Disclaimer';
 import { useSession } from '../../state/SessionContext';
-import { useDemoPlayer } from '../../audio/useDemoPlayer';
+import { preloadDemoAudio, useDemoPlayer } from '../../audio/useDemoPlayer';
 import { AUDIO_GROUP_LABELS } from '../../audio/demoAudio';
 import { buildRoomAudioShapeForPair } from '../../audio/roomAudioShape';
 import { LOG_DB_FOOTNOTE } from '../../state/types';
@@ -106,6 +107,13 @@ export function AudioDiffScreen() {
   const { session } = useSession();
   const { activeId, progress, play, stop } = useDemoPlayer();
   const sim = session.derived?.simulation ?? deriveSimulation(session.answers);
+
+  useEffect(() => {
+    const urls = [
+      ...new Set(session.audio.pairs.flatMap((p) => [p.beforeSrc, p.afterSrc])),
+    ];
+    void preloadDemoAudio(urls);
+  }, [session.audio.pairs]);
 
   return (
     <Screen

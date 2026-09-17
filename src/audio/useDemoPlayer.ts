@@ -146,7 +146,7 @@ async function loadBuffer(ctx: AudioContext, url: string): Promise<AudioBuffer> 
   if (pending) return pending;
 
   const job = (async () => {
-    const res = await fetch(url);
+    const res = await fetch(url, { cache: 'force-cache' });
     if (!res.ok) throw new Error(`audio fetch ${res.status}`);
     const raw = await res.arrayBuffer();
     const buf = await ctx.decodeAudioData(raw.slice(0));
@@ -160,6 +160,26 @@ async function loadBuffer(ctx: AudioContext, url: string): Promise<AudioBuffer> 
 
   pendingLoads.set(url, job);
   return job;
+}
+
+/** Fetch+decode stems ahead of clicks so play/stop stay synchronous. */
+export function preloadDemoAudio(urls: readonly string[]): Promise<void> {
+  const ctx = getCtx();
+  const unique = [...new Set(urls.filter(Boolean))];
+  return Promise.all(
+    unique.map((url) =>
+      loadBuffer(ctx, url).catch(() => {
+        /* keep other stems; play will retry */
+        return null;
+      }),
+    ),
+  ).then(() => undefined);
+}
+
+/** Unlock AudioContext on a user gesture (e.g. «Пропустить» на расчёте). */
+export function unlockDemoAudio(): void {
+  const ctx = getCtx();
+  if (ctx.state === 'suspended') void ctx.resume();
 }
 
 type Chain = {
@@ -443,13 +463,15 @@ export function useDemoPlayer() {
 
       const stub = parseStubSrc(src);
       const ctx = getCtx();
-      if (ctx.state === 'suspended') await ctx.resume();
+      // Resume only if needed; already-running ctx keeps clicks instant.
+      if (ctx.state === 'suspended') {
+        try {
+          await ctx.resume();
+        } catch {
+          /* ignore — play may still work after next gesture */
+        }
+      }
       if (gen !== generationRef.current) return;
-
-      startedAt.current = performance.now();
-      activeIdRef.current = id;
-      setActiveId(id);
-      setProgress(prefersReducedMotion() ? 0.5 : 0);
 
       const clearUiIfMine = () => {
         if (gen !== generationRef.current) return;
@@ -476,7 +498,15 @@ export function useDemoPlayer() {
         rafRef.current = requestAnimationFrame(tick);
       };
 
+      const armUi = () => {
+        startedAt.current = performance.now();
+        activeIdRef.current = id;
+        setActiveId(id);
+        setProgress(prefersReducedMotion() ? 0.5 : 0);
+      };
+
       if (stub) {
+        armUi();
         startProgress(stub.scene === 'talk' ? 2800 : 2400);
         if (gen !== generationRef.current) return;
         stopRef.current = playStub(ctx, stub.kind, stub.scene, clearUiIfMine);
@@ -484,8 +514,11 @@ export function useDemoPlayer() {
       }
 
       try {
-        const buffer = await loadBuffer(ctx, src);
+        // Prefer sync cache hit — no fetch/decode on click.
+        let buffer = bufferCache.get(src);
+        if (!buffer) buffer = await loadBuffer(ctx, src);
         if (gen !== generationRef.current) return;
+        armUi();
         startProgress(buffer.duration * 1000);
         stopRef.current = playStem(ctx, buffer, src, opts, clearUiIfMine);
       } catch {

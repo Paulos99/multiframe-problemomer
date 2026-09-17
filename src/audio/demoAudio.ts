@@ -33,6 +33,11 @@ export const DEMO_AUDIO_PAIRS: AudioPair[] = [
   },
 ];
 
+/** Unique stem URLs for prefetch / decode (До and После share one file). */
+export const DEMO_STEM_URLS: readonly string[] = [
+  ...new Set(DEMO_AUDIO_PAIRS.flatMap((p) => [p.beforeSrc, p.afterSrc])),
+];
+
 export type StubKind = 'before' | 'after';
 export type StubScene = 'steps' | 'talk';
 

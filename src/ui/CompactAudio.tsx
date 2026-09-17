@@ -1,4 +1,5 @@
-import { useDemoPlayer } from '../audio/useDemoPlayer';
+import { useEffect } from 'react';
+import { useDemoPlayer, preloadDemoAudio } from '../audio/useDemoPlayer';
 import { buildRoomAudioShapeForPair } from '../audio/roomAudioShape';
 import type { AudioPair, DerivedSimulation } from '../state/types';
 import styles from './CompactAudio.module.css';
@@ -29,6 +30,11 @@ type Props = {
 
 export function CompactAudio({ pairs, sim }: Props) {
   const { activeId, progress, play, stop } = useDemoPlayer();
+
+  useEffect(() => {
+    const urls = [...new Set(pairs.flatMap((p) => [p.beforeSrc, p.afterSrc]))];
+    void preloadDemoAudio(urls);
+  }, [pairs]);
 
   return (
     <section className={styles.wrap} aria-label="Сравнить звук до и после">
