@@ -74,7 +74,7 @@ Live context (do not redesign from this URL alone): https://paulos99.github.io/m
 | Result feature order (confirmed 2026-09-13) | **1)** класс жилья/комфорта → **2)** эффективность → **3)** эффект барабана → **4)** безопасность → **5)** остальное. Монтаж клиенту только как **быстро, без долгой стройки** — без техники крепежа/коммуникаций. |
 | Result features copy (2026-09-13; rewrite 2026-09-17) | Без пункта Flat/Wave. Блок `Уникальность системы MultiFrame`: **1** панель vs плёнка/барабан + воздух и удар; **2** быстрый бескаркасный монтаж + любое перекрытие/стадия; **3** без ваты и пыли, сертификаты, жилые помещения. Не слоганы и не техдамп. |
 | Flow collapse (confirmed 2026-09-14) | Убрать экран **Сравнение** (дублировал Итог). Аудио До/После — **компактно на Result** сразу после блоков «Сейчас» / «С MultiFrame». Поток: Start → Room → Result. |
-| Processing ceremony (2026-09-17) | После последнего вопроса Room — одноразовый экран `processing` (~6 с, `Пропустить`). Motion UI: чипы + эквалайзер «Сейчас / С MultiFrame» + чеклист. Без SVG-иллюстраций, без классов/дБ. Назад с Итога не проигрывает церемонию. |
+| Processing ceremony (2026-09-17) | После последнего вопроса Room — fullscreen зелёный loading (~7 с, `Пропустить`): прогресс-бар + сменяющиеся статусы по центру. Без карточек/эквалайзера/классов. Назад с Итога не проигрывает. |
 | Result sticky CTA (confirmed 2026-09-13) | **C4:** `Открыть калькулятор MultiFrame` (вместо «Расчёт материалов»). |
 | Result lead (confirmed 2026-09-13) | Заявка = консультация / подбор. Open **P2:** `Запросить консультацию или подбор`. Title: `Заявка на консультацию`. Note: `Разберём ваш случай, подберём материал.` Отдельную disabled-кнопку «Консультация» не показываем. |
 | Feature copy style (confirmed 2026-09-13; UI 2026-09-17) | Преимущества на результате — **тезис + 1 фраза обоснования**, премиальным цельным языком. Title `Уникальность системы MultiFrame`. Три карты по позиционированию stp-multiframe.ru: эффективно / быстро / экологично. Не слоганы и не техдамп. Flat/Wave в блоке преимуществ **не** показываем. |
@@ -196,7 +196,7 @@ A capability with no row is `absent` by default. The State column always holds o
 
 | Capability | State | Note |
 | ---------- | ----- | ---- |
-| Comfort wizard (Start + Room + Processing + Result) | included | Start → Room → Processing → Result. Processing = skippable ceremony (chips + CSS equalizer). Audio compact on Result. No Before/After or Audio steps. |
+| Comfort wizard (Start + Room + Processing + Result) | included | Start → Room → Processing → Result. Processing = fullscreen green loading (status lines + bar, ~7s). Audio compact on Result. No Before/After or Audio steps. |
 | Ceiling-only / upstairs noise scope | included | `answers.scope: 'ceiling'`. No floor question. |
 | Frameless MultiFrame positioning | included | Only бескаркасная StP MultiFrame; framed systems out of scope. |
 | Room + optional slab input | included | Room type, area m², optional slab key (default solid 180 mm). |

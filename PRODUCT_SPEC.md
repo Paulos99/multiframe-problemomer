@@ -106,7 +106,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-16 | **Final CTA order:** open table and frequency graphs come before the in-body `Следующий шаг`; the conversion block is the last substantive section on Result. |
 | 2026-09-16 | **Workshop (transcript 07):** drop Start «для себя / для клиента»; site path = comfort on **your object**. Room = **external → internal** (house/slab first; room type later). Hide **пол сверху**. Result = scare current state first, then MultiFrame %; everyday labels «Некомфортно / Допустимо / Комфортно / Тихо». Wishes (музыка / ТВ / сон ребёнка) as internal factor, not «что мешает». Both air+impact channels stay. |
 | 2026-09-17 | **Result structure rewrite:** norms → current → MultiFrame (felt axes + % + audio + charts) → why → CTA. Official SP hybrid in headers; everyday 5-step felt on axes only. Channel renames; Start lead updated; noisyNeighbors subtitle removed; drop technical/подробности and LOG_DB footnotes. |
-| 2026-09-17 | **Processing ceremony:** after last Room question, one-shot animated screen `processing` (~6s, skippable) before Result. Motion UI only (chips + equalizer bars + checklist) — no hand-drawn SVG room. No Rw/Lnw/classes on this screen. Back from Result skips replaying it. Progress dots stay Start/Объект/Итог. |
+| 2026-09-17 | **Processing ceremony:** after last Room question, fullscreen StP-green loading (~7s, skippable) before Result. Center: rotating status lines + thin progress bar. No chips/equalizer/classes/dB. Header and sticky CTA hidden. Back from Result skips replaying it. |
 | 2026-09-17 | **Features block rename:** `Почему MultiFrame подходит` → `Уникальность системы MultiFrame`. Three cards from stp-multiframe.ru positioning (эффективно / быстро / экологично): panel vs film+drum, fast frameless install + any slab/stage, eco/no mineral wool. Drop dynamic `Под ваш потолок` why-line from the UI; `whyMultiFrame` stays in lead handoff only. |
 
 ---
@@ -387,39 +387,33 @@ Owner: do **not** put «пока без чистового пола» under floo
 
 ### Goal
 
-Ceremony between the last Room answer and Result: show that the app is assembling a room-specific acoustic profile (now vs MultiFrame) without spoiling classes or dB.
+Minimal fullscreen loading ceremony after the last Room answer: the UI immerses in StP green; the user only sees a progress bar and rotating status lines. Must not look like Result.
 
 ### Visible elements
 
-- H1 + lead
-- Two abstract equalizer panels: `Сейчас` · `С MultiFrame` (CSS bars only — **no** hand-drawn SVG room / icons)
-- Answer chips (house, slab, room, area)
-- Four-step checklist + progress 0–100%
-- Honesty line + `Пропустить`
-- No sticky CTA, no progress dots
+- Full-viewport green stage (`#01644f`); header, progress dots and sticky CTA hidden
+- Centered status line (crossfade) + thin progress bar
+- Soft `Пропустить` at the bottom
+- No cards, equalizers, chips, checklists, classes, or dB
 
 ### Exact primary copy (RU)
 
 | Role | Text |
 | ---- | ---- |
-| H1 | `Считаем акустический профиль` |
-| Lead | `Собираем модель вашей комнаты — как слышно сейчас и как станет с MultiFrame.` |
-| Beats | `Собираем модель помещения` · `Оцениваем шум сверху сейчас` · `Считаем эффект MultiFrame` · `Собираем профиль комфорта` |
-| Done | `Профиль готов` |
+| Status lines (cycle ~7 s) | `Собираем модель вашего помещения` · `Считываем перекрытие и тип дома` · `Оцениваем, как слышно сверху сейчас` · `Считаем эффект MultiFrame` · `Собираем акустический профиль` · `Почти готово…` |
 | Skip | `Пропустить` |
-| Honesty | `Ориентир по модели комнаты, не лабораторный замер.` |
 
 ### Controls
 
 | Control | Action | Enabled |
 | ------- | ------ | ------- |
-| Auto-advance | After ~6.2 s → Result (`derived` already computed) | Always |
+| Auto-advance | After ~7 s → Result (`derived` already computed) | Always |
 | `Пропустить` | Immediate → Result | Always |
 | Reduced motion | ~400 ms → Result | When `prefers-reduced-motion` |
 
 ### Must NOT appear
 
-Rw / Lnw / ΔdB, classes А/Б/В / «Дискомфорт», % quieter, sticky CTA, progress dots, hand-drawn illustrations, Polyblock, calculator.
+Rw / Lnw / ΔdB, classes А/Б/В / «Дискомфорт», % quieter, sticky CTA, progress dots, header, hand-drawn illustrations, equalizer panels, answer chips, Polyblock, calculator.
 
 ### Navigation notes
 
@@ -818,7 +812,7 @@ Client path also: `buildClientSummary(session)` — plain-text digest for clipbo
 
 1. Open Start: **no** role picker, object H1, new lead, **no dB**, tap `Начать`.
 2. Room: house/slab first, then room + area > 0; **no** «пол сверху»; «Шум сверху» without «мешает ли» subtitle; optional wish; `Далее`.
-3. Processing: ceremony with chips + equalizer (no classes/dB); auto or `Пропустить` → Result.
+3. Processing: fullscreen green loading with status lines (no classes/dB); auto or `Пропустить` → Result.
 4. Result reads as: нормы → сейчас → MultiFrame → вывод → CTA.
 5. Official headers use А/Б/В (or «ниже допустимого (В)»); felt 5-step axes on channels; audio Воздушный / Ударный / Смешанный.
 6. Calculator preserves `area` (+ `roomType`); optional demo lead, copy summary, restart work.
