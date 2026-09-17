@@ -49,7 +49,7 @@ const SUBSTEP_COPY: Record<RoomSubstep, { title: string; subtitle: string }> = {
   },
   noisyNeighbors: {
     title: 'Шум сверху',
-    subtitle: 'Как обычно с шумом сверху — не оценка «мешает ли».',
+    subtitle: '',
   },
   roomWish: {
     title: 'Что важно в этой комнате',

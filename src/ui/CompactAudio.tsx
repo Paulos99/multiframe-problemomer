@@ -16,9 +16,9 @@ function PlayIcon({ playing }: { playing: boolean }) {
 
 const GROUPS: Array<AudioPair['group']> = ['air', 'impact', 'mixed'];
 const GROUP_TITLES: Record<AudioPair['group'], string> = {
-  air: 'Голоса и музыка',
-  impact: 'Шаги и удары',
-  mixed: 'Бытовой шум',
+  air: 'Воздушный шум',
+  impact: 'Ударный шум',
+  mixed: 'Смешанный шум',
 };
 
 type Props = {

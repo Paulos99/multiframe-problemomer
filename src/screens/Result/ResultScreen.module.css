@@ -1688,8 +1688,283 @@
   .scaleStateAfter,
   .scaleStateBoth,
   .effectCard .qFillAfter,
-  .effectCard .qFillBefore {
+  .effectCard .qFillBefore,
+  .feltMark,
+  .feltMarkMf,
+  .feltMarkBoth {
     animation: none;
     transition: none;
+  }
+}
+
+/* Result v2: norms → now → MultiFrame → why → CTA */
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+}
+
+.officialHead {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 750;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.contextLine {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.normTableSimple {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  font-size: 13px;
+}
+
+.normTableSimple th,
+.normTableSimple td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.normTableSimple thead th {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: var(--bg-subtle);
+  vertical-align: top;
+}
+
+.normTableSimple thead th span {
+  display: block;
+  margin-top: 2px;
+  font-size: 10px;
+  font-weight: 550;
+  letter-spacing: 0;
+  text-transform: none;
+  opacity: 0.85;
+}
+
+.normTableSimple th + th,
+.normTableSimple td + td {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.normTableSimple tbody td {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.normTableSimple tbody td em {
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-left: 2px;
+}
+
+.normTableSimple tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.feltStack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.feltScale {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 12px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(1, 100, 79, 0.16);
+  background: var(--bg-subtle);
+}
+
+.feltHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.feltHead strong {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.feltHead b {
+  font-size: 14px;
+  font-weight: 850;
+  letter-spacing: -0.02em;
+  color: var(--accent-color);
+}
+
+.feltTrack {
+  position: relative;
+  height: 64px;
+  margin: 4px 8px 0;
+}
+
+.feltLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 28px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    rgba(122, 135, 144, 0.55),
+    rgba(1, 100, 79, 0.25) 45%,
+    var(--accent-color)
+  );
+}
+
+.feltStep {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 4.6em;
+  gap: 4px;
+}
+
+.feltDot {
+  width: 11px;
+  height: 11px;
+  margin-top: 23px;
+  border-radius: 50%;
+  background: #9aa4ab;
+  border: 2px solid var(--bg-card);
+  box-shadow: 0 0 0 1px rgba(122, 135, 144, 0.35);
+  z-index: 1;
+}
+
+.feltDot[data-danger] {
+  background: #8a6a5a;
+}
+
+.feltStepActive .feltDot {
+  background: var(--accent-color);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.feltLabel {
+  font-size: 9px;
+  font-weight: 650;
+  line-height: 1.15;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.feltStepActive .feltLabel {
+  color: var(--text-primary);
+  font-weight: 750;
+}
+
+.feltMark,
+.feltMarkMf,
+.feltMarkBoth {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 18px;
+  padding: 2px 6px;
+  border-radius: var(--radius-pill);
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  animation: markerIn 360ms var(--ease-out) both;
+  z-index: 2;
+}
+
+.feltMark {
+  color: #fff;
+  background: #68757e;
+}
+
+.feltMarkMf {
+  top: auto;
+  bottom: -2px;
+  color: #fff;
+  background: var(--accent-color);
+  box-shadow: 0 3px 10px rgba(1, 100, 79, 0.18);
+}
+
+.feltMarkBoth {
+  color: var(--accent-color);
+  background: var(--bg-card);
+  border: 1px solid rgba(1, 100, 79, 0.35);
+}
+
+.block .charts {
+  padding-top: 8px;
+  border-top: 1px solid var(--border-color);
+}
+
+@media (max-width: 640px) {
+  .block {
+    padding: 14px 12px;
+  }
+
+  .feltTrack {
+    margin-inline: 2px;
+    height: 72px;
+  }
+
+  .feltStep {
+    width: 3.8em;
+  }
+
+  .feltLabel {
+    font-size: 8px;
+  }
+
+  .feltMark,
+  .feltMarkMf,
+  .feltMarkBoth {
+    font-size: 7px;
+    padding-inline: 5px;
+  }
+
+  .normTableSimple {
+    font-size: 12px;
+  }
+
+  .normTableSimple th,
+  .normTableSimple td {
+    padding: 7px 8px;
+  }
+
+  .tableWrap {
+    overflow-x: auto;
+  }
+
+  .normTableSimple {
+    min-width: 480px;
   }
 }

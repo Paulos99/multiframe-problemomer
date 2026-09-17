@@ -13,16 +13,17 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 - Feeling + comfort-class story first on early screens; **no numbers on Start**.
 - On Before/After + Profile: show the **full evidence pack** — personal room story, classes А/Б/В, numbers, charts, and plain-language explanations of each (owner 2026-09-12: «показать всё, аргументированно, понятно, персонально»).
 - **Evidence layout (Q4, owner 2026-09-12):** everything on one scroll — **conclusion / verdict on top**, detailed data below. Not progressive disclosure; not audience-trimmed packs. Anyone skims what they need. Same full stack for all user models (context may still change copy/CTA emphasis).
-- **Result must include (owner 2026-09-16):** (1) one direct verdict for *this* ceiling/room, (2) one shared official scale presented as a table with levels in columns and noise types in rows, (3) one combined effect + audio block, (4) three concise reasons-to-believe, (5) open technical evidence, then (6) the next step at the very bottom. Do not repeat the same conclusion in summary cards or a narrative ribbon.
-- **Charts (owner 2026-09-16):** the primary visual combines scale and table logic: columns **Ниже В → В → Б → А**, rows **Голоса и музыка / Шаги и удары**, with `Сейчас` and `MultiFrame` directly inside the matching cells. Two quietness cards follow, where perceived percentage leads and Δ Rw / Δ Lnw is secondary. **Frequency isolation charts** (R(f) / удар по Гц, форма как [zamer_graph](https://pavelantsibor.github.io/zamer_graph/)) stay open inside neutral **«Расчёт и нормы»** above the final CTA. Both frequency series are **изоляция** (выше = тише в комнате). Captions + one `pre_lab` disclaimer required.
+- **Result chain (owner 2026-09-17):** (1) **Нормы комфорта в стройке** — СП А/Б/В + Rw/Lnw + construction context, (2) **Текущая ситуация** — official hybrid SP header + two felt 5-step axes (now only), (3) **С MultiFrame** — official hybrid after + felt axes with now/after + % + audio + frequency charts, (4) **Почему MultiFrame подходит**, (5) **Следующий шаг**. No top ComfortScale table, no separate «Что изменится на слух», no «Расчёт и нормы / подробности», no `LOG_DB_FOOTNOTE`.
+- **Felt vs official (owner 2026-09-17):** headers use official hybrid via `comfortClassFor` + `HYBRID_CLASS_LABELS` / «ниже допустимого (В)» (never «Д», never felt words in headers). Axes use **опасно → некомфортно → приемлемо → комфортно → тихо** (тихо=А, комфортно=Б, приемлемо=В, некомфортно=below V, опасно=far below: Rw&lt;~47 / Lnw&gt;~68).
+- **Channel names (owner 2026-09-17):** `Воздушный шум (голоса и музыка)` · `Ударный шум (шаги и падения)`; audio `Воздушный шум` · `Ударный шум` · `Смешанный шум`.
 - **Numbers policy (owner 2026-09-13):** show a **full working MultiFrame effect model** with complete numbers now — currently **unconfirmed** (`marketing_placeholder` / `pre_lab`). After Trofimov (or lab) confirmation, **replace** values with correct ones; do not redesign the UX around hiding numbers. Never present placeholders as lab guarantees or certificates.
 - Effect source: `marketing_placeholder`; disclaimer: `pre_lab` / expert qualitative — never lab guarantees. Charts/numbers are **oriented arguments**, not certificates.
 - MultiFrame Δ is **frequency-shaped** (`marketing_placeholder` / `pre_lab`): typical ΔRw **+8…+12** (more on a light slab), ΔLnw **−4…−9** without a floating floor and **−2…−4** if the floor above already floats. UI range is **computed from the room model**, not hardcoded +10/−8. Never present as a lab certificate.
-- Classes **А/Б/В** (СП 51.13330.2011): **А** = высокий комфорт, **Б** = комфорт, **В** = допустимый уровень. Below-scale UI is only **`Ниже В`**: it has no letter and must never be presented as a fictional class «Д». Use one common axis with two independently marked rows: voices/music (Rw) and steps/impacts (Lnw).
+- Classes **А/Б/В** (СП 51.13330.2011): **А** = высокий комфорт, **Б** = комфорт, **В** = допустимый уровень. Below-scale official wording is **`ниже допустимого (В)`** (no letter «Д»). Felt axes are visual only.
 - «примерно вдвое спокойнее» **only for air (воздух)**; impact (удар) = quieter + floor often needed — never claim Lnw norm from ceiling alone.
 - Audio = **три группы примеров:** воздух · удар · смешанный; After = case-specific MultiFrame cut of **level + frequencies** with ≈% for this room (`pre_lab`); not showroom volume-duck alone.
 - Mobile: denser inputs + sticky question/CTA; both noise rows remain on the same shared scale axis and keep their everyday labels. No raw tech dumps without explanation.
-- **Premium tone (owner 2026-09-13):** never UI phrases like «за что платим», «за что ~500 тыс.», blunt cost/price push. Show features and effects so the user **infers** value. Soft B2B benefits OK («для клиента» path) without «средний чек» / money-first language.
+- **Premium tone (owner 2026-09-13):** never UI phrases like «за что платим», «за что ~500 тыс.», blunt cost/price push. Show features and effects so the user **infers** value. Soft B2B benefits OK without «средний чек» / money-first language.
 - Out of scope: walls, partitions, floors systems, Polyblock, framed systems, fake lab guarantees, floor-level question.
 
 ### Workshop log (durable)
@@ -103,6 +104,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-16 | **Scale/table merge:** replace the abstract dot-and-line scale with a compact table: official levels are columns, everyday noise types are rows, and state badges sit in their actual cells. Technical thresholds remain below as a second layer. |
 | 2026-09-16 | **Final CTA order:** open table and frequency graphs come before the in-body `Следующий шаг`; the conversion block is the last substantive section on Result. |
 | 2026-09-16 | **Workshop (transcript 07):** drop Start «для себя / для клиента»; site path = comfort on **your object**. Room = **external → internal** (house/slab first; room type later). Hide **пол сверху**. Result = scare current state first, then MultiFrame %; everyday labels «Некомфортно / Допустимо / Комфортно / Тихо». Wishes (музыка / ТВ / сон ребёнка) as internal factor, not «что мешает». Both air+impact channels stay. |
+| 2026-09-17 | **Result structure rewrite:** norms → current → MultiFrame (felt axes + % + audio + charts) → why → CTA. Official SP hybrid in headers; everyday 5-step felt on axes only. Channel renames; Start lead updated; noisyNeighbors subtitle removed; drop technical/подробности and LOG_DB footnotes. |
 
 ---
 
@@ -266,7 +268,7 @@ Create demand for acoustic comfort **on this object**. No role question. No numb
 | Role | Text |
 | ---- | ---- |
 | H1 | `Проверьте уровень акустического комфорта на своём объекте` |
-| Lead | `Проблемомер показывает ориентир уровня шума по типу перекрытия, строительным материалам и внешним и внутренним факторам. Следующий шаг — как изменится акустический комфорт после монтажа MultiFrame.` |
+| Lead | `Проблемомер показывает средний уровень шума исходя из типа перекрытия и строительных материалов, а также внутренних и внешних факторов. Следующий расчет показывает, как изменится звукоизоляция и акустический комфорт после монтажа системы MultiFrame.` |
 | Bullet 1 | `Сначала внешнее: дом и перекрытие — то, на что нельзя повлиять` |
 | Bullet 2 | `Затем внутреннее: комната, потолок, что важно именно вам` |
 | Bullet 3 | `Сначала текущий комфорт без MultiFrame, потом эффект системы` |
@@ -529,16 +531,17 @@ None.
 
 ### Goal
 
-Two-beat conclusion on one scroll (workshop 16.09): **first scare the current state without MultiFrame**, then show MultiFrame with everyday labels and percentages. Official SP scale and frequency charts sit below as support. CTA to calculator and consultation.
+Walk **norms → current → MultiFrame → why → CTA** on one scroll. Official SP class lives in block headers; everyday felt 5-step axes sit under them. CTA to calculator and consultation.
 
 ### Visible elements
 
-- **Top — текущая ситуация only:** everyday labels `Некомфортно / Допустимо / Комфортно / Тихо` for air and impact; SP letters secondary. No MultiFrame mixed into the first block.
-- **Then — с MultiFrame:** % quieter, after labels, compact audio.
-- **Then** three reasons → open SP dB table + frequency charts → **«Следующий шаг»** → restart.
-- Title `Акустический профиль помещения`. Subtitle about **your object**. Copy summary available to everyone (same flow for specialists).
-- **Charts block:** large Δ Rw / Δ Lnw + quietness bars first (in quieter); frequency isolation charts later as secondary evidence.
-- Do **not** hide detail behind tabs/accordions as the primary pattern; scroll is the disclosure.
+- **1. Нормы комфорта в стройке:** short SP explanation + А/Б/В Rw/Lnw table + construction context (перекрытие + тип дома).
+- **2. Текущая ситуация:** header `Сейчас: уровень комфорта по нормам «…»` + two felt axes (now only).
+- **3. С MultiFrame:** header `С MultiFrame: уровень комфорта по нормам «…»` + felt axes with now/after + % quieter + compact audio + frequency charts.
+- **4. Почему MultiFrame подходит:** three reasons + closing line.
+- **5. Следующий шаг:** calculator + lead + summary copy + restart.
+- Title `Акустический профиль помещения`. Subtitle about **your object**.
+- Do **not** show: top ComfortScale table, separate «Что изменится на слух», «Расчёт и нормы / подробности», `LOG_DB_FOOTNOTE`, long verdictLead.
 
 ### Exact primary copy (RU)
 
@@ -546,27 +549,28 @@ Two-beat conclusion on one scroll (workshop 16.09): **first scare the current st
 | ---- | ---- |
 | Title | `Акустический профиль помещения` |
 | Subtitle | `Ориентир комфорта для вашего объекта и следующий шаг к расчёту` |
-| Now eyebrow | `Текущая ситуация` |
-| Everyday labels | `Некомфортно` · `Допустимо` · `Комфортно` · `Тихо` |
-| Effect eyebrow | `С MultiFrame` |
-| Verdict one-liner | Dynamic from channel rise (air / impact / both) |
-| Scale title | `Шкала комфортности` |
-| Scale columns | `Ниже В` · `В Допустимый` · `Б Комфорт` · `А Высокий` |
-| Scale rows | `Голоса и музыка` · `Шаги и удары`; badges `Сейчас` / `MultiFrame` |
-| Effect title | `Что изменится на слух` |
+| Norms title | `Нормы комфорта в стройке` |
+| Now title | `Текущая ситуация` |
+| Now header | `Сейчас: уровень комфорта по нормам «{official}»` |
+| MF title | `С MultiFrame` |
+| MF header | `С MultiFrame: уровень комфорта по нормам «{official}»` |
+| Channel axes | `Воздушный шум (голоса и музыка)` · `Ударный шум (шаги и падения)` |
+| Felt steps | `Опасно` · `Некомфортно` · `Приемлемо` · `Комфортно` · `Тихо` |
+| Audio groups | `Воздушный шум` · `Ударный шум` · `Смешанный шум` |
 | Why title | `Почему MultiFrame подходит` |
-| Technical title | `Расчёт и нормы` |
 | Next-step title | `Следующий шаг` |
 | Calculator CTA | `Открыть калькулятор MultiFrame` |
 | Lead open | `Запросить консультацию или подбор` |
 | Lead title | `Заявка на консультацию` |
-| Lead help | `Разберём ваш случай, подберём материал.` |
+| Lead help | `Разберём ваш объект, подберём материал.` |
 | Summary | `Скопировать сводку` |
 | Name | `Имя` / placeholder `Как к вам обращаться` |
 | Phone | `Телефон` / placeholder `+7 …` |
 | Submit | `Отправить` → success `Заявка принята` (MVP: demo stub / console — no real StP CRM; do not invent corporate endpoint) |
 | Restart | `Пройти ещё раз` |
 | Sticky next | `Открыть калькулятор MultiFrame` (opens calculator; always enabled) |
+
+**Official header labels:** `Высокий комфорт (А)` · `Комфорт (Б)` · `Допустимый (В)` · `ниже допустимого (В)` (no «Д»).
 
 **Dynamic whyMultiFrame lines (up to ~4, from answers):** examples locked in code intent —
 
@@ -591,7 +595,7 @@ Lead: empty name/phone must not claim success. Success: `Заявка приня
 
 ### Must NOT appear
 
-Separate disabled «Консультация (недоступно в демо)»; primary labels «Оставить заявку (демо)» / «Заявка · демо»; fake live StP phone/email; lab certificate; Polyblock upsell; walls/floors systems; guaranteed Lnw norm from ceiling alone.
+Separate disabled «Консультация (недоступно в демо)»; primary labels «Оставить заявку (демо)» / «Заявка · демо»; fake live StP phone/email; lab certificate; Polyblock upsell; walls/floors systems; guaranteed Lnw norm from ceiling alone; fictional class «Д»; felt words in official SP headers.
 
 ---
 
@@ -760,10 +764,10 @@ Client path also: `buildClientSummary(session)` — plain-text digest for clipbo
 
 ### A — Visitor on StP site
 
-1. Open Start: **no** role picker, object H1, **no dB**, tap `Начать`.
-2. Room: house/slab first, then room + area > 0; **no** «пол сверху»; optional wish; `Далее`.
-3. Result opens with **current state only** (scare), then MultiFrame % and audio.
-4. Everyday labels first; SP table and frequency charts below.
+1. Open Start: **no** role picker, object H1, new lead, **no dB**, tap `Начать`.
+2. Room: house/slab first, then room + area > 0; **no** «пол сверху»; «Шум сверху» without «мешает ли» subtitle; optional wish; `Далее`.
+3. Result reads as: нормы → сейчас → MultiFrame → вывод → CTA.
+4. Official headers use А/Б/В (or «ниже допустимого (В)»); felt 5-step axes on channels; audio Воздушный / Ударный / Смешанный.
 5. Calculator preserves `area` (+ `roomType`); optional demo lead, copy summary, restart work.
 6. Must **not** present role split, Scenarios, Current complaint, floor-above, or standalone Before/After and Audio screens.
 
@@ -773,10 +777,10 @@ Client path also: `buildClientSummary(session)` — plain-text digest for clipbo
 
 1. Same Start (no role). Default slab OK (`Не знаю`).
 2. External factors quickly → room/area → Result.
-3. Result full pack; copyable summary; technical evidence before the final calculator / lead block.
+3. Result full pack; copyable summary; norms/MF evidence before the final calculator / lead block.
 4. ≤3 min without scenario/complaint quiz.
 
-**Pass:** path ≤3 min; audio shows case-specific two-channel difference; current then MultiFrame; calculator CTA works.
+**Pass:** path ≤3 min; audio shows case-specific two-channel difference; norms then current then MultiFrame; calculator CTA works.
 
 ---
 

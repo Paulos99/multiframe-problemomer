@@ -12,7 +12,7 @@ import type {
   SessionAnswers,
   SlabKey,
 } from './types';
-import { SIMULATION_BADGE } from './types';
+import { HYBRID_CLASS_LABELS, SIMULATION_BADGE } from './types';
 import { buildConstruction, resolveSlab } from './acoustic/construction';
 import { applyMultiFrame } from './acoustic/multiframe';
 import { buildReceiving, quietFromReceivedAir, quietFromReceivedImpact } from './acoustic/receiving';
@@ -214,6 +214,53 @@ export function impactClassFor(Lnw: number): ClassLabel {
   if (Lnw <= NORMS.B.Lnw) return 'B';
   if (Lnw <= NORMS.V.Lnw) return 'V';
   return 'below';
+}
+
+/** Felt comfort steps on Result axes (visual only — not SP class letters). */
+export type FeltStep = 'danger' | 'uncomfortable' | 'acceptable' | 'comfort' | 'quiet';
+
+export const FELT_STEPS: FeltStep[] = [
+  'danger',
+  'uncomfortable',
+  'acceptable',
+  'comfort',
+  'quiet',
+];
+
+export const FELT_STEP_LABELS: Record<FeltStep, string> = {
+  danger: 'Опасно',
+  uncomfortable: 'Некомфортно',
+  acceptable: 'Приемлемо',
+  comfort: 'Комфортно',
+  quiet: 'Тихо',
+};
+
+/** Far-below-V thresholds for the «опасно» felt step. */
+export const FELT_DANGER = {
+  RwBelow: 47,
+  LnwAbove: 68,
+} as const;
+
+export function airFeltStep(Rw: number): FeltStep {
+  if (Rw >= NORMS.A.Rw) return 'quiet';
+  if (Rw >= NORMS.B.Rw) return 'comfort';
+  if (Rw >= NORMS.V.Rw) return 'acceptable';
+  if (Rw < FELT_DANGER.RwBelow) return 'danger';
+  return 'uncomfortable';
+}
+
+export function impactFeltStep(Lnw: number): FeltStep {
+  if (Lnw <= NORMS.A.Lnw) return 'quiet';
+  if (Lnw <= NORMS.B.Lnw) return 'comfort';
+  if (Lnw <= NORMS.V.Lnw) return 'acceptable';
+  if (Lnw > FELT_DANGER.LnwAbove) return 'danger';
+  return 'uncomfortable';
+}
+
+/** Official SP hybrid label for Result block headers (not felt words). */
+export function officialComfortLabel(cls: ClassLabel): string {
+  if (cls === 'below') return 'ниже допустимого (В)';
+  return HYBRID_CLASS_LABELS[cls];
 }
 
 export function airChip(side: DerivedSimSide): string {
