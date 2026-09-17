@@ -1,0 +1,14 @@
+---
+description: После завершения доработок сразу коммитить и пушить в remote
+alwaysApply: true
+---
+
+# Auto-push after finishing work
+
+When a task or refinement is **finished** (code/docs done, checks green if run):
+
+1. Commit the relevant changes (follow the repo’s git commit protocol).
+2. Immediately `git push` to the tracked remote branch — **do not wait** for the user to say «запушь».
+3. Reply with the commit hash / short message and that it was pushed.
+
+Exceptions: user explicitly says not to commit/push; secrets or unrelated dirty files — warn and push only the task’s files (or ask if unclear).

@@ -1,11 +1,11 @@
 /**
  * Build room-specific audio shape from receiving L2 bands + stem calibration.
  *
- * Stems in public/audio are already «До through wall». Shape only:
- * - relative room loudness (mostly cuts),
- * - MultiFrame После: one broadband Δ(dBA) only (stems already through-wall;
- *   applying full ΔL(f) EQ on top double-cut / killed the demo).
- * Never re-EQ the stem toward the model spectrum on «До» — that brightened muffled files.
+ * Contract:
+ * - «До» = authored through-wall stem × room gain from L2_before (level only).
+ * - «После» = that same «До» base × MultiFrame transfer relative to «До»
+ *   (broadband ΔdBA + residual ΔL(f) shape). Never remap «После» from the
+ *   sample as if it were an independent absolute level.
  */
 import { SPECTRUM_HZ, clamp, round1 } from '../state/acoustic/bands';
 import type { AudioPair, DerivedSimulation } from '../state/types';
@@ -24,21 +24,20 @@ export type AudioPlayGroup = 'air' | 'impact' | 'mixed';
 
 export type RoomAudioShape = {
   stemId: StemId;
-  /** Broadband room offset vs authored stem level (dB) — До. */
+  /** Broadband room offset vs authored stem — shared «До» base for both sides. */
   beforeGainDb: number;
   /**
-   * Broadband После cut ≈ A-weighted L2_after − L2_before (dB, ≤ 0).
-   * This is the only overall loudness drop — do not also apply full band Δ as EQ.
+   * Relative После loudness vs До: L2_after_dBA − L2_before_dBA (≤ 0).
+   * Applied only on the after side, on top of beforeGainDb.
    */
   afterGainDb: number;
   /** Always zeros: stem timbre is already through-wall. */
   beforeEqDb: number[];
   /**
-   * Reserved for lab-shaped ΔL(f). Currently zeros — stems are already muffled;
-   * peaking MultiFrame EQ stacked with afterGain made «После» too quiet.
+   * Residual ΔL(f) vs the broadband afterGain: (L2_after − L2_before) − afterGainDb.
+   * So at each key band, afterGain + deltaEq ≈ true band Δ (no double-count of the mean).
    */
   deltaEqDb: number[];
-  /** Target A-weighted levels used for UI honesty / debug. */
   targetBeforeDb: number;
   targetAfterDb: number;
 };
@@ -84,9 +83,7 @@ function playbackRefDb(group: AudioPlayGroup): number {
 }
 
 /**
- * Map received-room dBA → playback offset from authored stem level.
- * Stems ≈ ref for that group. Good (quiet) rooms must cut almost 1:1 — a thick
- * monolith office must not play the stem at near-full authored loudness.
+ * Map received-room dBA → playback offset from authored stem level («До» only).
  */
 export function playbackGainForReceivedDb(
   receivedDba: number,
@@ -103,13 +100,19 @@ export function buildRoomAudioShape(
   stemId: StemId,
 ): RoomAudioShape {
   void STEM_CALIBRATION[stemId];
-  const { targetBeforeDb, targetAfterDb } = pickBands(sim, group);
+  const { before, after, targetBeforeDb, targetAfterDb } = pickBands(sim, group);
 
-  const beforeEqDb = KEY_BAND_INDICES.map(() => 0);
-  const afterGainDb = clamp(round1(targetAfterDb - targetBeforeDb), -10, 0);
-  const deltaEqDb = KEY_BAND_INDICES.map(() => 0);
-
+  // «До» level from this room — shared base for both buttons.
   const beforeGainDb = playbackGainForReceivedDb(targetBeforeDb, group);
+  const beforeEqDb = KEY_BAND_INDICES.map(() => 0);
+
+  // «После» = «До» + relative MultiFrame transfer (never an independent absolute remap).
+  const afterGainDb = clamp(round1(targetAfterDb - targetBeforeDb), -14, -3);
+  const deltaEqDb = KEY_BAND_INDICES.map((i) => {
+    const bandDelta = (after[i] ?? 0) - (before[i] ?? 0);
+    // Residual around broadband so total ≈ band Δ, without counting the mean twice.
+    return clamp(round1(bandDelta - afterGainDb), -10, 3);
+  });
 
   return {
     stemId,
@@ -132,7 +135,11 @@ export function buildRoomAudioShapeForPair(
   return buildRoomAudioShape(sim, pair.group, stemId);
 }
 
-/** @internal helpers for tests */
+/** Effective cut at a key band ≈ afterGain + residual (for checks / debug). */
+export function effectiveAfterBandDb(shape: RoomAudioShape): number[] {
+  return shape.deltaEqDb.map((d) => round1(shape.afterGainDb + d));
+}
+
 export function assertSpectrumAligned(levels: readonly number[]): boolean {
   return levels.length === SPECTRUM_HZ.length;
 }

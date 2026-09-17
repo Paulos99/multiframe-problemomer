@@ -240,18 +240,18 @@ function buildPeakingEq(ctx: AudioContext, gainsDb: readonly number[]): Chain {
 }
 
 function softLimiter(ctx: AudioContext): DynamicsCompressorNode {
+  // Safety only — must NOT squash «До» into «После» or the claimed Δ disappears.
   const c = ctx.createDynamicsCompressor();
-  c.threshold.value = -12;
-  c.knee.value = 12;
-  c.ratio.value = 12;
-  c.attack.value = 0.002;
-  c.release.value = 0.18;
+  c.threshold.value = -1.5;
+  c.knee.value = 3;
+  c.ratio.value = 2;
+  c.attack.value = 0.003;
+  c.release.value = 0.25;
   return c;
 }
 
 /**
- * Playback: authored through-wall stem (+ optional trim) → room offset → После cuts.
- * No upward normalize and no before-EQ — MP3s are already muffled/quiet.
+ * «До» = stem × room(before). «После» = that same base × relative MultiFrame Δ.
  */
 function roomProcess(
   ctx: AudioContext,
@@ -262,6 +262,7 @@ function roomProcess(
   const cal = STEM_CALIBRATION[stemId];
   const trimDb = Math.min(0, cal.trimDb);
 
+  // Shared «До» base for both sides — never remap after from an absolute after-dBA.
   const beforeGainDb = shape?.beforeGainDb ?? 0;
   const afterGainDb =
     opts.side === 'after' ? (shape?.afterGainDb ?? legacyAfterGain(opts)) : 0;
@@ -309,18 +310,25 @@ function roomProcess(
 }
 
 /**
- * Legacy fallback when shape is missing: broadband only (no stacked EQ).
+ * Legacy: relative После vs missing shape — broadband Δ only, still on top of «До».
  */
 function legacyAfterGain(opts: AudioPlayOptions): number {
-  const air = Math.max(4, Math.min(10, Math.abs(opts.deltaRw ?? 8)));
-  const imp = Math.max(3, Math.min(8, Math.abs(opts.deltaLnw ?? 6)));
+  const air = Math.max(5, Math.min(12, Math.abs(opts.deltaRw ?? 8)));
+  const imp = Math.max(4, Math.min(10, Math.abs(opts.deltaLnw ?? 6)));
   if (opts.group === 'air') return -air;
   if (opts.group === 'impact') return -imp;
   return -((air + imp) / 2);
 }
 
-function legacyDeltaEq(_opts: AudioPlayOptions): number[] {
-  return [0, 0, 0, 0, 0, 0, 0];
+/** Legacy residual tilt around broadband (not a second full |Δ|). */
+function legacyDeltaEq(opts: AudioPlayOptions): number[] {
+  if (opts.group === 'impact') {
+    return [-2, -3, -3.5, -2, -1, 0, 0.5];
+  }
+  if (opts.group === 'air') {
+    return [1, 0.5, 0, -1, -2.5, -3.5, -4];
+  }
+  return [0, -0.5, -1.5, -1.5, -2, -2.5, -3];
 }
 
 function playStem(

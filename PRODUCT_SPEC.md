@@ -546,8 +546,8 @@ None.
 
 - **Structure:** UI = three example groups (воздух / удар / смешанный); model still Rw + Lnw.
 - **Examples:** locked list above — do not invent extra stubs without owner.
-- **Personalization:** **До** scales from authored stem level by received L2/dBA with **group-specific refs** (air / impact / mixed): quiet good rooms (thick monolith office) cut almost 1:1; loud rooms only gently boost. **После** = one broadband Δ(dBA) capped ≈ −10 dB.
-- **Processing:** MP3 stems are already authored as quiet through-wall «До» (frozen RMS + HF roll-off). Playback = optional stem trim (≤0) → relative room gain from L2_before → После = **one** broadband Δ(dBA) capped ≈ −10 dB (no peaking ΔL(f) on top — that double-cut muffled stems). Soft limiter. Mixed = blend of air+impact bands. Exact Δ remains `pre_lab` until lab confirmation.
+- **Personalization:** **До** = stem × room gain from L2_before (group-specific refs; quiet good rooms cut almost 1:1). **После** = that same «До» base × relative MultiFrame transfer (`afterGainDb` = ΔdBA + residual `deltaEqDb` = ΔL(f) − afterGain) — never an independent absolute remap from the sample.
+- **Processing:** through-wall stems; trim ≤0 → shared beforeGain → on После only: broadband ΔdBA (−14…−3) + residual peaking ΔL(f); soft peak safety only (must not squash До into После). Mixed = blend of air+impact. Exact Δ remains `pre_lab`.
 - **Reduction UI (C):** always show **both** `≈ −{n}%` and short Δ caption (`ориентир −8 дБ` / case Δ). `%` = **perceived loudness** map from Δ (rule of thumb ASSUMPTION: ~−10 dB ≈ half as loud → ~−50%; ~−8 dB ≈ ~−40…−45% perceived — tune with Trofimov). **Never** compute % as linear `(64−56)/64` or `8/64`.
 - **Log education (required):** visible footnote that dB is logarithmic — small dB numbers = large sensation change; example `64 → 56` is substantial, not “a few percent”.
 - **Impact honesty:** ceiling softens impact; floating floor above often needed for norm — visible near impact (and mixed if impact-heavy).

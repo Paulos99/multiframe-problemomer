@@ -4,7 +4,7 @@
  */
 import { applyMultiFrame } from './multiframe';
 import { buildConstruction, constructionFixture } from './construction';
-import { SPECTRUM_HZ } from './bands';
+import { SPECTRUM_HZ, clamp, round1 } from './bands';
 import { deriveSimulation, NORMS } from '../simulation';
 import type { RoomAnswers, SessionAnswers } from '../types';
 import { buildRoomAudioShape, playbackGainForReceivedDb } from '../../audio/roomAudioShape';
@@ -184,14 +184,28 @@ export function assertModelAnchors(): string[] {
   ) {
     errors.push('playbackGainForReceivedDb not monotonic with received dBA');
   }
-  if (shapeLoud.afterGainDb >= 0) {
-    errors.push(`MultiFrame afterGainDb should be negative (got ${shapeLoud.afterGainDb})`);
+  if (shapeLoud.afterGainDb >= -3) {
+    errors.push(`MultiFrame afterGainDb should cut ≥ 3 dB vs До (got ${shapeLoud.afterGainDb})`);
   }
-  if (shapeLoud.afterGainDb < -10) {
-    errors.push(`После afterGainDb should be capped (≥ −10), got ${shapeLoud.afterGainDb}`);
+  if (shapeLoud.afterGainDb < -14) {
+    errors.push(`После afterGainDb should be capped (≥ −14), got ${shapeLoud.afterGainDb}`);
   }
-  if (shapeLoud.deltaEqDb.some((g) => g !== 0)) {
-    errors.push('deltaEqDb should be flat zeros while stems are through-wall demos');
+  const dbaDiff = round1(shapeLoud.targetAfterDb - shapeLoud.targetBeforeDb);
+  if (Math.abs(shapeLoud.afterGainDb - clamp(dbaDiff, -14, -3)) > 0.15) {
+    errors.push(
+      `afterGain must equal relative dBA Δ (got ${shapeLoud.afterGainDb}, dBA ${dbaDiff})`,
+    );
+  }
+  // Residual EQ should not be flat-zero when bands move (MultiFrame shapes spectrum).
+  const residualEnergy = shapeLoud.deltaEqDb.reduce((a, b) => a + Math.abs(b), 0);
+  if (residualEnergy < 2) {
+    errors.push(`deltaEq residual vs До should shape spectrum (energy ${residualEnergy})`);
+  }
+  // Effective after cut at key bands must stay clearly below До (0).
+  const effective = shapeLoud.deltaEqDb.map((d) => shapeLoud.afterGainDb + d);
+  const meanEff = effective.reduce((a, b) => a + b, 0) / effective.length;
+  if (meanEff > -5) {
+    errors.push(`effective После vs До too weak (mean ${meanEff.toFixed(1)} dB)`);
   }
 
   const simGoodMono = deriveSimulation(
