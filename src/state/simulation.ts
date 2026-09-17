@@ -244,7 +244,7 @@ export const FELT_STEP_LABELS: Record<FeltStep, string> = {
 };
 
 /**
- * Far-below-V thresholds for the worst felt step.
+ * Far-below thresholds kept for index-based helpers (SP story elsewhere).
  * Typical in-situ ПК / brick (~Rw 46, Lnw 75) must land on «некомфортно», not the edge.
  */
 export const FELT_DANGER = {
@@ -252,7 +252,27 @@ export const FELT_DANGER = {
   LnwAbove: 76,
 } as const;
 
-export function airFeltStep(Rw: number): FeltStep {
+/**
+ * Бытовая шкала по громкости в комнате (received dBA) — та же величина, что подпись дБ и демо-аудио.
+ * Воздух: тихо ≤42 · комфортно ≤48 · приемлемо ≤54 · некомфортно ≤60 · иначе очень шумно.
+ */
+export const FELT_AIR_DBA = {
+  quiet: 42,
+  comfort: 48,
+  acceptable: 54,
+  uncomfortable: 60,
+} as const;
+
+/** Удар: те же ступени со сдвигом +14 (impact dBA системно выше воздуха). */
+export const FELT_IMPACT_DBA = {
+  quiet: 56,
+  comfort: 62,
+  acceptable: 68,
+  uncomfortable: 74,
+} as const;
+
+/** @deprecated Prefer airFeltFromReceived — kept for SP-index experiments. */
+export function airFeltFromIndex(Rw: number): FeltStep {
   if (Rw >= NORMS.A.Rw) return 'quiet';
   if (Rw >= NORMS.B.Rw) return 'comfort';
   if (Rw >= NORMS.V.Rw) return 'acceptable';
@@ -260,13 +280,35 @@ export function airFeltStep(Rw: number): FeltStep {
   return 'uncomfortable';
 }
 
-export function impactFeltStep(Lnw: number): FeltStep {
+/** @deprecated Prefer impactFeltFromReceived. */
+export function impactFeltFromIndex(Lnw: number): FeltStep {
   if (Lnw <= NORMS.A.Lnw) return 'quiet';
   if (Lnw <= NORMS.B.Lnw) return 'comfort';
   if (Lnw <= NORMS.V.Lnw) return 'acceptable';
   if (Lnw > FELT_DANGER.LnwAbove) return 'danger';
   return 'uncomfortable';
 }
+
+export function airFeltFromReceived(receivedDba: number): FeltStep {
+  if (receivedDba <= FELT_AIR_DBA.quiet) return 'quiet';
+  if (receivedDba <= FELT_AIR_DBA.comfort) return 'comfort';
+  if (receivedDba <= FELT_AIR_DBA.acceptable) return 'acceptable';
+  if (receivedDba <= FELT_AIR_DBA.uncomfortable) return 'uncomfortable';
+  return 'danger';
+}
+
+export function impactFeltFromReceived(receivedDba: number): FeltStep {
+  if (receivedDba <= FELT_IMPACT_DBA.quiet) return 'quiet';
+  if (receivedDba <= FELT_IMPACT_DBA.comfort) return 'comfort';
+  if (receivedDba <= FELT_IMPACT_DBA.acceptable) return 'acceptable';
+  if (receivedDba <= FELT_IMPACT_DBA.uncomfortable) return 'uncomfortable';
+  return 'danger';
+}
+
+/** @deprecated Use airFeltFromReceived. */
+export const airFeltStep = airFeltFromIndex;
+/** @deprecated Use impactFeltFromReceived. */
+export const impactFeltStep = impactFeltFromIndex;
 
 /** Official SP hybrid label for Result block headers (not felt words). */
 export function officialComfortLabel(cls: ClassLabel): string {

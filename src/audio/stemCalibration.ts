@@ -63,13 +63,13 @@ export const STEM_CALIBRATION: Record<StemId, StemCalibration> = {
 export const STEM_NORM_TARGET_DBFS = -33;
 
 /**
- * Stem authored loudness ≈ this received air dBA (typical annoying upstairs talk).
- * Quieter rooms cut almost 1:1 from here; louder rooms only gently boost.
+ * Stem authored loudness ≈ this received air dBA («некомфортно / очень шумно»).
+ * Acceptable (~54) and quiet (~42) rooms then cut almost 1:1 so demo matches the felt scale.
  */
-export const PLAYBACK_REF_DBA_AIR = 56;
-/** Stem stomp ≈ this impact dBA — impact L2 sits far above air, needs its own anchor. */
-export const PLAYBACK_REF_DBA_IMPACT = 74;
-export const PLAYBACK_REF_DBA_MIXED = 65;
+export const PLAYBACK_REF_DBA_AIR = 61;
+/** Stem stomp ≈ uncomfortable impact zone (felt impact ladder is ~+14 vs air). */
+export const PLAYBACK_REF_DBA_IMPACT = 75;
+export const PLAYBACK_REF_DBA_MIXED = 68;
 
 /** @deprecated Use PLAYBACK_REF_DBA_AIR — kept for old imports. */
 export const PLAYBACK_REF_DBA = PLAYBACK_REF_DBA_AIR;

@@ -14,7 +14,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 - On Before/After + Profile: show the **full evidence pack** — personal room story, classes А/Б/В, numbers, charts, and plain-language explanations of each (owner 2026-09-12: «показать всё, аргументированно, понятно, персонально»).
 - **Evidence layout (Q4, owner 2026-09-12):** everything on one scroll — **conclusion / verdict on top**, detailed data below. Not progressive disclosure; not audience-trimmed packs. Anyone skims what they need. Same full stack for all user models (context may still change copy/CTA emphasis).
 - **Result chain (owner 2026-09-17):** (1) **Нормы комфорта в стройке** — СП А/Б/В + Rw/Lnw + construction context, (2) **Текущая ситуация** — official hybrid SP header + two felt 5-step axes (now only), (3) **С MultiFrame** — official hybrid after + felt axes with now/after + % + audio + frequency charts, (4) **Уникальность системы MultiFrame** — short contrast table vs ordinary stretch ceiling (шум / монтаж / состав), no essays, (5) **Следующий шаг**. No top ComfortScale table, no separate «Что изменится на слух», no «Расчёт и нормы / подробности», no `LOG_DB_FOOTNOTE`.
-- **Felt vs official (owner 2026-09-17):** headers use official hybrid via `comfortClassFor` + `HYBRID_CLASS_LABELS` / «ниже допустимого (В)» (never «Д», never felt words in headers). Axes use **очень шумно → некомфортно → приемлемо → комфортно → тихо** (тихо=А, комфортно=Б, приемлемо=В, некомфортно=below V, очень шумно=far below: Rw&lt;~44 / Lnw&gt;~76). Typical brick+ПК lands on «некомфортно», not the edge. Scales also show received-room dB now (and after under MultiFrame).
+- **Felt vs official (owner 2026-09-17, sync 2026-09-17):** headers use official hybrid via `comfortClassFor` + `HYBRID_CLASS_LABELS` / «ниже допустимого (В)» (never «Д», never felt words in headers). **Felt axes = received-room dBA** (same quantity as the ≈дБ label and demo audio): воздух тихо≤42 / комфортно≤48 / приемлемо≤54 / некомфортно≤60 / иначе очень шумно; удар +14 к порогам. Not Rw/Lnw class letters — those stay in the official header only.
 - **Channel names (owner 2026-09-17):** `Воздушный шум (голоса и музыка)` · `Ударный шум (шаги и падения)`; audio `Воздушный шум` · `Ударный шум` · `Смешанный шум`.
 - **Numbers policy (owner 2026-09-13):** show a **full working MultiFrame effect model** with complete numbers now — currently **unconfirmed** (`marketing_placeholder` / `pre_lab`). After Trofimov (or lab) confirmation, **replace** values with correct ones; do not redesign the UX around hiding numbers. Never present placeholders as lab guarantees or certificates.
 - Effect source: `marketing_placeholder`; disclaimer: `pre_lab` / expert qualitative — never lab guarantees. Charts/numbers are **oriented arguments**, not certificates.
@@ -108,6 +108,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-17 | **Result structure rewrite:** norms → current → MultiFrame (felt axes + % + audio + charts) → why → CTA. Official SP hybrid in headers; everyday 5-step felt on axes only. Channel renames; Start lead updated; noisyNeighbors subtitle removed; drop technical/подробности and LOG_DB footnotes. |
 | 2026-09-17 | **Processing ceremony:** after last Room question, fullscreen StP-green loading (~7s, skippable) before Result. Center: rotating status lines + thin progress bar. No chips/equalizer/classes/dB. Header and sticky CTA hidden. Back from Result skips replaying it. |
 | 2026-09-17 | **Features block rename:** `Почему MultiFrame подходит` → `Уникальность системы MultiFrame`. Three cards from stp-multiframe.ru positioning (эффективно / быстро / экологично): panel vs film+drum, fast frameless install + any slab/stage, eco/no mineral wool. Drop dynamic `Под ваш потолок` why-line from the UI; `whyMultiFrame` stays in lead handoff only. |
+| 2026-09-17 | **Felt axes = received dBA** (sync with ≈дБ + demo audio). Official SP hybrid stays in block headers only. Playback refs raised so «приемлемо/тихо» cut the through-wall stems hard. |
 | 2026-09-17 | **Uniqueness block rewrite (owner):** drop three essay columns. Concept = contrast table `Обычный натяжной` vs `MultiFrame`: Шум `Только плёнка` / `Воздух и удар`; Монтаж `Каркас и стройка` / `Как натяжной`; Состав `Минвата и пыль` / `Без ваты`. No lead, no closer, no numbered cards. |
 
 ---
@@ -596,7 +597,7 @@ Walk **norms → current → MultiFrame → why → CTA** on one scroll. Officia
 | MF title | `С MultiFrame` |
 | MF header | `С MultiFrame: уровень комфорта по нормам «{official}»` |
 | Channel axes | `Воздушный шум (голоса и музыка)` · `Ударный шум (шаги и падения)` |
-| Felt steps | `Очень шумно` · `Некомфортно` · `Приемлемо` · `Комфортно` · `Тихо` |
+| Felt steps | `Очень шумно` · `Некомфортно` · `Приемлемо` · `Комфортно` · `Тихо` (from received dBA, not Rw/Lnw) |
 | Level in room | `Сейчас: ≈ N дБ` · under MultiFrame also `→ с MultiFrame: ≈ M дБ` |
 | Audio groups | `Воздушный шум` · `Ударный шум` · `Смешанный шум` |
 | Why title | `Уникальность системы MultiFrame` |

@@ -16,10 +16,10 @@ import {
   FELT_STEP_LABELS,
   FELT_STEPS,
   NORMS,
-  airFeltStep,
+  airFeltFromReceived,
   comfortClassFor,
   deriveSimulation,
-  impactFeltStep,
+  impactFeltFromReceived,
   officialComfortLabel,
   type FeltStep,
 } from '../../state/simulation';
@@ -159,10 +159,10 @@ export function ResultScreen() {
   const beforeOfficial = officialComfortLabel(hybridBefore);
   const afterOfficial = officialComfortLabel(hybridAfter);
 
-  const airNowFelt = airFeltStep(sim.before.Rw);
-  const airAfterFelt = airFeltStep(sim.after.Rw);
-  const impactNowFelt = impactFeltStep(sim.before.Lnw);
-  const impactAfterFelt = impactFeltStep(sim.after.Lnw);
+  const airNowFelt = airFeltFromReceived(sim.receivedAirDb.before);
+  const airAfterFelt = airFeltFromReceived(sim.receivedAirDb.after);
+  const impactNowFelt = impactFeltFromReceived(sim.receivedImpactDb.before);
+  const impactAfterFelt = impactFeltFromReceived(sim.receivedImpactDb.after);
 
   const roomLabel = room.roomType ? ROOM_TYPE_LABELS[room.roomType] : null;
   const slab = resolveSlab(room);
@@ -273,8 +273,8 @@ export function ResultScreen() {
           <h2>Текущая ситуация</h2>
           <p>
             Ориентир того, как сейчас слышны голоса и шаги сверху в этой комнате — до монтажа
-            MultiFrame. Цифры в дБ — ориентировочная громкость в помещении; шкала рядом — бытовая
-            оценка по тем же нормам А/Б/В.
+            MultiFrame. Цифры в дБ и бытовая шкала — про громкость в помещении; класс по нормам
+            А/Б/В — в заголовке блока (про перекрытие).
           </p>
           <p className={styles.officialHead}>
             Сейчас: уровень комфорта по нормам «{beforeOfficial}»
@@ -301,8 +301,9 @@ export function ResultScreen() {
         <header className={styles.sectionHead}>
           <h2>С MultiFrame</h2>
           <p>
-            Тот же ориентир после монтажа системы: насколько тише станет в комнате и куда
-            сдвинется класс по нормам. Сравните дБ «сейчас» и «после» на каждом канале.
+            Тот же ориентир после монтажа системы: насколько тише станет в комнате по дБ и бытовой
+            шкале, и куда сдвинется класс по нормам в заголовке. Сравните «сейчас» и «после» на
+            каждом канале — в том числе в демо-звуке.
           </p>
           <p className={styles.officialHead}>
             С MultiFrame: уровень комфорта по нормам «{afterOfficial}»

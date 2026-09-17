@@ -5,7 +5,13 @@
 import { applyMultiFrame } from './multiframe';
 import { buildConstruction, constructionFixture } from './construction';
 import { SPECTRUM_HZ, clamp, round1 } from './bands';
-import { deriveSimulation, NORMS } from '../simulation';
+import {
+  airFeltFromReceived,
+  deriveSimulation,
+  impactFeltFromReceived,
+  NORMS,
+  FELT_STEPS,
+} from '../simulation';
 import type { RoomAnswers, SessionAnswers } from '../types';
 import { buildRoomAudioShape, playbackGainForReceivedDb } from '../../audio/roomAudioShape';
 
@@ -221,7 +227,7 @@ export function assertModelAnchors(): string[] {
     }),
   );
   const shapeGoodAir = buildRoomAudioShape(simGoodMono, 'air', 'talk');
-  if (shapeGoodAir.beforeGainDb > -5) {
+  if (shapeGoodAir.beforeGainDb > -8) {
     errors.push(
       `good monolith office «До» should cut stem hard (beforeGain ${shapeGoodAir.beforeGainDb}, L2 ${shapeGoodAir.targetBeforeDb})`,
     );
@@ -230,6 +236,54 @@ export function assertModelAnchors(): string[] {
     errors.push(
       `good mono До must be quieter than loud neighbors (${shapeGoodAir.beforeGainDb} vs ${shapeLoud.beforeGainDb})`,
     );
+  }
+
+  const simKidsMono = deriveSimulation(
+    sampleAnswers({
+      slabType: 'monolith',
+      slabThickness: 'over_250',
+      houseType: 'monolith',
+      roomType: 'kids',
+      ceilingAreaM2: 20,
+      noisyNeighbors: 'sometimes_noisy',
+      floorAbove: 'ordinary',
+      objectStage: 'occupied',
+    }),
+  );
+  const kidsAirFeltBefore = airFeltFromReceived(simKidsMono.receivedAirDb.before);
+  const kidsAirFeltAfter = airFeltFromReceived(simKidsMono.receivedAirDb.after);
+  if (kidsAirFeltBefore === 'quiet') {
+    errors.push(
+      `kids mono250 «До» felt should not be тихо (L2 ${simKidsMono.receivedAirDb.before}, step ${kidsAirFeltBefore})`,
+    );
+  }
+  const shapeKidsAir = buildRoomAudioShape(simKidsMono, 'air', 'talk');
+  if (
+    kidsAirFeltBefore === 'acceptable' ||
+    kidsAirFeltBefore === 'comfort' ||
+    kidsAirFeltBefore === 'quiet'
+  ) {
+    if (shapeKidsAir.beforeGainDb > -5) {
+      errors.push(
+        `acceptable/comfort kids До must cut stem (beforeGain ${shapeKidsAir.beforeGainDb}, felt ${kidsAirFeltBefore}, L2 ${shapeKidsAir.targetBeforeDb})`,
+      );
+    }
+  }
+  const kidsFeltIdxBefore = FELT_STEPS.indexOf(kidsAirFeltBefore);
+  const kidsFeltIdxAfter = FELT_STEPS.indexOf(kidsAirFeltAfter);
+  if (kidsFeltIdxAfter < kidsFeltIdxBefore) {
+    errors.push(
+      `kids mono MultiFrame felt should not worsen (${kidsAirFeltBefore} → ${kidsAirFeltAfter})`,
+    );
+  }
+  if (simKidsMono.receivedAirDb.after >= simKidsMono.receivedAirDb.before - 2) {
+    errors.push(
+      `kids mono L2 after should drop vs before (${simKidsMono.receivedAirDb.before} → ${simKidsMono.receivedAirDb.after})`,
+    );
+  }
+  const kidsImpactFeltBefore = impactFeltFromReceived(simKidsMono.receivedImpactDb.before);
+  if (FELT_STEPS.indexOf(kidsImpactFeltBefore) < 0) {
+    errors.push(`invalid impact felt step ${kidsImpactFeltBefore}`);
   }
 
   const simKitchen = deriveSimulation(
