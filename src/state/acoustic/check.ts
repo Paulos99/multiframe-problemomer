@@ -186,6 +186,9 @@ export function assertModelAnchors(): string[] {
   if (meanDelta >= 0) {
     errors.push(`MultiFrame air ΔL EQ should cut on average (got ${meanDelta})`);
   }
+  if (shapeLoud.afterGainDb >= 0) {
+    errors.push(`MultiFrame afterGainDb should be negative (got ${shapeLoud.afterGainDb})`);
+  }
 
   const simKitchen = deriveSimulation(
     sampleAnswers({

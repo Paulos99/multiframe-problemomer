@@ -546,7 +546,7 @@ None.
 - **Structure:** UI = three example groups (воздух / удар / смешанный); model still Rw + Lnw.
 - **Examples:** locked list above — do not invent extra stubs without owner.
 - **Personalization:** **До** is shaped to this room’s received L2/dBA (neighbors, area, slab, absorption). **После** applies the MultiFrame transfer `ΔL(f)` from the same receiving bands — not a fixed exaggerated duck and not identical raw MP3 for every room.
-- **Processing:** stem calibration (frozen RMS + band shape) → normalize → match L2_before → optional peaking cascade for ΔL(f); soft limiter. Mixed = blend of air+impact bands. Exact EQ remains `pre_lab` until lab confirmation.
+- **Processing:** MP3 stems are already authored as quiet through-wall «До» (frozen RMS + HF roll-off). Playback = optional stem trim (≤0) → relative room gain from L2_before → После broadband + ΔL(f) cuts only; soft limiter. **No** upward normalize and **no** before-EQ (that made muffled stems loud/bright). Mixed = blend of air+impact bands. Exact Δ remains `pre_lab` until lab confirmation.
 - **Reduction UI (C):** always show **both** `≈ −{n}%` and short Δ caption (`ориентир −8 дБ` / case Δ). `%` = **perceived loudness** map from Δ (rule of thumb ASSUMPTION: ~−10 dB ≈ half as loud → ~−50%; ~−8 dB ≈ ~−40…−45% perceived — tune with Trofimov). **Never** compute % as linear `(64−56)/64` or `8/64`.
 - **Log education (required):** visible footnote that dB is logarithmic — small dB numbers = large sensation change; example `64 → 56` is substantial, not “a few percent”.
 - **Impact honesty:** ceiling softens impact; floating floor above often needed for norm — visible near impact (and mixed if impact-heavy).

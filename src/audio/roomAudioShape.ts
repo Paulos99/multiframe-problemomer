@@ -1,7 +1,12 @@
 /**
  * Build room-specific audio shape from receiving L2 bands + stem calibration.
+ *
+ * Stems in public/audio are already «До through wall». Shape only:
+ * - relative room loudness (mostly cuts),
+ * - MultiFrame После broadband + ΔL(f) cuts.
+ * Never re-EQ the stem toward the model spectrum on «До» — that brightened muffled files.
  */
-import { SPECTRUM_HZ, clamp, mean, round1 } from '../state/acoustic/bands';
+import { SPECTRUM_HZ, clamp, round1 } from '../state/acoustic/bands';
 import type { AudioPair, DerivedSimulation } from '../state/types';
 import {
   KEY_BAND_INDICES,
@@ -16,11 +21,13 @@ export type AudioPlayGroup = 'air' | 'impact' | 'mixed';
 
 export type RoomAudioShape = {
   stemId: StemId;
-  /** Broadband gain after stem RMS normalize (dB). */
+  /** Broadband room offset vs authored stem level (dB) — До. */
   beforeGainDb: number;
-  /** Peaking EQ vs stem for in-room before spectrum (dB at KEY_BAND_INDICES). */
+  /** Extra broadband cut for После = targetAfter − targetBefore (dB, ≤ 0). */
+  afterGainDb: number;
+  /** Always zeros: stem timbre is already through-wall. */
   beforeEqDb: number[];
-  /** Peaking EQ for MultiFrame transfer ΔL(f) = after − before (dB). */
+  /** Peaking EQ for MultiFrame transfer ΔL(f) = after − before (dB, cuts). */
   deltaEqDb: number[];
   /** Target A-weighted levels used for UI honesty / debug. */
   targetBeforeDb: number;
@@ -29,11 +36,6 @@ export type RoomAudioShape = {
 
 function mixBands(a: readonly number[], b: readonly number[]): number[] {
   return a.map((v, i) => round1((v + (b[i] ?? v)) / 2));
-}
-
-function relShape(levels: readonly number[]): number[] {
-  const m = mean(levels);
-  return levels.map((v) => round1(v - m));
 }
 
 function pickBands(
@@ -67,11 +69,12 @@ function pickBands(
 }
 
 /**
- * Map received-room dBA → playback gain after stem is normalized to STEM_NORM_TARGET_DBFS.
- * Clamped so phones stay usable; still varies clearly across rooms.
+ * Map received-room dBA → playback offset from authored stem level.
+ * Compressed and mostly cuts — stems already encode a typical upstairs level.
  */
 export function playbackGainForReceivedDb(receivedDba: number): number {
-  return clamp(receivedDba - PLAYBACK_REF_DBA, -16, 10);
+  const raw = (receivedDba - PLAYBACK_REF_DBA) * 0.35;
+  return clamp(round1(raw), -8, 1);
 }
 
 export function buildRoomAudioShape(
@@ -79,24 +82,22 @@ export function buildRoomAudioShape(
   group: AudioPlayGroup,
   stemId: StemId,
 ): RoomAudioShape {
-  const cal = STEM_CALIBRATION[stemId];
+  void STEM_CALIBRATION[stemId];
   const { before, after, targetBeforeDb, targetAfterDb } = pickBands(sim, group);
 
-  const targetRel = relShape(before);
-  const stemRel = cal.bandRelDb;
-  const beforeEqDb = KEY_BAND_INDICES.map((i) =>
-    clamp(round1((targetRel[i] ?? 0) - (stemRel[i] ?? 0)), -10, 10),
-  );
+  // Do not reshape stem spectrum on «До» — files are already muffled through-wall.
+  const beforeEqDb = KEY_BAND_INDICES.map(() => 0);
   const deltaEqDb = KEY_BAND_INDICES.map((i) =>
-    clamp(round1((after[i] ?? 0) - (before[i] ?? 0)), -18, 4),
+    clamp(round1((after[i] ?? 0) - (before[i] ?? 0)), -16, 0),
   );
 
-  // Stem normalize offset is applied in the player from rmsDbFs → STEM_NORM_TARGET_DBFS.
   const beforeGainDb = playbackGainForReceivedDb(targetBeforeDb);
+  const afterGainDb = clamp(round1(targetAfterDb - targetBeforeDb), -16, 0);
 
   return {
     stemId,
     beforeGainDb,
+    afterGainDb,
     beforeEqDb,
     deltaEqDb,
     targetBeforeDb,

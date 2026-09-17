@@ -2,8 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { parseStubSrc, type StubKind, type StubScene } from './demoAudio';
 import {
   keyBandHz,
+  MASTER_PLAYBACK_GAIN,
   STEM_CALIBRATION,
-  STEM_NORM_TARGET_DBFS,
   stemIdFromSrc,
   type StemId,
 } from './stemCalibration';
@@ -221,16 +221,17 @@ function buildPeakingEq(ctx: AudioContext, gainsDb: readonly number[]): Chain {
 
 function softLimiter(ctx: AudioContext): DynamicsCompressorNode {
   const c = ctx.createDynamicsCompressor();
-  c.threshold.value = -6;
-  c.knee.value = 8;
-  c.ratio.value = 8;
-  c.attack.value = 0.003;
-  c.release.value = 0.12;
+  c.threshold.value = -12;
+  c.knee.value = 12;
+  c.ratio.value = 12;
+  c.attack.value = 0.002;
+  c.release.value = 0.18;
   return c;
 }
 
 /**
- * Room-truthful process: stem normalize → match L2_before → optional ΔL(f) for After.
+ * Playback: authored through-wall stem (+ optional trim) → room offset → После cuts.
+ * No upward normalize and no before-EQ — MP3s are already muffled/quiet.
  */
 function roomProcess(
   ctx: AudioContext,
@@ -239,41 +240,45 @@ function roomProcess(
 ): Chain {
   const shape = opts.shape;
   const cal = STEM_CALIBRATION[stemId];
-  const normDb = STEM_NORM_TARGET_DBFS - cal.rmsDbFs;
+  const trimDb = Math.min(0, cal.trimDb);
+
   const beforeGainDb = shape?.beforeGainDb ?? 0;
-  const beforeEq = shape?.beforeEqDb ?? [0, 0, 0, 0, 0, 0, 0];
+  const afterGainDb =
+    opts.side === 'after' ? (shape?.afterGainDb ?? legacyAfterGain(opts)) : 0;
   const deltaEq =
     opts.side === 'after'
       ? (shape?.deltaEqDb ?? legacyDeltaEq(opts))
       : [0, 0, 0, 0, 0, 0, 0];
 
-  const norm = ctx.createGain();
-  norm.gain.value = dbToGain(normDb);
+  const trim = ctx.createGain();
+  trim.gain.value = dbToGain(trimDb);
 
-  const beforeEqChain = buildPeakingEq(ctx, beforeEq);
   const roomGain = ctx.createGain();
   roomGain.gain.value = dbToGain(beforeGainDb);
+
+  const afterGain = ctx.createGain();
+  afterGain.gain.value = dbToGain(afterGainDb);
 
   const deltaEqChain = buildPeakingEq(ctx, deltaEq);
   const limiter = softLimiter(ctx);
   const ceiling = ctx.createGain();
-  ceiling.gain.value = 0.92;
+  ceiling.gain.value = MASTER_PLAYBACK_GAIN;
 
-  norm.connect(beforeEqChain.input);
-  beforeEqChain.output.connect(roomGain);
-  roomGain.connect(deltaEqChain.input);
+  trim.connect(roomGain);
+  roomGain.connect(afterGain);
+  afterGain.connect(deltaEqChain.input);
   deltaEqChain.output.connect(limiter);
   limiter.connect(ceiling);
 
   return {
-    input: norm,
+    input: trim,
     output: ceiling,
     teardown: () => {
-      beforeEqChain.teardown();
       deltaEqChain.teardown();
       try {
-        norm.disconnect();
+        trim.disconnect();
         roomGain.disconnect();
+        afterGain.disconnect();
         limiter.disconnect();
         ceiling.disconnect();
       } catch {
@@ -283,22 +288,48 @@ function roomProcess(
   };
 }
 
-/** Fallback when shape is missing: mild scalar Δ as peaking tilt (legacy). */
-function legacyDeltaEq(opts: AudioPlayOptions): number[] {
+function legacyAfterGain(opts: AudioPlayOptions): number {
   const air = Math.max(4, Math.min(12, Math.abs(opts.deltaRw ?? 8)));
   const imp = Math.max(3, Math.min(10, Math.abs(opts.deltaLnw ?? 6)));
-  let atten: number;
-  if (opts.group === 'air') atten = air;
-  else if (opts.group === 'impact') atten = imp;
-  else atten = (air + imp) / 2;
-  // KEY bands: more cut on highs for air, lows for impact
+  if (opts.group === 'air') return -air;
+  if (opts.group === 'impact') return -imp;
+  return -((air + imp) / 2);
+}
+
+/** Fallback when shape is missing: mild scalar Δ as peaking tilt (legacy). */
+function legacyDeltaEq(opts: AudioPlayOptions): number[] {
+  const atten = Math.abs(legacyAfterGain(opts));
   if (opts.group === 'impact') {
-    return [-atten * 0.35, -atten * 0.55, -atten * 0.7, -atten * 0.45, -atten * 0.25, -atten * 0.15, -atten * 0.1];
+    return [
+      -atten * 0.35,
+      -atten * 0.55,
+      -atten * 0.7,
+      -atten * 0.45,
+      -atten * 0.25,
+      -atten * 0.15,
+      -atten * 0.1,
+    ];
   }
   if (opts.group === 'air') {
-    return [-atten * 0.15, -atten * 0.25, -atten * 0.35, -atten * 0.5, -atten * 0.7, -atten * 0.85, -atten * 0.95];
+    return [
+      -atten * 0.15,
+      -atten * 0.25,
+      -atten * 0.35,
+      -atten * 0.5,
+      -atten * 0.7,
+      -atten * 0.85,
+      -atten * 0.95,
+    ];
   }
-  return [-atten * 0.25, -atten * 0.4, -atten * 0.5, -atten * 0.5, -atten * 0.55, -atten * 0.6, -atten * 0.65];
+  return [
+    -atten * 0.25,
+    -atten * 0.4,
+    -atten * 0.5,
+    -atten * 0.5,
+    -atten * 0.55,
+    -atten * 0.6,
+    -atten * 0.65,
+  ];
 }
 
 function playStem(
