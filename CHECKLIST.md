@@ -72,11 +72,12 @@ Live context (do not redesign from this URL alone): https://paulos99.github.io/m
 | Current complaint survey (removed 2026-09-13) | Убрать вместе со сценариями (тот же антипаттерн). Класс до/после считает модель, не самооценка «мешает». |
 | Effectiveness block (confirmed 2026-09-13) | Сначала **ориентиры Δ** (воздух/удар) с **поясняющими подписями и ощущениями** у каждой дельты; затем графики. Рамка pre_lab. |
 | Result feature order (confirmed 2026-09-13) | **1)** класс жилья/комфорта → **2)** эффективность → **3)** эффект барабана → **4)** безопасность → **5)** остальное. Монтаж клиенту только как **быстро, без долгой стройки** — без техники крепежа/коммуникаций. |
-| Result features copy (2026-09-13) | Без пункта Flat/Wave. Барабан перефразирован (draft): тезис `Под обычным натяжным потолком воздух в зазоре усиливает шум сверху, как полотно барабана.` / why `MultiFrame рассеивает эту энергию в панели, и комната воспринимается спокойнее.` |
+| Result features copy (2026-09-13; rewrite 2026-09-17) | Без пункта Flat/Wave. Блок `Уникальность системы MultiFrame`: **1** панель vs плёнка/барабан + воздух и удар; **2** быстрый бескаркасный монтаж + любое перекрытие/стадия; **3** без ваты и пыли, сертификаты, жилые помещения. Не слоганы и не техдамп. |
 | Flow collapse (confirmed 2026-09-14) | Убрать экран **Сравнение** (дублировал Итог). Аудио До/После — **компактно на Result** сразу после блоков «Сейчас» / «С MultiFrame». Поток: Start → Room → Result. |
+| Processing ceremony (2026-09-17) | После последнего вопроса Room — одноразовый экран `processing` (~6 с, `Пропустить`). Motion UI: чипы + эквалайзер «Сейчас / С MultiFrame» + чеклист. Без SVG-иллюстраций, без классов/дБ. Назад с Итога не проигрывает церемонию. |
 | Result sticky CTA (confirmed 2026-09-13) | **C4:** `Открыть калькулятор MultiFrame` (вместо «Расчёт материалов»). |
 | Result lead (confirmed 2026-09-13) | Заявка = консультация / подбор. Open **P2:** `Запросить консультацию или подбор`. Title: `Заявка на консультацию`. Note: `Разберём ваш случай, подберём материал.` Отдельную disabled-кнопку «Консультация» не показываем. |
-| Feature copy style (confirmed 2026-09-13) | Преимущества на результате — **тезис + 1 фраза обоснования**, премиальным цельным языком. Барабан (draft): «Под обычным натяжным потолком воздух в зазоре усиливает шум сверху, как полотно барабана. MultiFrame рассеивает эту энергию в панели, и комната воспринимается спокойнее.» Не слоганы и не техдамп. Flat/Wave в блоке преимуществ **не** показываем. |
+| Feature copy style (confirmed 2026-09-13; UI 2026-09-17) | Преимущества на результате — **тезис + 1 фраза обоснования**, премиальным цельным языком. Title `Уникальность системы MultiFrame`. Три карты по позиционированию stp-multiframe.ru: эффективно / быстро / экологично. Не слоганы и не техдамп. Flat/Wave в блоке преимуществ **не** показываем. |
 | Start chrome (confirmed 2026-09-13) | **Superseded 2026-09-16** — see Start chrome (2026-09-16). |
 
 ## 3. Active surfaces
@@ -109,7 +110,7 @@ Ask about product needs, not implementations. Mark what the first version actual
 
 Product capabilities that **are** in the first version (not listed as vibe template toggles above — see ledger):
 
-- 3-step comfort wizard after Start: Room → Result (audio compact inside Result; no Before/After / Audio screens)
+- Comfort wizard: Start → Room → Processing (ceremony) → Result (audio compact inside Result; no Before/After / Audio screens)
 - Expert qualitative effect model with `marketing_placeholder` ΔRw / ΔLnw and pre_lab disclaimer
 - Before/after emotional contrast + SimCompare (feeling primary, dB tertiary)
 - Audio groups воздух / удар / смешанный with locked household examples; case-specific After (level + frequencies + ≈%)
@@ -195,7 +196,7 @@ A capability with no row is `absent` by default. The State column always holds o
 
 | Capability | State | Note |
 | ---------- | ----- | ---- |
-| Comfort wizard (Start + Room + Result) | included | Start → Room → Result. Audio compact on Result after «Сейчас / С MultiFrame». No Before/After or Audio steps. |
+| Comfort wizard (Start + Room + Processing + Result) | included | Start → Room → Processing → Result. Processing = skippable ceremony (chips + CSS equalizer). Audio compact on Result. No Before/After or Audio steps. |
 | Ceiling-only / upstairs noise scope | included | `answers.scope: 'ceiling'`. No floor question. |
 | Frameless MultiFrame positioning | included | Only бескаркасная StP MultiFrame; framed systems out of scope. |
 | Room + optional slab input | included | Room type, area m², optional slab key (default solid 180 mm). |
@@ -207,7 +208,7 @@ A capability with no row is `absent` by default. The State column always holds o
 | Two-layer acoustic model | included | Construction (Trofimov + mass/coincidence/ПК/wood/flanking/floor ΔLn(f) → Rw/Lnw + charts) vs receiving room (L1−R+S/A, A-weighted). Lab anchors: bare 180=54/76, ПК 220=52/74. Product in-situ «сейчас» typically Rw ~44–48 (panel/unknown), air often вне нормы. |
 | Trofimov-style comfort classes A/B/V | included | Canon A\|B\|V; UI Cyrillic А\|Б\|В. Result shows **independent** air (Rw) and impact (Lnw) levels; full hybrid SP class is secondary. Never promise full Lnw norm from ceiling alone. |
 | Case-specific audio (air / impact / mixed) | included | Stems in `public/audio/`; After cuts level + frequencies from room Δ; mixed = blend; show ≈%; `pre_lab`. |
-| JTBD Result narrative + hot funnel | included | Current then MultiFrame; whyMultiFrame UI; «Следующий шаг» CTA; lead handoff + summary copy. No role split. |
+| JTBD Result narrative + hot funnel | included | Current then MultiFrame; features block `Уникальность системы MultiFrame`; «Следующий шаг» CTA; lead handoff + summary copy. No role split. |
 | Floor-above survey | removed | Workshop 2026-09-16: too expert; model keeps unknown. |
 | Start role picker self/client | removed | Workshop 2026-09-16: confuses visitors. |
 | Room external/internal survey | included | House/slab first; wishes as internal factor. |

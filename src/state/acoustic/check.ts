@@ -7,6 +7,7 @@ import { buildConstruction, constructionFixture } from './construction';
 import { SPECTRUM_HZ } from './bands';
 import { deriveSimulation, NORMS } from '../simulation';
 import type { RoomAnswers, SessionAnswers } from '../types';
+import { buildRoomAudioShape, playbackGainForReceivedDb } from '../../audio/roomAudioShape';
 
 function sampleRoom(over: Partial<RoomAnswers> = {}): RoomAnswers {
   return {
@@ -162,6 +163,28 @@ export function assertModelAnchors(): string[] {
     errors.push(
       `loud neighbors should raise received air (${simLoud.receivedAirDb.before} vs ${simQuiet.receivedAirDb.before})`,
     );
+  }
+  if (
+    !simLoud.receivedAirBands?.before?.length ||
+    simLoud.receivedAirBands.before.length !== SPECTRUM_HZ.length
+  ) {
+    errors.push('receivedAirBands.before missing or wrong length');
+  }
+
+  const shapeQuiet = buildRoomAudioShape(simQuiet, 'air', 'talk');
+  const shapeLoud = buildRoomAudioShape(simLoud, 'air', 'talk');
+  if (shapeLoud.beforeGainDb <= shapeQuiet.beforeGainDb) {
+    errors.push(
+      `audio beforeGain should rise with loud neighbors (${shapeLoud.beforeGainDb} vs ${shapeQuiet.beforeGainDb})`,
+    );
+  }
+  if (playbackGainForReceivedDb(simLoud.receivedAirDb.before) <= playbackGainForReceivedDb(simQuiet.receivedAirDb.before)) {
+    errors.push('playbackGainForReceivedDb not monotonic with received dBA');
+  }
+  const meanDelta =
+    shapeLoud.deltaEqDb.reduce((a, b) => a + b, 0) / Math.max(1, shapeLoud.deltaEqDb.length);
+  if (meanDelta >= 0) {
+    errors.push(`MultiFrame air ΔL EQ should cut on average (got ${meanDelta})`);
   }
 
   const simKitchen = deriveSimulation(

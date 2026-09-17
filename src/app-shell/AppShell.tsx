@@ -6,12 +6,15 @@ import { useSession } from '../state/SessionContext';
 import { buildCalculatorUrl } from '../state/session';
 import { StartScreen } from '../screens/Start/StartScreen';
 import { RoomScreen } from '../screens/Room/RoomScreen';
+import { ProcessingScreen } from '../screens/Processing/ProcessingScreen';
 import { ResultScreen } from '../screens/Result/ResultScreen';
 
 export function AppShell() {
   const { session, goNext, goBack, canGoNext } = useSession();
   const { step } = session;
-  const showNav = step !== 'start';
+  const isProcessing = step === 'processing';
+  const showNav = step !== 'start' && !isProcessing;
+  const showProgress = step !== 'start' && !isProcessing;
   const isResult = step === 'result';
 
   let content = null;
@@ -21,6 +24,9 @@ export function AppShell() {
       break;
     case 'room':
       content = <RoomScreen />;
+      break;
+    case 'processing':
+      content = <ProcessingScreen />;
       break;
     case 'result':
       content = <ResultScreen />;
@@ -33,7 +39,7 @@ export function AppShell() {
   return (
     <div className={`${styles.shell} ${showNav ? styles.withFooter : ''}`}>
       <Header />
-      {step !== 'start' ? <ProgressDots /> : null}
+      {showProgress ? <ProgressDots /> : null}
       <main className={styles.main}>{content}</main>
       {showNav ? (
         <StickyCta

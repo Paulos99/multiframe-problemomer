@@ -13,7 +13,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 - Feeling + comfort-class story first on early screens; **no numbers on Start**.
 - On Before/After + Profile: show the **full evidence pack** — personal room story, classes А/Б/В, numbers, charts, and plain-language explanations of each (owner 2026-09-12: «показать всё, аргументированно, понятно, персонально»).
 - **Evidence layout (Q4, owner 2026-09-12):** everything on one scroll — **conclusion / verdict on top**, detailed data below. Not progressive disclosure; not audience-trimmed packs. Anyone skims what they need. Same full stack for all user models (context may still change copy/CTA emphasis).
-- **Result chain (owner 2026-09-17):** (1) **Нормы комфорта в стройке** — СП А/Б/В + Rw/Lnw + construction context, (2) **Текущая ситуация** — official hybrid SP header + two felt 5-step axes (now only), (3) **С MultiFrame** — official hybrid after + felt axes with now/after + % + audio + frequency charts, (4) **Почему MultiFrame подходит**, (5) **Следующий шаг**. No top ComfortScale table, no separate «Что изменится на слух», no «Расчёт и нормы / подробности», no `LOG_DB_FOOTNOTE`.
+- **Result chain (owner 2026-09-17):** (1) **Нормы комфорта в стройке** — СП А/Б/В + Rw/Lnw + construction context, (2) **Текущая ситуация** — official hybrid SP header + two felt 5-step axes (now only), (3) **С MultiFrame** — official hybrid after + felt axes with now/after + % + audio + frequency charts, (4) **Уникальность системы MultiFrame** — site positioning (эффективно / быстро / экологично) as three claim+why cards, (5) **Следующий шаг**. No top ComfortScale table, no separate «Что изменится на слух», no «Расчёт и нормы / подробности», no `LOG_DB_FOOTNOTE`.
 - **Felt vs official (owner 2026-09-17):** headers use official hybrid via `comfortClassFor` + `HYBRID_CLASS_LABELS` / «ниже допустимого (В)» (never «Д», never felt words in headers). Axes use **очень шумно → некомфортно → приемлемо → комфортно → тихо** (тихо=А, комфортно=Б, приемлемо=В, некомфортно=below V, очень шумно=far below: Rw&lt;~44 / Lnw&gt;~76). Typical brick+ПК lands on «некомфортно», not the edge. Scales also show received-room dB now (and after under MultiFrame).
 - **Channel names (owner 2026-09-17):** `Воздушный шум (голоса и музыка)` · `Ударный шум (шаги и падения)`; audio `Воздушный шум` · `Ударный шум` · `Смешанный шум`.
 - **Numbers policy (owner 2026-09-13):** show a **full working MultiFrame effect model** with complete numbers now — currently **unconfirmed** (`marketing_placeholder` / `pre_lab`). After Trofimov (or lab) confirmation, **replace** values with correct ones; do not redesign the UX around hiding numbers. Never present placeholders as lab guarantees or certificates.
@@ -21,7 +21,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 - MultiFrame Δ is **frequency-shaped** (`marketing_placeholder` / `pre_lab`): typical ΔRw **+8…+12** (more on a light slab), ΔLnw **−4…−9** without a floating floor and **−2…−4** if the floor above already floats. UI range is **computed from the room model**, not hardcoded +10/−8. Never present as a lab certificate.
 - Classes **А/Б/В** (СП 51.13330.2011): **А** = высокий комфорт, **Б** = комфорт, **В** = допустимый уровень. Below-scale official wording is **`ниже допустимого (В)`** (no letter «Д»). Felt axes are visual only.
 - «примерно вдвое спокойнее» **only for air (воздух)**; impact (удар) = quieter + floor often needed — never claim Lnw norm from ceiling alone.
-- Audio = **три группы примеров:** воздух · удар · смешанный; After = case-specific MultiFrame cut of **level + frequencies** with ≈% for this room (`pre_lab`); not showroom volume-duck alone.
+- Audio = **три группы примеров:** воздух · удар · смешанный. **До** = stem, приведённый к L2/dBA этой комнаты (соседи, площадь, плита); **После** = тот же граф + полосовой MultiFrame transfer `ΔL(f)` из receiving (`pre_lab`). Не showroom duck и не одинаковый сырой MP3 для всех помещений.
 - Mobile: denser inputs + sticky question/CTA; both noise rows remain on the same shared scale axis and keep their everyday labels. No raw tech dumps without explanation.
 - **Premium tone (owner 2026-09-13):** never UI phrases like «за что платим», «за что ~500 тыс.», blunt cost/price push. Show features and effects so the user **infers** value. Soft B2B benefits OK without «средний чек» / money-first language.
 - Out of scope: walls, partitions, floors systems, Polyblock, framed systems, fake lab guarantees, floor-level question.
@@ -96,6 +96,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-15 | **Features block:** title `Чем MultiFrame отличается` + lead; two text cards (барабан · быстрый монтаж); claim + why, no price talk. |
 | 2026-09-15 | **In-situ baseline realism:** product «сейчас» is not Trofimov lab Rw. Stronger flanking (panel/unknown mass stock), drum −2 Rw, ordinary floor no +1 Rw, universal leak −2 Rw. Lab fixtures unchanged (180=54/76). |
 | 2026-09-15 | **Real audio stems:** До/После use `public/audio/` MP3 (разговор / топот / пылесос). After = Web Audio level+EQ from this room’s ΔRw/ΔLnw, not a second file. |
+| 2026-09-17 | **Room-truthful audio:** calibrate stems; До matches received L2/dBA for this room; После applies ΔL(f) from receiving bands (not scalar ASSUMPTION EQ only). |
 | 2026-09-16 | **JTBD Result arc:** reorder — verdict → emotion → quieter → audio → whyMultiFrame → features+safety → **narrative ribbon (5 params)** → SP table+charts → **«Следующий шаг»** (calc + lead + client summary copy). `interestFor` copy on Start/Room/Result. |
 | 2026-09-16 | **Hot funnel:** in-body calculator; structured `buildLeadHandoff` (room+sim+why); client «Скопировать сводку»; premium stagger reveal + Room progress bar; `prefers-reduced-motion` respected. |
 | 2026-09-16 | **Result simplification (supersedes the two rows above):** verdict → one shared official scale with two rows → combined effect+audio → three MultiFrame reasons → next step → open «Расчёт и нормы». Remove emotion cards, separate Δ cards, `whyFit` duplication, features duplication and the five-step ribbon. |
@@ -105,6 +106,8 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-16 | **Final CTA order:** open table and frequency graphs come before the in-body `Следующий шаг`; the conversion block is the last substantive section on Result. |
 | 2026-09-16 | **Workshop (transcript 07):** drop Start «для себя / для клиента»; site path = comfort on **your object**. Room = **external → internal** (house/slab first; room type later). Hide **пол сверху**. Result = scare current state first, then MultiFrame %; everyday labels «Некомфортно / Допустимо / Комфортно / Тихо». Wishes (музыка / ТВ / сон ребёнка) as internal factor, not «что мешает». Both air+impact channels stay. |
 | 2026-09-17 | **Result structure rewrite:** norms → current → MultiFrame (felt axes + % + audio + charts) → why → CTA. Official SP hybrid in headers; everyday 5-step felt on axes only. Channel renames; Start lead updated; noisyNeighbors subtitle removed; drop technical/подробности and LOG_DB footnotes. |
+| 2026-09-17 | **Processing ceremony:** after last Room question, one-shot animated screen `processing` (~6s, skippable) before Result. Motion UI only (chips + equalizer bars + checklist) — no hand-drawn SVG room. No Rw/Lnw/classes on this screen. Back from Result skips replaying it. Progress dots stay Start/Объект/Итог. |
+| 2026-09-17 | **Features block rename:** `Почему MultiFrame подходит` → `Уникальность системы MultiFrame`. Three cards from stp-multiframe.ru positioning (эффективно / быстро / экологично): panel vs film+drum, fast frameless install + any slab/stage, eco/no mineral wool. Drop dynamic `Под ваш потолок` why-line from the UI; `whyMultiFrame` stays in lead handoff only. |
 
 ---
 
@@ -218,19 +221,19 @@ Must **not** appear: calculator links, dB values, lead form, Polyblock, floor qu
 | -------- | -------------- |
 | `start` | Старт |
 | `room` | Объект |
-| `beforeAfter` | Сравнение |
-| `audio` | Звук |
-| `result` | Профиль |
+| `result` | Итог |
+
+One-shot `processing` (ceremony between Room and Result) is **not** a progress-dot step.
 
 **Removed from survey (2026-09-13):** `scenarios` («что слышите/мешает») and `current` (complaint comfort quiz). Reason: many users have not lived in the flat or have not framed a noise problem; asking invites «мне ничего не мешает». Education of typical upstairs noise moves into Result/Before-After copy + default audio demo — not a quiz.
 
-- Hidden on Start.
+- Hidden on Start and on `processing`.
 - On narrow viewports (≤520px): dots only, labels may hide.
 - `aria-label`: `Прогресс`.
 
 ### Sticky CTA
 
-- Hidden on Start.
+- Hidden on Start and on `processing`.
 - Shown on steps `room` … `result`.
 - Back: `Назад` (enabled when not on first sticky step; Start has no sticky bar).
 - Next default: `Далее`.
@@ -378,6 +381,52 @@ Owner: do **not** put «пока без чистового пола» under floo
 - **Limits:** Russian residential acoustic limits are mainly by **building category А/Б/В** and construction type, not a simple “year → other Lnw number” table in the MVP model. Year ≠ substitute for slab + floor-above.
 - **Decision:** do **not** add year/period in current MVP. Revisit later if slab+house type leave too much ambiguity.
 
+---
+
+## Screen 2b — Processing (`processing`)
+
+### Goal
+
+Ceremony between the last Room answer and Result: show that the app is assembling a room-specific acoustic profile (now vs MultiFrame) without spoiling classes or dB.
+
+### Visible elements
+
+- H1 + lead
+- Two abstract equalizer panels: `Сейчас` · `С MultiFrame` (CSS bars only — **no** hand-drawn SVG room / icons)
+- Answer chips (house, slab, room, area)
+- Four-step checklist + progress 0–100%
+- Honesty line + `Пропустить`
+- No sticky CTA, no progress dots
+
+### Exact primary copy (RU)
+
+| Role | Text |
+| ---- | ---- |
+| H1 | `Считаем акустический профиль` |
+| Lead | `Собираем модель вашей комнаты — как слышно сейчас и как станет с MultiFrame.` |
+| Beats | `Собираем модель помещения` · `Оцениваем шум сверху сейчас` · `Считаем эффект MultiFrame` · `Собираем профиль комфорта` |
+| Done | `Профиль готов` |
+| Skip | `Пропустить` |
+| Honesty | `Ориентир по модели комнаты, не лабораторный замер.` |
+
+### Controls
+
+| Control | Action | Enabled |
+| ------- | ------ | ------- |
+| Auto-advance | After ~6.2 s → Result (`derived` already computed) | Always |
+| `Пропустить` | Immediate → Result | Always |
+| Reduced motion | ~400 ms → Result | When `prefers-reduced-motion` |
+
+### Must NOT appear
+
+Rw / Lnw / ΔdB, classes А/Б/В / «Дискомфорт», % quieter, sticky CTA, progress dots, hand-drawn illustrations, Polyblock, calculator.
+
+### Navigation notes
+
+- Entered only from the last Room substep (with `withDerived`).
+- Back from Result returns to the last Room question — **does not** replay Processing.
+
+---
 
 ## Screens removed from survey (2026-09-13)
 
@@ -476,7 +525,7 @@ None.
 | After button | `После` |
 | Playing state | `Играет` · `нажмите — пауза` |
 | Impact honesty | `По удару потолок смягчает; пол сверху часто дополняет результат.` |
-| Audio disclaimer | `Аудио — иллюстрация эффекта модели для этой комнаты, не лабораторный замер. Срезаются громкость и частоты по ориентиру MultiFrame.` |
+| Audio disclaimer | `Аудио — иллюстрация приёма в этой комнате и эффекта MultiFrame (ориентир до лабораторных данных), не лабораторный замер.` |
 | Sticky next | `Смотреть итог` |
 
 ### Household examples — locked (owner 2026-09-13, D)
@@ -498,17 +547,17 @@ None.
 | Sticky `Смотреть итог` | Go to Result | Always |
 | Sticky `Назад` | Go to Before/After | Always |
 
-**Audio rules (confirmed 2026-09-13)**
+**Audio rules (confirmed 2026-09-13; room-truthful 2026-09-17)**
 
 - **Structure:** UI = three example groups (воздух / удар / смешанный); model still Rw + Lnw.
 - **Examples:** locked list above — do not invent extra stubs without owner.
-- **Personalization:** After processing uses **this room’s** oriented MultiFrame effect (from Room → sim), not a fixed exaggerated duck.
-- **Processing:** reduce **amplitude and frequency content** to reflect MultiFrame’s effect — ASSUMPTION on exact EQ curve until technical confirmation. Mixed = blend of air+impact ASSUMPTION.
+- **Personalization:** **До** is shaped to this room’s received L2/dBA (neighbors, area, slab, absorption). **После** applies the MultiFrame transfer `ΔL(f)` from the same receiving bands — not a fixed exaggerated duck and not identical raw MP3 for every room.
+- **Processing:** stem calibration (frozen RMS + band shape) → normalize → match L2_before → optional peaking cascade for ΔL(f); soft limiter. Mixed = blend of air+impact bands. Exact EQ remains `pre_lab` until lab confirmation.
 - **Reduction UI (C):** always show **both** `≈ −{n}%` and short Δ caption (`ориентир −8 дБ` / case Δ). `%` = **perceived loudness** map from Δ (rule of thumb ASSUMPTION: ~−10 dB ≈ half as loud → ~−50%; ~−8 dB ≈ ~−40…−45% perceived — tune with Trofimov). **Never** compute % as linear `(64−56)/64` or `8/64`.
 - **Log education (required):** visible footnote that dB is logarithmic — small dB numbers = large sensation change; example `64 → 56` is substantial, not “a few percent”.
 - **Impact honesty:** ceiling softens impact; floating floor above often needed for norm — visible near impact (and mixed if impact-heavy).
 - **Labeling:** keep `ориентир` / `pre_lab` — not lab measurement; drop old «контраст усилен для показа» as the *primary* promise.
-- Mode: real MP3 stems in `public/audio/`; After processing via Web Audio (level + EQ from room Δ). Legacy `stub:` synth kept as fallback only.
+- Mode: real MP3 stems in `public/audio/`; Web Audio room graph. Legacy `stub:` synth kept as fallback only.
 
 ### Validation messages
 
@@ -535,7 +584,7 @@ Walk **norms → current → MultiFrame → why → CTA** on one scroll. Officia
 - **1. Нормы комфорта в стройке:** short SP explanation + А/Б/В Rw/Lnw table + construction context (перекрытие + тип дома).
 - **2. Текущая ситуация:** header `Сейчас: уровень комфорта по нормам «…»` + two felt axes (now only).
 - **3. С MultiFrame:** header `С MultiFrame: уровень комфорта по нормам «…»` + felt axes with now/after + % quieter + compact audio + frequency charts.
-- **4. Почему MultiFrame подходит:** three reasons + closing line.
+- **4. Уникальность системы MultiFrame:** three claim+why cards (panel vs film / fast frameless / eco) + closing line.
 - **5. Следующий шаг:** calculator + lead + summary copy + restart.
 - Title `Акустический профиль помещения`. Subtitle about **your object**.
 - Do **not** show: top ComfortScale table, separate «Что изменится на слух», «Расчёт и нормы / подробности», `LOG_DB_FOOTNOTE`, long verdictLead.
@@ -555,7 +604,12 @@ Walk **norms → current → MultiFrame → why → CTA** on one scroll. Officia
 | Felt steps | `Очень шумно` · `Некомфортно` · `Приемлемо` · `Комфортно` · `Тихо` |
 | Level in room | `Сейчас: ≈ N дБ` · under MultiFrame also `→ с MultiFrame: ≈ M дБ` |
 | Audio groups | `Воздушный шум` · `Ударный шум` · `Смешанный шум` |
-| Why title | `Почему MultiFrame подходит` |
+| Why title | `Уникальность системы MultiFrame` |
+| Why lead | `Модульная система StP: снижает воздушный и ударный шум, ставится в темпе натяжного потолка и без минеральной ваты.` |
+| Why 01 | `Тише за счёт панели, а не плёнки` — плёнка почти не изолирует (барабан в зазоре); панель рассеивает энергию и работает по воздуху и удару. |
+| Why 02 | `Быстро, без тяжёлого каркаса` — темп натяжного потолка; без двух дней стройки и лишней потери высоты; любой тип перекрытия и стадия ремонта. |
+| Why 03 | `Безопасно для жилой комнаты` — без минеральной ваты и пыли; сертифицированные материалы для жилых помещений (кухня, ванная). |
+| Why closer | `Для этой комнаты это привычный формат натяжного потолка — с акустикой внутри системы, а не надеждой на одну плёнку.` |
 | Next-step title | `Следующий шаг` |
 | Calculator CTA | `Открыть калькулятор MultiFrame` |
 | Lead open | `Запросить консультацию или подбор` |
@@ -764,10 +818,12 @@ Client path also: `buildClientSummary(session)` — plain-text digest for clipbo
 
 1. Open Start: **no** role picker, object H1, new lead, **no dB**, tap `Начать`.
 2. Room: house/slab first, then room + area > 0; **no** «пол сверху»; «Шум сверху» without «мешает ли» subtitle; optional wish; `Далее`.
-3. Result reads as: нормы → сейчас → MultiFrame → вывод → CTA.
-4. Official headers use А/Б/В (or «ниже допустимого (В)»); felt 5-step axes on channels; audio Воздушный / Ударный / Смешанный.
-5. Calculator preserves `area` (+ `roomType`); optional demo lead, copy summary, restart work.
-6. Must **not** present role split, Scenarios, Current complaint, floor-above, or standalone Before/After and Audio screens.
+3. Processing: ceremony with chips + equalizer (no classes/dB); auto or `Пропустить` → Result.
+4. Result reads as: нормы → сейчас → MultiFrame → вывод → CTA.
+5. Official headers use А/Б/В (or «ниже допустимого (В)»); felt 5-step axes on channels; audio Воздушный / Ударный / Смешанный.
+6. Calculator preserves `area` (+ `roomType`); optional demo lead, copy summary, restart work.
+7. Must **not** present role split, Scenarios, Current complaint, floor-above, or standalone Before/After and Audio screens.
+8. Back from Result returns to Room (last question), **without** replaying Processing.
 
 **Pass:** completes without tech dumps; never promises Lnw norm from ceiling alone; sticky CTA OK on phone.
 

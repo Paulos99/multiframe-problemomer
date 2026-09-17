@@ -1,4 +1,5 @@
 import { useDemoPlayer } from '../audio/useDemoPlayer';
+import { buildRoomAudioShapeForPair } from '../audio/roomAudioShape';
 import type { AudioPair, DerivedSimulation } from '../state/types';
 import styles from './CompactAudio.module.css';
 
@@ -33,7 +34,10 @@ export function CompactAudio({ pairs, sim }: Props) {
     <section className={styles.wrap} aria-label="Сравнить звук до и после">
       <header className={styles.head}>
         <h3>Послушайте «До» и «После»</h3>
-        <p>Один и тот же звук с эффектом, рассчитанным для этой комнаты.</p>
+        <p>
+          Один и тот же звук, приведённый к уровню и спектру этой комнаты — до и после
+          MultiFrame.
+        </p>
       </header>
 
       <div className={styles.groups}>
@@ -50,6 +54,7 @@ export function CompactAudio({ pairs, sim }: Props) {
                   const afterId = `${pair.id}:after`;
                   const beforeOn = activeId === beforeId;
                   const afterOn = activeId === afterId;
+                  const shape = buildRoomAudioShapeForPair(sim, pair);
                   return (
                     <div key={pair.id} className={styles.example}>
                       <span className={styles.exampleLabel}>{pair.label}</span>
@@ -69,6 +74,7 @@ export function CompactAudio({ pairs, sim }: Props) {
                               void play(beforeId, pair.beforeSrc, {
                                 side: 'before',
                                 group: pair.group,
+                                shape,
                                 deltaRw: sim.delta.Rw,
                                 deltaLnw: Math.abs(sim.delta.Lnw),
                               });
@@ -99,6 +105,7 @@ export function CompactAudio({ pairs, sim }: Props) {
                               void play(afterId, pair.afterSrc, {
                                 side: 'after',
                                 group: pair.group,
+                                shape,
                                 deltaRw: sim.delta.Rw,
                                 deltaLnw: Math.abs(sim.delta.Lnw),
                               });

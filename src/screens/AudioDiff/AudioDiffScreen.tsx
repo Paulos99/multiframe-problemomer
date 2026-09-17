@@ -3,6 +3,7 @@ import { Disclaimer } from '../../ui/Disclaimer';
 import { useSession } from '../../state/SessionContext';
 import { useDemoPlayer } from '../../audio/useDemoPlayer';
 import { AUDIO_GROUP_LABELS } from '../../audio/demoAudio';
+import { buildRoomAudioShapeForPair } from '../../audio/roomAudioShape';
 import { LOG_DB_FOOTNOTE } from '../../state/types';
 import { deriveSimulation } from '../../state/simulation';
 import type { AudioPair, DerivedSimulation } from '../../state/types';
@@ -136,6 +137,7 @@ export function AudioDiffScreen() {
               const afterId = `${pair.id}:after`;
               const beforeOn = activeId === beforeId;
               const afterOn = activeId === afterId;
+              const shape = buildRoomAudioShapeForPair(sim, pair);
               return (
                 <article key={pair.id} className={styles.pair}>
                   <header className={styles.pairHead}>
@@ -159,6 +161,7 @@ export function AudioDiffScreen() {
                           void play(beforeId, pair.beforeSrc, {
                             side: 'before',
                             group: pair.group,
+                            shape,
                             deltaRw: sim.delta.Rw,
                             deltaLnw: Math.abs(sim.delta.Lnw),
                           });
@@ -181,6 +184,7 @@ export function AudioDiffScreen() {
                           void play(afterId, pair.afterSrc, {
                             side: 'after',
                             group: pair.group,
+                            shape,
                             deltaRw: sim.delta.Rw,
                             deltaLnw: Math.abs(sim.delta.Lnw),
                           });
@@ -198,7 +202,7 @@ export function AudioDiffScreen() {
 
       <Disclaimer
         compact
-        text="Аудио — иллюстрация эффекта модели для этой комнаты, не лабораторный замер. Срезаются громкость и частоты по ориентиру MultiFrame."
+        text="Аудио — иллюстрация приёма в этой комнате и эффекта MultiFrame (ориентир до лабораторных данных), не лабораторный замер."
       />
     </Screen>
   );

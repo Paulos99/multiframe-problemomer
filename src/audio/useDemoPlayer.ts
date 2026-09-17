@@ -1,20 +1,28 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { parseStubSrc, type StubKind, type StubScene } from './demoAudio';
+import {
+  keyBandHz,
+  STEM_CALIBRATION,
+  STEM_NORM_TARGET_DBFS,
+  stemIdFromSrc,
+  type StemId,
+} from './stemCalibration';
+import type { RoomAudioShape } from './roomAudioShape';
 
 export type AudioPlayGroup = 'air' | 'impact' | 'mixed';
 
 export type AudioPlayOptions = {
   side: 'before' | 'after';
   group: AudioPlayGroup;
-  /** Oriented MultiFrame ΔRw for this room (positive = quieter air). */
-  deltaRw: number;
-  /** Oriented |ΔLnw| for this room (positive = quieter impact). */
-  deltaLnw: number;
+  /** Room-specific shape from receiving L2 bands (preferred). */
+  shape?: RoomAudioShape;
+  /** Legacy fallbacks when shape missing. */
+  deltaRw?: number;
+  deltaLnw?: number;
 };
 
 let sharedCtx: AudioContext | null = null;
 const bufferCache = new Map<string, AudioBuffer>();
-/** In-flight decode promises so parallel loads share one fetch. */
 const pendingLoads = new Map<string, Promise<AudioBuffer>>();
 
 function prefersReducedMotion(): boolean {
@@ -154,58 +162,120 @@ async function loadBuffer(ctx: AudioContext, url: string): Promise<AudioBuffer> 
   return job;
 }
 
-/**
- * Case-oriented After: cut level from room Δ and darken spectrum (ASSUMPTION EQ).
- */
-function afterProcess(
-  ctx: AudioContext,
-  opts: AudioPlayOptions,
-): { input: AudioNode; output: AudioNode; teardown: () => void } {
-  const airDb = Math.max(6, Math.min(14, Math.abs(opts.deltaRw)));
-  const impDb = Math.max(4, Math.min(12, Math.abs(opts.deltaLnw)));
+type Chain = {
+  input: AudioNode;
+  output: AudioNode;
+  teardown: () => void;
+};
 
-  let attenDb: number;
-  let lowpassHz: number;
-  let highShelfDb: number;
+function buildPeakingEq(ctx: AudioContext, gainsDb: readonly number[]): Chain {
+  const hz = keyBandHz();
+  const filters: BiquadFilterNode[] = [];
+  let first: AudioNode | null = null;
+  let prev: AudioNode | null = null;
 
-  if (opts.group === 'air') {
-    attenDb = airDb;
-    lowpassHz = 2200;
-    highShelfDb = -airDb * 0.55;
-  } else if (opts.group === 'impact') {
-    attenDb = impDb;
-    lowpassHz = 900;
-    highShelfDb = -impDb * 0.35;
-  } else {
-    attenDb = (airDb + impDb) / 2;
-    lowpassHz = 1400;
-    highShelfDb = -attenDb * 0.45;
+  for (let i = 0; i < hz.length; i++) {
+    const g = gainsDb[i] ?? 0;
+    if (Math.abs(g) < 0.35) continue;
+    const f = ctx.createBiquadFilter();
+    f.type = 'peaking';
+    f.frequency.value = hz[i]!;
+    f.Q.value = 1.41;
+    f.gain.value = g;
+    filters.push(f);
+    if (!first) first = f;
+    if (prev) prev.connect(f);
+    prev = f;
   }
 
-  const lp = ctx.createBiquadFilter();
-  lp.type = 'lowpass';
-  lp.frequency.value = lowpassHz;
-  lp.Q.value = 0.7;
-
-  const shelf = ctx.createBiquadFilter();
-  shelf.type = 'highshelf';
-  shelf.frequency.value = 1800;
-  shelf.gain.value = highShelfDb;
-
-  const g = ctx.createGain();
-  g.gain.value = dbToGain(-attenDb);
-
-  lp.connect(shelf);
-  shelf.connect(g);
+  if (!first || !prev) {
+    const bypass = ctx.createGain();
+    bypass.gain.value = 1;
+    return {
+      input: bypass,
+      output: bypass,
+      teardown: () => {
+        try {
+          bypass.disconnect();
+        } catch {
+          /* ignore */
+        }
+      },
+    };
+  }
 
   return {
-    input: lp,
-    output: g,
+    input: first,
+    output: prev,
     teardown: () => {
+      for (const f of filters) {
+        try {
+          f.disconnect();
+        } catch {
+          /* ignore */
+        }
+      }
+    },
+  };
+}
+
+function softLimiter(ctx: AudioContext): DynamicsCompressorNode {
+  const c = ctx.createDynamicsCompressor();
+  c.threshold.value = -6;
+  c.knee.value = 8;
+  c.ratio.value = 8;
+  c.attack.value = 0.003;
+  c.release.value = 0.12;
+  return c;
+}
+
+/**
+ * Room-truthful process: stem normalize → match L2_before → optional ΔL(f) for After.
+ */
+function roomProcess(
+  ctx: AudioContext,
+  stemId: StemId,
+  opts: AudioPlayOptions,
+): Chain {
+  const shape = opts.shape;
+  const cal = STEM_CALIBRATION[stemId];
+  const normDb = STEM_NORM_TARGET_DBFS - cal.rmsDbFs;
+  const beforeGainDb = shape?.beforeGainDb ?? 0;
+  const beforeEq = shape?.beforeEqDb ?? [0, 0, 0, 0, 0, 0, 0];
+  const deltaEq =
+    opts.side === 'after'
+      ? (shape?.deltaEqDb ?? legacyDeltaEq(opts))
+      : [0, 0, 0, 0, 0, 0, 0];
+
+  const norm = ctx.createGain();
+  norm.gain.value = dbToGain(normDb);
+
+  const beforeEqChain = buildPeakingEq(ctx, beforeEq);
+  const roomGain = ctx.createGain();
+  roomGain.gain.value = dbToGain(beforeGainDb);
+
+  const deltaEqChain = buildPeakingEq(ctx, deltaEq);
+  const limiter = softLimiter(ctx);
+  const ceiling = ctx.createGain();
+  ceiling.gain.value = 0.92;
+
+  norm.connect(beforeEqChain.input);
+  beforeEqChain.output.connect(roomGain);
+  roomGain.connect(deltaEqChain.input);
+  deltaEqChain.output.connect(limiter);
+  limiter.connect(ceiling);
+
+  return {
+    input: norm,
+    output: ceiling,
+    teardown: () => {
+      beforeEqChain.teardown();
+      deltaEqChain.teardown();
       try {
-        lp.disconnect();
-        shelf.disconnect();
-        g.disconnect();
+        norm.disconnect();
+        roomGain.disconnect();
+        limiter.disconnect();
+        ceiling.disconnect();
       } catch {
         /* ignore */
       }
@@ -213,9 +283,28 @@ function afterProcess(
   };
 }
 
+/** Fallback when shape is missing: mild scalar Δ as peaking tilt (legacy). */
+function legacyDeltaEq(opts: AudioPlayOptions): number[] {
+  const air = Math.max(4, Math.min(12, Math.abs(opts.deltaRw ?? 8)));
+  const imp = Math.max(3, Math.min(10, Math.abs(opts.deltaLnw ?? 6)));
+  let atten: number;
+  if (opts.group === 'air') atten = air;
+  else if (opts.group === 'impact') atten = imp;
+  else atten = (air + imp) / 2;
+  // KEY bands: more cut on highs for air, lows for impact
+  if (opts.group === 'impact') {
+    return [-atten * 0.35, -atten * 0.55, -atten * 0.7, -atten * 0.45, -atten * 0.25, -atten * 0.15, -atten * 0.1];
+  }
+  if (opts.group === 'air') {
+    return [-atten * 0.15, -atten * 0.25, -atten * 0.35, -atten * 0.5, -atten * 0.7, -atten * 0.85, -atten * 0.95];
+  }
+  return [-atten * 0.25, -atten * 0.4, -atten * 0.5, -atten * 0.5, -atten * 0.55, -atten * 0.6, -atten * 0.65];
+}
+
 function playStem(
   ctx: AudioContext,
   buffer: AudioBuffer,
+  srcUrl: string,
   opts: AudioPlayOptions | undefined,
   onEnd: () => void,
 ): () => void {
@@ -223,19 +312,29 @@ function playStem(
   src.buffer = buffer;
 
   const master = ctx.createGain();
-  master.gain.value = 0.85;
+  master.gain.value = 1;
   master.connect(ctx.destination);
 
   let teardownProcess: (() => void) | null = null;
-  const isAfter = opts?.side === 'after';
 
-  if (isAfter && opts) {
-    const chain = afterProcess(ctx, opts);
+  if (opts) {
+    const stemId = opts.shape?.stemId ?? stemIdFromSrc(srcUrl);
+    const chain = roomProcess(ctx, stemId, opts);
     src.connect(chain.input);
     chain.output.connect(master);
     teardownProcess = chain.teardown;
   } else {
-    src.connect(master);
+    const g = ctx.createGain();
+    g.gain.value = 0.85;
+    src.connect(g);
+    g.connect(master);
+    teardownProcess = () => {
+      try {
+        g.disconnect();
+      } catch {
+        /* ignore */
+      }
+    };
   }
 
   let stopped = false;
@@ -305,7 +404,6 @@ export function useDemoPlayer() {
 
   const play = useCallback(
     async (id: string, src: string, opts?: AudioPlayOptions) => {
-      // Invalidate any in-flight load / playing graph first.
       generationRef.current += 1;
       const gen = generationRef.current;
       stopRef.current?.();
@@ -358,7 +456,7 @@ export function useDemoPlayer() {
         const buffer = await loadBuffer(ctx, src);
         if (gen !== generationRef.current) return;
         startProgress(buffer.duration * 1000);
-        stopRef.current = playStem(ctx, buffer, opts, clearUiIfMine);
+        stopRef.current = playStem(ctx, buffer, src, opts, clearUiIfMine);
       } catch {
         if (gen !== generationRef.current) return;
         activeIdRef.current = null;

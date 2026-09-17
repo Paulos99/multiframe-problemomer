@@ -121,6 +121,8 @@ export function withDerived(session: SessionState): SessionState {
 }
 
 export function stepIndex(step: WizardStep): number {
+  // Processing is a one-shot ceremony between room and result — not a progress dot.
+  if (step === 'processing') return WIZARD_STEPS.indexOf('result');
   return WIZARD_STEPS.indexOf(step);
 }
 
@@ -152,6 +154,8 @@ export function canProceed(session: SessionState): boolean {
       if (session.roomSubstep === 'basics' || isLastRoomSubstep(session.roomSubstep)) {
         return roomBasicsComplete(session);
       }
+      return true;
+    case 'processing':
       return true;
     case 'result':
       return true;

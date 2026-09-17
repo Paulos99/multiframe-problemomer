@@ -59,8 +59,8 @@ export type NoiseScenario =
 export type ComfortLevel = 'quiet' | 'ok' | 'bothers';
 export type NoiseType = 'impact' | 'airborne' | 'mixed';
 
-/** Flow: Start → Room → Result (audio lives inside Result; no separate Сравнение) */
-export type WizardStep = 'start' | 'room' | 'result';
+/** Flow: Start → Room → Processing → Result (audio lives inside Result; no separate Сравнение) */
+export type WizardStep = 'start' | 'room' | 'processing' | 'result';
 
 /** Sub-steps inside Room (one question block per screen). External first, then internal. */
 export type RoomSubstep =
@@ -146,6 +146,9 @@ export interface DerivedSimulation {
   quietImpactAfter: number;
   receivedAirDb: { before: number; after: number };
   receivedImpactDb: { before: number; after: number };
+  /** In-room L2(f) bands (1/3-oct) for truthful audio shaping. */
+  receivedAirBands: { before: number[]; after: number[] };
+  receivedImpactBands: { before: number[]; after: number[] };
 }
 
 export interface DerivedProfile {

@@ -1,0 +1,479 @@
+.screen {
+  animation: fadeUp var(--duration-slow) var(--ease-out);
+}
+
+.card {
+  position: relative;
+  overflow: hidden;
+  padding: 24px 20px 18px;
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(165deg, rgba(1, 100, 79, 0.1), transparent 45%),
+    var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.scan {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(1, 100, 79, 0.08) 48%,
+    transparent 100%
+  );
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+.stageNoise .scan,
+.stageMf .scan,
+.stageProfile .scan {
+  opacity: 1;
+  animation: scanSweep 2.4s var(--ease-out) infinite;
+}
+
+.rings {
+  pointer-events: none;
+  position: absolute;
+  top: 42%;
+  left: 50%;
+  width: min(280px, 70vw);
+  height: min(280px, 70vw);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity var(--duration-slow) var(--ease-out);
+}
+
+.stageNoise .rings,
+.stageMf .rings,
+.stageProfile .rings {
+  opacity: 1;
+}
+
+.ring {
+  position: absolute;
+  inset: 28%;
+  border-radius: 50%;
+  border: 1px solid rgba(1, 100, 79, 0.22);
+  box-shadow: 0 0 0 0 rgba(1, 100, 79, 0.28);
+  animation: ringPulse 2.2s ease-out infinite;
+}
+
+.ringMid {
+  inset: 14%;
+  animation-delay: 0.35s;
+  border-color: rgba(1, 100, 79, 0.16);
+}
+
+.ringOuter {
+  inset: 0;
+  animation-delay: 0.7s;
+  border-color: rgba(1, 100, 79, 0.1);
+}
+
+.head {
+  position: relative;
+  z-index: 1;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-color);
+}
+
+.title {
+  margin: 0 0 8px;
+  font-size: clamp(1.35rem, 4vw, 1.75rem);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.lead {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 15px;
+  max-width: 42ch;
+}
+
+.eqRow {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.eqPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 12px 12px;
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  min-height: 132px;
+}
+
+.eqLabel {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--text-secondary);
+}
+
+.eqBefore .eqLabel {
+  color: #9a5b1a;
+}
+
+.eqAfter .eqLabel {
+  color: var(--accent-color);
+}
+
+.bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 4px;
+  height: 72px;
+  flex: 1;
+}
+
+.bar {
+  flex: 1;
+  max-width: 12px;
+  height: 100%;
+  border-radius: 4px 4px 2px 2px;
+  transform-origin: bottom center;
+  transform: scaleY(0.12);
+  opacity: 0.35;
+}
+
+.eqBefore .bar {
+  background: linear-gradient(180deg, #e8a04a, #c46a1a);
+}
+
+.eqAfter .bar {
+  background: linear-gradient(180deg, #2ab38b, var(--accent-color));
+}
+
+.stageNoise .eqBefore .bar,
+.stageMf .eqBefore .bar,
+.stageProfile .eqBefore .bar {
+  opacity: 1;
+  animation: barDance 1.05s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * 70ms);
+  transform: scaleY(var(--h, 0.5));
+}
+
+.barsLoud .bar {
+  animation-duration: 0.78s;
+}
+
+.eqAfter .bar {
+  transform: scaleY(0.08);
+}
+
+.stageMf .eqAfter .bar,
+.stageProfile .eqAfter .bar {
+  opacity: 1;
+  animation: barCalm 1.4s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * 90ms);
+  transform: scaleY(var(--h, 0.3));
+}
+
+.stageMf .eqBefore .bar,
+.stageProfile .eqBefore .bar {
+  opacity: 0.55;
+}
+
+.layers {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity var(--duration-slow) var(--ease-out),
+    transform var(--duration-slow) var(--ease-out);
+}
+
+.stageMf .layers,
+.stageProfile .layers {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.layer {
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  border: 1px solid rgba(1, 100, 79, 0.22);
+  animation: layerIn 0.55s var(--ease-out) both;
+}
+
+.layer:nth-child(2) {
+  animation-delay: 0.12s;
+  width: 92%;
+  margin-inline: auto;
+}
+
+.layer:nth-child(3) {
+  animation-delay: 0.24s;
+  width: 84%;
+  margin-inline: auto;
+}
+
+.chips {
+  position: relative;
+  z-index: 1;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  color: var(--accent-color);
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid rgba(1, 100, 79, 0.18);
+  opacity: 0;
+  transform: translateY(8px);
+  animation: chipIn 0.45s var(--ease-out) forwards;
+  animation-delay: calc(var(--i, 0) * 90ms);
+}
+
+.checklist {
+  position: relative;
+  z-index: 1;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.checkItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.checkActive {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.checkDone {
+  color: var(--success-color);
+}
+
+.checkMark {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  background: var(--bg-subtle);
+}
+
+.checkActive .checkMark {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.checkDone .checkMark {
+  border-color: var(--success-color);
+  background: var(--ok-soft);
+  color: var(--success-color);
+}
+
+.progressWrap {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.progressBar {
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.progressFill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent-color), #2ab38b);
+  transition: width 80ms linear;
+}
+
+.status {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-height: 1.2em;
+}
+
+.honesty {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.skip {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.stageProfile .status {
+  color: var(--accent-color);
+  animation: softGlow 1.2s ease-in-out infinite;
+}
+
+@keyframes barDance {
+  0%,
+  100% {
+    transform: scaleY(calc(var(--h, 0.5) * 0.72));
+  }
+  50% {
+    transform: scaleY(var(--h, 0.5));
+  }
+}
+
+@keyframes barCalm {
+  0%,
+  100% {
+    transform: scaleY(calc(var(--h, 0.3) * 0.88));
+  }
+  50% {
+    transform: scaleY(var(--h, 0.3));
+  }
+}
+
+@keyframes chipIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes layerIn {
+  from {
+    opacity: 0;
+    transform: scaleX(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes ringPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(1, 100, 79, 0.28);
+    opacity: 0.85;
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgba(1, 100, 79, 0);
+    opacity: 0.35;
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(1, 100, 79, 0);
+    opacity: 0.2;
+  }
+}
+
+@keyframes scanSweep {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+@media (max-width: 520px) {
+  .card {
+    padding: 20px 16px 14px;
+    gap: 14px;
+  }
+
+  .eqRow {
+    gap: 8px;
+  }
+
+  .eqPanel {
+    min-height: 118px;
+    padding: 12px 10px 10px;
+  }
+
+  .bars {
+    height: 60px;
+  }
+
+  .lead {
+    font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen,
+  .chip,
+  .bar,
+  .ring,
+  .scan,
+  .layer,
+  .stageProfile .status {
+    animation: none !important;
+  }
+
+  .chip {
+    opacity: 1;
+    transform: none;
+  }
+
+  .eqBefore .bar,
+  .eqAfter .bar {
+    opacity: 1;
+    transform: scaleY(var(--h, 0.4));
+  }
+
+  .layers {
+    opacity: 1;
+    transform: none;
+  }
+}

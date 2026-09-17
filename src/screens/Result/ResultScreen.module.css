@@ -1397,7 +1397,7 @@
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 9px;
-  padding: 14px 12px;
+  padding: 16px 14px;
 }
 
 .reasonList article + article {
@@ -1425,8 +1425,8 @@
 
 .reasonList p {
   margin: 0;
-  font-size: 12px;
-  line-height: 1.45;
+  font-size: 13px;
+  line-height: 1.5;
   color: var(--text-secondary);
 }
 

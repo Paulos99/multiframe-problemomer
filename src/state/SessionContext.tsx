@@ -67,7 +67,11 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         if (nextSub) {
           return { ...prev, roomSubstep: nextSub };
         }
-        return withDerived({ ...prev, step: 'result' });
+        return withDerived({ ...prev, step: 'processing' });
+      }
+
+      if (prev.step === 'processing') {
+        return { ...prev, step: 'result' };
       }
 
       const n = nextStep(prev.step);
@@ -93,6 +97,15 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         return { ...prev, step: 'start', roomSubstep: ROOM_SUBSTEPS[0]! };
       }
 
+      // Processing → last Room question; Result → Room (skip replaying ceremony).
+      if (prev.step === 'processing' || prev.step === 'result') {
+        return {
+          ...prev,
+          step: 'room',
+          roomSubstep: ROOM_SUBSTEPS[ROOM_SUBSTEPS.length - 1]!,
+        };
+      }
+
       const p = prevStep(prev.step);
       if (!p) return prev;
       if (p === 'room') {
@@ -107,12 +120,18 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const goTo = useCallback((step: WizardStep) => {
-    setSession((prev) => ({
-      ...prev,
-      step,
-      roomSubstep:
-        step === 'room' ? prev.roomSubstep : ROOM_SUBSTEPS[0]!,
-    }));
+    setSession((prev) => {
+      let next = {
+        ...prev,
+        step,
+        roomSubstep:
+          step === 'room' ? prev.roomSubstep : ROOM_SUBSTEPS[0]!,
+      };
+      if (step === 'result' && !prev.derived) {
+        next = withDerived(next);
+      }
+      return next;
+    });
   }, []);
 
   const restart = useCallback(() => {

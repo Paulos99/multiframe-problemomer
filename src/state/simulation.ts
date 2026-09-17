@@ -188,6 +188,14 @@ export function deriveSimulation(answers: SessionAnswers): DerivedSimulation {
     quietImpactAfter: quietFromReceivedImpact(recImpAfter),
     receivedAirDb: { before: recAirBefore, after: recAirAfter },
     receivedImpactDb: { before: recImpBefore, after: recImpAfter },
+    receivedAirBands: {
+      before: [...rec.airBands.before],
+      after: [...rec.airBands.after],
+    },
+    receivedImpactBands: {
+      before: [...rec.impactBands.before],
+      after: [...rec.impactBands.after],
+    },
   };
 }
 

@@ -39,6 +39,25 @@ const NORM_ROWS: { cls: Exclude<ClassLabel, 'below'>; label: string; rw: string;
     { cls: 'V', label: 'Допустимый (В)', rw: `≥ ${NORMS.V.Rw}`, lnw: `≤ ${NORMS.V.Lnw}` },
   ];
 
+/** Site positioning: эффективно / быстро / экологично — claim + why, no mount tech. */
+const MULTIFRAME_ADVANTAGES = [
+  {
+    n: '01',
+    title: 'Тише за счёт панели, а не плёнки',
+    text: 'Обычный натяжной почти не изолирует: воздух в зазоре усиливает шаги и голоса, как полотно барабана. MultiFrame рассеивает эту энергию в панели и работает сразу по воздушному и ударному шуму.',
+  },
+  {
+    n: '02',
+    title: 'Быстро, без тяжёлого каркаса',
+    text: 'Панели ставятся в темпе натяжного потолка: без двух дней каркасной стройки и без лишней потери высоты. Система подходит к любому перекрытию и к любой стадии ремонта.',
+  },
+  {
+    n: '03',
+    title: 'Безопасно для жилой комнаты',
+    text: 'Без минеральной ваты и строительной пыли. Материалы сертифицированы и рассчитаны на жилые помещения — в том числе кухню и ванную.',
+  },
+] as const;
+
 function optionLabel<T extends string>(
   options: { id: T; label: string }[],
   id: T | undefined,
@@ -147,8 +166,6 @@ export function ResultScreen() {
   const { session, restart } = useSession();
   const room = session.answers.room;
   const sim = session.derived?.simulation ?? deriveSimulation(session.answers);
-  const whyLines = session.derived?.whyMultiFrame ?? [];
-
   const hybridBefore = comfortClassFor(sim.before.Rw, sim.before.Lnw);
   const hybridAfter = comfortClassFor(sim.after.Rw, sim.after.Lnw);
   const beforeOfficial = officialComfortLabel(hybridBefore);
@@ -172,10 +189,6 @@ export function ResultScreen() {
   const airSpectrum = sim.airSpectrum;
   const impactSpectrum = sim.impactSpectrum;
   const calcUrl = buildCalculatorUrl(session.cta);
-  const roomReason =
-    whyLines.find((line) => !line.toLocaleLowerCase('ru').includes('каркас')) ??
-    whyLines[0] ??
-    'Система работает с шумом, который приходит сверху через перекрытие.';
 
   const [showLead, setShowLead] = useState(false);
   const [sent, setSent] = useState(false);
@@ -351,44 +364,30 @@ export function ResultScreen() {
         </div>
       </section>
 
-      <section className={styles.reasons} aria-label="Почему MultiFrame подходит">
+      <section className={styles.reasons} aria-label="Уникальность системы MultiFrame">
         <header className={styles.sectionHead}>
-          <h2>Почему MultiFrame подходит</h2>
-          <p>Три причины для этой комнаты.</p>
+          <h2>Уникальность системы MultiFrame</h2>
+          <p>
+            Модульная система StP: снижает воздушный и ударный шум, ставится в темпе натяжного
+            потолка и без минеральной ваты.
+          </p>
         </header>
 
         <div className={styles.reasonList}>
-          <article>
-            <span>01</span>
-            <div>
-              <strong>Под ваш потолок</strong>
-              <p>{roomReason}</p>
-            </div>
-          </article>
-          <article>
-            <span>02</span>
-            <div>
-              <strong>Без эффекта барабана</strong>
-              <p>
-                Обычная плёнка сама по себе не решает проблему; MultiFrame рассеивает энергию
-                шума в панели.
-              </p>
-            </div>
-          </article>
-          <article>
-            <span>03</span>
-            <div>
-              <strong>Без тяжёлого каркаса</strong>
-              <p>
-                Монтаж в темпе натяжного потолка, без долгой стройки и лишней потери высоты.
-              </p>
-            </div>
-          </article>
+          {MULTIFRAME_ADVANTAGES.map((item) => (
+            <article key={item.n}>
+              <span>{item.n}</span>
+              <div>
+                <strong>{item.title}</strong>
+                <p>{item.text}</p>
+              </div>
+            </article>
+          ))}
         </div>
 
         <p className={styles.reasonConclusion}>
-          Для этой комнаты MultiFrame объединяет акустический эффект и привычный формат
-          натяжного потолка.
+          Для этой комнаты это привычный формат натяжного потолка — с акустикой внутри
+          системы, а не надеждой на одну плёнку.
         </p>
       </section>
 
