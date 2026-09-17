@@ -13,7 +13,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 - Feeling + comfort-class story first on early screens; **no numbers on Start**.
 - On Before/After + Profile: show the **full evidence pack** — personal room story, classes А/Б/В, numbers, charts, and plain-language explanations of each (owner 2026-09-12: «показать всё, аргументированно, понятно, персонально»).
 - **Evidence layout (Q4, owner 2026-09-12):** everything on one scroll — **conclusion / verdict on top**, detailed data below. Not progressive disclosure; not audience-trimmed packs. Anyone skims what they need. Same full stack for all user models (context may still change copy/CTA emphasis).
-- **Result chain (owner 2026-09-17):** (1) **Нормы комфорта в стройке** — СП А/Б/В + Rw/Lnw + construction context, (2) **Текущая ситуация** — official hybrid SP header + two felt 5-step axes (now only), (3) **С MultiFrame** — official hybrid after + felt axes with now/after + % + audio + frequency charts, (4) **Уникальность системы MultiFrame** — short contrast table vs ordinary stretch ceiling (шум / монтаж / состав), no essays, (5) **Следующий шаг**. No top ComfortScale table, no separate «Что изменится на слух», no «Расчёт и нормы / подробности», no `LOG_DB_FOOTNOTE`.
+- **Result chain (owner 2026-09-17):** (1) **Нормы комфорта в стройке** — СП А/Б/В + Rw/Lnw + construction context, (2) **Текущая ситуация** — official hybrid SP header + two felt 5-step axes (now only), (3) **С MultiFrame** — official hybrid after + felt axes with now/after + % + audio + frequency charts, (4) **Уникальность системы MultiFrame** — StP pillar cards (звукоизоляция+комфорт, безопасность, экология, монтаж, универсальность); no comparison with plain stretch film, (5) **Следующий шаг**. No top ComfortScale table, no separate «Что изменится на слух», no «Расчёт и нормы / подробности», no `LOG_DB_FOOTNOTE`.
 - **Felt vs official (owner 2026-09-17, sync 2026-09-17):** headers use official hybrid via `comfortClassFor` + `HYBRID_CLASS_LABELS` / «ниже допустимого (В)» (never «Д», never felt words in headers). **Felt axes = received-room dBA** (same quantity as the ≈дБ label and demo audio): воздух тихо≤42 / комфортно≤48 / приемлемо≤54 / некомфортно≤60 / иначе очень шумно; удар +14 к порогам. Not Rw/Lnw class letters — those stay in the official header only.
 - **Channel names (owner 2026-09-17):** `Воздушный шум (голоса и музыка)` · `Ударный шум (шаги и падения)`; audio `Воздушный шум` · `Ударный шум` · `Смешанный шум`.
 - **Numbers policy (owner 2026-09-13):** show a **full working MultiFrame effect model** with complete numbers now — currently **unconfirmed** (`marketing_placeholder` / `pre_lab`). After Trofimov (or lab) confirmation, **replace** values with correct ones; do not redesign the UX around hiding numbers. Never present placeholders as lab guarantees or certificates.
@@ -109,7 +109,8 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-17 | **Processing ceremony:** after last Room question, fullscreen StP-green loading (~7s, skippable) before Result. Center: rotating status lines + thin progress bar. No chips/equalizer/classes/dB. Header and sticky CTA hidden. Back from Result skips replaying it. |
 | 2026-09-17 | **Features block rename:** `Почему MultiFrame подходит` → `Уникальность системы MultiFrame`. Three cards from stp-multiframe.ru positioning (эффективно / быстро / экологично): panel vs film+drum, fast frameless install + any slab/stage, eco/no mineral wool. Drop dynamic `Под ваш потолок` why-line from the UI; `whyMultiFrame` stays in lead handoff only. |
 | 2026-09-17 | **Felt axes = received dBA** (sync with ≈дБ + demo audio). Official SP hybrid stays in block headers only. Playback refs raised so «приемлемо/тихо» cut the through-wall stems hard. |
-| 2026-09-17 | **Uniqueness block rewrite (owner):** drop three essay columns. Concept = contrast table `Обычный натяжной` vs `MultiFrame`: Шум `Только плёнка` / `Воздух и удар`; Монтаж `Каркас и стройка` / `Как натяжной`; Состав `Минвата и пыль` / `Без ваты`. No lead, no closer, no numbered cards. |
+| 2026-09-17 | **Uniqueness block rewrite (owner):** two cards `Только плёнка` vs `Плёнка + MultiFrame` — three parallel bullets (вид / шум / что под полотном). Lead: тишина зависит от слоя между плитой и полотном. No nonsense table rows (e.g. «минвата» vs обычный натяжной). |
+| 2026-09-17 | **Uniqueness pillars (owner):** no stretch-film comparison. Grid of 5 StP pillars: звукоизоляция+комфорт, безопасность, экологичность, быстрый монтаж, универсальность. Lead `Эффективно. Безопасно. Без долгой стройки.` Title + one line each. |
 
 ---
 
@@ -580,7 +581,7 @@ Walk **norms → current → MultiFrame → why → CTA** on one scroll. Officia
 - **1. Нормы комфорта в стройке:** short SP explanation + А/Б/В Rw/Lnw table + construction context (перекрытие + тип дома).
 - **2. Текущая ситуация:** header `Сейчас: уровень комфорта по нормам «…»` + two felt axes (now only).
 - **3. С MultiFrame:** header `С MultiFrame: уровень комфорта по нормам «…»` + felt axes with now/after + % quieter + compact audio + frequency charts.
-- **4. Уникальность системы MultiFrame:** contrast table vs ordinary stretch ceiling (3 short rows). No essays, no closer.
+- **4. Уникальность системы MultiFrame:** lead + 5 pillar cards (StP positioning), no film comparison.
 - **5. Следующий шаг:** calculator + lead + summary copy + restart.
 - Title `Акустический профиль помещения`. Subtitle about **your object**.
 - Do **not** show: top ComfortScale table, separate «Что изменится на слух», «Расчёт и нормы / подробности», `LOG_DB_FOOTNOTE`, long verdictLead.
@@ -601,8 +602,8 @@ Walk **norms → current → MultiFrame → why → CTA** on one scroll. Officia
 | Level in room | `Сейчас: ≈ N дБ` · under MultiFrame also `→ с MultiFrame: ≈ M дБ` |
 | Audio groups | `Воздушный шум` · `Ударный шум` · `Смешанный шум` |
 | Why title | `Уникальность системы MultiFrame` |
-| Why cols | `Обычный натяжной` · `MultiFrame` |
-| Why rows | Шум: `Только плёнка` / `Воздух и удар` · Монтаж: `Каркас и стройка` / `Как натяжной` · Состав: `Минвата и пыль` / `Без ваты` |
+| Why lead | `Эффективно. Безопасно. Без долгой стройки.` |
+| Why pillars | Звукоизоляция и акустический комфорт · Безопасность · Экологичность · Быстрый монтаж · Универсальность (title + one line each) |
 | Next-step title | `Следующий шаг` |
 | Calculator CTA | `Открыть калькулятор MultiFrame` |
 | Lead open | `Запросить консультацию или подбор` |

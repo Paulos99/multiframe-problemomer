@@ -39,11 +39,28 @@ const NORM_ROWS: { cls: Exclude<ClassLabel, 'below'>; label: string; rw: string;
     { cls: 'V', label: 'Допустимый (В)', rw: `≥ ${NORMS.V.Rw}`, lnw: `≤ ${NORMS.V.Lnw}` },
   ];
 
-/** Contrast vs ordinary stretch ceiling — short cells, no essays. */
-const UNIQUENESS_ROWS = [
-  { axis: 'Шум', before: 'Только плёнка', after: 'Воздух и удар' },
-  { axis: 'Монтаж', before: 'Каркас и стройка', after: 'Как натяжной' },
-  { axis: 'Состав', before: 'Минвата и пыль', after: 'Без ваты' },
+/** StP site pillars — title + one line, no vs-comparison with plain stretch film. */
+const MULTIFRAME_PILLARS = [
+  {
+    title: 'Звукоизоляция и акустический комфорт',
+    text: 'Снижает воздушный и ударный шум — в комнате спокойнее и ровнее по ощущению.',
+  },
+  {
+    title: 'Безопасность',
+    text: 'Материалы для жилых помещений: спальня, детская, кухня и ванная.',
+  },
+  {
+    title: 'Экологичность',
+    text: 'Без минеральной ваты и строительной пыли на объекте.',
+  },
+  {
+    title: 'Быстрый монтаж',
+    text: 'Панели до полотна: без долгой каркасной стройки и лишней потери высоты.',
+  },
+  {
+    title: 'Универсальность',
+    text: 'Подходит к любому перекрытию и к любой стадии ремонта.',
+  },
 ] as const;
 
 function optionLabel<T extends string>(
@@ -356,29 +373,20 @@ export function ResultScreen() {
       <section className={styles.reasons} aria-label="Уникальность системы MultiFrame">
         <header className={styles.sectionHead}>
           <h2>Уникальность системы MultiFrame</h2>
+          <p>Эффективно. Безопасно. Без долгой стройки.</p>
         </header>
 
-        <table className={styles.uniqTable}>
-          <caption className="srOnly">Обычный натяжной и MultiFrame</caption>
-          <thead>
-            <tr>
-              <th scope="col">
-                <span className="srOnly">Критерий</span>
-              </th>
-              <th scope="col">Обычный натяжной</th>
-              <th scope="col">MultiFrame</th>
-            </tr>
-          </thead>
-          <tbody>
-            {UNIQUENESS_ROWS.map((row) => (
-              <tr key={row.axis}>
-                <th scope="row">{row.axis}</th>
-                <td data-label="Обычный натяжной">{row.before}</td>
-                <td data-label="MultiFrame">{row.after}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <ul className={styles.uniqGrid}>
+          {MULTIFRAME_PILLARS.map((item) => (
+            <li key={item.title} className={styles.uniqPillar}>
+              <span className={styles.uniqPillarMark} aria-hidden />
+              <div className={styles.uniqPillarBody}>
+                <strong>{item.title}</strong>
+                <p>{item.text}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className={styles.nextStep} aria-label="Следующий шаг">
