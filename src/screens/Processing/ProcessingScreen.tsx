@@ -17,6 +17,7 @@ const TOTAL_MS = 7000;
 const EXIT_MS = 780;
 const REDUCED_MS = 400;
 const LINE_MS = TOTAL_MS / STATUS_LINES.length;
+const SWAP_MS = 720;
 
 function prefersReducedMotion(): boolean {
   return (
@@ -33,15 +34,17 @@ function easeInOutCubic(t: number): number {
 export function ProcessingScreen() {
   const { goTo } = useSession();
   const [lineIndex, setLineIndex] = useState(0);
+  const [prevIndex, setPrevIndex] = useState<number | null>(null);
   const [progress, setProgress] = useState(0);
   const [phase, setPhase] = useState<'enter' | 'run' | 'exit'>('enter');
   const finished = useRef(false);
   const exitTimer = useRef(0);
+  const lineIndexRef = useRef(0);
 
-  const finish = (opts?: { unlock?: boolean }) => {
+  const finish = () => {
     if (finished.current) return;
     finished.current = true;
-    if (opts?.unlock) unlockDemoAudio();
+    unlockDemoAudio();
     setProgress(100);
     setPhase('exit');
     const delay = prefersReducedMotion() ? 0 : EXIT_MS;
@@ -66,7 +69,16 @@ export function ProcessingScreen() {
 
     const timers: number[] = [];
     for (let i = 1; i < STATUS_LINES.length; i++) {
-      timers.push(window.setTimeout(() => setLineIndex(i), i * LINE_MS));
+      timers.push(
+        window.setTimeout(() => {
+          setPrevIndex(lineIndexRef.current);
+          lineIndexRef.current = i;
+          setLineIndex(i);
+          timers.push(
+            window.setTimeout(() => setPrevIndex(null), SWAP_MS),
+          );
+        }, i * LINE_MS),
+      );
     }
 
     const start = performance.now();
@@ -92,7 +104,8 @@ export function ProcessingScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-once ceremony
   }, []);
 
-  const status = STATUS_LINES[lineIndex] ?? STATUS_LINES[0]!;
+  const current = STATUS_LINES[lineIndex] ?? STATUS_LINES[0]!;
+  const outgoing = prevIndex != null ? STATUS_LINES[prevIndex] : null;
   const overlayClass = [
     styles.overlay,
     phase === 'run' || phase === 'exit' ? styles.entered : '',
@@ -105,9 +118,16 @@ export function ProcessingScreen() {
     <div className={overlayClass} role="status" aria-busy={phase !== 'exit'} aria-live="polite">
       <div className={styles.glow} aria-hidden />
       <div className={styles.center}>
-        <p key={lineIndex} className={styles.status}>
-          {status}
-        </p>
+        <div className={styles.statusStage}>
+          {outgoing ? (
+            <p key={`out-${prevIndex}`} className={`${styles.status} ${styles.statusOut}`} aria-hidden>
+              {outgoing}
+            </p>
+          ) : null}
+          <p key={`in-${lineIndex}`} className={`${styles.status} ${styles.statusIn}`}>
+            {current}
+          </p>
+        </div>
         <div
           className={styles.bar}
           role="progressbar"
@@ -122,14 +142,6 @@ export function ProcessingScreen() {
           />
         </div>
       </div>
-      <button
-        type="button"
-        className={styles.skip}
-        onClick={() => finish({ unlock: true })}
-        disabled={phase === 'exit'}
-      >
-        Пропустить
-      </button>
     </div>
   );
 }

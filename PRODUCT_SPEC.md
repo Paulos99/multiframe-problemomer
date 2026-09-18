@@ -106,7 +106,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-16 | **Final CTA order:** open table and frequency graphs come before the in-body `Следующий шаг`; the conversion block is the last substantive section on Result. |
 | 2026-09-16 | **Workshop (transcript 07):** drop Start «для себя / для клиента»; site path = comfort on **your object**. Room = **external → internal** (house/slab first; room type later). Hide **пол сверху**. Result = scare current state first, then MultiFrame %; everyday labels «Некомфортно / Допустимо / Комфортно / Тихо». Wishes (музыка / ТВ / сон ребёнка) as internal factor, not «что мешает». Both air+impact channels stay. |
 | 2026-09-17 | **Result structure rewrite:** norms → current → MultiFrame (felt axes + % + audio + charts) → why → CTA. Official SP hybrid in headers; everyday 5-step felt on axes only. Channel renames; Start lead updated; noisyNeighbors subtitle removed; drop technical/подробности and LOG_DB footnotes. |
-| 2026-09-17 | **Processing ceremony:** after last Room question, fullscreen StP-green loading (~7s, skippable) before Result. Center: rotating status lines + thin progress bar. No chips/equalizer/classes/dB. Header and sticky CTA hidden. Back from Result skips replaying it. |
+| 2026-09-17 | **Processing ceremony:** after last Room question, fullscreen StP-green loading (~7s, not skippable) before Result. Center: one-line rotating status + thin progress bar. No chips/equalizer/classes/dB. Header and sticky CTA hidden. Back from Result skips replaying it. |
 | 2026-09-17 | **Features block rename:** `Почему MultiFrame подходит` → `Уникальность системы MultiFrame`. Three cards from stp-multiframe.ru positioning (эффективно / быстро / экологично): panel vs film+drum, fast frameless install + any slab/stage, eco/no mineral wool. Drop dynamic `Под ваш потолок` why-line from the UI; `whyMultiFrame` stays in lead handoff only. |
 | 2026-09-17 | **Felt axes = received dBA** (sync with ≈дБ + demo audio). Official SP hybrid stays in block headers only. Playback refs raised so «приемлемо/тихо» cut the through-wall stems hard. |
 | 2026-09-18 | **Felt axes back to Rw/Lnw (SP).** Room L2 only drives demo audio. Axis captions show Rw/Lnw with direction; copy separates изоляция vs громкость в комнате. |
@@ -396,8 +396,8 @@ Minimal fullscreen loading ceremony after the last Room answer: the UI immerses 
 ### Visible elements
 
 - Full-viewport green stage (`#01644f`); header, progress dots and sticky CTA hidden
-- Centered status line (crossfade) + thin progress bar
-- Soft `Пропустить` at the bottom
+- Centered **one-line** status (smooth out/in swap) + thin progress bar
+- No skip control
 - No cards, equalizers, chips, checklists, classes, or dB
 
 ### Exact primary copy (RU)
@@ -405,14 +405,12 @@ Minimal fullscreen loading ceremony after the last Room answer: the UI immerses 
 | Role | Text |
 | ---- | ---- |
 | Status lines (cycle ~7 s) | `Собираем модель вашего помещения` · `Считываем перекрытие и тип дома` · `Оцениваем, как слышно сверху сейчас` · `Считаем эффект MultiFrame` · `Собираем акустический профиль` · `Почти готово…` |
-| Skip | `Пропустить` |
 
 ### Controls
 
 | Control | Action | Enabled |
 | ------- | ------ | ------- |
 | Auto-advance | After ~7 s → Result (`derived` already computed) | Always |
-| `Пропустить` | Immediate → Result | Always |
 | Reduced motion | ~400 ms → Result | When `prefers-reduced-motion` |
 
 ### Must NOT appear
@@ -813,7 +811,7 @@ Client path also: `buildClientSummary(session)` — plain-text digest for clipbo
 
 1. Open Start: **no** role picker, object H1, new lead, **no dB**, tap `Начать`.
 2. Room: house/slab first, then room + area > 0; **no** «пол сверху»; «Шум сверху» without «мешает ли» subtitle; optional wish; `Далее`.
-3. Processing: fullscreen green loading with status lines (no classes/dB); auto or `Пропустить` → Result.
+3. Processing: fullscreen green loading with one-line status animation (no classes/dB); auto → Result.
 4. Result reads as: нормы → сейчас → MultiFrame → вывод → CTA.
 5. Official headers use А/Б/В (or «ниже допустимого (В)»); felt 5-step axes on channels; audio Воздушный / Ударный / Смешанный.
 6. Calculator preserves `area` (+ `roomType`); optional demo lead, copy summary, restart work.
