@@ -296,6 +296,9 @@ export const HYBRID_CLASS_LABELS: Record<ClassLabel, string> = {
 
 export const CALCULATOR_URL = 'https://paulos99.github.io/MF_StP/';
 
+/** StP site contact block («Связаться с нами») at the bottom of the page. */
+export const CONSULTATION_URL = 'https://stp-multiframe.ru/#section-partner';
+
 export const DISCLAIMER_EXPERT =
   'Оценка экспертная и качественная. Это не инженерный расчёт звукоизоляции и не гарантия конкретных показателей.';
 

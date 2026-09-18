@@ -76,7 +76,7 @@ Live context (do not redesign from this URL alone): https://paulos99.github.io/m
 | Flow collapse (confirmed 2026-09-14) | Убрать экран **Сравнение** (дублировал Итог). Аудио До/После — **компактно на Result** сразу после блоков «Сейчас» / «С MultiFrame». Поток: Start → Room → Result. |
 | Processing ceremony (2026-09-17) | После последнего вопроса Room — fullscreen зелёный loading (~10 с, без пропуска): прогресс-бар + однострочные статусы с плавной сменой. Без карточек/эквалайзера/классов. Назад с Итога не проигрывает. |
 | Result sticky CTA (confirmed 2026-09-13) | **C4:** `Открыть калькулятор MultiFrame` (вместо «Расчёт материалов»). |
-| Result lead (confirmed 2026-09-13) | Заявка = консультация / подбор. Open **P2:** `Запросить консультацию или подбор`. Title: `Заявка на консультацию`. Note: `Разберём ваш случай, подберём материал.` Отдельную disabled-кнопку «Консультация» не показываем. |
+| Result lead (confirmed 2026-09-18) | `Запросить консультацию или подбор` открывает `https://stp-multiframe.ru/#section-partner` (блок «Связаться с нами»). Встроенной формы заявки нет. |
 | Feature copy style (confirmed 2026-09-13; UI 2026-09-17) | Уникальность — **заголовок + одна строка** на pillar; сетка 2 колонки. Без сравнения «плёнка vs MultiFrame». Flat/Wave **не** показываем. |
 | Start chrome (confirmed 2026-09-13) | **Superseded 2026-09-16** — see Start chrome (2026-09-16). |
 
@@ -114,7 +114,7 @@ Product capabilities that **are** in the first version (not listed as vibe templ
 - Expert qualitative effect model with `marketing_placeholder` ΔRw / ΔLnw and pre_lab disclaimer
 - Before/after emotional contrast + SimCompare (feeling primary, dB tertiary)
 - Audio groups воздух / удар / смешанный with locked household examples; case-specific After (level + frequencies + ≈%)
-- CTA: calculator deep-link + consultation/selection lead form
+- CTA: calculator deep-link + consultation link to StP site `#section-partner`
 - Mobile-dense layout + sticky question/CTA chrome
 
 | Question                                                                                          | Answer |
@@ -213,7 +213,7 @@ A capability with no row is `absent` by default. The State column always holds o
 | Start role picker self/client | removed | Workshop 2026-09-16: confuses visitors. |
 | Room external/internal survey | included | House/slab first; wishes as internal factor. |
 | Calculator CTA handoff | included | Opens calculator with `area`, `roomType` (no scenarios). |
-| Consultation / selection lead | available | UI: `Запросить консультацию или подбор` · `Заявка на консультацию` · `Разберём ваш случай, подберём материал.` Delivery may stub until real endpoint; no invented StP CRM. |
+| Consultation / selection lead | included | UI: `Запросить консультацию или подбор` opens `https://stp-multiframe.ru/#section-partner` (bottom «Связаться с нами»). No in-app form. |
 | Sticky mobile chrome | included | Header + progress + sticky Далее/CTA; denser cards on narrow viewports. |
 | Theme toggle (light/dark) | included | Client-only preference. |
 | Auth (email + password) | absent | No accounts. |
@@ -223,7 +223,7 @@ A capability with no row is `absent` by default. The State column always holds o
 | File/media uploads | absent | — |
 | Payments / checkout | absent | — |
 | Backend API / database | absent | Static SPA only. |
-| Real CRM / lead delivery | absent | Demo stub only; do not invent endpoints. |
+| Real CRM / lead delivery | absent | Consultation goes to the live StP site form; no invented CRM endpoint in this app. |
 | Walls / partitions / floor systems | absent | Explicitly out of MVP scope. |
 | Polyblock product path | absent | Explicitly out of scope. |
 | Framed acoustic systems | absent | Explicitly out of scope. |

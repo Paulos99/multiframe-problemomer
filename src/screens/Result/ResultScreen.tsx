@@ -1,11 +1,11 @@
-import { useState, type FormEvent } from 'react';
+import { useState } from 'react';
 import { Screen } from '../../ui/Screen';
 import { Button } from '../../ui/Button';
-import { Field, TextInput } from '../../ui/Field';
 import { CompactAudio } from '../../ui/CompactAudio';
 import { SpectrumChart } from '../../ui/SpectrumChart';
 import { useSession } from '../../state/SessionContext';
 import {
+  CONSULTATION_URL,
   HOUSE_TYPE_OPTIONS,
   ROOM_TYPE_LABELS,
   SLAB_THICKNESS_OPTIONS,
@@ -24,11 +24,7 @@ import {
   type FeltStep,
 } from '../../state/simulation';
 import { resolveSlab } from '../../state/acoustic/construction';
-import {
-  buildCalculatorUrl,
-  buildClientSummary,
-  buildLeadHandoff,
-} from '../../state/session';
+import { buildCalculatorUrl, buildClientSummary } from '../../state/session';
 import styles from './ResultScreen.module.css';
 
 /** Official SP thresholds only (А/Б/В) — no fictional «Д». */
@@ -203,22 +199,14 @@ export function ResultScreen() {
   const impactSpectrum = sim.impactSpectrum;
   const calcUrl = buildCalculatorUrl(session.cta);
 
-  const [showLead, setShowLead] = useState(false);
-  const [sent, setSent] = useState(false);
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
   const [copied, setCopied] = useState(false);
 
   function openCalc() {
     window.open(calcUrl, '_blank', 'noopener,noreferrer');
   }
 
-  function onLead(e: FormEvent) {
-    e.preventDefault();
-    if (!name.trim() || !phone.trim()) return;
-    const handoff = buildLeadHandoff(session, { name: name.trim(), phone: phone.trim() });
-    console.info('[lead-demo]', handoff);
-    setSent(true);
+  function openConsultation() {
+    window.open(CONSULTATION_URL, '_blank', 'noopener,noreferrer');
   }
 
   async function onCopySummary() {
@@ -409,47 +397,13 @@ export function ResultScreen() {
           <Button fullWidth onClick={openCalc}>
             Открыть калькулятор MultiFrame
           </Button>
-          <Button variant="secondary" fullWidth onClick={() => setShowLead((v) => !v)}>
+          <Button variant="secondary" fullWidth onClick={openConsultation}>
             Запросить консультацию или подбор
           </Button>
           <Button variant="ghost" fullWidth onClick={() => void onCopySummary()}>
             {copied ? 'Сводка скопирована' : 'Скопировать сводку'}
           </Button>
         </div>
-
-        {showLead ? (
-          <form className={styles.form} onSubmit={onLead}>
-            <h3>Заявка на консультацию</h3>
-            <p>Разберём ваш объект, подберём материал.</p>
-            <Field label="Имя">
-              <TextInput
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Как к вам обращаться"
-              />
-            </Field>
-            <Field label="Телефон">
-              <TextInput
-                required
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+7 …"
-              />
-            </Field>
-            <Button type="submit" fullWidth disabled={sent}>
-              {sent ? 'Заявка принята' : 'Отправить'}
-            </Button>
-            {sent ? (
-              <div className={styles.leadSuccess}>
-                <button type="button" className={styles.inlineLink} onClick={openCalc}>
-                  Открыть калькулятор MultiFrame
-                </button>
-              </div>
-            ) : null}
-          </form>
-        ) : null}
       </section>
 
       <Button variant="ghost" onClick={restart}>

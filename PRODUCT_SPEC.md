@@ -112,6 +112,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-18 | **Felt axes back to Rw/Lnw (SP).** Room L2 only drives demo audio. Axis captions show Rw/Lnw with direction; copy separates изоляция vs громкость в комнате. |
 | 2026-09-17 | **Uniqueness block rewrite (owner):** two cards `Только плёнка` vs `Плёнка + MultiFrame` — three parallel bullets (вид / шум / что под полотном). Lead: тишина зависит от слоя между плитой и полотном. No nonsense table rows (e.g. «минвата» vs обычный натяжной). |
 | 2026-09-17 | **Uniqueness pillars (owner):** no stretch-film comparison. Grid of 5 StP pillars: звукоизоляция+комфорт, безопасность, экологичность, быстрый монтаж, универсальность. Lead `Эффективно. Безопасно. Без долгой стройки.` Title + one line each. |
+| 2026-09-18 | Consultation CTA: `Запросить консультацию или подбор` opens `https://stp-multiframe.ru/#section-partner` (bottom «Связаться с нами» / contacts) in a new tab. In-app lead form removed. Calculator + copy summary stay. |
 
 ---
 
@@ -581,7 +582,7 @@ Walk **norms → current → MultiFrame → why → CTA** on one scroll. Officia
 - **2. Текущая ситуация:** header `Сейчас: уровень комфорта по нормам «…»` + two felt axes (now only).
 - **3. С MultiFrame:** header `С MultiFrame: уровень комфорта по нормам «…»` + felt axes with now/after + % quieter + compact audio + frequency charts.
 - **4. Уникальность системы MultiFrame:** lead + 5 pillar cards (StP positioning), no film comparison.
-- **5. Следующий шаг:** calculator + lead + summary copy + restart.
+- **5. Следующий шаг:** calculator + StP consultation link + summary copy + restart.
 - Title `Акустический профиль помещения`. Subtitle about **your object**.
 - Do **not** show: top ComfortScale table, separate «Что изменится на слух», «Расчёт и нормы / подробности», `LOG_DB_FOOTNOTE`, long verdictLead.
 
@@ -606,12 +607,7 @@ Walk **norms → current → MultiFrame → why → CTA** on one scroll. Officia
 | Next-step title | `Следующий шаг` |
 | Calculator CTA | `Открыть калькулятор MultiFrame` |
 | Lead open | `Запросить консультацию или подбор` |
-| Lead title | `Заявка на консультацию` |
-| Lead help | `Разберём ваш объект, подберём материал.` |
 | Summary | `Скопировать сводку` |
-| Name | `Имя` / placeholder `Как к вам обращаться` |
-| Phone | `Телефон` / placeholder `+7 …` |
-| Submit | `Отправить` → success `Заявка принята` (MVP: demo stub / console — no real StP CRM; do not invent corporate endpoint) |
 | Restart | `Пройти ещё раз` |
 | Sticky next | `Открыть калькулятор MultiFrame` (opens calculator; always enabled) |
 
@@ -629,14 +625,13 @@ Walk **norms → current → MultiFrame → why → CTA** on one scroll. Officia
 | Control | Action | Enabled |
 | ------- | ------ | ------- |
 | `Открыть калькулятор MultiFrame` (in-body + sticky) | Open calculator URL in new tab | Always (area may be omitted only if invalid — MVP requires area from Room) |
-| `Запросить консультацию или подбор` | Expand lead form | Always |
-| Lead submit | MVP may `console` stub; UI success `Заявка принята` — no invented StP CRM | Name/phone filled per UI validation (**ASSUMPTION:** submit when fields non-empty) |
+| `Запросить консультацию или подбор` | Open `https://stp-multiframe.ru/#section-partner` in a new tab | Always |
 | `Пройти ещё раз` | Reset session → Start | Always |
 | Sticky `Назад` | Go to Audio | Always |
 
 ### Validation messages
 
-Lead: empty name/phone must not claim success. Success: `Заявка принята`.
+Consultation CTA has no in-app form fields.
 
 ### Must NOT appear
 
@@ -653,8 +648,8 @@ Separate disabled «Консультация (недоступно в демо)�
 | Missing slab | Default solid **180 mm** silently for sim |
 | Audio no matching pair | Fallback both pairs + `демо-набор` |
 | Audio playing | Show `Играет` / pause affordance |
-| Lead form | Opens consultation/selection request; MVP may stub delivery — never invent live StP CRM |
-| Consultation button | **Removed** as separate disabled control — lead CTA covers consultation/selection |
+| Lead form | **Removed** — consultation CTA opens the StP site contact block |
+| Consultation button | **Removed** as separate disabled control — `Запросить консультацию или подбор` covers consultation/selection |
 | Theme | Light/dark client toggle; content identical |
 | Reduced motion | Keep functionality; reduce decorative motion |
 
@@ -796,13 +791,13 @@ MVP `console.info('[lead-demo]', handoff)` shape:
 
 Client path also: `buildClientSummary(session)` — plain-text digest for clipboard / менеджер.
 
-### Lead form behavior
+### Consultation CTA
 
-- Purpose: request **consultation or material selection** (not a “demo toy” label in UI).
-- Fields: name, phone.
-- Open: `Запросить консультацию или подбор` · Title: `Заявка на консультацию` · Help: interest-aware (`ваш` / `клиента`).
-- On submit (MVP): may still be a `console` stub until real endpoint exists — **do not invent** StP CRM URL. Success UI: `Заявка принята` + optional calc link; client notes summary for менеджер.
+- Purpose: request **consultation or material selection** on the official StP site (not an in-app form).
+- Open: `Запросить консультацию или подбор` → `https://stp-multiframe.ru/#section-partner` in a new tab (bottom contacts / «Связаться с нами»).
+- No in-app name/phone form and no invented StP CRM endpoint.
 - No separate disabled «Консультация» button.
+- `buildLeadHandoff` remains for `buildClientSummary` (clipboard digest).
 - Result motion is limited to scale markers and effect bars; Room progress remains. Honor `prefers-reduced-motion`.
 
 ---
@@ -816,7 +811,7 @@ Client path also: `buildClientSummary(session)` — plain-text digest for clipbo
 3. Processing: fullscreen green loading with one-line status animation (no classes/dB); auto → Result.
 4. Result reads as: нормы → сейчас → MultiFrame → вывод → CTA.
 5. Official headers use А/Б/В (or «ниже допустимого (В)»); felt 5-step axes on channels; audio Воздушный / Ударный / Смешанный.
-6. Calculator preserves `area` (+ `roomType`); optional demo lead, copy summary, restart work.
+6. Calculator preserves `area` (+ `roomType`); consultation CTA opens StP site `#section-partner`; copy summary, restart work.
 7. Must **not** present role split, Scenarios, Current complaint, floor-above, or standalone Before/After and Audio screens.
 8. Back from Result returns to Room (last question), **without** replaying Processing.
 
@@ -826,7 +821,7 @@ Client path also: `buildClientSummary(session)` — plain-text digest for clipbo
 
 1. Same Start (no role). Default slab OK (`Не знаю`).
 2. External factors quickly → room/area → Result.
-3. Result full pack; copyable summary; norms/MF evidence before the final calculator / lead block.
+3. Result full pack; copyable summary; norms/MF evidence before the final calculator / consultation block.
 4. ≤3 min without scenario/complaint quiz.
 
 **Pass:** path ≤3 min; audio shows case-specific two-channel difference; norms then current then MultiFrame; calculator CTA works.

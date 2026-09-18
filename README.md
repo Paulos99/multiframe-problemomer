@@ -51,13 +51,13 @@ Base path для GitHub Pages: `/multiframe-problemomer/`.
 4. Текущее состояние — комфорт + тип шума + «почему»
 5. До/после — обычный потолок vs MultiFrame
 6. Аудио — услышать разницу
-7. Профиль + CTA: расчёт (`?area=`), консультация, заявка (stub)
+7. Профиль + CTA: расчёт (`?area=`), консультация на stp-multiframe.ru (`#section-partner`)
 
 ## Заглушки
 
 - Аудио генерируется процедурно (Web Audio), помечено «демо»
-- Форма заявки пишет в `console` и показывает JSON payload
 - Ссылка калькулятора: `https://paulos99.github.io/MF_StP/?area=…`
+- Консультация: `https://stp-multiframe.ru/#section-partner`
 
 ## Деплой
 
