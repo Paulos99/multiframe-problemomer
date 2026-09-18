@@ -13,11 +13,11 @@ const STATUS_LINES = [
   'Почти готово…',
 ] as const;
 
-const TOTAL_MS = 7000;
+const TOTAL_MS = 10000;
 const EXIT_MS = 780;
 const REDUCED_MS = 400;
 const LINE_MS = TOTAL_MS / STATUS_LINES.length;
-const SWAP_MS = 780;
+const SWAP_MS = 1100;
 
 function prefersReducedMotion(): boolean {
   return (

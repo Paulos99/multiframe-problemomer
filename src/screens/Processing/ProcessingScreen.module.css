@@ -108,11 +108,11 @@
 }
 
 .statusIn {
-  animation: statusIn 0.72s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: statusIn 1.05s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .statusOut {
-  animation: statusOut 0.68s cubic-bezier(0.33, 0, 0.2, 1) both;
+  animation: statusOut 0.95s cubic-bezier(0.33, 0, 0.15, 1) both;
 }
 
 .bar {
@@ -138,12 +138,13 @@
 @keyframes statusIn {
   from {
     opacity: 0;
-    transform: translateY(-0.85em) scale(0.98);
-    filter: blur(6px);
-    letter-spacing: 0.08em;
+    transform: translateY(-0.75em) scale(0.985);
+    filter: blur(5px);
+    letter-spacing: 0.05em;
   }
-  60% {
-    filter: blur(1px);
+  45% {
+    opacity: 0.55;
+    filter: blur(2px);
   }
   to {
     opacity: 1;
@@ -160,11 +161,15 @@
     filter: blur(0);
     letter-spacing: -0.02em;
   }
+  40% {
+    opacity: 0.45;
+    filter: blur(3px);
+  }
   to {
     opacity: 0;
-    transform: translateY(0.95em) scale(1.04);
-    filter: blur(8px);
-    letter-spacing: 0.14em;
+    transform: translateY(0.9em) scale(1.03);
+    filter: blur(9px);
+    letter-spacing: 0.12em;
   }
 }
 
