@@ -16,10 +16,10 @@ import {
   FELT_STEP_LABELS,
   FELT_STEPS,
   NORMS,
-  airFeltFromReceived,
+  airFeltFromIndex,
   comfortClassFor,
   deriveSimulation,
-  impactFeltFromReceived,
+  impactFeltFromIndex,
   officialComfortLabel,
   type FeltStep,
 } from '../../state/simulation';
@@ -81,22 +81,27 @@ function FeltScale({
   after,
   quieterPct,
   mode,
-  nowDb,
-  afterDb,
+  indexKind,
+  nowIndex,
+  afterIndex,
 }: {
   title: string;
   now: FeltStep;
   after?: FeltStep;
   quieterPct?: number;
   mode: 'nowOnly' | 'nowAndAfter';
-  nowDb: number;
-  afterDb?: number;
+  /** SP construction index shown on this axis (not room L2). */
+  indexKind: 'Rw' | 'Lnw';
+  nowIndex: number;
+  afterIndex?: number;
 }) {
   const nowIdx = feltIndex(now);
   const afterIdx = after ? feltIndex(after) : -1;
   const same = mode === 'nowAndAfter' && after && now === after;
-  const nowDbLabel = Math.round(nowDb);
-  const afterDbLabel = afterDb != null ? Math.round(afterDb) : null;
+  const nowVal = Math.round(nowIndex);
+  const afterVal = afterIndex != null ? Math.round(afterIndex) : null;
+  const direction =
+    indexKind === 'Rw' ? 'изоляция, больше — лучше' : 'индекс удара, меньше — лучше';
 
   return (
     <div
@@ -104,10 +109,10 @@ function FeltScale({
       role="img"
       aria-label={
         mode === 'nowOnly'
-          ? `${title}: сейчас ${FELT_STEP_LABELS[now]}, около ${nowDbLabel} дБ`
-          : `${title}: сейчас ${FELT_STEP_LABELS[now]}, около ${nowDbLabel} дБ; с MultiFrame ${
+          ? `${title}: сейчас ${FELT_STEP_LABELS[now]}, ${indexKind} ≈ ${nowVal}`
+          : `${title}: сейчас ${FELT_STEP_LABELS[now]}, ${indexKind} ≈ ${nowVal}; с MultiFrame ${
               after ? FELT_STEP_LABELS[after] : ''
-            }${afterDbLabel != null ? `, около ${afterDbLabel} дБ` : ''}${
+            }${afterVal != null ? `, ${indexKind} ≈ ${afterVal}` : ''}${
               quieterPct != null ? `, примерно на ${quieterPct}% тише` : ''
             }`
       }
@@ -120,15 +125,18 @@ function FeltScale({
       </div>
 
       <p className={styles.feltDb}>
-        {mode === 'nowOnly' || afterDbLabel == null ? (
+        {mode === 'nowOnly' || afterVal == null ? (
           <>
-            Сейчас в комнате: <b>≈ {nowDbLabel} дБ</b>
+            Сейчас: <b>{indexKind} ≈ {nowVal}</b>
+            <span> · {direction}</span>
           </>
         ) : (
           <>
-            Сейчас: <b>≈ {nowDbLabel} дБ</b>
+            <b>{indexKind}</b>:{' '}
+            <b>≈ {nowVal}</b>
             <span aria-hidden> → </span>
-            с MultiFrame: <b>≈ {afterDbLabel} дБ</b>
+            <b>≈ {afterVal}</b>
+            <span> · {direction}</span>
           </>
         )}
       </p>
@@ -176,10 +184,10 @@ export function ResultScreen() {
   const beforeOfficial = officialComfortLabel(hybridBefore);
   const afterOfficial = officialComfortLabel(hybridAfter);
 
-  const airNowFelt = airFeltFromReceived(sim.receivedAirDb.before);
-  const airAfterFelt = airFeltFromReceived(sim.receivedAirDb.after);
-  const impactNowFelt = impactFeltFromReceived(sim.receivedImpactDb.before);
-  const impactAfterFelt = impactFeltFromReceived(sim.receivedImpactDb.after);
+  const airNowFelt = airFeltFromIndex(sim.before.Rw);
+  const airAfterFelt = airFeltFromIndex(sim.after.Rw);
+  const impactNowFelt = impactFeltFromIndex(sim.before.Lnw);
+  const impactAfterFelt = impactFeltFromIndex(sim.after.Lnw);
 
   const roomLabel = room.roomType ? ROOM_TYPE_LABELS[room.roomType] : null;
   const slab = resolveSlab(room);
@@ -234,14 +242,15 @@ export function ResultScreen() {
         <header className={styles.sectionHead}>
           <h2>Нормы комфорта в стройке</h2>
           <p>
-            Чтобы понять, насколько тихо в вашей комнате, сравниваем её с официальной шкалой
-            акустического комфорта жилья — классами <b>А / Б / В</b> по СП 51.13330.2011. Ниже —
-            пороги этой шкалы; дальше по ним отметим, где вы сейчас и куда можно выйти с
-            MultiFrame.
+            Чтобы понять, насколько тихо в вашей комнате, сравниваем <b>перекрытие</b> с
+            официальной шкалой акустического комфорта жилья — классами <b>А / Б / В</b> по СП
+            51.13330.2011. Ниже — пороги этой шкалы; дальше по ним отметим, где вы сейчас и куда
+            можно выйти с MultiFrame.
           </p>
           <p>
-            <b>Rw</b> — насколько перекрытие держит воздушный шум (голоса, музыка): больше —
-            лучше. <b>Lnw</b> — насколько громко проходят шаги и удары: меньше — лучше.
+            <b>Rw</b> — изоляция от воздушного шума (голоса, музыка): <b>больше — лучше</b>.{' '}
+            <b>Lnw</b> — индекс ударного шума (шаги, падения): <b>меньше — лучше</b>. Это индексы
+            конструкции, а не «сколько дБ сейчас орёт в комнате».
           </p>
         </header>
 
@@ -289,9 +298,9 @@ export function ResultScreen() {
         <header className={styles.sectionHead}>
           <h2>Текущая ситуация</h2>
           <p>
-            Ориентир того, как сейчас слышны голоса и шаги сверху в этой комнате — до монтажа
-            MultiFrame. Цифры в дБ и бытовая шкала — про громкость в помещении; класс по нормам
-            А/Б/В — в заголовке блока (про перекрытие).
+            Ориентир по нормам СП для этого перекрытия — до монтажа MultiFrame. Шкала и цифры{' '}
+            <b>Rw / Lnw</b> — про изоляцию конструкции; как это слышно в комнате — в демо-звуке ниже
+            на шаге «С MultiFrame».
           </p>
           <p className={styles.officialHead}>
             Сейчас: уровень комфорта по нормам «{beforeOfficial}»
@@ -302,13 +311,15 @@ export function ResultScreen() {
           <FeltScale
             title="Воздушный шум (голоса и музыка)"
             now={airNowFelt}
-            nowDb={sim.receivedAirDb.before}
+            indexKind="Rw"
+            nowIndex={sim.before.Rw}
             mode="nowOnly"
           />
           <FeltScale
             title="Ударный шум (шаги и падения)"
             now={impactNowFelt}
-            nowDb={sim.receivedImpactDb.before}
+            indexKind="Lnw"
+            nowIndex={sim.before.Lnw}
             mode="nowOnly"
           />
         </div>
@@ -318,9 +329,9 @@ export function ResultScreen() {
         <header className={styles.sectionHead}>
           <h2>С MultiFrame</h2>
           <p>
-            Тот же ориентир после монтажа системы: насколько тише станет в комнате по дБ и бытовой
-            шкале, и куда сдвинется класс по нормам в заголовке. Сравните «сейчас» и «после» на
-            каждом канале — в том числе в демо-звуке.
+            Тот же ориентир по нормам после монтажа: куда сдвинутся <b>Rw / Lnw</b> и бытовая
+            шкала. Громкость в помещении слушайте в демо ниже — это отдельный слой (не путать с
+            индексами изоляции).
           </p>
           <p className={styles.officialHead}>
             С MultiFrame: уровень комфорта по нормам «{afterOfficial}»
@@ -332,8 +343,9 @@ export function ResultScreen() {
             title="Воздушный шум (голоса и музыка)"
             now={airNowFelt}
             after={airAfterFelt}
-            nowDb={sim.receivedAirDb.before}
-            afterDb={sim.receivedAirDb.after}
+            indexKind="Rw"
+            nowIndex={sim.before.Rw}
+            afterIndex={sim.after.Rw}
             quieterPct={sim.perceivedAirPct}
             mode="nowAndAfter"
           />
@@ -341,8 +353,9 @@ export function ResultScreen() {
             title="Ударный шум (шаги и падения)"
             now={impactNowFelt}
             after={impactAfterFelt}
-            nowDb={sim.receivedImpactDb.before}
-            afterDb={sim.receivedImpactDb.after}
+            indexKind="Lnw"
+            nowIndex={sim.before.Lnw}
+            afterIndex={sim.after.Lnw}
             quieterPct={sim.perceivedImpactPct}
             mode="nowAndAfter"
           />

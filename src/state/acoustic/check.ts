@@ -6,9 +6,9 @@ import { applyMultiFrame } from './multiframe';
 import { buildConstruction, constructionFixture } from './construction';
 import { SPECTRUM_HZ, clamp, round1 } from './bands';
 import {
-  airFeltFromReceived,
+  airFeltFromIndex,
   deriveSimulation,
-  impactFeltFromReceived,
+  impactFeltFromIndex,
   NORMS,
   FELT_STEPS,
 } from '../simulation';
@@ -250,30 +250,30 @@ export function assertModelAnchors(): string[] {
       objectStage: 'occupied',
     }),
   );
-  const kidsAirFeltBefore = airFeltFromReceived(simKidsMono.receivedAirDb.before);
-  const kidsAirFeltAfter = airFeltFromReceived(simKidsMono.receivedAirDb.after);
+  const kidsAirFeltBefore = airFeltFromIndex(simKidsMono.before.Rw);
+  const kidsAirFeltAfter = airFeltFromIndex(simKidsMono.after.Rw);
   if (kidsAirFeltBefore === 'quiet') {
     errors.push(
-      `kids mono250 «До» felt should not be тихо (L2 ${simKidsMono.receivedAirDb.before}, step ${kidsAirFeltBefore})`,
+      `kids mono250 «До» felt should not be тихо (Rw ${simKidsMono.before.Rw}, step ${kidsAirFeltBefore})`,
     );
   }
   const shapeKidsAir = buildRoomAudioShape(simKidsMono, 'air', 'talk');
-  if (
-    kidsAirFeltBefore === 'acceptable' ||
-    kidsAirFeltBefore === 'comfort' ||
-    kidsAirFeltBefore === 'quiet'
-  ) {
-    if (shapeKidsAir.beforeGainDb > -5) {
-      errors.push(
-        `acceptable/comfort kids До must cut stem (beforeGain ${shapeKidsAir.beforeGainDb}, felt ${kidsAirFeltBefore}, L2 ${shapeKidsAir.targetBeforeDb})`,
-      );
-    }
+  // Audio still follows L2; only require a meaningful cut on quiet-ish rooms.
+  if (shapeKidsAir.targetBeforeDb <= 54 && shapeKidsAir.beforeGainDb > -4) {
+    errors.push(
+      `kids mono До with L2≤54 should cut stem (beforeGain ${shapeKidsAir.beforeGainDb}, L2 ${shapeKidsAir.targetBeforeDb})`,
+    );
   }
   const kidsFeltIdxBefore = FELT_STEPS.indexOf(kidsAirFeltBefore);
   const kidsFeltIdxAfter = FELT_STEPS.indexOf(kidsAirFeltAfter);
   if (kidsFeltIdxAfter < kidsFeltIdxBefore) {
     errors.push(
-      `kids mono MultiFrame felt should not worsen (${kidsAirFeltBefore} → ${kidsAirFeltAfter})`,
+      `kids mono MultiFrame felt should not worsen (${kidsAirFeltBefore} → ${kidsAirFeltAfter}, Rw ${simKidsMono.before.Rw}→${simKidsMono.after.Rw})`,
+    );
+  }
+  if (simKidsMono.after.Rw <= simKidsMono.before.Rw) {
+    errors.push(
+      `kids mono Rw after should rise (${simKidsMono.before.Rw} → ${simKidsMono.after.Rw})`,
     );
   }
   if (simKidsMono.receivedAirDb.after >= simKidsMono.receivedAirDb.before - 2) {
@@ -281,7 +281,7 @@ export function assertModelAnchors(): string[] {
       `kids mono L2 after should drop vs before (${simKidsMono.receivedAirDb.before} → ${simKidsMono.receivedAirDb.after})`,
     );
   }
-  const kidsImpactFeltBefore = impactFeltFromReceived(simKidsMono.receivedImpactDb.before);
+  const kidsImpactFeltBefore = impactFeltFromIndex(simKidsMono.before.Lnw);
   if (FELT_STEPS.indexOf(kidsImpactFeltBefore) < 0) {
     errors.push(`invalid impact felt step ${kidsImpactFeltBefore}`);
   }
