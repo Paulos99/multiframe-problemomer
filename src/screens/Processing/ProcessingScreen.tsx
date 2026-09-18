@@ -17,7 +17,7 @@ const TOTAL_MS = 7000;
 const EXIT_MS = 780;
 const REDUCED_MS = 400;
 const LINE_MS = TOTAL_MS / STATUS_LINES.length;
-const SWAP_MS = 720;
+const SWAP_MS = 780;
 
 function prefersReducedMotion(): boolean {
   return (

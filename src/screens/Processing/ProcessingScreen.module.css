@@ -71,10 +71,22 @@
 .statusStage {
   position: relative;
   width: 100%;
-  height: 1.45em;
+  height: 1.7em;
   overflow: hidden;
-  mask-image: linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%);
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%);
+  mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    #000 18%,
+    #000 82%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    #000 18%,
+    #000 82%,
+    transparent 100%
+  );
 }
 
 .status {
@@ -100,7 +112,7 @@
 }
 
 .statusOut {
-  animation: statusOut 0.55s cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation: statusOut 0.68s cubic-bezier(0.33, 0, 0.2, 1) both;
 }
 
 .bar {
@@ -126,12 +138,12 @@
 @keyframes statusIn {
   from {
     opacity: 0;
-    transform: translateY(0.7em) scale(0.96);
-    filter: blur(5px);
-    letter-spacing: 0.06em;
+    transform: translateY(-0.85em) scale(0.98);
+    filter: blur(6px);
+    letter-spacing: 0.08em;
   }
-  55% {
-    filter: blur(0.5px);
+  60% {
+    filter: blur(1px);
   }
   to {
     opacity: 1;
@@ -146,12 +158,13 @@
     opacity: 1;
     transform: translateY(0) scale(1);
     filter: blur(0);
+    letter-spacing: -0.02em;
   }
   to {
     opacity: 0;
-    transform: translateY(-0.55em) scale(1.02);
-    filter: blur(4px);
-    letter-spacing: 0.04em;
+    transform: translateY(0.95em) scale(1.04);
+    filter: blur(8px);
+    letter-spacing: 0.14em;
   }
 }
 
