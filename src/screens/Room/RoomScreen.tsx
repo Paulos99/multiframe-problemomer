@@ -52,8 +52,8 @@ const SUBSTEP_COPY: Record<RoomSubstep, { title: string; subtitle: string }> = {
     subtitle: '',
   },
   roomWish: {
-    title: 'Что важно в этой комнате',
-    subtitle: 'Не жалоба, а то, под что считать комфорт: музыка, телевизор, сон ребёнка.',
+    title: 'Как пользуются комнатой',
+    subtitle: 'Один ориентир для любой квартиры — без хобби и состава семьи.',
   },
 };
 

@@ -38,8 +38,8 @@ export type PlannedCeilingOption = 'stretch_planned' | 'ceiling_exists' | 'unkno
 
 export type NoisyNeighborsOption = 'unknown' | 'usually_quiet' | 'sometimes_noisy' | 'often_noisy';
 
-/** Internal «что важно в комнате» — wishes, not a complaint quiz */
-export type RoomWishOption = 'unknown' | 'music' | 'tv' | 'child_sleep';
+/** How the room is used — universal, not hobby / family-composition quiz */
+export type RoomWishOption = 'unknown' | 'rest' | 'focus' | 'everyday';
 
 /** Legacy noise tags — still used for audio demo grouping, not a survey */
 export type NoiseScenario =
@@ -272,9 +272,9 @@ export const NOISY_NEIGHBORS_OPTIONS: { id: NoisyNeighborsOption; label: string 
 ];
 
 export const ROOM_WISH_OPTIONS: { id: RoomWishOption; label: string; hint: string }[] = [
-  { id: 'music', label: 'Музыка', hint: 'слушать и заниматься музыкой' },
-  { id: 'tv', label: 'Телевизор', hint: 'смотреть кино и передачи спокойно' },
-  { id: 'child_sleep', label: 'Сон ребёнка', hint: 'чтобы сверху меньше мешало засыпать' },
+  { id: 'rest', label: 'Отдых и сон', hint: 'тишина вечером и ночью' },
+  { id: 'focus', label: 'Работа и учёба', hint: 'разговоры и концентрация' },
+  { id: 'everyday', label: 'Обычная жизнь', hint: 'гостиная, кухня, быт' },
   { id: 'unknown', label: 'Не знаю', hint: 'достаточно общих ориентиров' },
 ];
 
