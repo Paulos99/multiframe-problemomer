@@ -40,10 +40,7 @@ export function CompactAudio({ pairs, sim }: Props) {
     <section className={styles.wrap} aria-label="Сравнить звук до и после">
       <header className={styles.head}>
         <h3>Послушайте «До» и «После»</h3>
-        <p>
-          Один и тот же звук, приведённый к громкости в этой комнате — до и после MultiFrame.
-          Шкалы выше — про изоляцию по нормам (Rw / Lnw); здесь — как это слышно.
-        </p>
+        <p>Один и тот же звук — до и после MultiFrame в условиях этой комнаты.</p>
       </header>
 
       <div className={styles.groups}>
