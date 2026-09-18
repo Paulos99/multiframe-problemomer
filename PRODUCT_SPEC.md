@@ -777,10 +777,12 @@ Base: `https://paulos99.github.io/MF_StP/`
 | Param | Source |
 | ----- | ------ |
 | `area` | ceiling m² (> 0) |
-| `roomType` | enum: `living` \| `bedroom` \| `kids` \| `kitchen` \| `office` \| `other` |
-| `scenarios` | **removed from survey** — do not require; omit from handoff or send empty (**ASSUMPTION:** omit) |
+| `mode` | always `area` when area present |
+| `walls` | always `0` — ceiling only, no wall surfaces |
+| `source` | always `problemomer` |
+| `roomType` | enum: `living` \| `bedroom` \| `kids` \| `kitchen` \| `office` \| `other` (optional metadata) |
 
-**ASSUMPTION:** handoff = `area` + `roomType`; `scenarios` no longer collected — omit.
+Calculator opens area mode, fills ceiling area, clears walls, runs quick ceiling calc.
 
 ### Session / CTA payload (`schemaVersion: 1`)
 

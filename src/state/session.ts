@@ -177,10 +177,14 @@ export function roomNextHint(session: SessionState): string | null {
   return null;
 }
 
+/** Ceiling-only area handoff into MultiFrame calculator (no walls). */
 export function buildCalculatorUrl(cta: CtaPayload, base = CALCULATOR_URL): string {
   const url = new URL(base);
   if (cta.ceilingAreaM2 != null && cta.ceilingAreaM2 > 0) {
     url.searchParams.set('area', String(cta.ceilingAreaM2));
+    url.searchParams.set('mode', 'area');
+    url.searchParams.set('walls', '0');
+    url.searchParams.set('source', 'problemomer');
   }
   if (cta.roomType) url.searchParams.set('roomType', cta.roomType);
   return url.toString();
