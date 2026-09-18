@@ -9,12 +9,12 @@ import { deriveSimulation } from './simulation';
 
 function wishLine(wish: RoomWishOption): string | null {
   switch (wish) {
-    case 'music':
-      return 'Для музыки в этой комнате важнее, насколько мягче станут голоса и бас сверху.';
-    case 'tv':
-      return 'Для телевизора важнее воздушный шум: речь и звук сверху должны меньше пробиваться.';
-    case 'child_sleep':
-      return 'Для сна ребёнка важны и шаги, и голоса — оба канала в этой комнате.';
+    case 'rest':
+      return 'Для отдыха и сна важны и шаги, и голоса сверху.';
+    case 'focus':
+      return 'Для работы и учёбы важнее, насколько мягче станут голоса и речь сверху.';
+    case 'everyday':
+      return 'Для обычной жизни смотрим оба канала: бытовые голоса и шаги сверху.';
     default:
       return null;
   }
@@ -48,8 +48,8 @@ function whyFor(
 
 function inferNoiseType(answers: SessionAnswers): NoiseType {
   const wish = answers.room.roomWish;
-  if (wish === 'music' || wish === 'tv') return 'airborne';
-  if (wish === 'child_sleep') return 'mixed';
+  if (wish === 'focus') return 'airborne';
+  if (wish === 'rest' || wish === 'everyday') return 'mixed';
   const n = answers.room.noisyNeighbors;
   if (n === 'often_noisy' || n === 'sometimes_noisy') return 'mixed';
   if (n === 'usually_quiet') return 'airborne';
