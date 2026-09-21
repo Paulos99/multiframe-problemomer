@@ -63,6 +63,26 @@ function furnishingFactor(room: RoomAnswers): number {
   }
 }
 
+/**
+ * Planned use tilts the in-room mix (L2 / demo), not construction Rw/Lnw.
+ * Sleep notices footsteps more; work notices speech; everyday is a mixed household.
+ */
+function wishUseAdj(room: RoomAnswers, f: number, kind: 'air' | 'impact'): number {
+  switch (room.roomWish) {
+    case 'rest':
+      if (kind === 'impact') return f <= 250 ? 2.4 : 1.1;
+      return f >= 200 && f <= 2500 ? 1.1 : 0.3;
+    case 'focus':
+      if (kind === 'air') return f >= 250 && f <= 2500 ? 2.6 : 0.5;
+      return f <= 200 ? -0.4 : 0;
+    case 'everyday':
+      if (kind === 'air') return f >= 250 && f <= 4000 ? 1.4 : 0.6;
+      return f >= 250 && f <= 2000 ? 1.3 : 0.5;
+    default:
+      return 0;
+  }
+}
+
 /** Equivalent absorption A(f), m² sabin. Kitchen stays hard at HF; bedroom more HF. */
 export function absorptionM2(room: RoomAnswers): number[] {
   const s = areaM2(room);
@@ -116,7 +136,7 @@ export function sourceAirBands(room: RoomAnswers): number[] {
       default:
         roomAdj = 0;
     }
-    return AIR_L1_OFFSET + pink + speech + lfParty + roomAdj + n;
+    return AIR_L1_OFFSET + pink + speech + lfParty + roomAdj + n + wishUseAdj(room, f, 'air');
   });
 }
 
@@ -142,7 +162,7 @@ export function sourceImpactBands(room: RoomAnswers): number[] {
         kind = 0;
     }
     const heavy = room.noisyNeighbors === 'often_noisy' && f <= 315 ? 2 : 0;
-    return IMPACT_L1_OFFSET + n * 0.65 + kind + heavy;
+    return IMPACT_L1_OFFSET + n * 0.65 + kind + heavy + wishUseAdj(room, f, 'impact');
   });
 }
 

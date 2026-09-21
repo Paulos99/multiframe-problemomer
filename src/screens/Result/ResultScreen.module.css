@@ -1682,6 +1682,21 @@
   color: var(--text-secondary);
 }
 
+.scenario {
+  margin: 4px 0 2px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(1, 100, 79, 0.22);
+  background: color-mix(in srgb, var(--accent-soft) 80%, var(--bg-card));
+}
+
+.scenario p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-primary);
+}
+
 .normTableSimple {
   width: 100%;
   border-collapse: collapse;

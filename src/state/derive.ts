@@ -6,19 +6,7 @@ import type {
   SessionAnswers,
 } from './types';
 import { deriveSimulation } from './simulation';
-
-function wishLine(wish: RoomWishOption): string | null {
-  switch (wish) {
-    case 'rest':
-      return 'Для отдыха и сна важны и шаги, и голоса сверху.';
-    case 'focus':
-      return 'Для работы и учёбы важнее, насколько мягче станут голоса и речь сверху.';
-    case 'everyday':
-      return 'Для обычной жизни смотрим оба канала: бытовые голоса и шаги сверху.';
-    default:
-      return null;
-  }
-}
+import { wishNoiseType, wishScenarioLine } from './wish';
 
 function whyFor(
   noiseType: NoiseType,
@@ -26,8 +14,7 @@ function whyFor(
   wish: RoomWishOption,
 ): string[] {
   const why: string[] = [];
-  const fromWish = wishLine(wish);
-  if (fromWish) why.push(fromWish);
+  if (wish !== 'unknown') why.push(wishScenarioLine(wish));
   if (noiseType === 'impact' || noiseType === 'mixed') {
     why.push(
       'Ударный шум сверху идёт через плиту — бескаркасная MultiFrame работает на потолке, без каркаса.',
@@ -47,13 +34,11 @@ function whyFor(
 }
 
 function inferNoiseType(answers: SessionAnswers): NoiseType {
-  const wish = answers.room.roomWish;
-  if (wish === 'focus') return 'airborne';
-  if (wish === 'rest' || wish === 'everyday') return 'mixed';
   const n = answers.room.noisyNeighbors;
-  if (n === 'often_noisy' || n === 'sometimes_noisy') return 'mixed';
-  if (n === 'usually_quiet') return 'airborne';
-  return 'mixed';
+  let fallback: NoiseType = 'mixed';
+  if (n === 'often_noisy' || n === 'sometimes_noisy') fallback = 'mixed';
+  else if (n === 'usually_quiet') fallback = 'airborne';
+  return wishNoiseType(answers.room.roomWish, fallback);
 }
 
 export function deriveProfile(answers: SessionAnswers): DerivedProfile {

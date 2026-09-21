@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Screen } from '../../ui/Screen';
 import { CardSelect } from '../../ui/CardSelect';
 import { Field, TextInput } from '../../ui/Field';
@@ -30,7 +31,7 @@ const SUBSTEP_TITLE: Record<RoomSubstep, string> = {
   plannedCeiling: 'Выберите планируемый потолок',
   objectStage: 'Укажите стадию объекта',
   noisyNeighbors: 'Укажите шум сверху',
-  roomWish: 'Укажите, как пользуются комнатой',
+  roomWish: 'Как планируете использовать комнату?',
 };
 
 export function RoomScreen() {
@@ -47,6 +48,9 @@ export function RoomScreen() {
     setRoomWish,
     canGoNext,
   } = useSession();
+  const [wishPicked, setWishPicked] = useState(
+    () => session.answers.room.roomWish !== 'unknown',
+  );
   const room = session.answers.room;
   const sub = session.roomSubstep;
   const hint = roomNextHint(session);
@@ -193,15 +197,17 @@ export function RoomScreen() {
       ) : null}
 
       {sub === 'roomWish' ? (
-        <div className={styles.grid}>
+        <div className={styles.wishGrid}>
           {ROOM_WISH_OPTIONS.map((opt) => (
             <CardSelect
               key={opt.id}
-              dense
               title={opt.label}
               hint={opt.hint}
-              selected={room.roomWish === opt.id}
-              onClick={() => setRoomWish(opt.id)}
+              selected={room.roomWish === opt.id && (wishPicked || room.roomWish !== 'unknown')}
+              onClick={() => {
+                setWishPicked(true);
+                setRoomWish(opt.id);
+              }}
             />
           ))}
         </div>

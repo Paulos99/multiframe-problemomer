@@ -8,6 +8,7 @@ import {
   CONSULTATION_URL,
   HOUSE_TYPE_OPTIONS,
   ROOM_TYPE_LABELS,
+  ROOM_WISH_OPTIONS,
   SLAB_THICKNESS_OPTIONS,
   SLAB_TYPE_OPTIONS,
   type ClassLabel,
@@ -25,6 +26,7 @@ import {
 } from '../../state/simulation';
 import { resolveSlab } from '../../state/acoustic/construction';
 import { buildCalculatorUrl, buildClientSummary } from '../../state/session';
+import { wishPrimaryGroup, wishScenarioLine } from '../../state/wish';
 import styles from './ResultScreen.module.css';
 
 /** Official SP thresholds only (А/Б/В) — no fictional «Д». */
@@ -190,6 +192,9 @@ export function ResultScreen() {
   const slabTypeLabel = optionLabel(SLAB_TYPE_OPTIONS, room.slabType);
   const slabThickLabel = optionLabel(SLAB_THICKNESS_OPTIONS, room.slabThickness);
   const houseLabel = optionLabel(HOUSE_TYPE_OPTIONS, room.houseType);
+  const wishLabel = optionLabel(ROOM_WISH_OPTIONS, room.roomWish);
+  const wish = room.roomWish;
+  const impactFirst = wishPrimaryGroup(wish) === 'impact';
   const slabContext =
     room.slabType === 'unknown' && room.slabThickness === 'unknown'
       ? `ориентир по типу дома (${houseLabel}), ~${slab.thicknessMm} мм`
@@ -278,6 +283,7 @@ export function ResultScreen() {
           тип дома: {houseLabel}
           {roomLabel ? ` · ${roomLabel}` : ''}
           {room.ceilingAreaM2 ? ` · ${room.ceilingAreaM2} м²` : ''}
+          {` · сценарий: ${wishLabel}`}
         </p>
       </section>
 
@@ -294,20 +300,41 @@ export function ResultScreen() {
         </header>
 
         <div className={styles.feltStack}>
-          <FeltScale
-            title="Воздушный шум (голоса и музыка)"
-            now={airNowFelt}
-            indexKind="Rw"
-            nowIndex={sim.before.Rw}
-            mode="nowOnly"
-          />
-          <FeltScale
-            title="Ударный шум (шаги и падения)"
-            now={impactNowFelt}
-            indexKind="Lnw"
-            nowIndex={sim.before.Lnw}
-            mode="nowOnly"
-          />
+          {impactFirst ? (
+            <>
+              <FeltScale
+                title="Ударный шум (шаги и падения)"
+                now={impactNowFelt}
+                indexKind="Lnw"
+                nowIndex={sim.before.Lnw}
+                mode="nowOnly"
+              />
+              <FeltScale
+                title="Воздушный шум (голоса и музыка)"
+                now={airNowFelt}
+                indexKind="Rw"
+                nowIndex={sim.before.Rw}
+                mode="nowOnly"
+              />
+            </>
+          ) : (
+            <>
+              <FeltScale
+                title="Воздушный шум (голоса и музыка)"
+                now={airNowFelt}
+                indexKind="Rw"
+                nowIndex={sim.before.Rw}
+                mode="nowOnly"
+              />
+              <FeltScale
+                title="Ударный шум (шаги и падения)"
+                now={impactNowFelt}
+                indexKind="Lnw"
+                nowIndex={sim.before.Lnw}
+                mode="nowOnly"
+              />
+            </>
+          )}
         </div>
       </section>
 
@@ -323,48 +350,98 @@ export function ResultScreen() {
           </p>
         </header>
 
+        <aside className={styles.scenario} aria-label="Сценарий использования">
+          <p>{wishScenarioLine(wish)}</p>
+        </aside>
+
         <div className={styles.feltStack}>
-          <FeltScale
-            title="Воздушный шум (голоса и музыка)"
-            now={airNowFelt}
-            after={airAfterFelt}
-            indexKind="Rw"
-            nowIndex={sim.before.Rw}
-            afterIndex={sim.after.Rw}
-            quieterPct={sim.perceivedAirPct}
-            mode="nowAndAfter"
-          />
-          <FeltScale
-            title="Ударный шум (шаги и падения)"
-            now={impactNowFelt}
-            after={impactAfterFelt}
-            indexKind="Lnw"
-            nowIndex={sim.before.Lnw}
-            afterIndex={sim.after.Lnw}
-            quieterPct={sim.perceivedImpactPct}
-            mode="nowAndAfter"
-          />
+          {impactFirst ? (
+            <>
+              <FeltScale
+                title="Ударный шум (шаги и падения)"
+                now={impactNowFelt}
+                after={impactAfterFelt}
+                indexKind="Lnw"
+                nowIndex={sim.before.Lnw}
+                afterIndex={sim.after.Lnw}
+                quieterPct={sim.perceivedImpactPct}
+                mode="nowAndAfter"
+              />
+              <FeltScale
+                title="Воздушный шум (голоса и музыка)"
+                now={airNowFelt}
+                after={airAfterFelt}
+                indexKind="Rw"
+                nowIndex={sim.before.Rw}
+                afterIndex={sim.after.Rw}
+                quieterPct={sim.perceivedAirPct}
+                mode="nowAndAfter"
+              />
+            </>
+          ) : (
+            <>
+              <FeltScale
+                title="Воздушный шум (голоса и музыка)"
+                now={airNowFelt}
+                after={airAfterFelt}
+                indexKind="Rw"
+                nowIndex={sim.before.Rw}
+                afterIndex={sim.after.Rw}
+                quieterPct={sim.perceivedAirPct}
+                mode="nowAndAfter"
+              />
+              <FeltScale
+                title="Ударный шум (шаги и падения)"
+                now={impactNowFelt}
+                after={impactAfterFelt}
+                indexKind="Lnw"
+                nowIndex={sim.before.Lnw}
+                afterIndex={sim.after.Lnw}
+                quieterPct={sim.perceivedImpactPct}
+                mode="nowAndAfter"
+              />
+            </>
+          )}
         </div>
 
-        <CompactAudio pairs={session.audio.pairs} sim={sim} />
+        <CompactAudio pairs={session.audio.pairs} sim={sim} wish={wish} />
 
         <div className={styles.charts}>
           <header>
             <h3>Изоляция по частотам</h3>
             <p>Чем выше линия, тем лучше конструкция сдерживает соответствующие частоты шума.</p>
           </header>
-          <SpectrumChart
-            title="Воздушный шум (голоса и музыка)"
-            subtitle="R(f), дБ · воздушный шум сверху"
-            series={airSpectrum}
-            yLabel="дБ"
-          />
-          <SpectrumChart
-            title="Ударный шум (шаги и падения)"
-            subtitle="Изоляция по полосам Гц · ударный шум"
-            series={impactSpectrum}
-            yLabel="дБ"
-          />
+          {impactFirst ? (
+            <>
+              <SpectrumChart
+                title="Ударный шум (шаги и падения)"
+                subtitle="Изоляция по полосам Гц · ударный шум"
+                series={impactSpectrum}
+                yLabel="дБ"
+              />
+              <SpectrumChart
+                title="Воздушный шум (голоса и музыка)"
+                subtitle="R(f), дБ · воздушный шум сверху"
+                series={airSpectrum}
+                yLabel="дБ"
+              />
+            </>
+          ) : (
+            <>
+              <SpectrumChart
+                title="Воздушный шум (голоса и музыка)"
+                subtitle="R(f), дБ · воздушный шум сверху"
+                series={airSpectrum}
+                yLabel="дБ"
+              />
+              <SpectrumChart
+                title="Ударный шум (шаги и падения)"
+                subtitle="Изоляция по полосам Гц · ударный шум"
+                series={impactSpectrum}
+                yLabel="дБ"
+              />
+            </>
+          )}
         </div>
       </section>
 

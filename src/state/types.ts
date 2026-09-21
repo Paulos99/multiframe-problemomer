@@ -38,7 +38,7 @@ export type PlannedCeilingOption = 'stretch_planned' | 'ceiling_exists' | 'unkno
 
 export type NoisyNeighborsOption = 'unknown' | 'usually_quiet' | 'sometimes_noisy' | 'often_noisy';
 
-/** How the room is used — universal, not hobby / family-composition quiz */
+/** Planned use of the room — drives demo accent and receiving mix, not hobbies */
 export type RoomWishOption = 'unknown' | 'rest' | 'focus' | 'everyday';
 
 /** Legacy noise tags — still used for audio demo grouping, not a survey */
@@ -272,10 +272,26 @@ export const NOISY_NEIGHBORS_OPTIONS: { id: NoisyNeighborsOption; label: string 
 ];
 
 export const ROOM_WISH_OPTIONS: { id: RoomWishOption; label: string; hint: string }[] = [
-  { id: 'rest', label: 'Отдых и сон', hint: 'тишина вечером и ночью' },
-  { id: 'focus', label: 'Работа и учёба', hint: 'разговоры и концентрация' },
-  { id: 'everyday', label: 'Обычная жизнь', hint: 'гостиная, кухня, быт' },
-  { id: 'unknown', label: 'Не знаю', hint: 'достаточно общих ориентиров' },
+  {
+    id: 'rest',
+    label: 'Спать и отдыхать',
+    hint: 'Ночью важны шаги сверху и тихие голоса — покажем оба канала',
+  },
+  {
+    id: 'focus',
+    label: 'Работать, учиться, созваниваться',
+    hint: 'Акцент на речи и ТВ сверху — воздушный шум',
+  },
+  {
+    id: 'everyday',
+    label: 'Общение, ТВ и обычный быт',
+    hint: 'Смешанный фон: голоса, шаги и техника',
+  },
+  {
+    id: 'unknown',
+    label: 'Пока не определились',
+    hint: 'Общий ориентир по обоим каналам, без акцента',
+  },
 ];
 
 /** Everyday first-layer labels (workshop 2026-09-16). SP letters stay secondary. */

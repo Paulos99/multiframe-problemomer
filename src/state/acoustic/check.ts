@@ -334,6 +334,36 @@ export function assertModelAnchors(): string[] {
     );
   }
 
+  const wishBase = {
+    roomType: 'living' as const,
+    floorAbove: 'ordinary' as const,
+    objectStage: 'occupied' as const,
+    noisyNeighbors: 'unknown' as const,
+  };
+  const simWishUnknown = deriveSimulation(sampleAnswers({ ...wishBase, roomWish: 'unknown' }));
+  const simWishRest = deriveSimulation(sampleAnswers({ ...wishBase, roomWish: 'rest' }));
+  const simWishFocus = deriveSimulation(sampleAnswers({ ...wishBase, roomWish: 'focus' }));
+  if (simWishRest.before.Rw !== simWishUnknown.before.Rw) {
+    errors.push(
+      `wish must not change construction Rw (${simWishRest.before.Rw} vs ${simWishUnknown.before.Rw})`,
+    );
+  }
+  if (simWishRest.before.Lnw !== simWishUnknown.before.Lnw) {
+    errors.push(
+      `wish must not change construction Lnw (${simWishRest.before.Lnw} vs ${simWishUnknown.before.Lnw})`,
+    );
+  }
+  if (simWishFocus.receivedAirDb.before <= simWishUnknown.receivedAirDb.before + 0.4) {
+    errors.push(
+      `focus should raise received air vs unknown (${simWishFocus.receivedAirDb.before} vs ${simWishUnknown.receivedAirDb.before})`,
+    );
+  }
+  if (simWishRest.receivedImpactDb.before <= simWishUnknown.receivedImpactDb.before + 0.4) {
+    errors.push(
+      `rest should raise received impact vs unknown (${simWishRest.receivedImpactDb.before} vs ${simWishUnknown.receivedImpactDb.before})`,
+    );
+  }
+
   const thickMf = applyMultiFrame(
     constructionFixture({ kind: 'solid', thicknessMm: 250, floor: 'bare', drum: false }),
   );

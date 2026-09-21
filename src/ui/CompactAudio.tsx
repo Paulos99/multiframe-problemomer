@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { useDemoPlayer, preloadDemoAudio } from '../audio/useDemoPlayer';
 import { buildRoomAudioShapeForPair } from '../audio/roomAudioShape';
-import type { AudioPair, DerivedSimulation } from '../state/types';
+import type { AudioPair, DerivedSimulation, RoomWishOption } from '../state/types';
+import { wishAudioLead, wishAudioOrder, wishPrimaryGroup } from '../state/wish';
 import styles from './CompactAudio.module.css';
 
 function PlayIcon({ playing }: { playing: boolean }) {
@@ -16,7 +17,6 @@ function PlayIcon({ playing }: { playing: boolean }) {
   return <span className={styles.playGlyph} aria-hidden />;
 }
 
-const GROUPS: Array<AudioPair['group']> = ['air', 'impact', 'mixed'];
 const GROUP_TITLES: Record<AudioPair['group'], string> = {
   air: 'Воздушный шум',
   impact: 'Ударный шум',
@@ -26,10 +26,13 @@ const GROUP_TITLES: Record<AudioPair['group'], string> = {
 type Props = {
   pairs: AudioPair[];
   sim: DerivedSimulation;
+  wish?: RoomWishOption;
 };
 
-export function CompactAudio({ pairs, sim }: Props) {
+export function CompactAudio({ pairs, sim, wish = 'unknown' }: Props) {
   const { activeId, progress, play, stop } = useDemoPlayer();
+  const groups = wishAudioOrder(wish);
+  const primary = wishPrimaryGroup(wish);
 
   useEffect(() => {
     const urls = [...new Set(pairs.flatMap((p) => [p.beforeSrc, p.afterSrc]))];
@@ -40,16 +43,28 @@ export function CompactAudio({ pairs, sim }: Props) {
     <section className={styles.wrap} aria-label="Сравнить звук до и после">
       <header className={styles.head}>
         <h3>Послушайте «До» и «После»</h3>
-        <p>Один и тот же звук — до и после MultiFrame в условиях этой комнаты.</p>
+        <p>{wishAudioLead(wish)}</p>
       </header>
 
       <div className={styles.groups}>
-        {GROUPS.map((group) => {
+        {groups.map((group) => {
           const groupPairs = pairs.filter((p) => p.group === group);
           if (!groupPairs.length) return null;
+          const featured = group === primary && wish !== 'unknown';
           return (
-            <div key={group} className={styles.group}>
-              <strong className={styles.groupTitle}>{GROUP_TITLES[group]}</strong>
+            <div
+              key={group}
+              className={`${styles.group} ${featured ? styles.groupFeatured : ''}`}
+            >
+              <strong className={styles.groupTitle}>
+                {GROUP_TITLES[group]}
+                {featured ? (
+                  <>
+                    {' '}
+                    <span className={styles.groupBadge}>для сценария</span>
+                  </>
+                ) : null}
+              </strong>
 
               <div className={styles.examples}>
                 {groupPairs.map((pair) => {
