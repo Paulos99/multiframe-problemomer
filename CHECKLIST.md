@@ -32,7 +32,7 @@ Live context (do not redesign from this URL alone): https://paulos99.github.io/m
 | Audiences / Start (superseded 2026-09-16) | Старт **без роли**. Путь сайта: комфорт **на своём объекте**. «Для себя / для клиента» убрано — путает. Специалисты идут тем же потоком. Длинный список ролей — карта JTBD, не UI. |
 | User models = JTBD content map (owner 2026-09-13; UI 2026-09-16) | Клиент с сайта StP; профи: менеджер, мастер, замерщик, дизайнер. Не отдельные ветки, а **один** buy-case. |
 | Further Start clarification | **Не делаем.** Роль на старте снята 16.09. |
-| What is the first user journey that must work end to end? | Старт без роли → внешние факторы (дом/перекрытие) → внутренние (комната, потолок, хотелки) → церемония расчёта → итог: сначала текущее без MultiFrame, затем эффект. **Без** «пола сверху», без экранов Сравнение / Звук и без опроса «что мешает». |
+| What is the first user journey that must work end to end? | Старт без роли → внешние факторы (дом/перекрытие) → внутренние (комната, потолок, как пользуются) → церемония расчёта → итог: сначала текущее без MultiFrame, затем эффект. **Без** «пола сверху», без экранов Сравнение / Звук и без опроса «что мешает». |
 | Result evidence depth (confirmed 2026-09-12) | **Показать всё**, аргументированно, понятно, персонально: **цифры + классы А/Б/В + графики + пояснения к ним**. Не выбирать «только ощущение» или «только цифры». Честная рамка pre_lab / marketing_placeholder сохраняется — это ориентиры под комнату, не лаб-сертификат. |
 | Evidence presentation Q4 (confirmed 2026-09-12) | **Всё сразу** на одном скролле: **сверху вывод**, ниже детальные данные. Менеджер и пользователь сами смотрят нужный слой. Не progressive disclosure и не урезание пакета по роли. |
 | Charts (confirmed 2026-09-13; spectrum restored 2026-09-14) | Шкала А→Б→В сверху; крупные Δ Rw / Δ Lnw + полосы «тише»; **частотные графики изоляции** (форма zamer_graph) ниже как вторичное доказательство. Обе кривые — изоляция, выше = тише. Подписи + pre_lab. |
@@ -61,11 +61,11 @@ Live context (do not redesign from this URL alone): https://paulos99.github.io/m
 | Audio chrome (confirmed 2026-09-13) | Title **T1:** `Услышать разницу`. Subtitle **S6:** `Сравните звук обычного потолка и потолка с MultiFrame`. Buttons **B2:** `До` · `После`. Sticky **N3:** `Смотреть итог`. |
 | Object stage (confirmed 2026-09-13) | `Новостройка / до заселения` · `Идёт ремонт` · `Уже живут` · `Не знаю`. |
 | House type options (confirmed 2026-09-13) | `Панельный` · `Блочный` · `Кирпичный` · `Монолит` (в т.ч. монолит-кирпич) · `Деревянный / по балкам` · `Не знаю`. Сталинка ≈ кирпичный (подсказка). |
-| Room field order (2026-09-16) | дом → тип перекрытия → толщина → тип+площадь → потолок → стадия → соседи → хотелки. Пол сверху **не в UI**. |
+| Room field order (2026-09-16) | дом → тип перекрытия → толщина → тип+площадь → потолок → стадия → соседи → как пользуются комнатой. Пол сверху **не в UI**. |
 | Room required fields (confirmed 2026-09-13) | Обязательны только **тип комнаты** и **площадь** (на шаге internals). Остальное — можно `Не знаю`. |
 | Floor above (2026-09-16) | Вопрос снят с MVP. Модель держит `unknown` (консервативное ASSUMPTION). |
 | Room = primary diagnostic (2026-09-16) | Фокус клиента на перекрытии. Тип комнаты не первый вопрос. |
-| Room wishes (2026-09-16) | Внутренний шаг «что важно»: музыка / телевизор / сон ребёнка / не знаю. Не квиз «мешает ли». |
+| Room wishes (2026-09-18) | Внутренний шаг «Как пользуются комнатой»: отдых и сон / работа и учёба / обычная жизнь / не знаю. Универсально для любой квартиры, не хобби и не состав семьи. |
 | Start chrome (2026-09-16) | Без роли. H1: `Проверьте уровень акустического комфорта на своём объекте`. CTA: `Начать`. |
 | Always both Δ channels (confirmed 2026-09-13) | На эффективности всегда **воздух и удар**, у каждого — пояснение + ощущение. |
 | Scenarios survey (removed 2026-09-13) | Убрать вопрос «что слышите/мешает»: клиент мог не жить в квартире и не задумываться о шуме; опрос провоцирует «мне ничего не мешает». |
@@ -211,7 +211,7 @@ A capability with no row is `absent` by default. The State column always holds o
 | JTBD Result narrative + hot funnel | included | Current then MultiFrame; features block `Уникальность системы MultiFrame`; «Следующий шаг» CTA; lead handoff + summary copy. No role split. |
 | Floor-above survey | removed | Workshop 2026-09-16: too expert; model keeps unknown. |
 | Start role picker self/client | removed | Workshop 2026-09-16: confuses visitors. |
-| Room external/internal survey | included | House/slab first; wishes as internal factor. |
+| Room external/internal survey | included | House/slab first; last internal = how the room is used (rest / focus / everyday). |
 | Calculator CTA handoff | included | Opens calculator with `area`, `roomType` (no scenarios). |
 | Consultation / selection lead | included | UI: `Запросить консультацию или подбор` opens `https://stp-multiframe.ru/#section-partner` (bottom «Связаться с нами»). No in-app form. |
 | Sticky mobile chrome | included | Header + progress + sticky Далее/CTA; denser cards on narrow viewports. |

@@ -104,7 +104,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-16 | **Motion correction:** no section stagger on Result. Animate only scale markers and effect bars; `prefers-reduced-motion` disables both. Existing sticky calculator CTA remains. |
 | 2026-09-16 | **Scale/table merge:** replace the abstract dot-and-line scale with a compact table: official levels are columns, everyday noise types are rows, and state badges sit in their actual cells. Technical thresholds remain below as a second layer. |
 | 2026-09-16 | **Final CTA order:** open table and frequency graphs come before the in-body `Следующий шаг`; the conversion block is the last substantive section on Result. |
-| 2026-09-16 | **Workshop (transcript 07):** drop Start «для себя / для клиента»; site path = comfort on **your object**. Room = **external → internal** (house/slab first; room type later). Hide **пол сверху**. Result = scare current state first, then MultiFrame %; everyday labels «Некомфортно / Допустимо / Комфортно / Тихо». Wishes (музыка / ТВ / сон ребёнка) as internal factor, not «что мешает». Both air+impact channels stay. |
+| 2026-09-18 | **Last Room question:** drop niche wishes (музыка / ТВ / сон ребёнка). Universal use: `Отдых и сон` · `Работа и учёба` · `Обычная жизнь` · `Не знаю`. |
 | 2026-09-17 | **Result structure rewrite:** norms → current → MultiFrame (felt axes + % + audio + charts) → why → CTA. Official SP hybrid in headers; everyday 5-step felt on axes only. Channel renames; Start lead updated; noisyNeighbors subtitle removed; drop technical/подробности and LOG_DB footnotes. |
 | 2026-09-17 | **Processing ceremony:** after last Room question, fullscreen StP-green loading (~10s, not skippable) before Result. Center: one-line rotating status + thin progress bar. No chips/equalizer/classes/dB. Header and sticky CTA hidden. Back from Result skips replaying it. |
 | 2026-09-17 | **Features block rename:** `Почему MultiFrame подходит` → `Уникальность системы MultiFrame`. Three cards from stp-multiframe.ru positioning (эффективно / быстро / экологично): panel vs film+drum, fast frameless install + any slab/stage, eco/no mineral wool. Drop dynamic `Под ваш потолок` why-line from the UI; `whyMultiFrame` stays in lead handoff only. |
@@ -299,7 +299,7 @@ Role picker `для себя` / `для клиента`; long role catalog; Rw/L
 
 ### Goal
 
-Diagnostic from **general to particular**. External factors first (house, slab type, slab thickness). Then internal (room + area, ceiling, stage, neighbors, wishes). **Пол сверху is not asked** (model keeps `unknown`). Year of build: **not in MVP**. Room type is **not** the first question.
+Diagnostic from **general to particular**. External factors first (house, slab type, slab thickness). Then internal (room + area, ceiling, stage, neighbors, **how the room is used**). **Пол сверху is not asked** (model keeps `unknown`). Year of build: **not in MVP**. Room type is **not** the first question. Last step is universal use (`Отдых и сон` · `Работа и учёба` · `Обычная жизнь` · `Не знаю`) — not music/TV/child sleep.
 
 ### Visible elements
 
