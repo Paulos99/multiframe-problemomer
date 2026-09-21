@@ -26,11 +26,25 @@
   color: var(--accent-color);
 }
 
+.lead {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-secondary);
+}
+
 .head p {
   margin: 0;
   color: var(--text-secondary);
   font-size: 15px;
   max-width: 42ch;
+}
+
+.head .lead {
+  margin: 0 0 8px;
+  font-size: 12px;
+  max-width: none;
 }
 
 /* Sticks under header + progress so the question stays in view on input steps */
@@ -53,6 +67,11 @@
   .headSticky p {
     font-size: 13px;
     max-width: none;
+  }
+
+  .headSticky .lead {
+    font-size: 12px;
+    margin-bottom: 6px;
   }
 
   .screen:has(.headSticky) {

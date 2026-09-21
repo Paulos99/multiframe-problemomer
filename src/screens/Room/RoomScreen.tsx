@@ -22,39 +22,15 @@ import styles from './RoomScreen.module.css';
 
 const ROOM_TYPES = Object.keys(ROOM_TYPE_LABELS) as RoomType[];
 
-const SUBSTEP_COPY: Record<RoomSubstep, { title: string; subtitle: string }> = {
-  houseType: {
-    title: 'Тип дома',
-    subtitle: 'На тип дома повлиять нельзя — от него зависит типичное перекрытие.',
-  },
-  slabType: {
-    title: 'Тип перекрытия',
-    subtitle: 'Главный внешний фактор для ориентира шума. Если не уверены — «Не знаю».',
-  },
-  slabThickness: {
-    title: 'Толщина перекрытия',
-    subtitle: 'Ориентир по разбросам; точность не обязательна.',
-  },
-  basics: {
-    title: 'Тип комнаты и площадь',
-    subtitle: 'Уже внутренний фактор: для профиля и ссылки на калькулятор.',
-  },
-  plannedCeiling: {
-    title: 'Планируемый потолок',
-    subtitle: 'Отделка потолка — то, на что можно повлиять в ремонте.',
-  },
-  objectStage: {
-    title: 'Стадия объекта',
-    subtitle: 'Ремонт и заселение — внутренний фактор помещения.',
-  },
-  noisyNeighbors: {
-    title: 'Шум сверху',
-    subtitle: '',
-  },
-  roomWish: {
-    title: 'Как пользуются комнатой',
-    subtitle: 'Один ориентир для любой квартиры — без хобби и состава семьи.',
-  },
+const SUBSTEP_TITLE: Record<RoomSubstep, string> = {
+  houseType: 'Укажите тип дома',
+  slabType: 'Выберите тип перекрытия',
+  slabThickness: 'Выберите толщину перекрытия',
+  basics: 'Укажите тип комнаты и площадь',
+  plannedCeiling: 'Выберите планируемый потолок',
+  objectStage: 'Укажите стадию объекта',
+  noisyNeighbors: 'Укажите шум сверху',
+  roomWish: 'Укажите, как пользуются комнатой',
 };
 
 export function RoomScreen() {
@@ -73,7 +49,6 @@ export function RoomScreen() {
   } = useSession();
   const room = session.answers.room;
   const sub = session.roomSubstep;
-  const copy = SUBSTEP_COPY[sub];
   const hint = roomNextHint(session);
   const idx = roomSubstepIndex(sub);
   const total = ROOM_SUBSTEPS.length;
@@ -81,15 +56,17 @@ export function RoomScreen() {
   const factorLabel = ROOM_FACTOR_GROUP_LABEL[ROOM_FACTOR_GROUP[sub]];
 
   return (
-    <Screen stickyHead eyebrow={factorLabel} title={copy.title} subtitle={copy.subtitle}>
+    <Screen
+      stickyHead
+      eyebrow={factorLabel}
+      lead={`Вопрос ${idx + 1} из ${total} · ${factorLabel}`}
+      title={SUBSTEP_TITLE[sub]}
+    >
       <div className={styles.progressWrap} aria-hidden>
         <div className={styles.progressTrack}>
           <div className={styles.progressFill} style={{ width: `${progressPct}%` }} />
         </div>
       </div>
-      <p className={styles.stepMeta} aria-live="polite">
-        Вопрос {idx + 1} из {total} · {factorLabel}
-      </p>
 
       {sub === 'houseType' ? (
         <div className={styles.grid}>
