@@ -26,7 +26,7 @@ function sampleRoom(over: Partial<RoomAnswers> = {}): RoomAnswers {
     objectStage: 'newbuild',
     plannedCeiling: 'stretch_planned',
     noisyNeighbors: 'unknown',
-    roomWish: 'unknown',
+    roomWish: 'general',
     ...over,
   };
 }
@@ -340,27 +340,27 @@ export function assertModelAnchors(): string[] {
     objectStage: 'occupied' as const,
     noisyNeighbors: 'unknown' as const,
   };
-  const simWishUnknown = deriveSimulation(sampleAnswers({ ...wishBase, roomWish: 'unknown' }));
-  const simWishRest = deriveSimulation(sampleAnswers({ ...wishBase, roomWish: 'rest' }));
-  const simWishFocus = deriveSimulation(sampleAnswers({ ...wishBase, roomWish: 'focus' }));
-  if (simWishRest.before.Rw !== simWishUnknown.before.Rw) {
+  const simWishGeneral = deriveSimulation(sampleAnswers({ ...wishBase, roomWish: 'general' }));
+  const simWishAbove = deriveSimulation(sampleAnswers({ ...wishBase, roomWish: 'from_above' }));
+  const simWishMusic = deriveSimulation(sampleAnswers({ ...wishBase, roomWish: 'music_recording' }));
+  if (simWishAbove.before.Rw !== simWishGeneral.before.Rw) {
     errors.push(
-      `wish must not change construction Rw (${simWishRest.before.Rw} vs ${simWishUnknown.before.Rw})`,
+      `wish must not change construction Rw (${simWishAbove.before.Rw} vs ${simWishGeneral.before.Rw})`,
     );
   }
-  if (simWishRest.before.Lnw !== simWishUnknown.before.Lnw) {
+  if (simWishAbove.before.Lnw !== simWishGeneral.before.Lnw) {
     errors.push(
-      `wish must not change construction Lnw (${simWishRest.before.Lnw} vs ${simWishUnknown.before.Lnw})`,
+      `wish must not change construction Lnw (${simWishAbove.before.Lnw} vs ${simWishGeneral.before.Lnw})`,
     );
   }
-  if (simWishFocus.receivedAirDb.before <= simWishUnknown.receivedAirDb.before + 0.4) {
+  if (simWishMusic.receivedAirDb.before <= simWishGeneral.receivedAirDb.before) {
     errors.push(
-      `focus should raise received air vs unknown (${simWishFocus.receivedAirDb.before} vs ${simWishUnknown.receivedAirDb.before})`,
+      `music_recording should raise received air vs general (${simWishMusic.receivedAirDb.before} vs ${simWishGeneral.receivedAirDb.before})`,
     );
   }
-  if (simWishRest.receivedImpactDb.before <= simWishUnknown.receivedImpactDb.before + 0.4) {
+  if (simWishAbove.receivedImpactDb.before <= simWishGeneral.receivedImpactDb.before) {
     errors.push(
-      `rest should raise received impact vs unknown (${simWishRest.receivedImpactDb.before} vs ${simWishUnknown.receivedImpactDb.before})`,
+      `from_above should raise received impact vs general (${simWishAbove.receivedImpactDb.before} vs ${simWishGeneral.receivedImpactDb.before})`,
     );
   }
 

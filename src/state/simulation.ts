@@ -95,7 +95,8 @@ function feelingFromReceived(
   loudNeighbors: boolean,
   wish: RoomAnswers['roomWish'],
 ): ComfortLevel {
-  const airLimit = wish === 'rest' ? 52 : wish === 'focus' ? 54 : 58;
+  const airLimit =
+    wish === 'from_above' || wish === 'music_recording' || wish === 'privacy_out' ? 54 : 58;
   if (loudNeighbors || receivedAir >= airLimit) {
     if (side.classLabel === 'A' && side.classStatus === 'ok') return 'ok';
     return 'bothers';

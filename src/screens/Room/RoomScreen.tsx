@@ -31,7 +31,7 @@ const SUBSTEP_TITLE: Record<RoomSubstep, string> = {
   plannedCeiling: 'Выберите планируемый потолок',
   objectStage: 'Укажите стадию объекта',
   noisyNeighbors: 'Укажите шум сверху',
-  roomWish: 'Как планируете использовать комнату?',
+  roomWish: 'Какую задачу должен решить MultiFrame?',
 };
 
 export function RoomScreen() {
@@ -48,9 +48,7 @@ export function RoomScreen() {
     setRoomWish,
     canGoNext,
   } = useSession();
-  const [wishPicked, setWishPicked] = useState(
-    () => session.answers.room.roomWish !== 'unknown',
-  );
+  const [wishPicked, setWishPicked] = useState(false);
   const room = session.answers.room;
   const sub = session.roomSubstep;
   const hint = roomNextHint(session);
@@ -197,13 +195,13 @@ export function RoomScreen() {
       ) : null}
 
       {sub === 'roomWish' ? (
-        <div className={styles.wishGrid}>
+        <div className={styles.grid}>
           {ROOM_WISH_OPTIONS.map((opt) => (
             <CardSelect
               key={opt.id}
+              dense
               title={opt.label}
-              hint={opt.hint}
-              selected={room.roomWish === opt.id && (wishPicked || room.roomWish !== 'unknown')}
+              selected={wishPicked && room.roomWish === opt.id}
               onClick={() => {
                 setWishPicked(true);
                 setRoomWish(opt.id);

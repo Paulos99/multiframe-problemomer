@@ -1,16 +1,17 @@
-import type { NoiseType, RoomWishOption } from './types';
+import type { NoiseType, PlannedCeilingOption, RoomWishOption } from './types';
 
 export type WishAudioGroup = 'air' | 'impact' | 'mixed';
 
-/** Demo order: the first group is the selling point for this use. */
+/** Demo order: the first group is the selling point for this job. */
 export function wishAudioOrder(wish: RoomWishOption): WishAudioGroup[] {
   switch (wish) {
-    case 'rest':
+    case 'from_above':
       return ['impact', 'air', 'mixed'];
-    case 'focus':
+    case 'privacy_out':
+    case 'music_recording':
       return ['air', 'mixed', 'impact'];
-    case 'everyday':
-      return ['mixed', 'air', 'impact'];
+    case 'general':
+    case 'other':
     default:
       return ['air', 'impact', 'mixed'];
   }
@@ -21,34 +22,50 @@ export function wishPrimaryGroup(wish: RoomWishOption): WishAudioGroup {
 }
 
 export function wishNoiseType(wish: RoomWishOption, fallback: NoiseType): NoiseType {
-  if (wish === 'focus') return 'airborne';
-  if (wish === 'rest' || wish === 'everyday') return 'mixed';
+  if (wish === 'privacy_out' || wish === 'music_recording') return 'airborne';
+  if (wish === 'from_above') return 'mixed';
   return fallback;
 }
 
-/** Result callout: how MultiFrame is useful for this planned use. */
+/** Result callout: how MultiFrame answers the chosen job. */
 export function wishScenarioLine(wish: RoomWishOption): string {
   switch (wish) {
-    case 'rest':
-      return 'Для сна и отдыха важны шаги сверху и ночные голоса. MultiFrame смягчает удар и воздух — комната воспринимается спокойнее ночью.';
-    case 'focus':
-      return 'Для работы, учёбы и созвонов важнее воздушный шум: речь и ТВ сверху. Потолок снижает разборчивость соседских голосов, чтобы легче держать концентрацию.';
-    case 'everyday':
-      return 'Для общения, ТВ и быта смотрим смешанный фон: голоса, шаги и техника сверху. MultiFrame делает его мягче по обоим каналам.';
-    default:
-      return 'Сценарий пока общий: ориентир по воздуху и удару без акцента. Когда определитесь с использованием, профиль можно пройти ещё раз.';
+    case 'from_above':
+      return 'Ваша задача — снизить шум сверху. MultiFrame работает на потолке: смягчает шаги и голоса, которые приходят через перекрытие.';
+    case 'privacy_out':
+      return 'Ваша задача — чтобы наверху меньше слышали вас. Потолок снижает передачу воздушного шума через перекрытие вверх; стены и двери — отдельный контур.';
+    case 'music_recording':
+      return 'Ваша задача — улучшить качество музыки и записи. Открытый звукопоглотитель MultiFrame уменьшает эхо в помещении и делает звучание чище; дополнительно становится тише входящий фон сверху.';
+    case 'general':
+      return 'Ваша задача — повысить общий акустический комфорт. MultiFrame даёт ориентир по воздуху и удару и делает комнату спокойнее без узкого акцента.';
+    case 'other':
+      return 'Задача задана вами отдельно. Ниже — полный акустический профиль комнаты с MultiFrame, без домысливания одной потребности.';
   }
 }
 
 export function wishAudioLead(wish: RoomWishOption): string {
   switch (wish) {
-    case 'rest':
-      return 'Начните с топота и разговоров — это то, что обычно мешает заснуть.';
-    case 'focus':
-      return 'Сначала послушайте голоса: этот канал сильнее влияет на работу и созвоны.';
-    case 'everyday':
-      return 'Смешанный пример ближе к дневному быту; рядом — воздух и удар по отдельности.';
+    case 'from_above':
+      return 'Начните с топота и голосов — это типичный шум сверху через перекрытие.';
+    case 'privacy_out':
+      return 'Сначала воздушный шум: речь и бытовые звуки уходят вверх через плиту.';
+    case 'music_recording':
+      return 'Слушайте воздух и смешанный пример: меньше постороннего фона — чище своё звучание.';
+    case 'general':
+    case 'other':
     default:
       return 'Один и тот же звук — до и после MultiFrame в условиях этой комнаты.';
   }
+}
+
+/** Qualitative sound-correction note (not Rw/Lnw). */
+export function wishSoundCorrectionLine(wish: RoomWishOption): string | null {
+  if (wish !== 'music_recording') return null;
+  return 'Звукокоррекция: открытый звукопоглотитель уменьшает эхо в помещении. Это акустика комнаты, а не индекс изоляции перекрытия Rw / Lnw.';
+}
+
+/** Stretch-ceiling drum effect — auto from planned ceiling, not a Q8 card. */
+export function stretchDrumLine(plannedCeiling: PlannedCeilingOption): string | null {
+  if (plannedCeiling !== 'stretch_planned') return null;
+  return 'Вы планируете натяжной потолок: под обычным полотном объём может усиливать шум сверху, как барабан. MultiFrame рассеивает эту энергию в панели — усиление снимается.';
 }

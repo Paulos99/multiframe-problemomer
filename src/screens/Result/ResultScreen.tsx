@@ -26,7 +26,7 @@ import {
 } from '../../state/simulation';
 import { resolveSlab } from '../../state/acoustic/construction';
 import { buildCalculatorUrl, buildClientSummary } from '../../state/session';
-import { wishPrimaryGroup, wishScenarioLine } from '../../state/wish';
+import { wishPrimaryGroup, wishScenarioLine, wishSoundCorrectionLine, stretchDrumLine } from '../../state/wish';
 import styles from './ResultScreen.module.css';
 
 /** Official SP thresholds only (А/Б/В) — no fictional «Д». */
@@ -195,6 +195,8 @@ export function ResultScreen() {
   const wishLabel = optionLabel(ROOM_WISH_OPTIONS, room.roomWish);
   const wish = room.roomWish;
   const impactFirst = wishPrimaryGroup(wish) === 'impact';
+  const soundCorrection = wishSoundCorrectionLine(wish);
+  const drumLine = stretchDrumLine(room.plannedCeiling);
   const slabContext =
     room.slabType === 'unknown' && room.slabThickness === 'unknown'
       ? `ориентир по типу дома (${houseLabel}), ~${slab.thicknessMm} мм`
@@ -283,7 +285,7 @@ export function ResultScreen() {
           тип дома: {houseLabel}
           {roomLabel ? ` · ${roomLabel}` : ''}
           {room.ceilingAreaM2 ? ` · ${room.ceilingAreaM2} м²` : ''}
-          {` · сценарий: ${wishLabel}`}
+          {` · задача: ${wishLabel}`}
         </p>
       </section>
 
@@ -350,8 +352,10 @@ export function ResultScreen() {
           </p>
         </header>
 
-        <aside className={styles.scenario} aria-label="Сценарий использования">
+        <aside className={styles.scenario} aria-label="Ваша задача">
           <p>{wishScenarioLine(wish)}</p>
+          {drumLine ? <p className={styles.scenarioExtra}>{drumLine}</p> : null}
+          {soundCorrection ? <p className={styles.scenarioExtra}>{soundCorrection}</p> : null}
         </aside>
 
         <div className={styles.feltStack}>

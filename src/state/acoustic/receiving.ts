@@ -64,18 +64,19 @@ function furnishingFactor(room: RoomAnswers): number {
 }
 
 /**
- * Planned use tilts the in-room mix (L2 / demo), not construction Rw/Lnw.
- * Sleep notices footsteps more; work notices speech; everyday is a mixed household.
+ * Job tilts the in-room mix (L2 / demo), not construction Rw/Lnw.
+ * Incoming noise → impact; privacy / music → airborne speech band.
  */
 function wishUseAdj(room: RoomAnswers, f: number, kind: 'air' | 'impact'): number {
   switch (room.roomWish) {
-    case 'rest':
+    case 'from_above':
       if (kind === 'impact') return f <= 250 ? 2.4 : 1.1;
       return f >= 200 && f <= 2500 ? 1.1 : 0.3;
-    case 'focus':
+    case 'privacy_out':
+    case 'music_recording':
       if (kind === 'air') return f >= 250 && f <= 2500 ? 2.6 : 0.5;
       return f <= 200 ? -0.4 : 0;
-    case 'everyday':
+    case 'general':
       if (kind === 'air') return f >= 250 && f <= 4000 ? 1.4 : 0.6;
       return f >= 250 && f <= 2000 ? 1.3 : 0.5;
     default:

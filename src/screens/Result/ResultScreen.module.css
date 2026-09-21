@@ -1688,6 +1688,9 @@
   border-radius: var(--radius-md);
   border: 1px solid rgba(1, 100, 79, 0.22);
   background: color-mix(in srgb, var(--accent-soft) 80%, var(--bg-card));
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .scenario p {
@@ -1695,6 +1698,11 @@
   font-size: 14px;
   line-height: 1.45;
   color: var(--text-primary);
+}
+
+.scenarioExtra {
+  font-size: 13px !important;
+  color: var(--text-secondary) !important;
 }
 
 .normTableSimple {

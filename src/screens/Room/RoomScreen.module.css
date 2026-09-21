@@ -23,23 +23,12 @@
   animation: fadeUp var(--duration-normal) var(--ease-out);
 }
 
-.wishGrid {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  animation: fadeUp var(--duration-normal) var(--ease-out);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .progressFill {
     transition: none;
   }
 
   .grid {
-    animation: none;
-  }
-
-  .wishGrid {
     animation: none;
   }
 }

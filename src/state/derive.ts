@@ -14,7 +14,7 @@ function whyFor(
   wish: RoomWishOption,
 ): string[] {
   const why: string[] = [];
-  if (wish !== 'unknown') why.push(wishScenarioLine(wish));
+  if (wish !== 'other') why.push(wishScenarioLine(wish));
   if (noiseType === 'impact' || noiseType === 'mixed') {
     why.push(
       'Ударный шум сверху идёт через плиту — бескаркасная MultiFrame работает на потолке, без каркаса.',

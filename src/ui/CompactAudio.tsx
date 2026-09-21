@@ -29,7 +29,7 @@ type Props = {
   wish?: RoomWishOption;
 };
 
-export function CompactAudio({ pairs, sim, wish = 'unknown' }: Props) {
+export function CompactAudio({ pairs, sim, wish = 'general' }: Props) {
   const { activeId, progress, play, stop } = useDemoPlayer();
   const groups = wishAudioOrder(wish);
   const primary = wishPrimaryGroup(wish);
@@ -50,7 +50,9 @@ export function CompactAudio({ pairs, sim, wish = 'unknown' }: Props) {
         {groups.map((group) => {
           const groupPairs = pairs.filter((p) => p.group === group);
           if (!groupPairs.length) return null;
-          const featured = group === primary && wish !== 'unknown';
+          const featured =
+            group === primary &&
+            (wish === 'from_above' || wish === 'privacy_out' || wish === 'music_recording');
           return (
             <div
               key={group}

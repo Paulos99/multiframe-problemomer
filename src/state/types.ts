@@ -38,8 +38,16 @@ export type PlannedCeilingOption = 'stretch_planned' | 'ceiling_exists' | 'unkno
 
 export type NoisyNeighborsOption = 'unknown' | 'usually_quiet' | 'sometimes_noisy' | 'often_noisy';
 
-/** Planned use of the room — drives demo accent and receiving mix, not hobbies */
-export type RoomWishOption = 'unknown' | 'rest' | 'focus' | 'everyday';
+/**
+ * Acoustic job for MultiFrame — personalizes Result copy and demo accent.
+ * Does not change construction Rw/Lnw.
+ */
+export type RoomWishOption =
+  | 'from_above'
+  | 'privacy_out'
+  | 'music_recording'
+  | 'general'
+  | 'other';
 
 /** Legacy noise tags — still used for audio demo grouping, not a survey */
 export type NoiseScenario =
@@ -271,27 +279,12 @@ export const NOISY_NEIGHBORS_OPTIONS: { id: NoisyNeighborsOption; label: string 
   { id: 'often_noisy', label: 'Сверху часто шумно' },
 ];
 
-export const ROOM_WISH_OPTIONS: { id: RoomWishOption; label: string; hint: string }[] = [
-  {
-    id: 'rest',
-    label: 'Спать и отдыхать',
-    hint: 'Ночью важны шаги сверху и тихие голоса — покажем оба канала',
-  },
-  {
-    id: 'focus',
-    label: 'Работать, учиться, созваниваться',
-    hint: 'Акцент на речи и ТВ сверху — воздушный шум',
-  },
-  {
-    id: 'everyday',
-    label: 'Общение, ТВ и обычный быт',
-    hint: 'Смешанный фон: голоса, шаги и техника',
-  },
-  {
-    id: 'unknown',
-    label: 'Пока не определились',
-    hint: 'Общий ориентир по обоим каналам, без акцента',
-  },
+export const ROOM_WISH_OPTIONS: { id: RoomWishOption; label: string }[] = [
+  { id: 'from_above', label: 'Снизить шум сверху' },
+  { id: 'privacy_out', label: 'Чтобы наверху меньше слышали вас' },
+  { id: 'music_recording', label: 'Улучшить качество музыки и записи' },
+  { id: 'general', label: 'Повысить общий акустический комфорт' },
+  { id: 'other', label: 'Другая задача' },
 ];
 
 /** Everyday first-layer labels (workshop 2026-09-16). SP letters stay secondary. */

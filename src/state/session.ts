@@ -50,7 +50,7 @@ function defaultRoom() {
     objectStage: 'unknown' as const,
     plannedCeiling: 'unknown' as const,
     noisyNeighbors: 'unknown' as const,
-    roomWish: 'unknown' as const,
+    roomWish: 'general' as const,
   };
 }
 
