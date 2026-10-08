@@ -23,7 +23,7 @@ import {
   NORMS,
   officialComfortLabel,
 } from './simulation';
-import { buildLeadHandoff } from './session';
+import { buildLeadHandoff, withDerived } from './session';
 import { buildAirSpectrum, buildImpactSpectrum } from './spectrum';
 import { spectrumChartSvg } from './chartSvg';
 import { wishScenarioLine, stretchDrumLine } from './wish';
@@ -521,27 +521,102 @@ function buildReportDocument(session: SessionState): string {
 </body></html>`;
 }
 
+/** Prefetch pdf libs so the click is not waiting on the network. */
+export function prefetchAcousticProfilePdf(): void {
+  void Promise.all([import('html2canvas'), import('jspdf')]);
+}
+
+function waitFrames(n: number): Promise<void> {
+  return new Promise((resolve) => {
+    const step = (left: number) => {
+      if (left <= 0) resolve();
+      else requestAnimationFrame(() => step(left - 1));
+    };
+    step(n);
+  });
+}
+
+function loadIframeDocument(iframe: HTMLIFrameElement, html: string): Promise<Document> {
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const finish = (err?: Error) => {
+      if (settled) return;
+      settled = true;
+      window.clearTimeout(timer);
+      if (err) reject(err);
+      else {
+        const doc = iframe.contentDocument;
+        if (!doc?.body) reject(new Error('Не удалось собрать отчёт'));
+        else resolve(doc);
+      }
+    };
+    const timer = window.setTimeout(() => finish(new Error('Отчёт не открылся')), 12000);
+    iframe.onload = () => finish();
+    iframe.srcdoc = html;
+    requestAnimationFrame(() => {
+      if (iframe.contentDocument?.querySelector('.page')) finish();
+    });
+  });
+}
+
+function triggerDownload(blob: Blob, filename: string, preview: Window | null): void {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.rel = 'noopener';
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  if (preview && !preview.closed) {
+    try {
+      preview.location.replace(url);
+    } catch {
+      preview.close();
+    }
+  }
+
+  window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+}
+
 /** Render report as one A4 page image each → PDF download. */
-export async function downloadAcousticProfilePdf(session: SessionState): Promise<void> {
-  if (!session.derived) {
+export async function downloadAcousticProfilePdf(
+  session: SessionState,
+  preview: Window | null = null,
+): Promise<void> {
+  const full = session.derived ? session : withDerived(session);
+  if (!full.derived) {
+    preview?.close();
     throw new Error('Нет расчёта для отчёта');
   }
 
-  const html = buildReportDocument(session);
-  const host = document.createElement('div');
-  host.setAttribute('aria-hidden', 'true');
-  host.style.cssText = `position:fixed;left:-12000px;top:0;width:${PAGE_W}px;background:#fff;z-index:-1;pointer-events:none;`;
-  host.innerHTML = html;
-  document.body.appendChild(host);
-
-  const root = host.querySelector('#mf-report-root') as HTMLElement | null;
-  const pages = Array.from(host.querySelectorAll('.page')) as HTMLElement[];
-  if (!root || pages.length === 0) {
-    host.remove();
-    throw new Error('Не удалось собрать отчёт');
-  }
+  const html = buildReportDocument(full);
+  const iframe = document.createElement('iframe');
+  iframe.setAttribute('aria-hidden', 'true');
+  iframe.setAttribute('title', 'PDF');
+  iframe.style.cssText = [
+    'position:fixed',
+    'left:0',
+    'top:0',
+    `width:${PAGE_W}px`,
+    `height:${PAGE_H}px`,
+    'border:0',
+    'opacity:0.01',
+    'pointer-events:none',
+    'z-index:2147483646',
+    'background:#fff',
+  ].join(';');
+  document.body.appendChild(iframe);
 
   try {
+    const idoc = await loadIframeDocument(iframe, html);
+    const pages = Array.from(idoc.querySelectorAll('.page')) as HTMLElement[];
+    if (pages.length === 0) {
+      throw new Error('Не удалось собрать отчёт');
+    }
+
     const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
       import('html2canvas'),
       import('jspdf'),
@@ -552,14 +627,18 @@ export async function downloadAcousticProfilePdf(session: SessionState): Promise
     const pageH = pdf.internal.pageSize.getHeight();
 
     for (let i = 0; i < pages.length; i++) {
+      pages.forEach((page, j) => {
+        page.style.display = j === i ? 'block' : 'none';
+      });
+      await waitFrames(2);
+
       const pageEl = pages[i]!;
       const canvas = await html2canvas(pageEl, {
         scale: 2,
         backgroundColor: '#ffffff',
         useCORS: true,
         logging: false,
-        width: PAGE_W,
-        height: PAGE_H,
+        foreignObjectRendering: false,
         windowWidth: PAGE_W,
         windowHeight: PAGE_H,
       });
@@ -569,12 +648,17 @@ export async function downloadAcousticProfilePdf(session: SessionState): Promise
       pdf.addImage(imgData, 'PNG', 0, 0, pageW, pageH, undefined, 'FAST');
     }
 
-    const room = session.answers.room;
+    const room = full.answers.room;
     const roomName = room.roomType ? ROOM_TYPE_LABELS[room.roomType] : 'komnata';
     const safe = roomName.replace(/[^\wа-яА-ЯёЁ\-]+/gi, '_').slice(0, 24);
-    pdf.save(`MultiFrame_профиль_${safe}_${room.ceilingAreaM2 ?? 'area'}.pdf`);
+    const filename = `MultiFrame_результаты_${safe}_${room.ceilingAreaM2 ?? 'area'}.pdf`;
+    const blob = pdf.output('blob');
+    triggerDownload(blob, filename, preview);
+  } catch (err) {
+    preview?.close();
+    throw err;
   } finally {
-    host.remove();
+    iframe.remove();
   }
 }
 

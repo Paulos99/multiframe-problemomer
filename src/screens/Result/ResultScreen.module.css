@@ -953,6 +953,13 @@
   min-height: var(--touch-min);
 }
 
+.pdfError {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.35;
+  color: #b42318;
+}
+
 @media (max-width: 420px) {
   .splitActions {
     grid-template-columns: 1fr;

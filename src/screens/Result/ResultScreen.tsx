@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Screen } from '../../ui/Screen';
 import { Button } from '../../ui/Button';
 import { CompactAudio } from '../../ui/CompactAudio';
@@ -25,7 +25,11 @@ import {
 } from '../../state/simulation';
 import { resolveSlab } from '../../state/acoustic/construction';
 import { buildCalculatorUrl } from '../../state/session';
-import { downloadAcousticProfilePdf, shareAcousticProfile } from '../../state/reportPdf';
+import {
+  downloadAcousticProfilePdf,
+  prefetchAcousticProfilePdf,
+  shareAcousticProfile,
+} from '../../state/reportPdf';
 import { wishPrimaryGroup, wishScenarioLine, wishSoundCorrectionLine, stretchDrumLine } from '../../state/wish';
 import styles from './ResultScreen.module.css';
 
@@ -234,14 +238,30 @@ export function ResultScreen() {
   }
 
   const [pdfBusy, setPdfBusy] = useState(false);
+  const [pdfError, setPdfError] = useState(false);
+
+  useEffect(() => {
+    prefetchAcousticProfilePdf();
+  }, []);
 
   async function onDownloadProfile() {
     if (pdfBusy) return;
     setPdfBusy(true);
+    setPdfError(false);
+    // Open now, while we still have the click gesture — later pdf.save() is often blocked.
+    const preview = window.open('', '_blank');
+    if (preview) {
+      preview.document.write(
+        '<!doctype html><title>PDF</title><p style="font-family:sans-serif;padding:24px">Готовим PDF…</p>',
+      );
+      preview.document.close();
+    }
     try {
-      await downloadAcousticProfilePdf(session);
+      await downloadAcousticProfilePdf(session, preview);
     } catch (err) {
       console.error('[pdf]', err);
+      setPdfError(true);
+      preview?.close();
     } finally {
       setPdfBusy(false);
     }
@@ -554,6 +574,11 @@ export function ResultScreen() {
               {shareLabel}
             </Button>
           </div>
+          {pdfError ? (
+            <p className={styles.pdfError} role="alert">
+              Не удалось скачать. Разрешите всплывающие окна и нажмите ещё раз.
+            </p>
+          ) : null}
         </div>
       </section>
 
