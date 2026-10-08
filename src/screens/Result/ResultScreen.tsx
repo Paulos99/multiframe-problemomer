@@ -11,7 +11,6 @@ import {
   ROOM_WISH_OPTIONS,
   SLAB_THICKNESS_OPTIONS,
   SLAB_TYPE_OPTIONS,
-  type ClassLabel,
 } from '../../state/types';
 import {
   FELT_STEP_LABELS,
@@ -29,13 +28,19 @@ import { buildCalculatorUrl, buildClientSummary } from '../../state/session';
 import { wishPrimaryGroup, wishScenarioLine, wishSoundCorrectionLine, stretchDrumLine } from '../../state/wish';
 import styles from './ResultScreen.module.css';
 
-/** Official SP thresholds only (А/Б/В) — no fictional «Д». */
-const NORM_ROWS: { cls: Exclude<ClassLabel, 'below'>; label: string; rw: string; lnw: string }[] =
-  [
-    { cls: 'A', label: 'Высокий комфорт (А)', rw: `≥ ${NORMS.A.Rw}`, lnw: `≤ ${NORMS.A.Lnw}` },
-    { cls: 'B', label: 'Комфорт (Б)', rw: `≥ ${NORMS.B.Rw}`, lnw: `≤ ${NORMS.B.Lnw}` },
-    { cls: 'V', label: 'Допустимый (В)', rw: `≥ ${NORMS.V.Rw}`, lnw: `≤ ${NORMS.V.Lnw}` },
-  ];
+/** Official SP thresholds А/Б/В + explicit «ниже допустимого» band. */
+const NORM_ROWS: { key: string; label: string; rw: string; lnw: string; muted?: boolean }[] = [
+  { key: 'A', label: 'Высокий комфорт (А)', rw: `≥ ${NORMS.A.Rw}`, lnw: `≤ ${NORMS.A.Lnw}` },
+  { key: 'B', label: 'Комфорт (Б)', rw: `≥ ${NORMS.B.Rw}`, lnw: `≤ ${NORMS.B.Lnw}` },
+  { key: 'V', label: 'Допустимый (В)', rw: `≥ ${NORMS.V.Rw}`, lnw: `≤ ${NORMS.V.Lnw}` },
+  {
+    key: 'below',
+    label: 'Ниже допустимого',
+    rw: `< ${NORMS.V.Rw}`,
+    lnw: `> ${NORMS.V.Lnw}`,
+    muted: true,
+  },
+];
 
 /** StP site pillars — title + one line, no vs-comparison with plain stretch film. */
 const MULTIFRAME_PILLARS = [
@@ -111,14 +116,14 @@ function FeltScale({
           : `${title}: сейчас ${FELT_STEP_LABELS[now]}, ${indexKind} ≈ ${nowVal}; с MultiFrame ${
               after ? FELT_STEP_LABELS[after] : ''
             }${afterVal != null ? `, ${indexKind} ≈ ${afterVal}` : ''}${
-              quieterPct != null ? `, примерно на ${quieterPct}% тише` : ''
+              quieterPct != null ? `, станет на ≈ ${quieterPct}% тише` : ''
             }`
       }
     >
       <div className={styles.feltHead}>
         <strong>{title}</strong>
         {mode === 'nowAndAfter' && quieterPct != null ? (
-          <b>≈ {quieterPct}% тише</b>
+          <b>станет на ≈ {quieterPct}% тише</b>
         ) : null}
       </div>
 
@@ -205,6 +210,17 @@ export function ResultScreen() {
   const airSpectrum = sim.airSpectrum;
   const impactSpectrum = sim.impactSpectrum;
   const calcUrl = buildCalculatorUrl(session.cta);
+  // «Другая задача» / сплошные «Не знаю» по объекту — без персонального блока задачи.
+  const objectAllUnknown =
+    room.houseType === 'unknown' &&
+    room.slabType === 'unknown' &&
+    room.slabThickness === 'unknown' &&
+    room.floorAbove === 'unknown' &&
+    room.noisyNeighbors === 'unknown' &&
+    room.objectStage === 'unknown' &&
+    room.plannedCeiling === 'unknown';
+  const showWishScenario = wish !== 'other' && !objectAllUnknown;
+  const showScenarioAside = showWishScenario || Boolean(drumLine) || Boolean(soundCorrection);
 
   const [copied, setCopied] = useState(false);
 
@@ -227,25 +243,48 @@ export function ResultScreen() {
     }
   }
 
+  const airChart = (
+    <SpectrumChart
+      title="Воздушный шум (голоса и музыка)"
+      subtitle="R(f), дБ · воздушный шум сверху"
+      series={airSpectrum}
+      yLabel="дБ"
+      indexBadge={{ kind: 'Rw', before: sim.before.Rw, after: sim.after.Rw }}
+    />
+  );
+  const impactChart = (
+    <SpectrumChart
+      title="Ударный шум (шаги и падения)"
+      subtitle="Изоляция по полосам Гц · ударный шум"
+      series={impactSpectrum}
+      yLabel="дБ"
+      indexBadge={{ kind: 'Lnw', before: sim.before.Lnw, after: sim.after.Lnw }}
+    />
+  );
+
   return (
-    <Screen
-      dense
-      title="Акустический профиль помещения"
-      subtitle="Ориентир комфорта для вашего объекта и следующий шаг к расчёту"
-    >
+    <Screen dense title="Акустический профиль помещения">
       <section className={styles.block} aria-label="Нормы комфорта в стройке">
         <header className={styles.sectionHead}>
           <h2>Нормы комфорта в стройке</h2>
           <p>
-            Чтобы понять, насколько тихо в вашей комнате, сравниваем <b>перекрытие</b> с
-            официальной шкалой акустического комфорта жилья — классами <b>А / Б / В</b> по СП
-            51.13330.2011. Ниже — пороги этой шкалы; дальше по ним отметим, где вы сейчас и куда
-            можно выйти с MultiFrame.
+            Сравниваем <b>перекрытие</b> с официальной шкалой акустического комфорта жилья по СП
+            51.13330.2011.
           </p>
-          <p>
-            <b>Rw</b> — изоляция от воздушного шума (голоса, музыка): <b>больше — лучше</b>.{' '}
-            <b>Lnw</b> — индекс ударного шума (шаги, падения): <b>меньше — лучше</b>.
-          </p>
+          <ul className={styles.normLeadList}>
+            <li>
+              Классы <b>А / Б / В</b> — пороги комфорта в таблице ниже
+            </li>
+            <li>Дальше отметим, где вы сейчас и куда можно выйти с MultiFrame</li>
+          </ul>
+          <div className={styles.indexDefs}>
+            <p>
+              <b>Rw</b> — изоляция от воздушного шума (голоса, музыка): <b>больше — лучше</b>
+            </p>
+            <p>
+              <b>Lnw</b> — индекс ударного шума (шаги, падения): <b>меньше — лучше</b>
+            </p>
+          </div>
         </header>
 
         <div className={styles.tableWrap}>
@@ -265,7 +304,7 @@ export function ResultScreen() {
             </thead>
             <tbody>
               {NORM_ROWS.map((r) => (
-                <tr key={r.cls}>
+                <tr key={r.key} className={r.muted ? styles.normBelow : undefined}>
                   <td>{r.label}</td>
                   <td>
                     {r.rw} <em>дБ</em>
@@ -278,28 +317,42 @@ export function ResultScreen() {
             </tbody>
           </table>
         </div>
-
-        <p className={styles.contextLine}>
-          Для вашего перекрытия: {slabContext}
-          {' · '}
-          тип дома: {houseLabel}
-          {roomLabel ? ` · ${roomLabel}` : ''}
-          {room.ceilingAreaM2 ? ` · ${room.ceilingAreaM2} м²` : ''}
-          {` · задача: ${wishLabel}`}
-        </p>
       </section>
 
       <section className={styles.block} aria-label="Текущая ситуация">
         <header className={styles.sectionHead}>
           <h2>Текущая ситуация</h2>
-          <p>
-            Ориентир по нормам СП для этого перекрытия — до монтажа MultiFrame. Шкала и цифры{' '}
-            <b>Rw / Lnw</b> — про изоляцию конструкции.
-          </p>
-          <p className={styles.officialHead}>
-            Сейчас: уровень комфорта по нормам «{beforeOfficial}»
-          </p>
         </header>
+
+        <div className={styles.objectCard} aria-label="Объект">
+          <h3>Объект</h3>
+          <dl className={styles.objectGrid}>
+            <div>
+              <dt>Перекрытие</dt>
+              <dd>{slabContext}</dd>
+            </div>
+            <div>
+              <dt>Тип дома</dt>
+              <dd>{houseLabel}</dd>
+            </div>
+            {roomLabel ? (
+              <div>
+                <dt>Комната</dt>
+                <dd>{roomLabel}</dd>
+              </div>
+            ) : null}
+            {room.ceilingAreaM2 ? (
+              <div>
+                <dt>Площадь</dt>
+                <dd>{room.ceilingAreaM2} м²</dd>
+              </div>
+            ) : null}
+            <div>
+              <dt>Задача</dt>
+              <dd>{wishLabel}</dd>
+            </div>
+          </dl>
+        </div>
 
         <div className={styles.feltStack}>
           {impactFirst ? (
@@ -338,25 +391,25 @@ export function ResultScreen() {
             </>
           )}
         </div>
+
+        <p className={styles.comfortClass}>
+          <span>Класс комфорта помещения</span>
+          <b>«{beforeOfficial}»</b>
+        </p>
       </section>
 
       <section className={styles.block} aria-label="С MultiFrame">
         <header className={styles.sectionHead}>
           <h2>С MultiFrame</h2>
-          <p>
-            Тот же ориентир по нормам после монтажа: куда сдвинутся <b>Rw / Lnw</b> и бытовая
-            шкала.
-          </p>
-          <p className={styles.officialHead}>
-            С MultiFrame: уровень комфорта по нормам «{afterOfficial}»
-          </p>
         </header>
 
-        <aside className={styles.scenario} aria-label="Ваша задача">
-          <p>{wishScenarioLine(wish)}</p>
-          {drumLine ? <p className={styles.scenarioExtra}>{drumLine}</p> : null}
-          {soundCorrection ? <p className={styles.scenarioExtra}>{soundCorrection}</p> : null}
-        </aside>
+        {showScenarioAside ? (
+          <aside className={styles.scenario} aria-label="Ваша задача">
+            {showWishScenario ? <p>{wishScenarioLine(wish)}</p> : null}
+            {drumLine ? <p className={styles.scenarioExtra}>{drumLine}</p> : null}
+            {soundCorrection ? <p className={styles.scenarioExtra}>{soundCorrection}</p> : null}
+          </aside>
+        ) : null}
 
         <div className={styles.feltStack}>
           {impactFirst ? (
@@ -417,36 +470,21 @@ export function ResultScreen() {
           </header>
           {impactFirst ? (
             <>
-              <SpectrumChart
-                title="Ударный шум (шаги и падения)"
-                subtitle="Изоляция по полосам Гц · ударный шум"
-                series={impactSpectrum}
-                yLabel="дБ"
-              />
-              <SpectrumChart
-                title="Воздушный шум (голоса и музыка)"
-                subtitle="R(f), дБ · воздушный шум сверху"
-                series={airSpectrum}
-                yLabel="дБ"
-              />
+              {impactChart}
+              {airChart}
             </>
           ) : (
             <>
-              <SpectrumChart
-                title="Воздушный шум (голоса и музыка)"
-                subtitle="R(f), дБ · воздушный шум сверху"
-                series={airSpectrum}
-                yLabel="дБ"
-              />
-              <SpectrumChart
-                title="Ударный шум (шаги и падения)"
-                subtitle="Изоляция по полосам Гц · ударный шум"
-                series={impactSpectrum}
-                yLabel="дБ"
-              />
+              {airChart}
+              {impactChart}
             </>
           )}
         </div>
+
+        <p className={styles.comfortClass}>
+          <span>Класс комфорта помещения</span>
+          <b>«{afterOfficial}»</b>
+        </p>
       </section>
 
       <section className={styles.reasons} aria-label="Уникальность системы MultiFrame">
@@ -476,7 +514,7 @@ export function ResultScreen() {
 
         <div className={styles.nextActions}>
           <Button fullWidth onClick={openCalc}>
-            Открыть калькулятор MultiFrame
+            Рассчитать количество MultiFrame
           </Button>
           <Button variant="secondary" fullWidth onClick={openConsultation}>
             Запросить консультацию или подбор

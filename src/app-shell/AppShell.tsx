@@ -34,7 +34,7 @@ export function AppShell() {
       break;
   }
 
-  const ctaLabel = isResult ? 'Открыть калькулятор MultiFrame' : 'Далее';
+  const ctaLabel = isResult ? 'Рассчитать количество MultiFrame' : 'Далее';
   const calcUrl = isResult ? buildCalculatorUrl(session.cta) : null;
 
   return (

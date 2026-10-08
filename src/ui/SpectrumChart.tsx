@@ -1,5 +1,12 @@
+import { useCallback, useMemo, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import type { SpectrumSeries } from '../state/spectrum';
 import styles from './SpectrumChart.module.css';
+
+type IndexBadge = {
+  kind: 'Rw' | 'Lnw';
+  before: number;
+  after: number;
+};
 
 type Props = {
   title: string;
@@ -8,6 +15,18 @@ type Props = {
   yLabel: string;
   beforeLabel?: string;
   afterLabel?: string;
+  /** Weighted index shown in the top-right corner (до → после). */
+  indexBadge?: IndexBadge;
+};
+
+type HoverPoint = {
+  i: number;
+  hz: number;
+  before: number;
+  after: number;
+  x: number;
+  yBefore: number;
+  yAfter: number;
 };
 
 function xAt(hz: number, hzMin: number, hzMax: number, x0: number, w: number): number {
@@ -86,6 +105,19 @@ function formatHz(hz: number): string {
   return hz >= 1000 ? `${hz / 1000}k` : String(hz);
 }
 
+function nearestBandIndex(hzList: readonly number[], targetHz: number): number {
+  let best = 0;
+  let bestDist = Infinity;
+  for (let i = 0; i < hzList.length; i++) {
+    const d = Math.abs(Math.log10(hzList[i]!) - Math.log10(targetHz));
+    if (d < bestDist) {
+      bestDist = d;
+      best = i;
+    }
+  }
+  return best;
+}
+
 export function SpectrumChart({
   title,
   subtitle,
@@ -93,6 +125,7 @@ export function SpectrumChart({
   yLabel,
   beforeLabel = 'Сейчас',
   afterLabel = 'С MultiFrame',
+  indexBadge,
 }: Props) {
   const padL = 28;
   const padR = 10;
@@ -134,55 +167,136 @@ export function SpectrumChart({
   );
 
   const xLabels = [100, 250, 500, 1000, 2000, 5000];
+  const [hover, setHover] = useState<HoverPoint | null>(null);
+
+  const onMove = useCallback(
+    (e: ReactPointerEvent<SVGSVGElement>) => {
+      const svg = e.currentTarget;
+      const rect = svg.getBoundingClientRect();
+      const sx = ((e.clientX - rect.left) / rect.width) * W;
+      if (sx < padL || sx > W - padR) {
+        setHover(null);
+        return;
+      }
+      const t = (sx - padL) / plotW;
+      const logHz = Math.log10(hzMin) + t * (Math.log10(hzMax) - Math.log10(hzMin));
+      const targetHz = 10 ** logHz;
+      const i = nearestBandIndex(series.hz, targetHz);
+      const hz = series.hz[i]!;
+      const before = series.before[i]!;
+      const after = series.after[i]!;
+      setHover({
+        i,
+        hz,
+        before,
+        after,
+        x: xAt(hz, hzMin, hzMax, padL, plotW),
+        yBefore: yAt(before, yMin, yMax, padT, plotH),
+        yAfter: yAt(after, yMin, yMax, padT, plotH),
+      });
+    },
+    [hzMax, hzMin, plotH, plotW, series.after, series.before, series.hz, yMax, yMin],
+  );
+
+  const tooltipStyle = useMemo(() => {
+    if (!hover) return undefined;
+    const leftPct = (hover.x / W) * 100;
+    const flip = leftPct > 62;
+    return {
+      left: `${leftPct}%`,
+      transform: flip ? 'translate(-100%, 0)' : 'translate(0, 0)',
+    } as const;
+  }, [hover]);
 
   return (
     <figure className={styles.wrap}>
-      <figcaption>
-        <strong>{title}</strong>
-        <span>{subtitle}</span>
+      <figcaption className={styles.captionRow}>
+        <div className={styles.captionText}>
+          <strong>{title}</strong>
+          <span>{subtitle}</span>
+        </div>
+        {indexBadge ? (
+          <div className={styles.indexBadge} aria-label={`${indexBadge.kind} до и после`}>
+            <b>{indexBadge.kind}</b>
+            <span>
+              ≈ {Math.round(indexBadge.before)}
+              <span aria-hidden> → </span>≈ {Math.round(indexBadge.after)}
+            </span>
+          </div>
+        ) : null}
       </figcaption>
 
-      <svg
-        className={styles.svg}
-        viewBox={`0 0 ${W} ${H}`}
-        role="img"
-        aria-label={`${title}: ${beforeLabel} и ${afterLabel}. Чем выше линия, тем лучше изоляция.`}
-      >
-        {yTicks.map((tick) => {
-          const y = yAt(tick, yMin, yMax, padT, plotH);
-          return (
-            <g key={tick}>
-              <line x1={padL} x2={W - padR} y1={y} y2={y} className={styles.grid} />
-              <text x={padL - 6} y={y + 3} className={styles.tick} textAnchor="end">
-                {tick}
-              </text>
-            </g>
-          );
-        })}
-
-        {xLabels.map((hz) => {
-          const x = xAt(hz, hzMin, hzMax, padL, plotW);
-          return (
-            <text key={hz} x={x} y={H - 6} className={styles.tick} textAnchor="middle">
-              {formatHz(hz)}
-            </text>
-          );
-        })}
-
-        <text
-          x={11}
-          y={padT + plotH / 2}
-          className={styles.axisLabel}
-          transform={`rotate(-90 11 ${padT + plotH / 2})`}
-          textAnchor="middle"
+      <div className={styles.plot}>
+        <svg
+          className={styles.svg}
+          viewBox={`0 0 ${W} ${H}`}
+          role="img"
+          aria-label={`${title}: ${beforeLabel} и ${afterLabel}. Чем выше линия, тем лучше изоляция. Наведите курсор, чтобы увидеть дБ по частоте.`}
+          onPointerMove={onMove}
+          onPointerLeave={() => setHover(null)}
         >
-          {yLabel}
-        </text>
+          {yTicks.map((tick) => {
+            const y = yAt(tick, yMin, yMax, padT, plotH);
+            return (
+              <g key={tick}>
+                <line x1={padL} x2={W - padR} y1={y} y2={y} className={styles.grid} />
+                <text x={padL - 6} y={y + 3} className={styles.tick} textAnchor="end">
+                  {tick}
+                </text>
+              </g>
+            );
+          })}
 
-        <path d={area} className={styles.gain} />
-        <path d={beforePath} className={styles.before} fill="none" />
-        <path d={afterPath} className={styles.after} fill="none" />
-      </svg>
+          {xLabels.map((hz) => {
+            const x = xAt(hz, hzMin, hzMax, padL, plotW);
+            return (
+              <text key={hz} x={x} y={H - 6} className={styles.tick} textAnchor="middle">
+                {formatHz(hz)}
+              </text>
+            );
+          })}
+
+          <text
+            x={11}
+            y={padT + plotH / 2}
+            className={styles.axisLabel}
+            transform={`rotate(-90 11 ${padT + plotH / 2})`}
+            textAnchor="middle"
+          >
+            {yLabel}
+          </text>
+
+          <path d={area} className={styles.gain} />
+          <path d={beforePath} className={styles.before} fill="none" />
+          <path d={afterPath} className={styles.after} fill="none" />
+
+          {hover ? (
+            <g className={styles.hoverLayer} pointerEvents="none">
+              <line
+                x1={hover.x}
+                x2={hover.x}
+                y1={padT}
+                y2={padT + plotH}
+                className={styles.hoverLine}
+              />
+              <circle cx={hover.x} cy={hover.yBefore} r={3.2} className={styles.dotBefore} />
+              <circle cx={hover.x} cy={hover.yAfter} r={3.5} className={styles.dotAfter} />
+            </g>
+          ) : null}
+        </svg>
+
+        {hover ? (
+          <div className={styles.tooltip} style={tooltipStyle} role="status">
+            <strong>{formatHz(hover.hz)} Гц</strong>
+            <span>
+              {beforeLabel}: <b>{hover.before.toFixed(1)} дБ</b>
+            </span>
+            <span>
+              {afterLabel}: <b>{hover.after.toFixed(1)} дБ</b>
+            </span>
+          </div>
+        ) : null}
+      </div>
 
       <ul className={styles.legend}>
         <li>
