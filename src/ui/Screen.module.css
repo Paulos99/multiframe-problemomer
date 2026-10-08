@@ -6,13 +6,13 @@
 }
 
 .hero .head h1 {
-  font-size: clamp(1.6rem, 4.5vw, 2.15rem);
+  font-size: clamp(1.7rem, 4.5vw, 2.35rem);
   letter-spacing: -0.02em;
 }
 
 .head h1 {
   margin: 0 0 8px;
-  font-size: clamp(1.35rem, 3.5vw, 1.75rem);
+  font-size: clamp(1.4rem, 3.5vw, 1.9rem);
   line-height: 1.2;
   letter-spacing: -0.015em;
 }
@@ -37,8 +37,8 @@
 .head p {
   margin: 0;
   color: var(--text-secondary);
-  font-size: 15px;
-  max-width: 42ch;
+  font-size: 16px;
+  max-width: 48ch;
 }
 
 .head .lead {

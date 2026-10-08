@@ -33,11 +33,38 @@
   --touch-min: 44px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-top: env(safe-area-inset-top, 0px);
-  --header-h: 64px;
+  /* Compact chrome — stays readable without ballooning when the page is zoomed. */
+  --header-h: 56px;
   /* Sticky CTA clearance: keep SimCompare metrics/chips above «Далее» on phones. */
   --footer-h: 120px;
   --font: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --max-w: 720px;
+  /* Scales main column + sticky CTA on large screens (header stays 1×). */
+  --desktop-zoom: 1;
+}
+
+@media (min-width: 900px) {
+  :root {
+    --max-w: 820px;
+    --desktop-zoom: 1.12;
+    --footer-h: 132px;
+  }
+}
+
+@media (min-width: 1200px) {
+  :root {
+    --max-w: 900px;
+    --desktop-zoom: 1.18;
+    --footer-h: 140px;
+  }
+}
+
+@media (min-width: 1440px) {
+  :root {
+    --max-w: 960px;
+    --desktop-zoom: 1.22;
+    --footer-h: 148px;
+  }
 }
 
 body.theme-dark {
