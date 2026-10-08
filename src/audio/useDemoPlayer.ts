@@ -287,10 +287,15 @@ function roomProcess(
   const trim = ctx.createGain();
   trim.gain.value = dbToGain(trimDb);
 
-  const muffler = ctx.createBiquadFilter();
-  muffler.type = 'lowpass';
-  muffler.frequency.value = mufflingHz;
-  muffler.Q.value = 0.7;
+  // Two cascaded LPs ≈ 24 dB/oct — one biquad at ~1.5 kHz is still too open on dry music.
+  const muffler1 = ctx.createBiquadFilter();
+  muffler1.type = 'lowpass';
+  muffler1.frequency.value = mufflingHz;
+  muffler1.Q.value = 0.707;
+  const muffler2 = ctx.createBiquadFilter();
+  muffler2.type = 'lowpass';
+  muffler2.frequency.value = isEcho ? mufflingHz : mufflingHz * 1.05;
+  muffler2.Q.value = 0.707;
 
   const roomGain = ctx.createGain();
   roomGain.gain.value = dbToGain(beforeGainDb);
@@ -316,9 +321,10 @@ function roomProcess(
   const ceiling = ctx.createGain();
   ceiling.gain.value = MASTER_PLAYBACK_GAIN;
 
-  // trim → muffler → room → after → EQ → split dry/wet → merge → limiter
-  trim.connect(muffler);
-  muffler.connect(roomGain);
+  // trim → muffler×2 → room → after → EQ → split dry/wet → merge → limiter
+  trim.connect(muffler1);
+  muffler1.connect(muffler2);
+  muffler2.connect(roomGain);
   roomGain.connect(afterGain);
   afterGain.connect(deltaEqChain.input);
   deltaEqChain.output.connect(dryGain);
@@ -336,7 +342,8 @@ function roomProcess(
       deltaEqChain.teardown();
       try {
         trim.disconnect();
-        muffler.disconnect();
+        muffler1.disconnect();
+        muffler2.disconnect();
         roomGain.disconnect();
         afterGain.disconnect();
         dryGain.disconnect();

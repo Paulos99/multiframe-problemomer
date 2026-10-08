@@ -212,9 +212,23 @@ export function assertModelAnchors(): string[] {
     MARKETING_AFTER_GAIN_MIN,
     MARKETING_AFTER_GAIN_MAX,
   );
-  if (Math.abs(shapeLoud.afterGainDb - expectedAfter) > 0.2) {
+  // Dry-stem demo: afterGain is at least dBA Δ, often stronger (index Δ + floor).
+  if (shapeLoud.afterGainDb > expectedAfter + 0.2) {
     errors.push(
-      `afterGain must be marketing-scaled dBA Δ (got ${shapeLoud.afterGainDb}, expected ${expectedAfter})`,
+      `afterGain should cut ≥ marketing-scaled dBA Δ (got ${shapeLoud.afterGainDb}, floor ${expectedAfter})`,
+    );
+  }
+  if (shapeLoud.afterGainDb > -7.5) {
+    errors.push(`air После should be clearly quieter on dry stems (got ${shapeLoud.afterGainDb})`);
+  }
+  if (shapeLoud.mufflingHzBefore > 2400) {
+    errors.push(
+      `До muffling too open for dry stems (${shapeLoud.mufflingHzBefore} Hz)`,
+    );
+  }
+  if (shapeLoud.mufflingHzAfter <= shapeLoud.mufflingHzBefore + 200) {
+    errors.push(
+      `После muffling should open vs До (${shapeLoud.mufflingHzBefore} → ${shapeLoud.mufflingHzAfter})`,
     );
   }
   // Residual EQ should not be flat-zero when bands move (MultiFrame shapes spectrum).
@@ -242,9 +256,14 @@ export function assertModelAnchors(): string[] {
     }),
   );
   const shapeGoodAir = buildRoomAudioShape(simGoodMono, 'air', 'talk');
-  if (shapeGoodAir.beforeGainDb > -8) {
+  if (shapeGoodAir.beforeGainDb > -5) {
     errors.push(
-      `good monolith office «До» should cut stem hard (beforeGain ${shapeGoodAir.beforeGainDb}, L2 ${shapeGoodAir.targetBeforeDb})`,
+      `good monolith office «До» should sit quieter (beforeGain ${shapeGoodAir.beforeGainDb}, L2 ${shapeGoodAir.targetBeforeDb})`,
+    );
+  }
+  if (shapeGoodAir.mufflingHzBefore > 2200) {
+    errors.push(
+      `good monolith office «До» should sound through-slab (${shapeGoodAir.mufflingHzBefore} Hz)`,
     );
   }
   if (shapeGoodAir.beforeGainDb >= shapeLoud.beforeGainDb) {

@@ -99,6 +99,7 @@ function playbackRefDb(group: AudioPlayGroup): number {
 
 /**
  * Map received-room dBA → playback offset from dry stem («До» only).
+ * Keep «До» present (uncomfortable) — slab muffling does the «through wall» feel.
  */
 export function playbackGainForReceivedDb(
   receivedDba: number,
@@ -106,16 +107,59 @@ export function playbackGainForReceivedDb(
 ): number {
   if (group === 'echo') return 0;
   const delta = receivedDba - playbackRefDb(group);
-  if (delta <= 0) return clamp(round1(delta * 0.95), -16, 0);
-  return clamp(round1(delta * 0.3), 0, 4);
+  if (delta <= 0) return clamp(round1(delta * 0.55), -10, 0);
+  return clamp(round1(delta * 0.25), 0, 3);
 }
 
-/** Heavier slab → darker muffling on continuous stems. */
-function mufflingHz(sim: DerivedSimulation, side: 'before' | 'after'): number {
+/**
+ * Dry stems need a real through-slab low-pass.
+ * Old MP3s were already muffled in-file; these are not.
+ */
+function mufflingHz(
+  sim: DerivedSimulation,
+  group: AudioPlayGroup,
+  side: 'before' | 'after',
+): number {
   const Rw = side === 'before' ? sim.before.Rw : sim.after.Rw;
-  // Stronger isolation → lower cutoff (more muffled upstairs noise)
-  const base = clamp(5200 - (Rw - 48) * 180, 900, 4800);
-  return round1(base);
+  // Weaker floor → more HF leak; stronger → darker.
+  const leak = clamp((50 - Rw) * 70, -500, 700);
+  const baseBefore =
+    group === 'impact' ? 980 : group === 'mixed' ? 1250 : 1550;
+  const beforeHz = clamp(baseBefore + leak, 700, 2400);
+  if (side === 'before') return round1(beforeHz);
+  // После: всё ещё «через потолок», но чуть открытее + тише по gain
+  const afterHz = clamp(beforeHz * 1.65 + 350, beforeHz + 500, 3800);
+  return round1(afterHz);
+}
+
+/** Floor so До/После always reads on dry household stems. */
+function demoAfterFloorDb(group: AudioPlayGroup): number {
+  if (group === 'impact') return -11;
+  if (group === 'mixed') return -9;
+  return -8;
+}
+
+/**
+ * Quieter После: received Δ, index Δ (Rw/Lnw), and a demo floor — take the strongest cut.
+ */
+function isolationAfterGainDb(
+  sim: DerivedSimulation,
+  group: AudioPlayGroup,
+  targetBeforeDb: number,
+  targetAfterDb: number,
+): number {
+  const rawDelta = targetAfterDb - targetBeforeDb;
+  const fromReceived = scaleAudioDelta(rawDelta);
+  const fromIndex =
+    group === 'impact'
+      ? scaleAudioDelta(-Math.abs(sim.delta.Lnw))
+      : group === 'air'
+        ? scaleAudioDelta(-Math.abs(sim.delta.Rw))
+        : scaleAudioDelta(
+            -((Math.abs(sim.delta.Rw) + Math.abs(sim.delta.Lnw)) / 2),
+          );
+  const strongest = Math.min(fromReceived, fromIndex, demoAfterFloorDb(group));
+  return clamp(round1(strongest), MARKETING_AFTER_GAIN_MIN, MARKETING_AFTER_GAIN_MAX);
 }
 
 export function buildRoomAudioShape(
@@ -149,16 +193,14 @@ export function buildRoomAudioShape(
   }
 
   const beforeGainDb = playbackGainForReceivedDb(targetBeforeDb, group);
+  const afterGainDb = isolationAfterGainDb(sim, group, targetBeforeDb, targetAfterDb);
   const rawDelta = targetAfterDb - targetBeforeDb;
-  const afterGainDb = clamp(
-    scaleAudioDelta(rawDelta),
-    MARKETING_AFTER_GAIN_MIN,
-    MARKETING_AFTER_GAIN_MAX,
-  );
   const deltaEqDb = KEY_BAND_INDICES.map((i) => {
     const bandDelta = (after[i] ?? 0) - (before[i] ?? 0);
     const residual = bandDelta - rawDelta;
-    return clamp(scaleAudioDelta(residual), -12, 3);
+    // Extra HF cut on После residual so impact/mixed don't just feel «тише той же тембр»
+    const tilt = i >= 4 ? -1.5 : i >= 2 ? -0.8 : 0;
+    return clamp(scaleAudioDelta(residual) + tilt, -14, 2);
   });
 
   return {
@@ -166,8 +208,8 @@ export function buildRoomAudioShape(
     mode,
     beforeGainDb,
     afterGainDb,
-    mufflingHzBefore: mufflingHz(sim, 'before'),
-    mufflingHzAfter: mufflingHz(sim, 'after'),
+    mufflingHzBefore: mufflingHz(sim, group, 'before'),
+    mufflingHzAfter: mufflingHz(sim, group, 'after'),
     deltaEqDb,
     // Light room air on isolation demos too (tails shorter than clap)
     rt60Before: round1(rev.rt60Before * 0.55),
