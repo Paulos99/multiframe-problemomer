@@ -118,14 +118,14 @@ export function spectrumChartSvg(
     .map((tick) => {
       const y = yAt(tick, yMin, yMax, padT, plotH);
       return `<line x1="${padL}" x2="${W - padR}" y1="${y}" y2="${y}" stroke="#e1e5e8" stroke-width="1"/>
-        <text x="${padL - 6}" y="${y + 3}" text-anchor="end" fill="#5f6b73" font-size="11">${tick}</text>`;
+        <text x="${padL - 6}" y="${y + 3}" text-anchor="end" fill="#5f6b73" font-size="9" font-weight="500">${tick}</text>`;
     })
     .join('');
 
   const xTicks = xLabels
     .map((hz) => {
       const x = xAt(hz, hzMin, hzMax, padL, plotW);
-      return `<text x="${x}" y="${H - 8}" text-anchor="middle" fill="#5f6b73" font-size="11">${formatHz(hz)}</text>`;
+      return `<text x="${x}" y="${H - 8}" text-anchor="middle" fill="#5f6b73" font-size="9" font-weight="500">${formatHz(hz)}</text>`;
     })
     .join('');
 
@@ -140,7 +140,7 @@ export function spectrumChartSvg(
   <svg viewBox="0 0 ${W} ${H}" width="100%" xmlns="http://www.w3.org/2000/svg" role="img">
     ${grid}
     ${xTicks}
-    <text x="12" y="${padT + plotH / 2}" fill="#5f6b73" font-size="11" text-anchor="middle" transform="rotate(-90 12 ${padT + plotH / 2})">дБ</text>
+    <text x="12" y="${padT + plotH / 2}" fill="#5f6b73" font-size="9" font-weight="500" text-anchor="middle" transform="rotate(-90 12 ${padT + plotH / 2})">дБ</text>
     <path d="${area}" fill="#01644f" opacity="0.18"/>
     <path d="${beforePath}" fill="none" stroke="#7a8790" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
     <path d="${afterPath}" fill="none" stroke="#01644f" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/>
