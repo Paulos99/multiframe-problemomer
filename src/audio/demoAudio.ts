@@ -52,7 +52,7 @@ export function parseStubSrc(src: string): { kind: StubKind; scene: StubScene } 
 }
 
 export const AUDIO_GROUP_LABELS = {
-  air: { title: 'Воздушный шум', help: 'Через перекрытие (Rw): речь, музыка, лай.' },
-  impact: { title: 'Ударный шум', help: 'Удар по плите (Lnw): бег, мебель, когти.' },
-  mixed: { title: 'Смешанный шум', help: 'И воздух, и удар сразу — бытовая техника.' },
+  air: { title: 'Воздушный шум', help: 'Голоса, музыка, лай — через плиту.' },
+  impact: { title: 'Ударный шум', help: 'Бег, мебель, когти — удар по плите.' },
+  mixed: { title: 'Смешанный шум', help: 'И голоса, и удар сразу, как пылесос.' },
 } as const;

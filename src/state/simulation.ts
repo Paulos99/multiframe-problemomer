@@ -173,9 +173,9 @@ export function deriveSimulation(answers: SessionAnswers): DerivedSimulation {
     feelingBefore: feelingFromReceived(before, recAirBefore, loudNeighbors, answers.room.roomWish),
     feelingAfter: feelingFromReceived(after, recAirAfter, false, answers.room.roomWish),
     honestLines: [
-      'Индексы Rw и Lnw — про перекрытие, пол сверху и тип дома, не про громкость соседей.',
+      'Индексы Rw и Lnw зависят от перекрытия, пола сверху и типа дома — не от того, насколько громко шумят соседи.',
       'Громкость в комнате считается по спектру: как шумят сверху, тип комнаты, площадь и мебель.',
-      'Удар: потолок смягчает; полную норму часто закрывает пол у соседа сверху.',
+      'Потолок смягчает шаги сверху; чтобы полностью уложиться в норму по удару, часто нужен ещё пол у соседа.',
     ],
     perceivedAirPct: perceivedReductionPct(airAbs),
     perceivedImpactPct: perceivedReductionPct(impactAbs),

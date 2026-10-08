@@ -128,7 +128,7 @@ export function RoomScreen() {
 
           <Field
             label="Площадь потолка, м²"
-            hint="Нужна для ссылки на калькулятор MultiFRAME"
+            hint="Чтобы открыть калькулятор количества MultiFrame"
           >
             <TextInput
               type="number"

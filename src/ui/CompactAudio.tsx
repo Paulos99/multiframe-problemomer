@@ -63,7 +63,7 @@ export function CompactAudio({ pairs, sim, wish = 'general' }: Props) {
                 {featured ? (
                   <>
                     {' '}
-                    <span className={styles.groupBadge}>для сценария</span>
+                    <span className={styles.groupBadge}>главное для задачи</span>
                   </>
                 ) : null}
               </strong>

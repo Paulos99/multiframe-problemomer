@@ -47,7 +47,7 @@ const NORM_ROWS: { key: string; label: string; rw: string; lnw: string; muted?: 
 const MULTIFRAME_PILLARS = [
   {
     title: 'Звукоизоляция и акустический комфорт',
-    text: 'Снижает воздушный и ударный шум — в комнате спокойнее и ровнее по ощущению.',
+    text: 'Снижает воздушный и ударный шум — в комнате становится спокойнее.',
   },
   {
     title: 'Безопасность',
@@ -59,7 +59,7 @@ const MULTIFRAME_PILLARS = [
   },
   {
     title: 'Быстрый монтаж',
-    text: 'Панели до полотна: без долгой каркасной стройки и лишней потери высоты.',
+    text: 'Сначала панели, потом натяжное полотно. Без каркаса и без лишней потери высоты.',
   },
   {
     title: 'Универсальность',
@@ -105,7 +105,7 @@ function FeltScale({
   const nowVal = Math.round(nowIndex);
   const afterVal = afterIndex != null ? Math.round(afterIndex) : null;
   const direction =
-    indexKind === 'Rw' ? 'изоляция, больше — лучше' : 'индекс удара, меньше — лучше';
+    indexKind === 'Rw' ? 'чем больше число, тем лучше' : 'чем меньше число, тем лучше';
 
   return (
     <div
@@ -265,7 +265,7 @@ export function ResultScreen() {
   const airChart = (
     <SpectrumChart
       title="Воздушный шум (голоса и музыка)"
-      subtitle="R(f), дБ · воздушный шум сверху"
+      subtitle="изоляция от голосов и музыки сверху"
       series={airSpectrum}
       yLabel="дБ"
       indexBadge={{ kind: 'Rw', before: sim.before.Rw, after: sim.after.Rw }}
@@ -274,7 +274,7 @@ export function ResultScreen() {
   const impactChart = (
     <SpectrumChart
       title="Ударный шум (шаги и падения)"
-      subtitle="Изоляция по полосам Гц · ударный шум"
+      subtitle="изоляция от шагов и падений"
       series={impactSpectrum}
       yLabel="дБ"
       indexBadge={{ kind: 'Lnw', before: sim.before.Lnw, after: sim.after.Lnw }}
@@ -294,7 +294,7 @@ export function ResultScreen() {
             <li>
               Классы <b>А / Б / В</b> — пороги комфорта в таблице ниже
             </li>
-            <li>Дальше отметим, где вы сейчас и какой уровень комфорта даёт MultiFrame</li>
+            <li>Ниже — где вы сейчас и какой уровень даёт MultiFrame</li>
           </ul>
           <div className={styles.indexDefs}>
             <p>
@@ -485,7 +485,7 @@ export function ResultScreen() {
         <div className={styles.charts}>
           <header>
             <h3>Изоляция по частотам</h3>
-            <p>Чем выше линия, тем лучше конструкция сдерживает соответствующие частоты шума.</p>
+            <p>Чем выше линия, тем лучше потолок держит шум на этой частоте.</p>
           </header>
           {impactFirst ? (
             <>
@@ -528,7 +528,7 @@ export function ResultScreen() {
       <section className={styles.nextStep} aria-label="Следующий шаг">
         <header>
           <h2>Следующий шаг</h2>
-          <p>Вы уже видите профиль объекта — в калькуляторе останется уточнить комплектацию.</p>
+          <p>Профиль комнаты готов. В калькуляторе можно подобрать комплектацию MultiFrame.</p>
         </header>
 
         <div className={styles.nextActions}>

@@ -41,7 +41,7 @@ const PAGE_H = 1123;
 const PILLARS = [
   {
     title: 'Звукоизоляция и акустический комфорт',
-    text: 'Снижает воздушный и ударный шум — в комнате спокойнее и ровнее по ощущению.',
+    text: 'Снижает воздушный и ударный шум — в комнате становится спокойнее.',
   },
   {
     title: 'Безопасность',
@@ -53,7 +53,7 @@ const PILLARS = [
   },
   {
     title: 'Быстрый монтаж',
-    text: 'Панели до полотна: без долгой каркасной стройки и лишней потери высоты.',
+    text: 'Сначала панели, потом натяжное полотно. Без каркаса и без лишней потери высоты.',
   },
   {
     title: 'Универсальность',
@@ -136,7 +136,7 @@ function buildReportDocument(session: SessionState): string {
 
   const airSvg = spectrumChartSvg(airSeries, {
     title: 'Воздушный шум (голоса и музыка)',
-    subtitle: 'R(f), дБ · воздушный шум сверху',
+    subtitle: 'изоляция от голосов и музыки сверху',
     indexKind: 'Rw',
     indexBefore: b.Rw,
     indexAfter: a.Rw,
@@ -144,7 +144,7 @@ function buildReportDocument(session: SessionState): string {
   });
   const impactSvg = spectrumChartSvg(impactSeries, {
     title: 'Ударный шум (шаги и падения)',
-    subtitle: 'Изоляция по полосам Гц · ударный шум',
+    subtitle: 'изоляция от шагов и падений',
     indexKind: 'Lnw',
     indexBefore: b.Lnw,
     indexAfter: a.Lnw,
@@ -467,7 +467,7 @@ function buildReportDocument(session: SessionState): string {
   <section class="page" data-page="2">
     ${pageChrome(2, TOTAL, roomLine)}
     <div class="sec"><span class="idx">04</span><h2>Частотный профиль изоляции</h2></div>
-    <p class="note">Чем выше линия, тем лучше конструкция сдерживает шум на этой частоте. Зелёная заливка — зона выигрыша MultiFrame.</p>
+    <p class="note">Чем выше линия, тем лучше потолок держит шум на этой частоте. Зелёная заливка — где MultiFrame выигрывает.</p>
 
     <div class="delta-strip">
       <div class="delta-item">

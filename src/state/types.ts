@@ -281,7 +281,7 @@ export const NOISY_NEIGHBORS_OPTIONS: { id: NoisyNeighborsOption; label: string 
 
 export const ROOM_WISH_OPTIONS: { id: RoomWishOption; label: string }[] = [
   { id: 'from_above', label: 'Снизить шум сверху' },
-  { id: 'privacy_out', label: 'Чтобы наверху меньше слышали вас' },
+  { id: 'privacy_out', label: 'Чтобы соседи сверху меньше слышали вас' },
   { id: 'music_recording', label: 'Улучшить качество музыки и записи' },
   { id: 'general', label: 'Повысить общий акустический комфорт' },
   { id: 'other', label: 'Другая задача' },
@@ -314,7 +314,7 @@ export const DISCLAIMER_EXPERT =
 export const SIMULATION_BADGE = 'По полевым замерам на объектах';
 
 export const DISCLAIMER_SIMULATION =
-  'Цифры — ориентир по полевым замерам MultiFrame на объектах, не лабораторный сертификат. Потолок смягчает удары сверху, а норму по удару часто закрывает пол у соседа.';
+  'Цифры — ориентир по полевым замерам на объектах, не лабораторный сертификат. Потолок смягчает шаги сверху; чтобы полностью уложиться в норму по удару, часто нужен ещё пол у соседа.';
 
 export const NORM_FOOTNOTE = 'Ориентир по шкале комфортности (норм. документы)';
 
