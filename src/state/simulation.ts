@@ -110,12 +110,18 @@ function feelingFromReceived(
 }
 
 /**
- * Perceived loudness reduction % from |Δ| dB.
- * Rule of thumb: ~10 dB ≈ half as loud → ~50%. Never linear Δ/level.
+ * Perceived loudness reduction % from |Δ| dB (psychoacoustic, not linear in dB or %).
+ * Rule of thumb in this product: ~8 dB ≈ half as loud (see LOG_DB_FOOTNOTE).
+ * loudness_after / loudness_before = 0.5^(Δ/8) → quieter% = (1 − ratio)·100.
  */
+export const HALF_LOUDNESS_DB = 8;
+
 export function perceivedReductionPct(absDeltaDb: number): number {
-  const pct = (1 - Math.pow(0.5, absDeltaDb / 10)) * 100;
-  return Math.round(Math.min(80, Math.max(15, pct)));
+  const d = Math.abs(absDeltaDb);
+  if (d < 0.05) return 0;
+  const ratio = Math.pow(0.5, d / HALF_LOUDNESS_DB);
+  const pct = (1 - ratio) * 100;
+  return Math.round(Math.min(75, Math.max(0, pct)));
 }
 
 export function comfortScore(Rw: number, Lnw: number): number {
@@ -158,8 +164,6 @@ export function deriveSimulation(answers: SessionAnswers): DerivedSimulation {
   const before = buildSide(constr.Rw, constr.Lnw);
   const after = buildSide(mf.Rw, mf.Lnw);
 
-  const airAbs = Math.abs(recAirBefore - recAirAfter);
-  const impactAbs = Math.abs(recImpBefore - recImpAfter);
   const reverb = buildReverbProfile(answers.room);
 
   return {
@@ -179,8 +183,9 @@ export function deriveSimulation(answers: SessionAnswers): DerivedSimulation {
       'Громкость в комнате считается по спектру: как шумят сверху, тип комнаты, площадь и мебель.',
       'Потолок смягчает шаги сверху.',
     ],
-    perceivedAirPct: perceivedReductionPct(airAbs),
-    perceivedImpactPct: perceivedReductionPct(impactAbs),
+    // % next to Rw/Lnw must follow those deltas (log loudness), not a floored L2 crumb.
+    perceivedAirPct: perceivedReductionPct(Math.abs(mf.deltaRw)),
+    perceivedImpactPct: perceivedReductionPct(Math.abs(mf.deltaLnw)),
     airSpectrum: seriesFromBands(constr.R, mf.R, mf.deltaRw),
     impactSpectrum: seriesFromBands(
       constr.impactIsolation,

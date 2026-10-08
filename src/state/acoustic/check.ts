@@ -16,6 +16,8 @@ import {
   impactFeltFromIndex,
   NORMS,
   FELT_STEPS,
+  perceivedReductionPct,
+  HALF_LOUDNESS_DB,
 } from '../simulation';
 import type { RoomAnswers, SessionAnswers } from '../types';
 import { buildRoomAudioShape, playbackGainForReceivedDb } from '../../audio/roomAudioShape';
@@ -496,6 +498,35 @@ export function assertModelAnchors(): string[] {
   }
   if (clapShape.afterGainDb > clapShape.beforeGainDb) {
     errors.push('echo clap shape: after should not be louder than before');
+  }
+
+  // Loudness % is log in dB: half at HALF_LOUDNESS_DB, no fake 15% floor.
+  if (HALF_LOUDNESS_DB !== 8) {
+    errors.push(`HALF_LOUDNESS_DB should be 8 (got ${HALF_LOUDNESS_DB})`);
+  }
+  if (perceivedReductionPct(HALF_LOUDNESS_DB) !== 50) {
+    errors.push(`−${HALF_LOUDNESS_DB} dB should read as ≈50% quieter`);
+  }
+  if (perceivedReductionPct(4) < 28 || perceivedReductionPct(4) > 31) {
+    errors.push(`Δ 4 dB should be ≈29% quieter (got ${perceivedReductionPct(4)})`);
+  }
+  if (perceivedReductionPct(1.8) >= 15) {
+    errors.push('tiny Δ must not be floored up to 15%');
+  }
+  const pctSim = deriveSimulation(
+    sampleAnswers({
+      slabType: 'monolith',
+      slabThickness: 'about_160_200',
+      houseType: 'monolith',
+      objectStage: 'occupied',
+    }),
+  );
+  const expectAir = perceivedReductionPct(Math.abs(pctSim.delta.Rw));
+  const expectImp = perceivedReductionPct(Math.abs(pctSim.delta.Lnw));
+  if (pctSim.perceivedAirPct !== expectAir || pctSim.perceivedImpactPct !== expectImp) {
+    errors.push(
+      `perceived % must follow index Δ (air ${pctSim.perceivedAirPct}≠${expectAir}, impact ${pctSim.perceivedImpactPct}≠${expectImp})`,
+    );
   }
 
   return errors;
