@@ -810,7 +810,7 @@ Client path also: `buildClientSummary(session)` — plain-text digest for clipbo
 2. Room: house/slab first, then room + area > 0; **no** «пол сверху»; «Шум сверху» without «мешает ли» subtitle; optional wish; `Далее`.
 3. Processing: fullscreen green loading with one-line status animation (no classes/dB); auto → Result.
 4. Result reads as: нормы → сейчас → MultiFrame → вывод → CTA.
-5. Official headers use А/Б/В (or «ниже допустимого (В)»); felt 5-step axes on channels; audio Воздушный / Ударный / Смешанный.
+5. Official headers use А/Б/В (or «ниже допустимого»); felt 5-step axes on channels; audio Воздушный / Ударный / Смешанный.
 6. Calculator preserves `area` (+ `roomType`); consultation CTA opens StP site `#section-partner`; copy summary, restart work.
 7. Must **not** present role split, Scenarios, Current complaint, floor-above, or standalone Before/After and Audio screens.
 8. Back from Result returns to Room (last question), **without** replaying Processing.
