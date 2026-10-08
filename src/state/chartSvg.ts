@@ -85,6 +85,8 @@ export function spectrumChartSvg(
     indexKind: 'Rw' | 'Lnw';
     indexBefore: number;
     indexAfter: number;
+    /** SVG canvas height in user units (default 260). */
+    height?: number;
   },
 ): string {
   const padL = 36;
@@ -92,7 +94,7 @@ export function spectrumChartSvg(
   const padT = 14;
   const padB = 28;
   const W = 640;
-  const H = 260;
+  const H = opts.height ?? 260;
   const plotW = W - padL - padR;
   const plotH = H - padT - padB;
   const all = [...series.before, ...series.after];

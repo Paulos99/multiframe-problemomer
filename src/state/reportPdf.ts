@@ -1,5 +1,6 @@
 /**
- * Acoustic profile PDF — full Result copy + frequency charts (html2canvas → jsPDF).
+ * Acoustic profile PDF — multi-page A4 document (one canvas per page → jsPDF).
+ * Designed as a room acoustic passport, not a screenshot dump.
  */
 import {
   HOUSE_TYPE_OPTIONS,
@@ -32,6 +33,10 @@ import {
   SHARE_MARKETING_BLURB,
 } from './shareLink';
 import type { ClassLabel } from './types';
+
+/** A4 @ 96 CSS px */
+const PAGE_W = 794;
+const PAGE_H = 1123;
 
 const PILLARS = [
   {
@@ -85,6 +90,24 @@ function formatDateRu(d = new Date()): string {
   });
 }
 
+function pageChrome(page: number, total: number, roomLine: string): string {
+  return `
+  <div class="page-top">
+    <div class="brand-row">
+      <span class="brand">StP MultiFrame</span>
+      <span class="doc-type">Акустический профиль помещения</span>
+    </div>
+    <div class="meta-row">
+      <span>${escapeHtml(roomLine)}</span>
+      <span>${escapeHtml(formatDateRu())}</span>
+    </div>
+  </div>
+  <div class="page-bottom">
+    <span>stp-multiframe.ru · ориентир по полевым замерам, не лабораторный протокол</span>
+    <span>${page} / ${total}</span>
+  </div>`;
+}
+
 function buildReportDocument(session: SessionState): string {
   const handoff = buildLeadHandoff(session);
   const room = handoff.room;
@@ -96,6 +119,7 @@ function buildReportDocument(session: SessionState): string {
   const hybridAfter = comfortClassFor(a.Rw, a.Lnw);
   const roomName = room.roomType ? ROOM_TYPE_LABELS[room.roomType] : 'комната';
   const area = room.ceilingAreaM2 != null ? `${room.ceilingAreaM2} м²` : 'н/д';
+  const roomLine = `${roomName} · ${area}`;
   const slabLabel =
     room.slabType === 'unknown' && room.slabThickness === 'unknown'
       ? `ориентир по типу дома (${optLabel(HOUSE_TYPE_OPTIONS, room.houseType)}), ~${slab.thicknessMm} мм`
@@ -116,6 +140,7 @@ function buildReportDocument(session: SessionState): string {
     indexKind: 'Rw',
     indexBefore: b.Rw,
     indexAfter: a.Rw,
+    height: 210,
   });
   const impactSvg = spectrumChartSvg(impactSeries, {
     title: 'Ударный шум (шаги и падения)',
@@ -123,189 +148,350 @@ function buildReportDocument(session: SessionState): string {
     indexKind: 'Lnw',
     indexBefore: b.Lnw,
     indexAfter: a.Lnw,
+    height: 210,
   });
 
   const pillars = PILLARS.map(
-    (p) =>
-      `<li><strong>${escapeHtml(p.title)}</strong><span>${escapeHtml(p.text)}</span></li>`,
+    (p, i) =>
+      `<li><span class="n">${i + 1}</span><div><strong>${escapeHtml(p.title)}</strong><p>${escapeHtml(p.text)}</p></div></li>`,
   ).join('');
+
+  const wishBlock =
+    room.roomWish !== 'other'
+      ? `<p class="lead">${escapeHtml(scenario)}</p>${drum ? `<p class="muted">${escapeHtml(drum)}</p>` : ''}`
+      : drum
+        ? `<p class="lead">${escapeHtml(drum)}</p>`
+        : `<p class="lead">Ориентир по воздушному и ударному шуму для выбранного перекрытия.</p>`;
+
+  const TOTAL = 3;
 
   return `<!DOCTYPE html>
 <html lang="ru"><head><meta charset="utf-8" />
 <style>
   * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #fff; }
   body {
-    margin: 0; padding: 0;
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-    color: #111; background: #fff;
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+    color: #152018;
+    -webkit-font-smoothing: antialiased;
   }
-  .sheet { width: 794px; background: #fff; }
-  .hero {
-    background: #01644f; color: #fff;
-    padding: 28px 32px 24px;
+  .sheet { width: ${PAGE_W}px; background: #fff; }
+
+  .page {
+    width: ${PAGE_W}px;
+    height: ${PAGE_H}px;
+    padding: 36px 44px 52px;
+    position: relative;
+    background: #fff;
+    overflow: hidden;
   }
-  .hero-top { display: flex; justify-content: space-between; font-size: 13px; opacity: .92; margin-bottom: 14px; }
-  .hero h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: -.02em; line-height: 1.15; }
-  .hero p { margin: 0; font-size: 13px; opacity: .9; max-width: 38em; }
-  .body { padding: 24px 32px 32px; display: flex; flex-direction: column; gap: 16px; }
-  .card {
-    background: #f5f7f8; border: 1px solid #e1e5e8;
-    border-radius: 12px; padding: 14px 16px;
+  .page::before {
+    content: "";
+    position: absolute; left: 0; top: 0; right: 0; height: 5px;
+    background: linear-gradient(90deg, #01644f 0%, #1a8f72 55%, #01644f 100%);
   }
-  .eyebrow {
-    margin: 0 0 8px; font-size: 10px; font-weight: 800;
-    letter-spacing: .1em; text-transform: uppercase; color: #01644f;
+
+  .page-top { margin-bottom: 22px; padding-bottom: 12px; border-bottom: 1px solid #d7e2dc; }
+  .brand-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 16px; margin-bottom: 6px;
   }
-  h2.sec { margin: 4px 0 0; font-size: 18px; letter-spacing: -.01em; }
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; font-size: 13px; }
-  .grid dt { margin: 0; color: #5f6b73; font-size: 11px; font-weight: 650; }
-  .grid dd { margin: 2px 0 0; font-weight: 650; }
-  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .metric { border-radius: 12px; padding: 14px 16px; border: 1px solid #e1e5e8; background: #f5f7f8; }
-  .metric.accent { background: #01644f; border-color: #01644f; color: #fff; }
-  .metric .label { font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; opacity: .85; }
-  .metric h3 { margin: 6px 0 8px; font-size: 16px; line-height: 1.3; }
-  .metric .nums { font-size: 13px; font-variant-numeric: tabular-nums; }
-  .metric .chips { margin-top: 6px; font-size: 11px; opacity: .85; }
-  .felt { display: flex; flex-direction: column; gap: 8px; }
-  .felt-row {
-    display: flex; justify-content: space-between; gap: 10px; align-items: baseline;
-    padding: 10px 12px; border-radius: 10px; background: #fff; border: 1px solid #e1e5e8;
-    font-size: 13px;
+  .brand {
+    font-size: 12px; font-weight: 800; letter-spacing: .12em;
+    text-transform: uppercase; color: #01644f;
   }
-  .felt-row b.pct { color: #01644f; white-space: nowrap; }
-  .scenario { font-size: 13px; line-height: 1.45; margin: 0; }
-  .scenario + .scenario { margin-top: 6px; color: #5f6b73; font-size: 12px; }
-  .delta p { margin: 4px 0 0; font-size: 13px; line-height: 1.45; }
-  .delta strong { color: #01644f; }
-  .norms-table { width: 100%; border-collapse: collapse; font-size: 12px; background: #fff; }
-  .norms-table th, .norms-table td { padding: 7px 8px; border-bottom: 1px solid #e1e5e8; text-align: left; }
-  .norms-table th { color: #5f6b73; font-size: 11px; background: #f5f7f8; }
-  .norms-table td:nth-child(2), .norms-table td:nth-child(3),
-  .norms-table th:nth-child(2), .norms-table th:nth-child(3) { text-align: right; white-space: nowrap; }
-  .norms-table tr.muted td { color: #5f6b73; }
-  .chart {
-    margin: 0; padding: 12px; border-radius: 12px;
-    background: #f5f7f8; border: 1px solid #e1e5e8;
+  .doc-type {
+    font-size: 11px; font-weight: 650; color: #5f6b73; letter-spacing: .02em;
   }
-  .chart figcaption {
-    display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; margin-bottom: 6px;
-  }
-  .chart figcaption strong { display: block; font-size: 13px; }
-  .chart figcaption span { display: block; font-size: 11px; color: #5f6b73; margin-top: 2px; }
-  .badge {
-    flex-shrink: 0; text-align: right; background: #fff; border: 1px solid #e1e5e8;
-    border-radius: 8px; padding: 4px 8px; font-size: 11px; color: #5f6b73;
-  }
-  .badge b { display: block; color: #111; font-size: 12px; }
-  .legend { list-style: none; margin: 6px 0 0; padding: 0; display: flex; gap: 14px; font-size: 11px; color: #5f6b73; }
-  .legend i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
-  .sw-b { background: #7a8790; } .sw-a { background: #01644f; }
-  .pillars { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-  .pillars li { display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: #5f6b73; }
-  .pillars strong { color: #111; font-size: 13px; }
-  .comfort {
-    padding: 12px 14px; border-radius: 12px;
-    border: 1px solid rgba(1,100,79,.18); background: #ecf7f3;
-  }
-  .comfort span { display: block; font-size: 12px; color: #5f6b73; font-weight: 650; }
-  .comfort b { display: block; margin-top: 4px; font-size: 15px; }
-  .foot {
+  .meta-row {
     display: flex; justify-content: space-between; gap: 12px;
-    padding-top: 10px; border-top: 1px solid #e1e5e8;
     font-size: 11px; color: #5f6b73;
   }
+
+  .page-bottom {
+    position: absolute; left: 44px; right: 44px; bottom: 22px;
+    display: flex; justify-content: space-between; gap: 12px;
+    padding-top: 10px; border-top: 1px solid #d7e2dc;
+    font-size: 10px; color: #7a8790;
+  }
+
+  .hero-title {
+    margin: 0 0 6px;
+    font-size: 28px; font-weight: 750; letter-spacing: -.025em; line-height: 1.15;
+    color: #0f1c16;
+  }
+  .hero-sub {
+    margin: 0 0 18px;
+    font-size: 14px; color: #5f6b73; line-height: 1.4;
+  }
+  .hero-sub b { color: #01644f; font-weight: 700; }
+
+  .sec {
+    margin: 0 0 10px;
+    display: flex; align-items: baseline; gap: 10px;
+  }
+  .sec .idx {
+    font-size: 11px; font-weight: 800; letter-spacing: .1em;
+    color: #01644f; text-transform: uppercase;
+  }
+  .sec h2 {
+    margin: 0; font-size: 15px; font-weight: 750; letter-spacing: -.01em;
+  }
+  .block { margin-bottom: 18px; }
+
+  .passport {
+    width: 100%; border-collapse: collapse;
+    border: 1px solid #d7e2dc; border-radius: 4px; overflow: hidden;
+  }
+  .passport th, .passport td {
+    padding: 10px 12px; text-align: left; vertical-align: top;
+    border-bottom: 1px solid #e6eeea; font-size: 12.5px; line-height: 1.35;
+  }
+  .passport tr:last-child th, .passport tr:last-child td { border-bottom: none; }
+  .passport th {
+    width: 28%; font-size: 11px; font-weight: 650; color: #5f6b73;
+    background: #f4f8f6; letter-spacing: .02em;
+  }
+  .passport td { font-weight: 650; color: #152018; background: #fff; }
+
+  .status-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  }
+  .status {
+    border: 1px solid #d7e2dc; padding: 12px 14px; background: #fff;
+  }
+  .status .k {
+    font-size: 10px; font-weight: 800; letter-spacing: .08em;
+    text-transform: uppercase; color: #5f6b73; margin-bottom: 6px;
+  }
+  .status .v { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .status .s { font-size: 11.5px; color: #5f6b73; }
+
+  .comfort-banner {
+    margin-top: 10px; padding: 12px 14px;
+    background: #f0f7f4; border-left: 3px solid #01644f;
+  }
+  .comfort-banner .k {
+    font-size: 10px; font-weight: 800; letter-spacing: .08em;
+    text-transform: uppercase; color: #5f6b73;
+  }
+  .comfort-banner .v {
+    margin-top: 4px; font-size: 16px; font-weight: 750; color: #0f1c16;
+  }
+
+  .lead { margin: 0 0 6px; font-size: 13px; line-height: 1.45; }
+  .muted { margin: 0; font-size: 12px; line-height: 1.4; color: #5f6b73; }
+
+  .felt { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+  .felt-row {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+    padding: 10px 12px; border: 1px solid #d7e2dc; background: #fafcfb;
+    font-size: 12.5px; line-height: 1.35;
+  }
+  .felt-row .pct {
+    flex-shrink: 0; color: #01644f; font-weight: 800; white-space: nowrap;
+  }
+
+  .compare {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px;
+  }
+  .cmp {
+    padding: 14px; border: 1px solid #d7e2dc; background: #fff;
+  }
+  .cmp.now { background: #f7f9f8; }
+  .cmp.after {
+    background: #01644f; border-color: #01644f; color: #fff;
+  }
+  .cmp .k {
+    font-size: 10px; font-weight: 800; letter-spacing: .1em;
+    text-transform: uppercase; opacity: .8; margin-bottom: 6px;
+  }
+  .cmp h3 { margin: 0 0 8px; font-size: 15px; font-weight: 750; line-height: 1.25; }
+  .cmp .nums { font-size: 12.5px; font-variant-numeric: tabular-nums; opacity: .95; }
+  .cmp .chips { margin-top: 6px; font-size: 11px; opacity: .8; }
+
+  .delta-strip {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    margin: 0 0 14px;
+  }
+  .delta-item {
+    padding: 12px 14px; border: 1px solid #d7e2dc; background: #f4f8f6;
+  }
+  .delta-item .k {
+    font-size: 10px; font-weight: 800; letter-spacing: .08em;
+    text-transform: uppercase; color: #5f6b73;
+  }
+  .delta-item .v {
+    margin-top: 4px; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums;
+  }
+  .delta-item .d { margin-top: 2px; font-size: 12px; color: #01644f; font-weight: 750; }
+
+  .note {
+    margin: 0 0 12px; font-size: 12px; color: #5f6b73; line-height: 1.4;
+  }
+
+  .chart {
+    margin: 0 0 14px; padding: 12px 14px 10px;
+    border: 1px solid #d7e2dc; background: #fafcfb;
+  }
+  .chart:last-of-type { margin-bottom: 0; }
+  .chart figcaption {
+    display: flex; justify-content: space-between; gap: 10px;
+    align-items: flex-start; margin-bottom: 6px;
+  }
+  .chart figcaption strong { display: block; font-size: 13px; font-weight: 750; }
+  .chart figcaption span { display: block; font-size: 11px; color: #5f6b73; margin-top: 2px; }
+  .badge {
+    flex-shrink: 0; text-align: right; background: #fff; border: 1px solid #d7e2dc;
+    padding: 4px 8px; font-size: 10.5px; color: #5f6b73;
+  }
+  .badge b { display: block; color: #152018; font-size: 11.5px; }
+  .legend {
+    list-style: none; margin: 6px 0 0; padding: 0;
+    display: flex; gap: 14px; font-size: 11px; color: #5f6b73;
+  }
+  .legend i {
+    display: inline-block; width: 14px; height: 2px; border-radius: 1px;
+    margin-right: 6px; vertical-align: middle;
+  }
+  .sw-b { background: #7a8790; } .sw-a { background: #01644f; }
+
+  .norms {
+    width: 100%; border-collapse: collapse; font-size: 12px;
+    border: 1px solid #d7e2dc;
+  }
+  .norms th, .norms td {
+    padding: 9px 10px; border-bottom: 1px solid #e6eeea; text-align: left;
+  }
+  .norms tr:last-child td { border-bottom: none; }
+  .norms th {
+    background: #f4f8f6; color: #5f6b73; font-size: 11px; font-weight: 650;
+  }
+  .norms td:nth-child(2), .norms td:nth-child(3),
+  .norms th:nth-child(2), .norms th:nth-child(3) {
+    text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums;
+  }
+  .norms tr.muted td { color: #7a8790; }
+
+  .pillars { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .pillars li {
+    display: grid; grid-template-columns: 22px 1fr; gap: 10px; align-items: start;
+    padding: 8px 0; border-bottom: 1px solid #e6eeea;
+  }
+  .pillars li:last-child { border-bottom: none; }
+  .pillars .n {
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: #e8f3ef; color: #01644f;
+    font-size: 11px; font-weight: 800;
+  }
+  .pillars strong { display: block; font-size: 12.5px; margin-bottom: 2px; }
+  .pillars p { margin: 0; font-size: 11.5px; color: #5f6b73; line-height: 1.4; }
+
+  .closing {
+    margin-top: 16px; padding: 14px;
+    border: 1px solid #d7e2dc; background: #f4f8f6;
+    font-size: 12px; line-height: 1.45; color: #5f6b73;
+  }
+  .closing b { color: #152018; }
 </style></head><body>
 <div class="sheet" id="mf-report-root">
-  <header class="hero">
-    <div class="hero-top">
-      <strong>StP MultiFrame · Проблемомер</strong>
-      <span>${escapeHtml(formatDateRu())}</span>
+
+  <!-- PAGE 1: passport + situation -->
+  <section class="page" data-page="1">
+    ${pageChrome(1, TOTAL, roomLine)}
+    <h1 class="hero-title">Акустический профиль помещения</h1>
+    <p class="hero-sub">Объект: <b>${escapeHtml(roomName)}</b>, ${escapeHtml(area)}. Ориентир эффекта MultiFrame по полевым замерам на объектах.</p>
+
+    <div class="block">
+      <div class="sec"><span class="idx">01</span><h2>Паспорт объекта</h2></div>
+      <table class="passport">
+        <tr><th>Помещение</th><td>${escapeHtml(roomName)} · ${escapeHtml(area)}</td></tr>
+        <tr><th>Тип дома</th><td>${escapeHtml(optLabel(HOUSE_TYPE_OPTIONS, room.houseType))}</td></tr>
+        <tr><th>Перекрытие</th><td>${escapeHtml(slabLabel)}</td></tr>
+        <tr><th>Задача</th><td>${escapeHtml(optLabel(ROOM_WISH_OPTIONS, room.roomWish))}</td></tr>
+      </table>
     </div>
-    <h1>Акустический профиль помещения</h1>
-    <p>Ориентир по полевым замерам MultiFrame на объектах — не лабораторный сертификат.</p>
-  </header>
-  <div class="body">
-    <section class="card">
-      <p class="eyebrow">Объект</p>
-      <dl class="grid">
-        <div><dt>Комната</dt><dd>${escapeHtml(roomName)} · ${escapeHtml(area)}</dd></div>
-        <div><dt>Тип дома</dt><dd>${escapeHtml(optLabel(HOUSE_TYPE_OPTIONS, room.houseType))}</dd></div>
-        <div><dt>Перекрытие</dt><dd>${escapeHtml(slabLabel)}</dd></div>
-        <div><dt>Задача</dt><dd>${escapeHtml(optLabel(ROOM_WISH_OPTIONS, room.roomWish))}</dd></div>
-      </dl>
-    </section>
 
-    <section>
-      <h2 class="sec">Текущая ситуация</h2>
-      <div class="felt" style="margin-top:10px">
-        <div class="felt-row">
-          <span>Воздушный шум · сейчас <b>${FELT_STEP_LABELS[airNow]}</b> (Rw ≈ ${Math.round(b.Rw)})</span>
+    <div class="block">
+      <div class="sec"><span class="idx">02</span><h2>Исходное состояние</h2></div>
+      <div class="status-grid">
+        <div class="status">
+          <div class="k">Воздушный шум</div>
+          <div class="v">${FELT_STEP_LABELS[airNow]}</div>
+          <div class="s">Rw ≈ ${Math.round(b.Rw)} дБ · класс ${chipLabel(airClassFor(b.Rw))}</div>
         </div>
-        <div class="felt-row">
-          <span>Ударный шум · сейчас <b>${FELT_STEP_LABELS[impactNow]}</b> (Lnw ≈ ${Math.round(b.Lnw)})</span>
+        <div class="status">
+          <div class="k">Ударный шум</div>
+          <div class="v">${FELT_STEP_LABELS[impactNow]}</div>
+          <div class="s">Lnw ≈ ${Math.round(b.Lnw)} дБ · класс ${chipLabel(impactClassFor(b.Lnw))}</div>
         </div>
       </div>
-      <div class="comfort" style="margin-top:10px">
-        <span>Класс комфорта помещения</span>
-        <b>«${escapeHtml(officialComfortLabel(hybridBefore))}»</b>
+      <div class="comfort-banner">
+        <div class="k">Класс комфорта помещения сейчас</div>
+        <div class="v">«${escapeHtml(officialComfortLabel(hybridBefore))}»</div>
       </div>
-    </section>
+    </div>
 
-    <section>
-      <h2 class="sec">С MultiFrame</h2>
-      ${
-        room.roomWish !== 'other'
-          ? `<div class="card" style="margin-top:10px"><p class="scenario">${escapeHtml(scenario)}</p>${drum ? `<p class="scenario">${escapeHtml(drum)}</p>` : ''}</div>`
-          : drum
-            ? `<div class="card" style="margin-top:10px"><p class="scenario">${escapeHtml(drum)}</p></div>`
-            : ''
-      }
-      <div class="felt" style="margin-top:10px">
+    <div class="block" style="margin-bottom:0">
+      <div class="sec"><span class="idx">03</span><h2>Прогноз с MultiFrame</h2></div>
+      ${wishBlock}
+      <div class="felt">
         <div class="felt-row">
-          <span>Воздушный шум · ${FELT_STEP_LABELS[airNow]} → <b>${FELT_STEP_LABELS[airAfter]}</b> · Rw ≈ ${Math.round(b.Rw)} → ≈ ${Math.round(a.Rw)}</span>
-          <b class="pct">станет на ≈ ${sim.perceivedAirPct}% тише</b>
+          <span>Воздух · ${FELT_STEP_LABELS[airNow]} → <b>${FELT_STEP_LABELS[airAfter]}</b> · Rw ≈ ${Math.round(b.Rw)} → ≈ ${Math.round(a.Rw)}</span>
+          <span class="pct">≈ ${sim.perceivedAirPct}% тише</span>
         </div>
         <div class="felt-row">
-          <span>Ударный шум · ${FELT_STEP_LABELS[impactNow]} → <b>${FELT_STEP_LABELS[impactAfter]}</b> · Lnw ≈ ${Math.round(b.Lnw)} → ≈ ${Math.round(a.Lnw)}</span>
-          <b class="pct">станет на ≈ ${sim.perceivedImpactPct}% тише</b>
+          <span>Удар · ${FELT_STEP_LABELS[impactNow]} → <b>${FELT_STEP_LABELS[impactAfter]}</b> · Lnw ≈ ${Math.round(b.Lnw)} → ≈ ${Math.round(a.Lnw)}</span>
+          <span class="pct">≈ ${sim.perceivedImpactPct}% тише</span>
         </div>
       </div>
-    </section>
+      <div class="compare">
+        <div class="cmp now">
+          <div class="k">Сейчас</div>
+          <h3>«${escapeHtml(officialComfortLabel(hybridBefore))}»</h3>
+          <div class="nums">Rw ≈ ${b.Rw} дБ · Lnw ≈ ${b.Lnw} дБ</div>
+          <div class="chips">воздух ${chipLabel(airClassFor(b.Rw))} · удар ${chipLabel(impactClassFor(b.Lnw))}</div>
+        </div>
+        <div class="cmp after">
+          <div class="k">С MultiFrame</div>
+          <h3>«${escapeHtml(officialComfortLabel(hybridAfter))}»</h3>
+          <div class="nums">Rw ≈ ${a.Rw} дБ · Lnw ≈ ${a.Lnw} дБ</div>
+          <div class="chips">воздух ${chipLabel(airClassFor(a.Rw))} · удар ${chipLabel(impactClassFor(a.Lnw))}</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <section class="cols">
-      <article class="metric">
-        <div class="label">Сейчас</div>
-        <h3>«${escapeHtml(officialComfortLabel(hybridBefore))}»</h3>
-        <div class="nums">Rw ≈ ${b.Rw} дБ · Lnw ≈ ${b.Lnw} дБ</div>
-        <div class="chips">воздух ${chipLabel(airClassFor(b.Rw))} · удар ${chipLabel(impactClassFor(b.Lnw))}</div>
-      </article>
-      <article class="metric accent">
-        <div class="label">С MultiFrame</div>
-        <h3>«${escapeHtml(officialComfortLabel(hybridAfter))}»</h3>
-        <div class="nums">Rw ≈ ${a.Rw} дБ · Lnw ≈ ${a.Lnw} дБ</div>
-        <div class="chips">воздух ${chipLabel(airClassFor(a.Rw))} · удар ${chipLabel(impactClassFor(a.Lnw))}</div>
-      </article>
-    </section>
+  <!-- PAGE 2: spectra -->
+  <section class="page" data-page="2">
+    ${pageChrome(2, TOTAL, roomLine)}
+    <div class="sec"><span class="idx">04</span><h2>Частотный профиль изоляции</h2></div>
+    <p class="note">Чем выше линия, тем лучше конструкция сдерживает шум на этой частоте. Зелёная заливка — зона выигрыша MultiFrame.</p>
 
-    <section class="card delta">
-      <p class="eyebrow">Эффект MultiFrame</p>
-      <p><strong>Воздух:</strong> Rw ${b.Rw} → ${a.Rw} (Δ +${Math.abs(sim.delta.Rw)} дБ)</p>
-      <p><strong>Удар:</strong> Lnw ${b.Lnw} → ${a.Lnw} (Δ −${Math.abs(sim.delta.Lnw)} дБ)</p>
-      <p style="margin-top:8px;font-size:12px;color:#5f6b73">Гибрид: ${escapeHtml(HYBRID_CLASS_LABELS[hybridBefore])} → ${escapeHtml(HYBRID_CLASS_LABELS[hybridAfter])}</p>
-    </section>
+    <div class="delta-strip">
+      <div class="delta-item">
+        <div class="k">Воздушный шум · Rw</div>
+        <div class="v">${b.Rw} → ${a.Rw} дБ</div>
+        <div class="d">Δ +${Math.abs(sim.delta.Rw)} дБ</div>
+      </div>
+      <div class="delta-item">
+        <div class="k">Ударный шум · Lnw</div>
+        <div class="v">${b.Lnw} → ${a.Lnw} дБ</div>
+        <div class="d">Δ −${Math.abs(sim.delta.Lnw)} дБ</div>
+      </div>
+    </div>
 
-    <section>
-      <h2 class="sec">Изоляция по частотам</h2>
-      <p style="margin:6px 0 10px;font-size:12px;color:#5f6b73">Чем выше линия, тем лучше конструкция сдерживает соответствующие частоты шума.</p>
-      ${airSvg}
-      <div style="height:12px"></div>
-      ${impactSvg}
-    </section>
+    ${airSvg}
+    ${impactSvg}
+  </section>
 
-    <section class="card">
-      <p class="eyebrow">Нормы комфорта в стройке · СП 51.13330.2011</p>
-      <table class="norms-table">
+  <!-- PAGE 3: norms + system -->
+  <section class="page" data-page="3">
+    ${pageChrome(3, TOTAL, roomLine)}
+    <div class="block">
+      <div class="sec"><span class="idx">05</span><h2>Нормы комфорта · СП 51.13330.2011</h2></div>
+      <table class="norms">
         <thead><tr><th>Уровень</th><th>Rw, дБ</th><th>Lnw, дБ</th></tr></thead>
         <tbody>
           <tr><td>Высокий комфорт (А)</td><td>≥ ${NORMS.A.Rw}</td><td>≤ ${NORMS.A.Lnw}</td></tr>
@@ -314,27 +500,28 @@ function buildReportDocument(session: SessionState): string {
           <tr class="muted"><td>Ниже допустимого</td><td>&lt; ${NORMS.V.Rw}</td><td>&gt; ${NORMS.V.Lnw}</td></tr>
         </tbody>
       </table>
-      <div class="comfort" style="margin-top:12px">
-        <span>Класс комфорта помещения с MultiFrame</span>
-        <b>«${escapeHtml(officialComfortLabel(hybridAfter))}»</b>
+      <div class="comfort-banner" style="margin-top:12px">
+        <div class="k">Класс комфорта с MultiFrame</div>
+        <div class="v">«${escapeHtml(officialComfortLabel(hybridAfter))}»</div>
       </div>
-    </section>
+      <p class="muted" style="margin-top:8px">Гибридная оценка: ${escapeHtml(HYBRID_CLASS_LABELS[hybridBefore])} → ${escapeHtml(HYBRID_CLASS_LABELS[hybridAfter])}.</p>
+    </div>
 
-    <section class="card">
-      <p class="eyebrow">Уникальность системы MultiFrame</p>
+    <div class="block">
+      <div class="sec"><span class="idx">06</span><h2>О системе MultiFrame</h2></div>
       <ul class="pillars">${pillars}</ul>
-    </section>
+    </div>
 
-    <footer class="foot">
-      <span>stp-multiframe.ru · Проблемомер</span>
-      <span>Не является лабораторным протоколом</span>
-    </footer>
-  </div>
+    <div class="closing">
+      <b>Важно.</b> Документ — ориентировочный акустический профиль по ответам в Проблемомере и полевым замерам MultiFrame. Не заменяет лабораторный протокол и проектную документацию.
+    </div>
+  </section>
+
 </div>
 </body></html>`;
 }
 
-/** Render report DOM → multi-page PDF file download. */
+/** Render report as one A4 page image each → PDF download. */
 export async function downloadAcousticProfilePdf(session: SessionState): Promise<void> {
   if (!session.derived) {
     throw new Error('Нет расчёта для отчёта');
@@ -343,13 +530,13 @@ export async function downloadAcousticProfilePdf(session: SessionState): Promise
   const html = buildReportDocument(session);
   const host = document.createElement('div');
   host.setAttribute('aria-hidden', 'true');
-  host.style.cssText =
-    'position:fixed;left:-12000px;top:0;width:794px;background:#fff;z-index:-1;pointer-events:none;';
+  host.style.cssText = `position:fixed;left:-12000px;top:0;width:${PAGE_W}px;background:#fff;z-index:-1;pointer-events:none;`;
   host.innerHTML = html;
   document.body.appendChild(host);
 
   const root = host.querySelector('#mf-report-root') as HTMLElement | null;
-  if (!root) {
+  const pages = Array.from(host.querySelectorAll('.page')) as HTMLElement[];
+  if (!root || pages.length === 0) {
     host.remove();
     throw new Error('Не удалось собрать отчёт');
   }
@@ -360,30 +547,26 @@ export async function downloadAcousticProfilePdf(session: SessionState): Promise
       import('jspdf'),
     ]);
 
-    const canvas = await html2canvas(root, {
-      scale: 2,
-      backgroundColor: '#ffffff',
-      useCORS: true,
-      logging: false,
-      windowWidth: 794,
-    });
-
     const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
     const pageW = pdf.internal.pageSize.getWidth();
     const pageH = pdf.internal.pageSize.getHeight();
-    const imgW = pageW;
-    const imgH = (canvas.height * imgW) / canvas.width;
-    const imgData = canvas.toDataURL('image/png', 1);
 
-    let heightLeft = imgH;
-    let position = 0;
-    pdf.addImage(imgData, 'PNG', 0, position, imgW, imgH, undefined, 'FAST');
-    heightLeft -= pageH;
-    while (heightLeft > 0.5) {
-      position = heightLeft - imgH;
-      pdf.addPage();
-      pdf.addImage(imgData, 'PNG', 0, position, imgW, imgH, undefined, 'FAST');
-      heightLeft -= pageH;
+    for (let i = 0; i < pages.length; i++) {
+      const pageEl = pages[i]!;
+      const canvas = await html2canvas(pageEl, {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        useCORS: true,
+        logging: false,
+        width: PAGE_W,
+        height: PAGE_H,
+        windowWidth: PAGE_W,
+        windowHeight: PAGE_H,
+      });
+
+      const imgData = canvas.toDataURL('image/png', 1);
+      if (i > 0) pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 0, 0, pageW, pageH, undefined, 'FAST');
     }
 
     const room = session.answers.room;
