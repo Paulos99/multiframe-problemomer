@@ -17,7 +17,7 @@ function whyFor(
   if (wish !== 'other') why.push(wishScenarioLine(wish));
   if (noiseType === 'impact' || noiseType === 'mixed') {
     why.push(
-      'Шаги сверху идут через плиту. MultiFrame ставится на потолок и смягчает этот удар без каркаса.',
+      'Шаги сверху идут через плиту. MultiFrame на потолке смягчает этот удар.',
     );
   }
   if (noiseType === 'airborne' || noiseType === 'mixed') {
@@ -28,7 +28,7 @@ function whyFor(
   if (comfort === 'bothers') {
     why.push('Если шум уже мешает, лучше заложить акустику до монтажа потолка.');
   } else {
-    why.push('С MultiFrame сверху становится тише, и потолок почти не опускается — каркас не нужен.');
+    why.push('С MultiFrame сверху становится тише. Каркас не нужен, потолок почти не опускается.');
   }
   return why.slice(0, 4);
 }

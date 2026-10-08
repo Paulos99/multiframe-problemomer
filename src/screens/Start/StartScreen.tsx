@@ -18,7 +18,7 @@ export function StartScreen() {
           сейчас шумно сверху.
         </p>
         <p className={styles.lead}>
-          Дальше вы увидите, как изменятся изоляция и комфорт после монтажа MultiFrame.
+          Дальше вы увидите, насколько тише станет после монтажа MultiFrame.
         </p>
         <div className={styles.cta}>
           <Button onClick={goNext} fullWidth>

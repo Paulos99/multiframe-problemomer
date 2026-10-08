@@ -161,7 +161,7 @@ function buildReportDocument(session: SessionState): string {
       ? `<p class="lead">${escapeHtml(scenario)}</p>${drum ? `<p class="muted">${escapeHtml(drum)}</p>` : ''}`
       : drum
         ? `<p class="lead">${escapeHtml(drum)}</p>`
-        : `<p class="lead">Ориентир по воздушному и ударному шуму для выбранного перекрытия.</p>`;
+        : `<p class="lead">Прогноз по голосам и шагам сверху для этого перекрытия.</p>`;
 
   const TOTAL = 3;
 
@@ -401,7 +401,7 @@ function buildReportDocument(session: SessionState): string {
   <section class="page" data-page="1">
     ${pageChrome(1, TOTAL, roomLine)}
     <h1 class="hero-title">Акустический профиль помещения</h1>
-    <p class="hero-sub">Объект: <b>${escapeHtml(roomName)}</b>, ${escapeHtml(area)}. Ориентир эффекта MultiFrame по полевым замерам на объектах.</p>
+    <p class="hero-sub">Объект: <b>${escapeHtml(roomName)}</b>, ${escapeHtml(area)}. Ориентир по полевым замерам MultiFrame на объектах.</p>
 
     <div class="block">
       <div class="sec"><span class="idx">01</span><h2>Паспорт объекта</h2></div>
@@ -466,8 +466,8 @@ function buildReportDocument(session: SessionState): string {
   <!-- PAGE 2: spectra -->
   <section class="page" data-page="2">
     ${pageChrome(2, TOTAL, roomLine)}
-    <div class="sec"><span class="idx">04</span><h2>Частотный профиль изоляции</h2></div>
-    <p class="note">Чем выше линия, тем лучше потолок держит шум на этой частоте. Зелёная заливка — где MultiFrame выигрывает.</p>
+    <div class="sec"><span class="idx">04</span><h2>Как потолок держит шум по частотам</h2></div>
+    <p class="note">Чем выше линия, тем лучше потолок держит шум на этой частоте. Зелёная заливка — выигрыш MultiFrame.</p>
 
     <div class="delta-strip">
       <div class="delta-item">
@@ -490,7 +490,7 @@ function buildReportDocument(session: SessionState): string {
   <section class="page" data-page="3">
     ${pageChrome(3, TOTAL, roomLine)}
     <div class="block">
-      <div class="sec"><span class="idx">05</span><h2>Нормы комфорта · СП 51.13330.2011</h2></div>
+      <div class="sec"><span class="idx">05</span><h2>Нормы комфорта для жилья · СП 51.13330.2011</h2></div>
       <table class="norms">
         <thead><tr><th>Уровень</th><th>Rw, дБ</th><th>Lnw, дБ</th></tr></thead>
         <tbody>
@@ -504,7 +504,7 @@ function buildReportDocument(session: SessionState): string {
         <div class="k">Класс комфорта с MultiFrame</div>
         <div class="v">«${escapeHtml(officialComfortLabel(hybridAfter))}»</div>
       </div>
-      <p class="muted" style="margin-top:8px">Гибридная оценка: ${escapeHtml(HYBRID_CLASS_LABELS[hybridBefore])} → ${escapeHtml(HYBRID_CLASS_LABELS[hybridAfter])}.</p>
+      <p class="muted" style="margin-top:8px">Класс комфорта: ${escapeHtml(HYBRID_CLASS_LABELS[hybridBefore])} → ${escapeHtml(HYBRID_CLASS_LABELS[hybridAfter])}.</p>
     </div>
 
     <div class="block">
@@ -513,7 +513,7 @@ function buildReportDocument(session: SessionState): string {
     </div>
 
     <div class="closing">
-      <b>Важно.</b> Документ — ориентировочный акустический профиль по ответам в Проблемомере и полевым замерам MultiFrame. Не заменяет лабораторный протокол и проектную документацию.
+      <b>Важно.</b> Это ориентир по ответам в Проблемомере и полевым замерам MultiFrame. Документ не заменяет лабораторный протокол и проект.
     </div>
   </section>
 

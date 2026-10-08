@@ -31,15 +31,15 @@ export function wishNoiseType(wish: RoomWishOption, fallback: NoiseType): NoiseT
 export function wishScenarioLine(wish: RoomWishOption): string {
   switch (wish) {
     case 'from_above':
-      return 'Вы хотите тише шаги и голоса сверху. MultiFrame на потолке смягчает и топот, и разговоры, которые доходят через плиту.';
+      return 'Вы хотите, чтобы сверху стало тише. MultiFrame на потолке смягчает топот и разговоры, которые доходят через плиту.';
     case 'privacy_out':
       return 'Вы хотите, чтобы соседи сверху меньше слышали вас. Потолок с MultiFrame глушит голоса и музыку, которые уходят вверх через плиту.';
     case 'music_recording':
-      return 'Вы хотите, чтобы музыка и запись звучали чище. Панель MultiFrame поглощает эхо в комнате. Заодно сверху становится тише посторонний фон.';
+      return 'Вы хотите, чтобы музыка и запись звучали чище. Панель MultiFrame поглощает эхо в комнате, и сверху тоже становится тише.';
     case 'general':
-      return 'Вы хотите, чтобы в комнате стало спокойнее в целом. MultiFrame снижает и голоса сверху, и шаги — без узкой настройки под одну проблему.';
+      return 'Вы хотите, чтобы в комнате стало спокойнее. MultiFrame снижает и голоса сверху, и шаги.';
     case 'other':
-      return 'Ниже — полный профиль комнаты с MultiFrame, без привязки к одной задаче.';
+      return 'Так выглядит профиль комнаты с MultiFrame.';
   }
 }
 
@@ -50,22 +50,22 @@ export function wishAudioLead(wish: RoomWishOption): string {
     case 'privacy_out':
       return 'Сначала голоса: речь уходит вверх через плиту.';
     case 'music_recording':
-      return 'Сравните голоса и смешанный шум: меньше фона — чище своё звучание.';
+      return 'Сравните голоса и смешанный шум. Когда фона меньше, запись звучит чище.';
     case 'general':
     case 'other':
     default:
-      return 'Один и тот же звук — сейчас и с MultiFrame в этой комнате.';
+      return 'Один и тот же звук сейчас и с MultiFrame в этой комнате.';
   }
 }
 
 /** Qualitative sound-correction note (not Rw/Lnw). */
 export function wishSoundCorrectionLine(wish: RoomWishOption): string | null {
   if (wish !== 'music_recording') return null;
-  return 'Отдельно: перфорация MultiFrame уменьшает эхо в самой комнате. Это не то же самое, что изоляция от соседей.';
+  return 'Перфорация MultiFrame ещё уменьшает эхо в самой комнате.';
 }
 
 /** Stretch-ceiling drum effect — auto from planned ceiling, not a Q8 card. */
 export function stretchDrumLine(plannedCeiling: PlannedCeilingOption): string | null {
   if (plannedCeiling !== 'stretch_planned') return null;
-  return 'Под обычным натяжным потолком воздух в зазоре может усиливать шум сверху, как барабан. MultiFrame это усиление снимает: энергия уходит в панель, а не гудит в полотне.';
+  return 'Под обычным натяжным потолком зазор может гудеть, как барабан, и усиливать шум сверху. MultiFrame это снимает.';
 }

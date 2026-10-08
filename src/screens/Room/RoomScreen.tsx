@@ -28,9 +28,9 @@ const SUBSTEP_TITLE: Record<RoomSubstep, string> = {
   slabType: 'Выберите тип перекрытия',
   slabThickness: 'Выберите толщину перекрытия',
   basics: 'Укажите тип комнаты и площадь',
-  plannedCeiling: 'Выберите планируемый потолок',
-  objectStage: 'Укажите стадию объекта',
-  noisyNeighbors: 'Укажите шум сверху',
+  plannedCeiling: 'Какой потолок планируете?',
+  objectStage: 'На какой стадии объект?',
+  noisyNeighbors: 'Насколько шумно сверху?',
   roomWish: 'Какую задачу должен решить MultiFrame?',
 };
 
@@ -128,7 +128,7 @@ export function RoomScreen() {
 
           <Field
             label="Площадь потолка, м²"
-            hint="Чтобы открыть калькулятор количества MultiFrame"
+            hint="Нужна, чтобы посчитать количество панелей"
           >
             <TextInput
               type="number"

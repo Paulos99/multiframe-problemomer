@@ -246,8 +246,8 @@ export const SLAB_THICKNESS_OPTIONS: { id: SlabThicknessOption; label: string }[
 
 export const FLOOR_ABOVE_OPTIONS: { id: FloorAboveOption; label: string }[] = [
   { id: 'unknown', label: 'Не знаю' },
-  { id: 'ordinary', label: 'Обычный пол (без плавающей схемы)' },
-  { id: 'floating', label: 'Есть плавающий пол / шумоизоляция в полу' },
+  { id: 'ordinary', label: 'Обычный пол, без шумоизоляции в полу' },
+  { id: 'floating', label: 'Есть шумоизоляция в полу сверху' },
 ];
 
 export const HOUSE_TYPE_OPTIONS: { id: HouseTypeOption; label: string }[] = [
@@ -309,14 +309,13 @@ export const CALCULATOR_URL = 'https://paulos99.github.io/MF_StP/';
 export const CONSULTATION_URL = 'https://stp-multiframe.ru/#section-partner';
 
 export const DISCLAIMER_EXPERT =
-  'Оценка экспертная и качественная. Это не инженерный расчёт звукоизоляции и не гарантия конкретных показателей.';
+  'Это экспертная оценка, не инженерный расчёт и не гарантия цифр.';
 
 export const SIMULATION_BADGE = 'По полевым замерам на объектах';
 
 export const DISCLAIMER_SIMULATION =
-  'Цифры — ориентир по полевым замерам на объектах, не лабораторный сертификат. Потолок смягчает шаги сверху; чтобы полностью уложиться в норму по удару, часто нужен ещё пол у соседа.';
+  'Цифры — ориентир по полевым замерам на объектах, не лабораторный сертификат. Потолок смягчает шаги сверху.';
 
-export const NORM_FOOTNOTE = 'Ориентир по шкале комфортности (норм. документы)';
+export const NORM_FOOTNOTE = 'Ориентир по нормам комфорта, не сертификат';
 
-export const LOG_DB_FOOTNOTE =
-  'Шкала дБ логарифмическая: −8 дБ ≈ вдвое тише по ощущению.';
+export const LOG_DB_FOOTNOTE = 'Минус 8 дБ ощущается примерно вдвое тише.';

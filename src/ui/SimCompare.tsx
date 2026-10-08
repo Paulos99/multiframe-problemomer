@@ -26,7 +26,7 @@ function ClassPill({ side }: { side: DerivedSimSide }) {
     return <span className={styles.statusPartial}>частично</span>;
   }
   if (side.classStatus === 'below' || side.classLabel === 'below') {
-    return <span className={styles.statusBelow}>ниже класса</span>;
+    return <span className={styles.statusBelow}>ниже нормы</span>;
   }
   return <span className={styles.classPill}>класс {classCyr(side.classLabel)}</span>;
 }

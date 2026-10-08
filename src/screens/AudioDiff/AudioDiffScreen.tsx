@@ -136,7 +136,7 @@ export function AudioDiffScreen() {
 
             {group === 'impact' || group === 'mixed' ? (
               <p className={styles.honesty}>
-                Потолок смягчает шаги сверху. Чтобы уложиться в норму по удару, часто нужен ещё пол у соседа.
+                Потолок смягчает шаги сверху.
               </p>
             ) : null}
 

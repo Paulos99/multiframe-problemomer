@@ -73,7 +73,7 @@ export function grade(
       return {
         classLabel: cls,
         classStatus: 'partial',
-        label: 'частично: воздух ближе к комфорту, удар ещё не в норме',
+        label: 'воздух лучше, удар ещё не в норме',
       };
     }
   }
@@ -175,7 +175,7 @@ export function deriveSimulation(answers: SessionAnswers): DerivedSimulation {
     honestLines: [
       'Индексы Rw и Lnw зависят от перекрытия, пола сверху и типа дома — не от того, насколько громко шумят соседи.',
       'Громкость в комнате считается по спектру: как шумят сверху, тип комнаты, площадь и мебель.',
-      'Потолок смягчает шаги сверху; чтобы полностью уложиться в норму по удару, часто нужен ещё пол у соседа.',
+      'Потолок смягчает шаги сверху.',
     ],
     perceivedAirPct: perceivedReductionPct(airAbs),
     perceivedImpactPct: perceivedReductionPct(impactAbs),
