@@ -16,12 +16,12 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 - **Result chain (owner 2026-09-17):** (1) **Нормы комфорта в стройке** — СП А/Б/В + Rw/Lnw + construction context, (2) **Текущая ситуация** — official hybrid SP header + two felt 5-step axes (now only), (3) **С MultiFrame** — official hybrid after + felt axes with now/after + % + audio + frequency charts, (4) **Уникальность системы MultiFrame** — StP pillar cards (звукоизоляция+комфорт, безопасность, экология, монтаж, универсальность); no comparison with plain stretch film, (5) **Следующий шаг**. No top ComfortScale table, no separate «Что изменится на слух», no «Расчёт и нормы / подробности», no `LOG_DB_FOOTNOTE`.
 - **Felt vs official (owner 2026-09-18):** headers use official hybrid via `comfortClassFor` + `HYBRID_CLASS_LABELS` / «ниже допустимого (В)» (never «Д», never felt words in headers). **Felt axes = Rw (воздух) / Lnw (удар)** mapped to А/Б/В + «очень шумно» ниже В. Axis captions show **Rw / Lnw** with direction hints (Rw больше — лучше; Lnw меньше — лучше) — not room L2 dBA. Demo audio stays on received L2; copy near audio says шкалы = изоляция, звук = громкость в комнате.
 - **Channel names (owner 2026-09-17):** `Воздушный шум (голоса и музыка)` · `Ударный шум (шаги и падения)`; audio `Воздушный шум` · `Ударный шум` · `Смешанный шум`.
-- **Numbers policy (owner 2026-09-13):** show a **full working MultiFrame effect model** with complete numbers now — currently **unconfirmed** (`marketing_placeholder` / `pre_lab`). After Trofimov (or lab) confirmation, **replace** values with correct ones; do not redesign the UX around hiding numbers. Never present placeholders as lab guarantees or certificates.
-- Effect source: `marketing_placeholder`; disclaimer: `pre_lab` / expert qualitative — never lab guarantees. Charts/numbers are **oriented arguments**, not certificates.
-- MultiFrame Δ is **frequency-shaped** (`marketing_placeholder` / `pre_lab`): typical ΔRw **+8…+12** (more on a light slab), ΔLnw **−4…−9** without a floating floor and **−2…−4** if the floor above already floats. UI range is **computed from the room model**, not hardcoded +10/−8. Never present as a lab certificate.
+- **Numbers policy (updated 2026-10 field anchors):** show a **full working MultiFrame effect model** calibrated to **object tests** (`field_in_situ` / `field_objects`) — foamblock, Kostroma, Andrianova(+Полиблок 10 + стяжка 60). Not a lab certificate. See `docs/sources/08-multiframe-field-anchors.md`.
+- Effect source: `field_in_situ`; disclaimer: `field_objects` / expert qualitative — never lab guarantees. Charts/numbers are **oriented arguments** from field spectra.
+- MultiFrame Δ is **field-shaped**: bare/ordinary ΔRw ~**+1…+9** by slab Rw (Kostroma ~+2, light ~+9), |ΔLnw| ~**4…7**; floating floor above → Andrianova residual ~**+1 / −1**. UI range from the room model. Never present as a lab certificate.
 - Classes **А/Б/В** (СП 51.13330.2011): **А** = высокий комфорт, **Б** = комфорт, **В** = допустимый уровень. Below-scale official wording is **`ниже допустимого (В)`** (no letter «Д»). Felt axes are visual only.
 - «примерно вдвое спокойнее» **only for air (воздух)**; impact (удар) = quieter + floor often needed — never claim Lnw norm from ceiling alone.
-- Audio = **три группы примеров:** воздух · удар · смешанный. **До** = stem, приведённый к L2/dBA этой комнаты (соседи, площадь, плита); **После** = тот же граф + полосовой MultiFrame transfer `ΔL(f)` из receiving (`pre_lab`). Не showroom duck и не одинаковый сырой MP3 для всех помещений.
+- Audio = **три группы примеров:** воздух · удар · смешанный. **До** = stem, приведённый к L2/dBA этой комнаты (соседи, площадь, плита); **После** = тот же граф + полосовой MultiFrame transfer `ΔL(f)` из receiving (field_objects). Не showroom duck и не одинаковый сырой MP3 для всех помещений.
 - Mobile: denser inputs + sticky question/CTA; both noise rows remain on the same shared scale axis and keep their everyday labels. No raw tech dumps without explanation.
 - **Premium tone (owner 2026-09-13):** never UI phrases like «за что платим», «за что ~500 тыс.», blunt cost/price push. Show features and effects so the user **infers** value. Soft B2B benefits OK without «средний чек» / money-first language.
 - Out of scope: walls, partitions, floors systems, Polyblock, framed systems, fake lab guarantees, floor-level question.
@@ -678,7 +678,7 @@ Separate disabled «Консультация (недоступно в демо)�
 
 **Must render**
 
-- Badge = `Оценка до лабораторных данных` (or equivalent pre_lab frame)
+- Badge = `По полевым замерам на объектах` (field_objects frame; not a lab certificate)
 - Columns: `Сейчас` · `С MultiFrame`
 - **Hybrid class labels (primary):** `Высокий комфорт (А)` · `Комфорт (Б)` · `Допустимый (В)` · `Ниже В` — plus soft norm hint
 - **Do NOT render** old feeling chips `Тихо` · `Терпимо` · `Мешает` (obsolete)
@@ -705,11 +705,11 @@ Separate disabled «Консультация (недоступно в демо)�
 | ---- | ----- |
 | Construction anchors (bare, no drum) | solid 180 → Rw 54 / Lnw 76; ПК 220 → 52/74 (Trofimov) |
 | Other solid (Trofimov) | 100→47/82 … 250→56/74 |
-| MultiFrame Δ | Invented frequency ΔR(f), typical ΔRw 8…12, ΔLnw 4…9 (2…4 if floating floor). **Not** a flat +10/−8 |
+| MultiFrame Δ | Field-calibrated ΔR(f): bare ~ΔRw 1…9 / |ΔLnw| 4…7; floating residual ~1 (Andrianova+Polyblock). **Not** a flat +10/−8 |
 | UI range | From the room model (`deltaRange`), not hardcoded |
 | NORMS (Rw min / Lnw max) | A 54/55; B 52/58; V 50/60 |
-| source | `marketing_placeholder` |
-| disclaimer | `pre_lab` |
+| source | `field_in_situ` |
+| disclaimer | `field_objects` |
 
 ---
 
@@ -737,7 +737,7 @@ Two layers so each Room answer moves the right number. Code: `src/state/acoustic
 
 **In-room level:** `L2(f) = L1(f) − R(f) + 10·log10(S/A(f))` (air); impact `Ln(f) + 10·log10(10/A) + source`. Displayed loudness = A-weighted energy sum (IEC 61672). A(f) from room type α and stage furnishing (Sabine surfaces, h=2.7 m).
 
-**MultiFrame** (`pre_lab` invention with physical shape): ΔR(f) from zamer_graph MultiFrame vs slab + perforation peak 100–500 Hz. Mean ΔRw 8…12 (less if slab Rw already ≥56). Mean |ΔLnw| 4…9 without floating floor, 2…4 with it. **Never** take Lnw to class A (55) by the ceiling alone. Swap only the Δ tables when lab curves exist — do not change UX.
+**MultiFrame** (`field_in_situ`): ΔR(f) / Δiso(f) from object tests — foamblock, Kostroma, Andrianova (monolith 200 + Полиблок 10 under 60 mm screed). Bare/ordinary interpolate by Rw; floating uses Andrianova residual. **Never** take Lnw to class A (55) by the ceiling alone. See `docs/sources/08-multiframe-field-anchors.md`.
 
 **Honesty on Result:** indices are about the floor/ceiling construction (and house flanking); loudness in the room also depends on how noisy it is upstairs, room finish, and area. Ceiling softens impact; the Lnw A-norm often needs the neighbor’s floating floor.
 

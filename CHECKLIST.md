@@ -37,7 +37,7 @@ Live context (do not redesign from this URL alone): https://paulos99.github.io/m
 | Evidence presentation Q4 (confirmed 2026-09-12) | **Всё сразу** на одном скролле: **сверху вывод**, ниже детальные данные. Менеджер и пользователь сами смотрят нужный слой. Не progressive disclosure и не урезание пакета по роли. |
 | Charts (confirmed 2026-09-13; spectrum restored 2026-09-14) | Шкала А→Б→В сверху; крупные Δ Rw / Δ Lnw + полосы «тише»; **частотные графики изоляции** (форма zamer_graph) ниже как вторичное доказательство. Обе кривые — изоляция, выше = тише. Подписи + pre_lab. |
 | Result trust pack (confirmed 2026-09-14) | Крупно показать **Δ Rw** и **Δ удар (Lnw)**; **частотные графики** Rw/изоляция по Гц по форме замеров (реф. zamer_graph); **2** понятных преимущества клиенту; ясно, что **класс комфорта растёт** по официальной шкале. Не вырезать доверие ради «пустоты». |
-| Numbers policy (confirmed 2026-09-13) | **Показываем полные числа сейчас** как рабочую модель эффекта MultiFrame — пока **неподтверждённые** (`pre_lab` / `marketing_placeholder`). После техподтверждения **заменим** на корректные. Не прятать цифры в MVP. Не выдавать за лаб-гарантию. |
+| Numbers policy (updated 2026-10 field) | **Показываем полные числа** по полевой модели MultiFrame (`field_in_situ` / foam·Kostroma·Andrianova+Polyblock). Не прятать цифры. Не выдавать за лаб-сертификат. |
 | MultiFrame features (presentation 2026-09-13 + stp-multiframe.ru) | Эффект барабана под натяжным → MultiFrame рассеивает; до ~17 дБ; AEROCELL / перфорация / SmartLock / шип-паз; Flat+Wave; для клиента монтаж = «быстро, без долгой стройки» (не техника крепежа/коммуникаций); потолок+стены; эко/сертификаты; патент. UI: **понятно + аргументированно** (тезис + короткое почему/как), не голые слоганы и не техдамп; **без** «за что платим». Источник: `docs/sources/06-multiframe-presentation.pdf`. |
 | Norm footnote (confirmed 2026-09-13) | Под сдвигом класса: `Ориентир по шкале комфортности (норм. документы)`. |
 | Class shift verdict line (confirmed 2026-09-13) | Формат: `Сейчас: {класс} → с MultiFrame: {класс}` (пример: `Сейчас: Дискомфорт → с MultiFrame: Комфорт (Б)`). |
@@ -111,7 +111,7 @@ Ask about product needs, not implementations. Mark what the first version actual
 Product capabilities that **are** in the first version (not listed as vibe template toggles above — see ledger):
 
 - Comfort wizard: Start → Room → Processing (ceremony) → Result (audio compact inside Result; no Before/After / Audio screens)
-- Expert qualitative effect model with `marketing_placeholder` ΔRw / ΔLnw and pre_lab disclaimer
+- Field-calibrated MultiFrame Δ model (`field_in_situ` / `field_objects`) — see `docs/sources/08-multiframe-field-anchors.md`
 - Before/after emotional contrast + SimCompare (feeling primary, dB tertiary)
 - Audio groups воздух / удар / смешанный with locked household examples; case-specific After (level + frequencies + ≈%)
 - CTA: calculator deep-link + consultation link to StP site `#section-partner`
@@ -175,8 +175,8 @@ Engineering decisions already made / owned by the agent (product terms):
 
 - **Surface:** one public Vite + React + TypeScript SPA (`webapp`). No separate SEO `website`, no backend microservices.
 - **Stack (recorded, do not reopen):** Vite + React SPA, client session state, GitHub Actions → GitHub Pages. No microservices.
-- **Effect model:** two layers — construction R(f)/Rw/Lnw from Trofimov + physics (mass, coincidence, ПК voids, wood, house flanking, floor ΔLn(f)); in-room A-weighted level from L1(f)−R(f)+10log(S/A) (neighbors, room type, area, furnishing). **Product «сейчас» = in-situ** (flanking + leak + drum), not lab Trofimov Rw; lab fixtures stay 180=54/76. MultiFrame Δ is invented frequency-shaped (`source: marketing_placeholder`, `disclaimer: pre_lab`): typical ΔRw 8…12, ΔLnw 4…9 (2…4 if floating floor). Neighbors do not change Rw. Ceiling alone never takes Lnw to class A. Classes **A/B/V** (UI А/Б/В) unchanged.
-- **Audio:** groups воздух / удар / смешанный; real MP3 stems (talk/stomp/vacuum); After = case Δ (level + EQ); mixed blends both; ≈% from room model; `pre_lab` / ориентир.
+- **Effect model:** two layers — construction R(f)/Rw/Lnw from Trofimov + physics (mass, coincidence, ПК voids, wood, house flanking, floor ΔLn(f)); in-room A-weighted level from L1(f)−R(f)+10log(S/A) (neighbors, room type, area, furnishing). **Product «сейчас» = in-situ** (flanking + leak + drum), not lab Trofimov Rw; lab fixtures stay 180=54/76. MultiFrame Δ is **field-calibrated** (`source: field_in_situ`, `disclaimer: field_objects`): foamblock / Kostroma / Andrianova(+Полиблок 10+стяжка 60). Typical bare ΔRw ~1…9 by slab Rw, |ΔLnw| ~4…7 (Kostroma-like); floating residual ~+1 / −1 (Andrianova). Neighbors do not change Rw. Ceiling alone never takes Lnw to class A. Classes **A/B/V** (UI А/Б/В) unchanged. See `docs/sources/08-multiframe-field-anchors.md`.
+- **Audio:** groups воздух / удар / смешанный; real MP3 stems (talk/stomp/vacuum); After = case Δ (level + EQ); mixed blends both; ≈% from room model; field-object ориентир.
 - **Result JTBD arc (2026-09-16 + workshop):** current-state scare first, then MultiFrame %; no `interestFor` UI; copy summary for everyone; Room external→internal; no floor-above question.
 - **CTA:** deep-link to MultiFRAME calculator with query payload; lead = consultation/selection request (MVP may stub delivery — never invent a corporate CRM endpoint).
 - **Mobile:** denser inputs + sticky progress/CTA; touch targets ≥44px; no tech dumps.
@@ -203,11 +203,11 @@ A capability with no row is `absent` by default. The State column always holds o
 | Noise scenario multi-select | removed | Owner 2026-09-13: do not quiz «что мешает». |
 | Current comfort + noise type | removed | Owner 2026-09-13: no complaint quiz; class from model. |
 | Emotional before/after contrast | included | Feeling bullets on Result cards; hybrid class lives on verdict + ladder + SP table (not repeated in cards). |
-| SimCompare effect UI | included | Quietness bars + large Δ; frequency isolation charts secondary on Result. Hybrid class primary; no `Тихо/Терпимо/Мешает`; pre_lab badge. |
-| marketing_placeholder Δ model | included | Frequency-shaped MultiFrame Δ (`pre_lab`): ΔRw typically 8…12, ΔLnw 4…9 (2…4 with floating floor); range from the room model. Never claim lab guarantees. |
+| SimCompare effect UI | included | Quietness bars + large Δ; frequency isolation charts secondary on Result. Hybrid class primary; no `Тихо/Терпимо/Мешает`; field-object badge. |
+| field_in_situ Δ model | included | MultiFrame Δ from object tests (foam / Kostroma / Andrianova+Polyblock): bare ΔRw ~1…9, |ΔLnw| ~4…7; floating residual ~1. Never claim lab certificate. |
 | Two-layer acoustic model | included | Construction (Trofimov + mass/coincidence/ПК/wood/flanking/floor ΔLn(f) → Rw/Lnw + charts) vs receiving room (L1−R+S/A, A-weighted). Lab anchors: bare 180=54/76, ПК 220=52/74. Product in-situ «сейчас» typically Rw ~44–48 (panel/unknown), air often вне нормы. |
 | Trofimov-style comfort classes A/B/V | included | Canon A\|B\|V; UI Cyrillic А\|Б\|В. Result shows **independent** air (Rw) and impact (Lnw) levels; full hybrid SP class is secondary. Never promise full Lnw norm from ceiling alone. |
-| Case-specific audio (air / impact / mixed) | included | Stems in `public/audio/`; After cuts level + frequencies from room Δ; mixed = blend; show ≈%; `pre_lab`. |
+| Case-specific audio (air / impact / mixed) | included | Stems in `public/audio/`; After cuts level + frequencies from room Δ; mixed = blend; show ≈%; field-object ориентир. |
 | JTBD Result narrative + hot funnel | included | Current then MultiFrame; features block `Уникальность системы MultiFrame`; «Следующий шаг» CTA; lead handoff + summary copy. No role split. |
 | Floor-above survey | removed | Workshop 2026-09-16: too expert; model keeps unknown. |
 | Start role picker self/client | removed | Workshop 2026-09-16: confuses visitors. |
@@ -227,7 +227,7 @@ A capability with no row is `absent` by default. The State column always holds o
 | Walls / partitions / floor systems | absent | Explicitly out of MVP scope. |
 | Polyblock product path | absent | Explicitly out of scope. |
 | Framed acoustic systems | absent | Explicitly out of scope. |
-| Lab-certified ΔRw/ΔLnw guarantees | absent | Placeholders only; always pre_lab. |
+| Lab-certified ΔRw/ΔLnw guarantees | absent | Field object anchors only; not a lab certificate. |
 | Native mobile app | absent | Deferred. |
 | SEO marketing website | absent | Deferred; SPA is the product. |
 | Real-time / WebSockets | absent | — |

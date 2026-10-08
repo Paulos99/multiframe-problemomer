@@ -1,6 +1,6 @@
 /**
  * Simulation facade: Trofimov + frequency model + in-room source layer.
- * MultiFrame Δ is marketing_placeholder / pre_lab (invented, physically shaped).
+ * MultiFrame Δ is field_in_situ (object tests: foamblock / Kostroma / Andrianova).
  */
 import type {
   ClassLabel,
@@ -36,15 +36,15 @@ export const NORMS = {
   V: { Rw: 50, Lnw: 60 },
 } as const;
 
-/** Typical centre — not applied as a flat delta anymore. */
-export const DELTA = { Rw: 10, Lnw: -8 } as const;
+/** Typical centre for ordinary concrete (Kostroma-like) — not a flat delta. */
+export const DELTA = { Rw: 2, Lnw: -6 } as const;
 
 export const SIM_META = {
-  source: 'marketing_placeholder' as const,
-  disclaimer: 'pre_lab' as const,
+  source: 'field_in_situ' as const,
+  disclaimer: 'field_objects' as const,
   deltaRange: {
-    Rw: [8, 12] as const,
-    Lnw: [6, 10] as const,
+    Rw: [1, 9] as const,
+    Lnw: [1, 8] as const,
   },
 };
 

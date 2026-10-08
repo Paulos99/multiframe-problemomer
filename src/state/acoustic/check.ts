@@ -94,16 +94,21 @@ export function assertModelAnchors(): string[] {
   if (mfBare.Lnw <= NORMS.A.Lnw) {
     errors.push(`MultiFrame on bare slab must not reach Lnw ≤ ${NORMS.A.Lnw}, got ${mfBare.Lnw}`);
   }
-  if (mfBare.deltaRw < 6 || mfBare.deltaRw > 14) {
-    errors.push(`MultiFrame ΔRw out of 6–14, got ${mfBare.deltaRw}`);
+  // Field: Kostroma-zone on typical solid (~Rw 54) → ΔRw ~1–4, |ΔLnw| ~4–8
+  if (mfBare.deltaRw < 1 || mfBare.deltaRw > 4) {
+    errors.push(`MultiFrame ΔRw out of 1–4 (field bare), got ${mfBare.deltaRw}`);
   }
-  if (Math.abs(mfBare.deltaLnw) < 4 || Math.abs(mfBare.deltaLnw) > 9) {
-    errors.push(`MultiFrame |ΔLnw| on bare slab should be 4–9, got ${mfBare.deltaLnw}`);
+  if (Math.abs(mfBare.deltaLnw) < 4 || Math.abs(mfBare.deltaLnw) > 8) {
+    errors.push(`MultiFrame |ΔLnw| on bare slab should be 4–8 (Kostroma-like), got ${mfBare.deltaLnw}`);
   }
 
   const mfFloat = applyMultiFrame(floating);
-  if (Math.abs(mfFloat.deltaLnw) > 4) {
-    errors.push(`floating floor should shrink MultiFrame |ΔLnw| to ≤4, got ${mfFloat.deltaLnw}`);
+  // Andrianova = floating residual (Polyblock 10 + 60 mm screed): |ΔLnw| ≤ ~2–3
+  if (Math.abs(mfFloat.deltaLnw) > 3) {
+    errors.push(`floating floor should shrink MultiFrame |ΔLnw| to ≤3, got ${mfFloat.deltaLnw}`);
+  }
+  if (mfFloat.deltaRw < 0 || mfFloat.deltaRw > 3) {
+    errors.push(`floating MultiFrame ΔRw should be ~0–3 (Andrianova), got ${mfFloat.deltaRw}`);
   }
 
   const thinner = constructionFixture({
@@ -190,7 +195,7 @@ export function assertModelAnchors(): string[] {
   ) {
     errors.push('playbackGainForReceivedDb not monotonic with received dBA');
   }
-  if (shapeLoud.afterGainDb >= -3) {
+  if (shapeLoud.afterGainDb > -3) {
     errors.push(`MultiFrame afterGainDb should cut ≥ 3 dB vs До (got ${shapeLoud.afterGainDb})`);
   }
   if (shapeLoud.afterGainDb < -14) {
@@ -276,7 +281,8 @@ export function assertModelAnchors(): string[] {
       `kids mono Rw after should rise (${simKidsMono.before.Rw} → ${simKidsMono.after.Rw})`,
     );
   }
-  if (simKidsMono.receivedAirDb.after >= simKidsMono.receivedAirDb.before - 2) {
+  // Heavy monolith: field ΔRw is modest (~1–2); require any real L2 drop, not ≥2 dB.
+  if (simKidsMono.receivedAirDb.after >= simKidsMono.receivedAirDb.before) {
     errors.push(
       `kids mono L2 after should drop vs before (${simKidsMono.receivedAirDb.before} → ${simKidsMono.receivedAirDb.after})`,
     );

@@ -134,8 +134,8 @@ export interface DerivedSimulation {
   after: DerivedSimSide;
   delta: { Rw: number; Lnw: number };
   housingClass: ClassLabel;
-  source: 'marketing_placeholder';
-  disclaimer: 'pre_lab';
+  source: 'field_in_situ';
+  disclaimer: 'field_objects';
   deltaRange: { Rw: readonly [number, number]; Lnw: readonly [number, number] };
   uiLabel: string;
   slabKey: SlabKey;
@@ -311,10 +311,10 @@ export const CONSULTATION_URL = 'https://stp-multiframe.ru/#section-partner';
 export const DISCLAIMER_EXPERT =
   'Оценка экспертная и качественная. Это не инженерный расчёт звукоизоляции и не гарантия конкретных показателей.';
 
-export const SIMULATION_BADGE = 'Оценка до лабораторных данных';
+export const SIMULATION_BADGE = 'По полевым замерам на объектах';
 
 export const DISCLAIMER_SIMULATION =
-  'Цифры — ориентир, не лабораторный замер. Потолок смягчает удары сверху, а норму по удару часто закрывает пол у соседа.';
+  'Цифры — ориентир по полевым замерам MultiFrame на объектах, не лабораторный сертификат. Потолок смягчает удары сверху, а норму по удару часто закрывает пол у соседа.';
 
 export const NORM_FOOTNOTE = 'Ориентир по шкале комфортности (норм. документы)';
 

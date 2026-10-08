@@ -52,18 +52,6 @@ export interface ConstructionResult {
   Ln: number[];
 }
 
-/** zamer_graph «перекрытие» airborne — MultiFrame Δ shape prior only. */
-export const AIR_SHAPE_REF = [
-  31.7, 35.6, 40.5, 42.7, 44.8, 48.9, 48.5, 49.4, 51.9, 51.9, 52.2, 50.4, 56.6,
-  60.9, 63.3, 63.8, 67.3, 67.5,
-] as const;
-
-/** zamer_graph impact isolation (higher = better) — MultiFrame Δ shape prior. */
-export const IMPACT_SHAPE_REF = [
-  1.0, 2.1, 6.8, 16.4, 19.1, 27.9, 24.0, 32.6, 35.2, 34.7, 36.6, 38.3, 43.0,
-  41.7, 40.4, 35.5, 43.9, 46.8,
-] as const;
-
 const THICKNESS_MID: Record<string, number> = {
   up_to_160: 150,
   about_160_200: 180,
