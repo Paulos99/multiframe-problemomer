@@ -45,25 +45,25 @@
 
 @media (min-width: 900px) {
   :root {
-    --max-w: 820px;
-    --desktop-zoom: 1.12;
-    --footer-h: 132px;
+    --max-w: 780px;
+    --desktop-zoom: 1.06;
+    --footer-h: 126px;
   }
 }
 
 @media (min-width: 1200px) {
   :root {
-    --max-w: 900px;
-    --desktop-zoom: 1.18;
-    --footer-h: 140px;
+    --max-w: 840px;
+    --desktop-zoom: 1.09;
+    --footer-h: 130px;
   }
 }
 
 @media (min-width: 1440px) {
   :root {
-    --max-w: 960px;
-    --desktop-zoom: 1.22;
-    --footer-h: 148px;
+    --max-w: 880px;
+    --desktop-zoom: 1.12;
+    --footer-h: 134px;
   }
 }
 
