@@ -2,14 +2,13 @@ import type { NoiseType, PlannedCeilingOption, RoomWishOption } from './types';
 
 export type WishAudioGroup = 'air' | 'impact' | 'mixed';
 
-/** Demo order: the first group is the selling point for this job. */
+/** Airborne always above impact. Mixed sits with the job (recording/privacy). */
 export function wishAudioOrder(wish: RoomWishOption): WishAudioGroup[] {
   switch (wish) {
-    case 'from_above':
-      return ['impact', 'air', 'mixed'];
     case 'privacy_out':
     case 'music_recording':
       return ['air', 'mixed', 'impact'];
+    case 'from_above':
     case 'general':
     case 'other':
     default:
@@ -18,7 +17,9 @@ export function wishAudioOrder(wish: RoomWishOption): WishAudioGroup[] {
 }
 
 export function wishPrimaryGroup(wish: RoomWishOption): WishAudioGroup {
-  return wishAudioOrder(wish)[0]!;
+  if (wish === 'from_above') return 'impact';
+  if (wish === 'privacy_out' || wish === 'music_recording') return 'air';
+  return 'air';
 }
 
 export function wishNoiseType(wish: RoomWishOption, fallback: NoiseType): NoiseType {

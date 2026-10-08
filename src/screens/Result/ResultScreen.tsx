@@ -30,7 +30,7 @@ import {
   prefetchAcousticProfilePdf,
   shareAcousticProfile,
 } from '../../state/reportPdf';
-import { wishPrimaryGroup, wishScenarioLine, wishSoundCorrectionLine, stretchDrumLine } from '../../state/wish';
+import { wishScenarioLine, wishSoundCorrectionLine, stretchDrumLine } from '../../state/wish';
 import styles from './ResultScreen.module.css';
 
 /** Official SP thresholds А/Б/В + explicit «ниже допустимого» band. */
@@ -204,7 +204,6 @@ export function ResultScreen() {
   const houseLabel = optionLabel(HOUSE_TYPE_OPTIONS, room.houseType);
   const wishLabel = optionLabel(ROOM_WISH_OPTIONS, room.roomWish);
   const wish = room.roomWish;
-  const impactFirst = wishPrimaryGroup(wish) === 'impact';
   const soundCorrection = wishSoundCorrectionLine(wish);
   const drumLine = stretchDrumLine(room.plannedCeiling);
   const slabContext =
@@ -393,41 +392,20 @@ export function ResultScreen() {
         </div>
 
         <div className={styles.feltStack}>
-          {impactFirst ? (
-            <>
-              <FeltScale
-                title="Ударный шум (шаги и падения)"
-                now={impactNowFelt}
-                indexKind="Lnw"
-                nowIndex={sim.before.Lnw}
-                mode="nowOnly"
-              />
-              <FeltScale
-                title="Воздушный шум (голоса и музыка)"
-                now={airNowFelt}
-                indexKind="Rw"
-                nowIndex={sim.before.Rw}
-                mode="nowOnly"
-              />
-            </>
-          ) : (
-            <>
-              <FeltScale
-                title="Воздушный шум (голоса и музыка)"
-                now={airNowFelt}
-                indexKind="Rw"
-                nowIndex={sim.before.Rw}
-                mode="nowOnly"
-              />
-              <FeltScale
-                title="Ударный шум (шаги и падения)"
-                now={impactNowFelt}
-                indexKind="Lnw"
-                nowIndex={sim.before.Lnw}
-                mode="nowOnly"
-              />
-            </>
-          )}
+          <FeltScale
+            title="Воздушный шум (голоса и музыка)"
+            now={airNowFelt}
+            indexKind="Rw"
+            nowIndex={sim.before.Rw}
+            mode="nowOnly"
+          />
+          <FeltScale
+            title="Ударный шум (шаги и падения)"
+            now={impactNowFelt}
+            indexKind="Lnw"
+            nowIndex={sim.before.Lnw}
+            mode="nowOnly"
+          />
         </div>
 
         <p className={styles.comfortClass}>
@@ -450,53 +428,26 @@ export function ResultScreen() {
         ) : null}
 
         <div className={styles.feltStack}>
-          {impactFirst ? (
-            <>
-              <FeltScale
-                title="Ударный шум (шаги и падения)"
-                now={impactNowFelt}
-                after={impactAfterFelt}
-                indexKind="Lnw"
-                nowIndex={sim.before.Lnw}
-                afterIndex={sim.after.Lnw}
-                quieterPct={sim.perceivedImpactPct}
-                mode="nowAndAfter"
-              />
-              <FeltScale
-                title="Воздушный шум (голоса и музыка)"
-                now={airNowFelt}
-                after={airAfterFelt}
-                indexKind="Rw"
-                nowIndex={sim.before.Rw}
-                afterIndex={sim.after.Rw}
-                quieterPct={sim.perceivedAirPct}
-                mode="nowAndAfter"
-              />
-            </>
-          ) : (
-            <>
-              <FeltScale
-                title="Воздушный шум (голоса и музыка)"
-                now={airNowFelt}
-                after={airAfterFelt}
-                indexKind="Rw"
-                nowIndex={sim.before.Rw}
-                afterIndex={sim.after.Rw}
-                quieterPct={sim.perceivedAirPct}
-                mode="nowAndAfter"
-              />
-              <FeltScale
-                title="Ударный шум (шаги и падения)"
-                now={impactNowFelt}
-                after={impactAfterFelt}
-                indexKind="Lnw"
-                nowIndex={sim.before.Lnw}
-                afterIndex={sim.after.Lnw}
-                quieterPct={sim.perceivedImpactPct}
-                mode="nowAndAfter"
-              />
-            </>
-          )}
+          <FeltScale
+            title="Воздушный шум (голоса и музыка)"
+            now={airNowFelt}
+            after={airAfterFelt}
+            indexKind="Rw"
+            nowIndex={sim.before.Rw}
+            afterIndex={sim.after.Rw}
+            quieterPct={sim.perceivedAirPct}
+            mode="nowAndAfter"
+          />
+          <FeltScale
+            title="Ударный шум (шаги и падения)"
+            now={impactNowFelt}
+            after={impactAfterFelt}
+            indexKind="Lnw"
+            nowIndex={sim.before.Lnw}
+            afterIndex={sim.after.Lnw}
+            quieterPct={sim.perceivedImpactPct}
+            mode="nowAndAfter"
+          />
         </div>
 
         <CompactAudio pairs={session.audio.pairs} sim={sim} wish={wish} />
@@ -506,17 +457,8 @@ export function ResultScreen() {
             <h3>Изоляция по частотам</h3>
             <p>Чем выше линия, тем лучше потолок держит шум на этой частоте.</p>
           </header>
-          {impactFirst ? (
-            <>
-              {impactChart}
-              {airChart}
-            </>
-          ) : (
-            <>
-              {airChart}
-              {impactChart}
-            </>
-          )}
+          {airChart}
+          {impactChart}
         </div>
 
         <p className={styles.comfortClass}>
