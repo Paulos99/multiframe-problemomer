@@ -103,7 +103,7 @@ function pageChrome(page: number, total: number, roomLine: string): string {
     </div>
   </div>
   <div class="page-bottom">
-    <span>stp-multiframe.ru · маркетинговый ориентир, не замер и не гарантия</span>
+    <span>stp-multiframe.ru · MultiFrame Проблемомер</span>
     <span>${page} / ${total}</span>
   </div>`;
 }
@@ -113,6 +113,7 @@ function buildReportDocument(session: SessionState): string {
   const room = handoff.room;
   const slab = resolveSlab(room);
   const sim = session.derived!.simulation;
+  const rev = sim.reverb;
   const b = sim.before;
   const a = sim.after;
   const hybridBefore = comfortClassFor(b.Rw, b.Lnw);
@@ -401,7 +402,7 @@ function buildReportDocument(session: SessionState): string {
   <section class="page" data-page="1">
     ${pageChrome(1, TOTAL, roomLine)}
     <h1 class="hero-title">Акустический профиль помещения</h1>
-    <p class="hero-sub">Объект: <b>${escapeHtml(roomName)}</b>, ${escapeHtml(area)}. Маркетинговый ориентир эффекта MultiFrame.</p>
+    <p class="hero-sub">Объект: <b>${escapeHtml(roomName)}</b>, ${escapeHtml(area)}. Эффект MultiFrame для этого помещения.</p>
 
     <div class="block">
       <div class="sec"><span class="idx">01</span><h2>Паспорт объекта</h2></div>
@@ -460,6 +461,11 @@ function buildReportDocument(session: SessionState): string {
           <div class="chips">воздух ${chipLabel(airClassFor(a.Rw))} · удар ${chipLabel(impactClassFor(a.Lnw))}</div>
         </div>
       </div>
+      <div class="comfort-banner" style="margin-top:12px">
+        <div class="k">Комфорт от эха в комнате</div>
+        <div class="v">${rev.comfortBefore}% → ${rev.comfortAfter}%</div>
+      </div>
+      <p class="muted" style="margin-top:6px">MultiFrame снимает порхающее эхо в помещении — не только шум сверху.</p>
     </div>
   </section>
 
@@ -513,7 +519,7 @@ function buildReportDocument(session: SessionState): string {
     </div>
 
     <div class="closing">
-      <b>Важно.</b> Это маркетинговый ориентир по ответам в Проблемомере. Документ не заменяет замер, лабораторный протокол и проект.
+      Документ собран по ответам в Проблемомере для объекта «${escapeHtml(roomName)}».
     </div>
   </section>
 

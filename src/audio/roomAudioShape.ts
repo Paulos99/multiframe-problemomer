@@ -1,11 +1,8 @@
 /**
- * Build room-specific audio shape from receiving L2 bands + stem calibration.
+ * Dry-stem → room playback shape.
  *
- * Contract:
- * - «До» = authored through-wall stem × room gain from L2_before (level only).
- * - «После» = that same «До» base × MultiFrame transfer relative to «До»
- *   (broadband ΔdBA + residual ΔL(f) shape). Never remap «После» from the
- *   sample as if it were an independent absolute level.
+ * Continuous (music/stomp/vacuum): muffling through slab + room echo.
+ * Clap: in-room source — almost no slab filter; contrast is echo length/wet.
  */
 import { SPECTRUM_HZ, clamp, round1 } from '../state/acoustic/bands';
 import {
@@ -25,24 +22,28 @@ import {
   type StemId,
 } from './stemCalibration';
 
-export type AudioPlayGroup = 'air' | 'impact' | 'mixed';
+export type AudioPlayGroup = 'air' | 'impact' | 'mixed' | 'echo';
 
 export type RoomAudioShape = {
   stemId: StemId;
-  /** Broadband room offset vs authored stem — shared «До» base for both sides. */
+  mode: 'isolation' | 'echo';
+  /** Broadband room offset vs dry stem — shared «До» base. */
   beforeGainDb: number;
-  /**
-   * Relative После loudness vs До: L2_after_dBA − L2_before_dBA (≤ 0).
-   * Applied only on the after side, on top of beforeGainDb.
-   */
+  /** Relative После loudness vs До (≤ 0). Isolation only. */
   afterGainDb: number;
-  /** Always zeros: stem timbre is already through-wall. */
-  beforeEqDb: number[];
-  /**
-   * Residual ΔL(f) vs the broadband afterGain: (L2_after − L2_before) − afterGainDb.
-   * So at each key band, afterGain + deltaEq ≈ true band Δ (no double-count of the mean).
-   */
+  /** Low-pass cutoff Hz for slab muffling (До). */
+  mufflingHzBefore: number;
+  /** Low-pass cutoff Hz with MultiFrame (После) — slightly more open / less harsh. */
+  mufflingHzAfter: number;
+  /** Peaking EQ residual for После (isolation). */
   deltaEqDb: number[];
+  /** Echo params for this side pair. */
+  rt60Before: number;
+  rt60After: number;
+  wetBefore: number;
+  wetAfter: number;
+  flutterBefore: number;
+  flutterAfter: number;
   targetBeforeDb: number;
   targetAfterDb: number;
 };
@@ -55,6 +56,15 @@ function pickBands(
   sim: DerivedSimulation,
   group: AudioPlayGroup,
 ): { before: number[]; after: number[]; targetBeforeDb: number; targetAfterDb: number } {
+  if (group === 'echo') {
+    // Clap is local — use air received levels only as a soft loudness cue
+    return {
+      before: sim.receivedAirBands.before,
+      after: sim.receivedAirBands.after,
+      targetBeforeDb: sim.receivedAirDb.before,
+      targetAfterDb: sim.receivedAirDb.after,
+    };
+  }
   if (group === 'air') {
     return {
       before: sim.receivedAirBands.before,
@@ -88,15 +98,24 @@ function playbackRefDb(group: AudioPlayGroup): number {
 }
 
 /**
- * Map received-room dBA → playback offset from authored stem level («До» only).
+ * Map received-room dBA → playback offset from dry stem («До» only).
  */
 export function playbackGainForReceivedDb(
   receivedDba: number,
   group: AudioPlayGroup = 'air',
 ): number {
+  if (group === 'echo') return 0;
   const delta = receivedDba - playbackRefDb(group);
   if (delta <= 0) return clamp(round1(delta * 0.95), -16, 0);
   return clamp(round1(delta * 0.3), 0, 4);
+}
+
+/** Heavier slab → darker muffling on continuous stems. */
+function mufflingHz(sim: DerivedSimulation, side: 'before' | 'after'): number {
+  const Rw = side === 'before' ? sim.before.Rw : sim.after.Rw;
+  // Stronger isolation → lower cutoff (more muffled upstairs noise)
+  const base = clamp(5200 - (Rw - 48) * 180, 900, 4800);
+  return round1(base);
 }
 
 export function buildRoomAudioShape(
@@ -105,14 +124,31 @@ export function buildRoomAudioShape(
   stemId: StemId,
 ): RoomAudioShape {
   void STEM_CALIBRATION[stemId];
+  const rev = sim.reverb;
+  const mode = group === 'echo' || stemId === 'clap' ? 'echo' : 'isolation';
   const { before, after, targetBeforeDb, targetAfterDb } = pickBands(sim, group);
 
-  // «До» level from this room — shared base for both buttons.
-  const beforeGainDb = playbackGainForReceivedDb(targetBeforeDb, group);
-  const beforeEqDb = KEY_BAND_INDICES.map(() => 0);
+  if (mode === 'echo') {
+    return {
+      stemId,
+      mode,
+      beforeGainDb: 0,
+      afterGainDb: -1.5,
+      mufflingHzBefore: 12000,
+      mufflingHzAfter: 14000,
+      deltaEqDb: KEY_BAND_INDICES.map(() => 0),
+      rt60Before: rev.rt60Before,
+      rt60After: rev.rt60After,
+      wetBefore: rev.wetBefore,
+      wetAfter: rev.wetAfter,
+      flutterBefore: rev.flutterBefore,
+      flutterAfter: rev.flutterAfter,
+      targetBeforeDb,
+      targetAfterDb,
+    };
+  }
 
-  // «После» = «До» + relative MultiFrame transfer (never an independent absolute remap).
-  // Playback is boosted further than the on-screen indices (marketing contrast).
+  const beforeGainDb = playbackGainForReceivedDb(targetBeforeDb, group);
   const rawDelta = targetAfterDb - targetBeforeDb;
   const afterGainDb = clamp(
     scaleAudioDelta(rawDelta),
@@ -127,10 +163,19 @@ export function buildRoomAudioShape(
 
   return {
     stemId,
+    mode,
     beforeGainDb,
     afterGainDb,
-    beforeEqDb,
+    mufflingHzBefore: mufflingHz(sim, 'before'),
+    mufflingHzAfter: mufflingHz(sim, 'after'),
     deltaEqDb,
+    // Light room air on isolation demos too (tails shorter than clap)
+    rt60Before: round1(rev.rt60Before * 0.55),
+    rt60After: round1(rev.rt60After * 0.55),
+    wetBefore: round1(rev.wetBefore * 0.45),
+    wetAfter: round1(rev.wetAfter * 0.45),
+    flutterBefore: round1(rev.flutterBefore * 0.5),
+    flutterAfter: round1(rev.flutterAfter * 0.5),
     targetBeforeDb,
     targetAfterDb,
   };
@@ -143,10 +188,10 @@ export function buildRoomAudioShapeForPair(
   const stemId = pair.beforeSrc
     ? stemIdFromSrc(pair.beforeSrc)
     : stemIdFromPairId(pair.id);
-  return buildRoomAudioShape(sim, pair.group, stemId);
+  const group = (pair.group as AudioPlayGroup) ?? 'air';
+  return buildRoomAudioShape(sim, group, stemId);
 }
 
-/** Effective cut at a key band ≈ afterGain + residual (for checks / debug). */
 export function effectiveAfterBandDb(shape: RoomAudioShape): number[] {
   return shape.deltaEqDb.map((d) => round1(shape.afterGainDb + d));
 }

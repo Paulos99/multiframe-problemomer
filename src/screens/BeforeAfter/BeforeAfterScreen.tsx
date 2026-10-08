@@ -47,9 +47,11 @@ export function BeforeAfterScreen() {
         <SimCompare sim={sim} tone="secondary" />
       </div>
 
-      <div className={styles.note}>
-        <p>{DISCLAIMER_SIMULATION}</p>
-      </div>
+      {DISCLAIMER_SIMULATION ? (
+        <div className={styles.note}>
+          <p>{DISCLAIMER_SIMULATION}</p>
+        </div>
+      ) : null}
     </Screen>
   );
 }

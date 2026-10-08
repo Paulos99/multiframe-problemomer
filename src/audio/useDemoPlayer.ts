@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { parseStubSrc, type StubKind, type StubScene } from './demoAudio';
+import { impulseToAudioBuffer } from './reverbImpulse';
 import {
   keyBandHz,
   MASTER_PLAYBACK_GAIN,
@@ -9,7 +10,7 @@ import {
 } from './stemCalibration';
 import type { RoomAudioShape } from './roomAudioShape';
 
-export type AudioPlayGroup = 'air' | 'impact' | 'mixed';
+export type AudioPlayGroup = 'air' | 'impact' | 'mixed' | 'echo';
 
 export type AudioPlayOptions = {
   side: 'before' | 'after';
@@ -251,7 +252,7 @@ function softLimiter(ctx: AudioContext): DynamicsCompressorNode {
 }
 
 /**
- * «До» = stem × room(before). «После» = that same base × relative MultiFrame Δ.
+ * Dry stem → trim → slab muffling → До/После gain+EQ → room convolver → limiter.
  */
 function roomProcess(
   ctx: AudioContext,
@@ -259,20 +260,37 @@ function roomProcess(
   opts: AudioPlayOptions,
 ): Chain {
   const shape = opts.shape;
-  const cal = STEM_CALIBRATION[stemId];
-  const trimDb = Math.min(0, cal.trimDb);
+  const cal = STEM_CALIBRATION[stemId] ?? STEM_CALIBRATION.music;
+  const trimDb = cal.trimDb;
+  const isAfter = opts.side === 'after';
+  const isEcho = opts.group === 'echo' || shape?.mode === 'echo';
 
-  // Shared «До» base for both sides — never remap after from an absolute after-dBA.
   const beforeGainDb = shape?.beforeGainDb ?? 0;
-  const afterGainDb =
-    opts.side === 'after' ? (shape?.afterGainDb ?? legacyAfterGain(opts)) : 0;
+  const afterGainDb = isAfter
+    ? (shape?.afterGainDb ?? (isEcho ? -1.5 : legacyAfterGain(opts)))
+    : 0;
   const deltaEq =
-    opts.side === 'after'
+    isAfter && !isEcho
       ? (shape?.deltaEqDb ?? legacyDeltaEq(opts))
       : [0, 0, 0, 0, 0, 0, 0];
 
+  const mufflingHz = isAfter
+    ? (shape?.mufflingHzAfter ?? (isEcho ? 14000 : 2800))
+    : (shape?.mufflingHzBefore ?? (isEcho ? 12000 : 2200));
+
+  const rt60 = isAfter ? (shape?.rt60After ?? 0.4) : (shape?.rt60Before ?? 0.9);
+  const wet = isAfter ? (shape?.wetAfter ?? 0.12) : (shape?.wetBefore ?? 0.35);
+  const flutter = isAfter
+    ? (shape?.flutterAfter ?? 0.15)
+    : (shape?.flutterBefore ?? 0.45);
+
   const trim = ctx.createGain();
   trim.gain.value = dbToGain(trimDb);
+
+  const muffler = ctx.createBiquadFilter();
+  muffler.type = 'lowpass';
+  muffler.frequency.value = mufflingHz;
+  muffler.Q.value = 0.7;
 
   const roomGain = ctx.createGain();
   roomGain.gain.value = dbToGain(beforeGainDb);
@@ -281,14 +299,34 @@ function roomProcess(
   afterGain.gain.value = dbToGain(afterGainDb);
 
   const deltaEqChain = buildPeakingEq(ctx, deltaEq);
+
+  const dryGain = ctx.createGain();
+  dryGain.gain.value = Math.max(0.15, 1 - wet);
+  const wetGain = ctx.createGain();
+  wetGain.gain.value = wet;
+
+  const convolver = ctx.createConvolver();
+  convolver.normalize = true;
+  convolver.buffer = impulseToAudioBuffer(ctx, { sampleRate: ctx.sampleRate, rt60, flutter });
+
+  const merge = ctx.createGain();
+  merge.gain.value = 1;
+
   const limiter = softLimiter(ctx);
   const ceiling = ctx.createGain();
   ceiling.gain.value = MASTER_PLAYBACK_GAIN;
 
-  trim.connect(roomGain);
+  // trim → muffler → room → after → EQ → split dry/wet → merge → limiter
+  trim.connect(muffler);
+  muffler.connect(roomGain);
   roomGain.connect(afterGain);
   afterGain.connect(deltaEqChain.input);
-  deltaEqChain.output.connect(limiter);
+  deltaEqChain.output.connect(dryGain);
+  deltaEqChain.output.connect(convolver);
+  dryGain.connect(merge);
+  convolver.connect(wetGain);
+  wetGain.connect(merge);
+  merge.connect(limiter);
   limiter.connect(ceiling);
 
   return {
@@ -298,8 +336,13 @@ function roomProcess(
       deltaEqChain.teardown();
       try {
         trim.disconnect();
+        muffler.disconnect();
         roomGain.disconnect();
         afterGain.disconnect();
+        dryGain.disconnect();
+        wetGain.disconnect();
+        convolver.disconnect();
+        merge.disconnect();
         limiter.disconnect();
         ceiling.disconnect();
       } catch {

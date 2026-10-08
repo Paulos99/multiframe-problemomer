@@ -432,6 +432,53 @@ export function assertModelAnchors(): string[] {
     errors.push('shareLink sessionFromShareToken must open Result with derived sim');
   }
 
+  const revOccupied = deriveSimulation(sampleAnswers({ objectStage: 'occupied' })).reverb;
+  if (revOccupied.comfortBefore !== 60 || revOccupied.comfortAfter !== 90) {
+    errors.push(
+      `occupied echo comfort should be 60→90 (got ${revOccupied.comfortBefore}→${revOccupied.comfortAfter})`,
+    );
+  }
+  const revNewbuild = deriveSimulation(sampleAnswers({ objectStage: 'newbuild' })).reverb;
+  if (revNewbuild.comfortBefore !== 0) {
+    errors.push(`newbuild echo comfort before should be 0 (got ${revNewbuild.comfortBefore})`);
+  }
+  if (revNewbuild.comfortAfter < 45 || revNewbuild.comfortAfter > 55) {
+    errors.push(`newbuild echo comfort after should be ~50 (got ${revNewbuild.comfortAfter})`);
+  }
+  const revSmall = deriveSimulation(
+    sampleAnswers({ objectStage: 'occupied', ceilingAreaM2: 12 }),
+  ).reverb;
+  const revLarge = deriveSimulation(
+    sampleAnswers({ objectStage: 'occupied', ceilingAreaM2: 40 }),
+  ).reverb;
+  if (revLarge.rt60Before <= revSmall.rt60Before) {
+    errors.push(
+      `larger area should lengthen RT60 before (${revLarge.rt60Before} vs ${revSmall.rt60Before})`,
+    );
+  }
+  if (revLarge.rt60After <= revSmall.rt60After) {
+    errors.push(
+      `larger area should lengthen RT60 after (${revLarge.rt60After} vs ${revSmall.rt60After})`,
+    );
+  }
+  if (
+    revOccupied.rt60After >= revOccupied.rt60Before ||
+    revOccupied.wetAfter >= revOccupied.wetBefore
+  ) {
+    errors.push('after MultiFrame should be shorter and drier than before');
+  }
+  const clapShape = buildRoomAudioShape(
+    deriveSimulation(sampleAnswers({ objectStage: 'occupied' })),
+    'echo',
+    'clap',
+  );
+  if (clapShape.rt60After >= clapShape.rt60Before || clapShape.wetAfter >= clapShape.wetBefore) {
+    errors.push('echo clap shape: after should be shorter / drier than before');
+  }
+  if (clapShape.afterGainDb > clapShape.beforeGainDb) {
+    errors.push('echo clap shape: after should not be louder than before');
+  }
+
   return errors;
 }
 

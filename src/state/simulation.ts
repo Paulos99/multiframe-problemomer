@@ -16,6 +16,7 @@ import { HYBRID_CLASS_LABELS, SIMULATION_BADGE } from './types';
 import { buildConstruction, resolveSlab } from './acoustic/construction';
 import { applyMultiFrame } from './acoustic/multiframe';
 import { buildReceiving, quietFromReceivedAir, quietFromReceivedImpact } from './acoustic/receiving';
+import { buildReverbProfile } from './acoustic/reverb';
 import { seriesFromBands } from './spectrum';
 
 export type { SlabKey };
@@ -159,6 +160,7 @@ export function deriveSimulation(answers: SessionAnswers): DerivedSimulation {
 
   const airAbs = Math.abs(recAirBefore - recAirAfter);
   const impactAbs = Math.abs(recImpBefore - recImpAfter);
+  const reverb = buildReverbProfile(answers.room);
 
   return {
     before,
@@ -199,6 +201,7 @@ export function deriveSimulation(answers: SessionAnswers): DerivedSimulation {
       before: [...rec.impactBands.before],
       after: [...rec.impactBands.after],
     },
+    reverb,
   };
 }
 

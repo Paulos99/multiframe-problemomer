@@ -257,7 +257,7 @@ export function buildClientSummary(session: SessionState): string {
     `Δ: +${Math.abs(handoff.sim.delta.Rw)} дБ воздух · −${Math.abs(handoff.sim.delta.Lnw)} дБ удар`,
     `Ощущение: ≈ −${handoff.sim.perceivedAirPct}% воздух · ≈ −${handoff.sim.perceivedImpactPct}% удар`,
     ...handoff.whyMultiFrame.slice(0, 2).map((w) => `• ${w}`),
-    'Маркетинговый ориентир · не замер и не гарантия',
+    'Эффект MultiFrame · Проблемомер',
   ];
   return lines.join('\n');
 }

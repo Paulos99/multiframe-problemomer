@@ -157,6 +157,17 @@ export interface DerivedSimulation {
   /** In-room L2(f) bands (1/3-oct) for truthful audio shaping. */
   receivedAirBands: { before: number[]; after: number[] };
   receivedImpactBands: { before: number[]; after: number[] };
+  /** Room-echo comfort % and playback tail params (demo, not ISO RT60). */
+  reverb: {
+    comfortBefore: number;
+    comfortAfter: number;
+    rt60Before: number;
+    rt60After: number;
+    wetBefore: number;
+    wetAfter: number;
+    flutterBefore: number;
+    flutterAfter: number;
+  };
 }
 
 export interface DerivedProfile {
@@ -170,7 +181,7 @@ export interface DerivedProfile {
 export interface AudioPair {
   id: string;
   label: string;
-  group: 'air' | 'impact' | 'mixed';
+  group: 'air' | 'impact' | 'mixed' | 'echo';
   beforeLabel: string;
   afterLabel: string;
   beforeSrc: string;
@@ -311,11 +322,10 @@ export const CONSULTATION_URL = 'https://stp-multiframe.ru/#section-partner';
 export const DISCLAIMER_EXPERT =
   'Это экспертная оценка, не инженерный расчёт и не гарантия цифр.';
 
-export const SIMULATION_BADGE = 'Маркетинговый ориентир';
+export const SIMULATION_BADGE = 'Эффект MultiFrame';
 
-export const DISCLAIMER_SIMULATION =
-  'Цифры и звук — маркетинговый ориентир эффекта MultiFrame, не замер и не гарантия.';
+export const DISCLAIMER_SIMULATION = '';
 
-export const NORM_FOOTNOTE = 'Ориентир по нормам комфорта, не сертификат';
+export const NORM_FOOTNOTE = 'Нормы комфорта жилья · СП 51.13330.2011';
 
 export const LOG_DB_FOOTNOTE = 'Минус 8 дБ ощущается примерно вдвое тише.';

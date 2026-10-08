@@ -1,83 +1,80 @@
 /**
- * Frozen stem calibration from offline analysis of public/audio/*.mp3
- * (miniaudio stream + STFT → 1/3-oct relative energy, 2026-09-17).
- *
- * Important: these MP3s are already authored as «through-wall / upstairs»
- * references — quiet RMS and heavy HF roll-off (talk HF−mid ≈ −60 dB).
- * They are NOT dry source recordings. Do not normalize them up or brighten
- * them with before-EQ; that made «До» loud and «звонким».
+ * Dry-stem calibration for public/audio/* (music / stomp / vacuum / clap).
+ * Stems are dry sources — room muffling + echo are applied in the playback graph.
  */
 import { SPECTRUM_HZ } from '../state/acoustic/bands';
 
-export type StemId = 'talk' | 'stomp' | 'vacuum';
+export type StemId = 'music' | 'stomp' | 'vacuum' | 'clap' | 'talk';
 
 export type StemCalibration = {
-  /** Measured file RMS in dBFS (full-scale digital). */
+  /** Measured / estimated file RMS in dBFS. */
   rmsDbFs: number;
-  /** Measured peak in dBFS. */
+  /** Measured / estimated peak in dBFS. */
   peakDbFs: number;
   /**
-   * Authored trim only (≤ 0). Never boost quiet stems toward a common target —
-   * talk/vacuum already sit near −33 dBFS by design; stomp is hotter.
+   * Gain to common loudness BEFORE room processing.
+   * Continuous stems → target RMS ≈ −20 dBFS.
+   * Clap → peak-normalized (silence after attack skews RMS).
    */
   trimDb: number;
-  /** Relative 1/3-oct band energy vs mean (dB), aligned to SPECTRUM_HZ. */
+  /** Unused for dry demos (kept for checks). */
   bandRelDb: readonly number[];
 };
 
+const FLAT_BANDS = SPECTRUM_HZ.map(() => 0);
+
+/** Target RMS for continuous dry stems before room FX. */
+export const STEM_NORM_TARGET_DBFS = -20;
+/** Target peak for clap attack. */
+export const CLAP_PEAK_TARGET_DBFS = -6;
+
+/**
+ * Provisional calibration — trim equals target − estimated RMS/peak.
+ * Values are conservative so hot files don't clip after room gain.
+ */
 export const STEM_CALIBRATION: Record<StemId, StemCalibration> = {
-  talk: {
-    rmsDbFs: -33.5,
-    peakDbFs: -15.0,
-    trimDb: 0,
-    bandRelDb: [
-      -9.2, -10.9, -0.8, 6.4, 5.6, 2.2, 7.0, 3.0, -4.8, -15.5, -23.0, -38.4, -43.9,
-      -48.1, -55.4, -59.6, -63.5, -65.6,
-    ],
+  music: {
+    rmsDbFs: -14,
+    peakDbFs: -1,
+    trimDb: STEM_NORM_TARGET_DBFS - -14, // −6
+    bandRelDb: FLAT_BANDS,
   },
   stomp: {
-    rmsDbFs: -26.6,
-    peakDbFs: -7.4,
-    // Soften hot impact stem toward talk/vacuum without lifting quiet files.
-    trimDb: -4,
-    bandRelDb: [
-      6.2, 4.9, 7.6, 5.7, 0.1, -9.3, -15.2, -19.3, -26.2, -32.7, -34.8, -42.0, -50.7,
-      -55.2, -60.8, -64.2, -64.7, -64.3,
-    ],
+    rmsDbFs: -18,
+    peakDbFs: -3,
+    trimDb: STEM_NORM_TARGET_DBFS - -18, // −2
+    bandRelDb: FLAT_BANDS,
   },
   vacuum: {
-    rmsDbFs: -33.6,
-    peakDbFs: -14.6,
-    trimDb: 0,
-    bandRelDb: [
-      -1.8, -2.2, 6.1, 6.8, 2.7, -3.5, -4.7, 6.4, -5.4, -8.9, -8.5, -6.6, -16.4,
-      -18.0, -21.5, -27.1, -26.6, -31.9,
-    ],
+    rmsDbFs: -16,
+    peakDbFs: -2,
+    trimDb: STEM_NORM_TARGET_DBFS - -16, // −4
+    bandRelDb: FLAT_BANDS,
+  },
+  clap: {
+    rmsDbFs: -28,
+    peakDbFs: -4,
+    trimDb: CLAP_PEAK_TARGET_DBFS - -4, // −2
+    bandRelDb: FLAT_BANDS,
+  },
+  /** @deprecated alias → music (old talk stem). */
+  talk: {
+    rmsDbFs: -14,
+    peakDbFs: -1,
+    trimDb: STEM_NORM_TARGET_DBFS - -14,
+    bandRelDb: FLAT_BANDS,
   },
 };
 
-/**
- * @deprecated Stems are already through-wall; do not normalize up to a target.
- * Kept only so old imports do not break — playback ignores this.
- */
-export const STEM_NORM_TARGET_DBFS = -33;
-
-/**
- * Stem authored loudness ≈ this received air dBA («некомфортно / очень шумно»).
- * Acceptable (~54) and quiet (~42) rooms then cut almost 1:1 so demo matches the felt scale.
- */
+/** Uncomfortable «До» air reference for continuous stems. */
 export const PLAYBACK_REF_DBA_AIR = 61;
-/** Stem stomp ≈ uncomfortable impact zone (felt impact ladder is ~+14 vs air). */
 export const PLAYBACK_REF_DBA_IMPACT = 75;
 export const PLAYBACK_REF_DBA_MIXED = 68;
-
-/** @deprecated Use PLAYBACK_REF_DBA_AIR — kept for old imports. */
 export const PLAYBACK_REF_DBA = PLAYBACK_REF_DBA_AIR;
 
-/** Global demo headroom (linear). Stems are already quiet; keep modest attenuation. */
-export const MASTER_PLAYBACK_GAIN = 0.55;
+/** Global headroom after room FX. */
+export const MASTER_PLAYBACK_GAIN = 0.62;
 
-/** Key 1/3-oct indices used for peaking EQ on «После» ΔL(f) only. */
 export const KEY_BAND_INDICES = [1, 3, 5, 7, 10, 13, 15] as const;
 
 export function keyBandHz(): number[] {
@@ -85,13 +82,17 @@ export function keyBandHz(): number[] {
 }
 
 export function stemIdFromPairId(pairId: string): StemId {
+  if (pairId.includes('clap') || pairId.includes('echo')) return 'clap';
   if (pairId.includes('stomp') || pairId.includes('impact')) return 'stomp';
   if (pairId.includes('vacuum') || pairId.includes('mixed')) return 'vacuum';
-  return 'talk';
+  if (pairId.includes('music') || pairId.includes('air')) return 'music';
+  return 'music';
 }
 
 export function stemIdFromSrc(src: string): StemId {
+  if (src.includes('clap')) return 'clap';
   if (src.includes('stomp')) return 'stomp';
   if (src.includes('vacuum')) return 'vacuum';
-  return 'talk';
+  if (src.includes('music') || src.includes('talk')) return 'music';
+  return 'music';
 }

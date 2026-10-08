@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Screen } from '../../ui/Screen';
 import { Button } from '../../ui/Button';
 import { CompactAudio } from '../../ui/CompactAudio';
+import { EchoComfort } from '../../ui/EchoComfort';
 import { SpectrumChart } from '../../ui/SpectrumChart';
 import { useSession } from '../../state/SessionContext';
 import {
@@ -449,6 +450,8 @@ export function ResultScreen() {
             mode="nowAndAfter"
           />
         </div>
+
+        <EchoComfort sim={sim} />
 
         <CompactAudio pairs={session.audio.pairs} sim={sim} wish={wish} />
 

@@ -188,7 +188,7 @@ function Bars({ sim }: { sim: DerivedSimulation }) {
           </span>
         </div>
       </div>
-      <p className={styles.barCaption}>Сейчас · С MultiFrame · Δ ориентир</p>
+      <p className={styles.barCaption}>Сейчас · С MultiFrame · Δ</p>
     </div>
   );
 }
@@ -219,7 +219,7 @@ export function SimCompare({ sim, emphasize = 'both', tone = 'primary' }: Props)
       </div>
 
       <p className={styles.range}>
-        ориентир Δ воздух +{rwLo}…+{rwHi} · удар −{lnwLo}…−{lnwHi}
+        Δ воздух +{rwLo}…+{rwHi} · удар −{lnwLo}…−{lnwHi}
       </p>
 
       <ul className={styles.lines}>
@@ -228,12 +228,14 @@ export function SimCompare({ sim, emphasize = 'both', tone = 'primary' }: Props)
         ))}
       </ul>
 
-      <aside className={styles.ibox} role="note">
-        <span className={styles.imark} aria-hidden>
-          i
-        </span>
-        <p>{DISCLAIMER_SIMULATION}</p>
-      </aside>
+      {DISCLAIMER_SIMULATION ? (
+        <aside className={styles.ibox} role="note">
+          <span className={styles.imark} aria-hidden>
+            i
+          </span>
+          <p>{DISCLAIMER_SIMULATION}</p>
+        </aside>
+      ) : null}
     </section>
   );
 }

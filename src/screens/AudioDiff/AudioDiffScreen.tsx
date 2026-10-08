@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { Screen } from '../../ui/Screen';
-import { Disclaimer } from '../../ui/Disclaimer';
 import { useSession } from '../../state/SessionContext';
 import { preloadDemoAudio, useDemoPlayer } from '../../audio/useDemoPlayer';
 import { AUDIO_GROUP_LABELS } from '../../audio/demoAudio';
@@ -91,14 +90,14 @@ function reductionLine(group: AudioPair['group'], sim: DerivedSimulation): strin
   const impactDb = Math.abs(sim.delta.Lnw);
 
   if (group === 'air') {
-    return `≈ −${airPct}% · ориентир −${airDb} дБ`;
+    return `≈ −${airPct}% · −${airDb} дБ`;
   }
   if (group === 'impact') {
-    return `≈ −${impactPct}% · ориентир −${impactDb} дБ`;
+    return `≈ −${impactPct}% · −${impactDb} дБ`;
   }
   const pct = Math.round((airPct + impactPct) / 2);
   const db = Math.round((airDb + impactDb) / 2);
-  return `≈ −${pct}% · ориентир −${db} дБ`;
+  return `≈ −${pct}% · −${db} дБ`;
 }
 
 const GROUPS: Array<AudioPair['group']> = ['air', 'impact', 'mixed'];
@@ -207,11 +206,6 @@ export function AudioDiffScreen() {
       })}
 
       <p className={styles.footnote}>{LOG_DB_FOOTNOTE}</p>
-
-      <Disclaimer
-        compact
-        text="Это пример, как может звучать комната до и после MultiFrame. Маркетинговый ориентир, не замер и не гарантия."
-      />
     </Screen>
   );
 }
