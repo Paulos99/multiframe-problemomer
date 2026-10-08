@@ -544,7 +544,7 @@ export function ResultScreen() {
               disabled={pdfBusy}
               onClick={() => void onDownloadProfile()}
             >
-              {pdfBusy ? 'Готовим PDF…' : 'Скачать профиль'}
+              {pdfBusy ? 'Готовим PDF…' : 'Скачать результаты'}
             </Button>
             <Button
               variant="ghost"
