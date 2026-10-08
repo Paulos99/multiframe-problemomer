@@ -12,7 +12,7 @@
   width: min(100%, var(--max-w));
   margin: 0 auto;
   min-height: var(--header-h);
-  padding: 8px 16px;
+  padding: 10px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -22,15 +22,14 @@
 .brand {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   min-width: 0;
 }
 
-/* Logos are near-white PNGs — darken on light header, keep bright on dark.
-   Kept compact so browser zoom / large screens don’t balloon the chrome. */
+/* Logos are near-white PNGs — darken on light header, keep bright on dark. */
 .stp {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
   flex: 0 0 auto;
   filter: brightness(0) saturate(100%);
@@ -38,9 +37,9 @@
 }
 
 .mf {
-  height: 22px;
+  height: 26px;
   width: auto;
-  max-width: 132px;
+  max-width: 150px;
   object-fit: contain;
   filter: brightness(0) saturate(100%);
   opacity: 0.9;
@@ -57,7 +56,7 @@
 }
 
 .product {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 650;
   color: var(--text-secondary);
   white-space: nowrap;
@@ -67,8 +66,8 @@
 
 .theme {
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-color);
   background: var(--bg-card);
@@ -76,7 +75,6 @@
   box-shadow: var(--shadow-sm);
   display: grid;
   place-items: center;
-  flex: 0 0 auto;
 }
 
 .themeIcon {

@@ -142,8 +142,8 @@ export function spectrumChartSvg(
     ${xTicks}
     <text x="12" y="${padT + plotH / 2}" fill="#5f6b73" font-size="11" text-anchor="middle" transform="rotate(-90 12 ${padT + plotH / 2})">дБ</text>
     <path d="${area}" fill="#01644f" opacity="0.18"/>
-    <path d="${beforePath}" fill="none" stroke="#7a8790" stroke-width="2.2" stroke-linejoin="round"/>
-    <path d="${afterPath}" fill="none" stroke="#01644f" stroke-width="2.6" stroke-linejoin="round"/>
+    <path d="${beforePath}" fill="none" stroke="#7a8790" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="${afterPath}" fill="none" stroke="#01644f" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/>
   </svg>
   <ul class="legend"><li><i class="sw-b"></i>Сейчас</li><li><i class="sw-a"></i>С MultiFrame</li></ul>
 </figure>`;

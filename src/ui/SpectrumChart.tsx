@@ -279,8 +279,8 @@ export function SpectrumChart({
                 y2={padT + plotH}
                 className={styles.hoverLine}
               />
-              <circle cx={hover.x} cy={hover.yBefore} r={3.2} className={styles.dotBefore} />
-              <circle cx={hover.x} cy={hover.yAfter} r={3.5} className={styles.dotAfter} />
+              <circle cx={hover.x} cy={hover.yBefore} r={2.4} className={styles.dotBefore} />
+              <circle cx={hover.x} cy={hover.yAfter} r={2.6} className={styles.dotAfter} />
             </g>
           ) : null}
         </svg>

@@ -79,18 +79,21 @@
   stroke-width: 1;
   stroke-dasharray: 3 3;
   opacity: 0.7;
+  vector-effect: non-scaling-stroke;
 }
 
 .dotBefore {
   fill: #7a8790;
   stroke: var(--bg-card);
-  stroke-width: 1.2;
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
 }
 
 .dotAfter {
   fill: var(--accent-color);
   stroke: var(--bg-card);
-  stroke-width: 1.2;
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
 }
 
 .tooltip {
@@ -127,6 +130,7 @@
 .grid {
   stroke: var(--border-color);
   stroke-width: 1;
+  vector-effect: non-scaling-stroke;
 }
 
 .tick {
@@ -146,16 +150,18 @@
 
 .before {
   stroke: #7a8790;
-  stroke-width: 2;
+  stroke-width: 1.75;
   stroke-linejoin: round;
   stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
 }
 
 .after {
   stroke: var(--accent-color);
-  stroke-width: 2.4;
+  stroke-width: 2;
   stroke-linejoin: round;
   stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
 }
 
 .legend {
@@ -178,8 +184,8 @@
 .swatchBefore,
 .swatchAfter {
   width: 14px;
-  height: 3px;
-  border-radius: 2px;
+  height: 2px;
+  border-radius: 1px;
   display: inline-block;
 }
 

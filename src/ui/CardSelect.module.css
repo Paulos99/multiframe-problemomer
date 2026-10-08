@@ -4,8 +4,8 @@
   justify-content: space-between;
   gap: 12px;
   width: 100%;
-  min-height: 64px;
-  padding: 14px 16px;
+  min-height: 52px;
+  padding: 12px 14px;
   text-align: left;
   background: var(--bg-card);
   border: 1.5px solid var(--border-color);
@@ -72,7 +72,8 @@
 
 .title {
   font-weight: 650;
-  font-size: 15px;
+  font-size: 16px;
+  line-height: 1.3;
 }
 
 .hint {
