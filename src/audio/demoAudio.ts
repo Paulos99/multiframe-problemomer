@@ -1,6 +1,6 @@
 import type { AudioPair } from '../state/types';
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env?.BASE_URL ?? '/';
 
 /** Real household stems in `public/audio/` — same file for До/После; After is processed. */
 export const DEMO_AUDIO_PAIRS: AudioPair[] = [

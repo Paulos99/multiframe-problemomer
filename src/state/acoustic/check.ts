@@ -14,6 +14,7 @@ import {
 } from '../simulation';
 import type { RoomAnswers, SessionAnswers } from '../types';
 import { buildRoomAudioShape, playbackGainForReceivedDb } from '../../audio/roomAudioShape';
+import { decodeRoomAnswers, encodeRoomAnswers, sessionFromShareToken } from '../shareLink';
 
 function sampleRoom(over: Partial<RoomAnswers> = {}): RoomAnswers {
   return {
@@ -404,6 +405,22 @@ export function assertModelAnchors(): string[] {
   );
   if (defaultLive.Rw >= 50) {
     errors.push(`default occupied unknown before should be Rw < 50 (got ${defaultLive.Rw})`);
+  }
+
+  const shareRoom = sampleRoom({
+    roomType: 'kids',
+    ceilingAreaM2: 22,
+    houseType: 'panel',
+    roomWish: 'from_above',
+  });
+  const token = encodeRoomAnswers(shareRoom);
+  const decoded = decodeRoomAnswers(token);
+  if (!decoded || decoded.roomType !== 'kids' || decoded.ceilingAreaM2 !== 22) {
+    errors.push('shareLink encode/decode lost room answers');
+  }
+  const sharedSession = sessionFromShareToken(token);
+  if (!sharedSession || sharedSession.step !== 'result' || !sharedSession.derived) {
+    errors.push('shareLink sessionFromShareToken must open Result with derived sim');
   }
 
   return errors;

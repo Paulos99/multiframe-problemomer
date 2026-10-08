@@ -29,6 +29,7 @@ import {
   prevStep,
   withDerived,
 } from './session';
+import { tryRestoreSharedSession } from './shareLink';
 
 interface SessionApi {
   session: SessionState;
@@ -51,8 +52,12 @@ interface SessionApi {
 
 const SessionContext = createContext<SessionApi | null>(null);
 
+function initialSession(): SessionState {
+  return tryRestoreSharedSession() ?? createInitialSession();
+}
+
 export function SessionProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<SessionState>(createInitialSession);
+  const [session, setSession] = useState<SessionState>(initialSession);
 
   const patch = useCallback((fn: (s: SessionState) => SessionState) => {
     setSession((prev) => fn(prev));
@@ -136,6 +141,15 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   const restart = useCallback(() => {
     setSession(createInitialSession());
+    try {
+      const url = new URL(window.location.href);
+      if (url.searchParams.has('p')) {
+        url.searchParams.delete('p');
+        history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+      }
+    } catch {
+      /* ignore */
+    }
   }, []);
 
   const patchRoom = useCallback(

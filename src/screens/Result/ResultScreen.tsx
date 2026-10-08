@@ -233,8 +233,18 @@ export function ResultScreen() {
     window.open(CONSULTATION_URL, '_blank', 'noopener,noreferrer');
   }
 
-  function onDownloadProfile() {
-    downloadAcousticProfilePdf(session);
+  const [pdfBusy, setPdfBusy] = useState(false);
+
+  async function onDownloadProfile() {
+    if (pdfBusy) return;
+    setPdfBusy(true);
+    try {
+      await downloadAcousticProfilePdf(session);
+    } catch (err) {
+      console.error('[pdf]', err);
+    } finally {
+      setPdfBusy(false);
+    }
   }
 
   async function onShare() {
@@ -247,7 +257,7 @@ export function ResultScreen() {
     shareState === 'shared'
       ? 'Отправлено'
       : shareState === 'copied'
-        ? 'Ссылка-сводка скопирована'
+        ? 'Ссылка скопирована'
         : shareState === 'failed'
           ? 'Не удалось поделиться'
           : 'Поделиться';
@@ -529,8 +539,13 @@ export function ResultScreen() {
             Запросить консультацию или подбор
           </Button>
           <div className={styles.splitActions}>
-            <Button variant="ghost" className={styles.splitBtn} onClick={onDownloadProfile}>
-              Скачать профиль
+            <Button
+              variant="ghost"
+              className={styles.splitBtn}
+              disabled={pdfBusy}
+              onClick={() => void onDownloadProfile()}
+            >
+              {pdfBusy ? 'Готовим PDF…' : 'Скачать профиль'}
             </Button>
             <Button
               variant="ghost"
