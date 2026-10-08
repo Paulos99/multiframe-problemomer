@@ -284,7 +284,7 @@ export function ResultScreen() {
             <li>
               Классы <b>А / Б / В</b> — пороги комфорта в таблице ниже
             </li>
-            <li>Дальше отметим, где вы сейчас и куда можно выйти с MultiFrame</li>
+            <li>Дальше отметим, где вы сейчас и какой уровень комфорта даёт MultiFrame</li>
           </ul>
           <div className={styles.indexDefs}>
             <p>
