@@ -942,6 +942,23 @@
   gap: 8px;
 }
 
+.splitActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.splitBtn {
+  width: 100%;
+  min-height: var(--touch-min);
+}
+
+@media (max-width: 420px) {
+  .splitActions {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Result hierarchy: one verdict, one scale, one proof layer */
 .verdict {
   gap: 14px;

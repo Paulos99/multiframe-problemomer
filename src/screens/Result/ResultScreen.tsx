@@ -24,7 +24,8 @@ import {
   type FeltStep,
 } from '../../state/simulation';
 import { resolveSlab } from '../../state/acoustic/construction';
-import { buildCalculatorUrl, buildClientSummary } from '../../state/session';
+import { buildCalculatorUrl } from '../../state/session';
+import { downloadAcousticProfilePdf, shareAcousticProfile } from '../../state/reportPdf';
 import { wishPrimaryGroup, wishScenarioLine, wishSoundCorrectionLine, stretchDrumLine } from '../../state/wish';
 import styles from './ResultScreen.module.css';
 
@@ -222,7 +223,7 @@ export function ResultScreen() {
   const showWishScenario = wish !== 'other' && !objectAllUnknown;
   const showScenarioAside = showWishScenario || Boolean(drumLine) || Boolean(soundCorrection);
 
-  const [copied, setCopied] = useState(false);
+  const [shareState, setShareState] = useState<'idle' | 'shared' | 'copied' | 'failed'>('idle');
 
   function openCalc() {
     window.open(calcUrl, '_blank', 'noopener,noreferrer');
@@ -232,16 +233,24 @@ export function ResultScreen() {
     window.open(CONSULTATION_URL, '_blank', 'noopener,noreferrer');
   }
 
-  async function onCopySummary() {
-    const text = buildClientSummary(session);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 2500);
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch {
-      console.info('[summary-copy-fallback]', text);
-    }
+  function onDownloadProfile() {
+    downloadAcousticProfilePdf(session);
   }
+
+  async function onShare() {
+    const result = await shareAcousticProfile(session);
+    setShareState(result === 'failed' ? 'failed' : result);
+    window.setTimeout(() => setShareState('idle'), 2500);
+  }
+
+  const shareLabel =
+    shareState === 'shared'
+      ? 'Отправлено'
+      : shareState === 'copied'
+        ? 'Ссылка-сводка скопирована'
+        : shareState === 'failed'
+          ? 'Не удалось поделиться'
+          : 'Поделиться';
 
   const airChart = (
     <SpectrumChart
@@ -519,9 +528,18 @@ export function ResultScreen() {
           <Button variant="secondary" fullWidth onClick={openConsultation}>
             Запросить консультацию или подбор
           </Button>
-          <Button variant="ghost" fullWidth onClick={() => void onCopySummary()}>
-            {copied ? 'Сводка скопирована' : 'Скопировать сводку'}
-          </Button>
+          <div className={styles.splitActions}>
+            <Button variant="ghost" className={styles.splitBtn} onClick={onDownloadProfile}>
+              Скачать профиль
+            </Button>
+            <Button
+              variant="ghost"
+              className={styles.splitBtn}
+              onClick={() => void onShare()}
+            >
+              {shareLabel}
+            </Button>
+          </div>
         </div>
       </section>
 
