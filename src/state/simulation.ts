@@ -318,7 +318,7 @@ export const impactFeltStep = impactFeltFromIndex;
 
 /** Official SP hybrid label for Result block headers (not felt words). */
 export function officialComfortLabel(cls: ClassLabel): string {
-  if (cls === 'below') return 'ниже допустимого (В)';
+  if (cls === 'below') return 'ниже допустимого';
   return HYBRID_CLASS_LABELS[cls];
 }
 

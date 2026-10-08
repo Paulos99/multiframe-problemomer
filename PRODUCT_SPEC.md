@@ -19,7 +19,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 - **Numbers policy (updated 2026-10 field anchors):** show a **full working MultiFrame effect model** calibrated to **object tests** (`field_in_situ` / `field_objects`) — foamblock, Kostroma, Andrianova(+Полиблок 10 + стяжка 60). Not a lab certificate. See `docs/sources/08-multiframe-field-anchors.md`.
 - Effect source: `field_in_situ`; disclaimer: `field_objects` / expert qualitative — never lab guarantees. Charts/numbers are **oriented arguments** from field spectra.
 - MultiFrame Δ is **field-shaped**: bare/ordinary ΔRw ~**+1…+9** by slab Rw (Kostroma ~+2, light ~+9), |ΔLnw| ~**4…7**; floating floor above → Andrianova residual ~**+1 / −1**. UI range from the room model. Never present as a lab certificate.
-- Classes **А/Б/В** (СП 51.13330.2011): **А** = высокий комфорт, **Б** = комфорт, **В** = допустимый уровень. Below-scale official wording is **`ниже допустимого (В)`** (no letter «Д»). Felt axes are visual only.
+- Classes **А/Б/В** (СП 51.13330.2011): **А** = высокий комфорт, **Б** = комфорт, **В** = допустимый уровень. Below-scale official wording is **`ниже допустимого`** (no letter «Д», no «(В)»). Felt axes are visual only.
 - «примерно вдвое спокойнее» **only for air (воздух)**; impact (удар) = quieter + floor often needed — never claim Lnw norm from ceiling alone.
 - Audio = **три группы примеров:** воздух · удар · смешанный. **До** = stem, приведённый к L2/dBA этой комнаты (соседи, площадь, плита); **После** = тот же граф + полосовой MultiFrame transfer `ΔL(f)` из receiving (field_objects). Не showroom duck и не одинаковый сырой MP3 для всех помещений.
 - Mobile: denser inputs + sticky question/CTA; both noise rows remain on the same shared scale axis and keep their everyday labels. No raw tech dumps without explanation.
@@ -611,7 +611,7 @@ Walk **norms → current → MultiFrame → why → CTA** on one scroll. Officia
 | Restart | `Пройти ещё раз` |
 | Sticky next | `Открыть калькулятор MultiFrame` (opens calculator; always enabled) |
 
-**Official header labels:** `Высокий комфорт (А)` · `Комфорт (Б)` · `Допустимый (В)` · `ниже допустимого (В)` (no «Д»).
+**Official header labels:** `Высокий комфорт (А)` · `Комфорт (Б)` · `Допустимый (В)` · `ниже допустимого` (no «Д»).
 
 **Dynamic whyMultiFrame lines (up to ~4, from answers):** examples locked in code intent —
 
