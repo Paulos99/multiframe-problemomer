@@ -13,6 +13,7 @@
 import { SPECTRUM_HZ, atHz, clamp, round0, round1 } from './bands';
 import type { ConstructionResult } from './construction';
 import { calibrateToLnw, calibrateToRw, iso717Lnw, iso717Rw } from './iso717';
+import { scaleIndexDelta } from './marketing';
 
 /** Foamblock 120 — measured ΔR(f) (MF − bare). */
 const FOAM_DR: readonly number[] = [
@@ -179,8 +180,8 @@ const MIN_AFTER_LNW = 56;
 
 export function applyMultiFrame(before: ConstructionResult): MultiFrameResult {
   const floating = before.floor === 'floating';
-  const dRwTarget = targetDeltaRw(before.Rw, floating);
-  const dLnwTarget = targetDeltaLnw(before.Rw, before.Lnw, floating);
+  const dRwTarget = scaleIndexDelta(targetDeltaRw(before.Rw, floating));
+  const dLnwTarget = scaleIndexDelta(targetDeltaLnw(before.Rw, before.Lnw, floating));
 
   const airShape = floating ? [...ANDRIANOVA_DR] : bareAirShape(before.Rw);
   const airDrum = drumLift(before.hasDrum);
@@ -213,8 +214,8 @@ export function applyMultiFrame(before: ConstructionResult): MultiFrameResult {
     deltaRw,
     deltaLnw,
     deltaRange: {
-      Rw: [Math.max(0, deltaRw - 1), Math.min(12, deltaRw + 2)] as const,
-      Lnw: [Math.max(0, absLnw - 1), Math.min(10, absLnw + 2)] as const,
+      Rw: [Math.max(0, deltaRw - 1), Math.min(16, deltaRw + 2)] as const,
+      Lnw: [Math.max(0, absLnw - 1), Math.min(14, absLnw + 2)] as const,
     },
   };
 }

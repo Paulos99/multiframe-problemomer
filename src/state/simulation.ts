@@ -43,8 +43,8 @@ export const SIM_META = {
   source: 'field_in_situ' as const,
   disclaimer: 'field_objects' as const,
   deltaRange: {
-    Rw: [1, 9] as const,
-    Lnw: [1, 8] as const,
+    Rw: [1, 12] as const,
+    Lnw: [1, 11] as const,
   },
 };
 
@@ -114,7 +114,7 @@ function feelingFromReceived(
  */
 export function perceivedReductionPct(absDeltaDb: number): number {
   const pct = (1 - Math.pow(0.5, absDeltaDb / 10)) * 100;
-  return Math.round(Math.min(70, Math.max(15, pct)));
+  return Math.round(Math.min(80, Math.max(15, pct)));
 }
 
 export function comfortScore(Rw: number, Lnw: number): number {

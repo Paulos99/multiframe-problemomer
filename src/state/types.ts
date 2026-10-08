@@ -311,10 +311,10 @@ export const CONSULTATION_URL = 'https://stp-multiframe.ru/#section-partner';
 export const DISCLAIMER_EXPERT =
   'Это экспертная оценка, не инженерный расчёт и не гарантия цифр.';
 
-export const SIMULATION_BADGE = 'По полевым замерам на объектах';
+export const SIMULATION_BADGE = 'Маркетинговый ориентир';
 
 export const DISCLAIMER_SIMULATION =
-  'Цифры — ориентир по полевым замерам на объектах, не лабораторный сертификат. Потолок смягчает шаги сверху.';
+  'Цифры и звук — маркетинговый ориентир эффекта MultiFrame, не замер и не гарантия.';
 
 export const NORM_FOOTNOTE = 'Ориентир по нормам комфорта, не сертификат';
 

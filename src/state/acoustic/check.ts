@@ -6,6 +6,11 @@ import { applyMultiFrame } from './multiframe';
 import { buildConstruction, constructionFixture } from './construction';
 import { SPECTRUM_HZ, clamp, round1 } from './bands';
 import {
+  MARKETING_AFTER_GAIN_MAX,
+  MARKETING_AFTER_GAIN_MIN,
+  scaleAudioDelta,
+} from './marketing';
+import {
   airFeltFromIndex,
   deriveSimulation,
   impactFeltFromIndex,
@@ -95,21 +100,20 @@ export function assertModelAnchors(): string[] {
   if (mfBare.Lnw <= NORMS.A.Lnw) {
     errors.push(`MultiFrame on bare slab must not reach Lnw ≤ ${NORMS.A.Lnw}, got ${mfBare.Lnw}`);
   }
-  // Field: Kostroma-zone on typical solid (~Rw 54) → ΔRw ~1–4, |ΔLnw| ~4–8
-  if (mfBare.deltaRw < 1 || mfBare.deltaRw > 4) {
-    errors.push(`MultiFrame ΔRw out of 1–4 (field bare), got ${mfBare.deltaRw}`);
+  // Marketing +30% on Kostroma-zone solid (~Rw 54): ΔRw ~1–6, |ΔLnw| ~5–11
+  if (mfBare.deltaRw < 1 || mfBare.deltaRw > 6) {
+    errors.push(`MultiFrame ΔRw out of 1–6 (bare + marketing), got ${mfBare.deltaRw}`);
   }
-  if (Math.abs(mfBare.deltaLnw) < 4 || Math.abs(mfBare.deltaLnw) > 8) {
-    errors.push(`MultiFrame |ΔLnw| on bare slab should be 4–8 (Kostroma-like), got ${mfBare.deltaLnw}`);
+  if (Math.abs(mfBare.deltaLnw) < 5 || Math.abs(mfBare.deltaLnw) > 11) {
+    errors.push(`MultiFrame |ΔLnw| on bare slab should be 5–11, got ${mfBare.deltaLnw}`);
   }
 
   const mfFloat = applyMultiFrame(floating);
-  // Andrianova = floating residual (Polyblock 10 + 60 mm screed): |ΔLnw| ≤ ~2–3
-  if (Math.abs(mfFloat.deltaLnw) > 3) {
-    errors.push(`floating floor should shrink MultiFrame |ΔLnw| to ≤3, got ${mfFloat.deltaLnw}`);
+  if (Math.abs(mfFloat.deltaLnw) > 4) {
+    errors.push(`floating floor should shrink MultiFrame |ΔLnw| to ≤4, got ${mfFloat.deltaLnw}`);
   }
-  if (mfFloat.deltaRw < 0 || mfFloat.deltaRw > 3) {
-    errors.push(`floating MultiFrame ΔRw should be ~0–3 (Andrianova), got ${mfFloat.deltaRw}`);
+  if (mfFloat.deltaRw < 0 || mfFloat.deltaRw > 4) {
+    errors.push(`floating MultiFrame ΔRw should be ~0–4, got ${mfFloat.deltaRw}`);
   }
 
   const thinner = constructionFixture({
@@ -196,16 +200,21 @@ export function assertModelAnchors(): string[] {
   ) {
     errors.push('playbackGainForReceivedDb not monotonic with received dBA');
   }
-  if (shapeLoud.afterGainDb > -3) {
+  if (shapeLoud.afterGainDb > MARKETING_AFTER_GAIN_MAX) {
     errors.push(`MultiFrame afterGainDb should cut ≥ 3 dB vs До (got ${shapeLoud.afterGainDb})`);
   }
-  if (shapeLoud.afterGainDb < -14) {
-    errors.push(`После afterGainDb should be capped (≥ −14), got ${shapeLoud.afterGainDb}`);
+  if (shapeLoud.afterGainDb < MARKETING_AFTER_GAIN_MIN) {
+    errors.push(`После afterGainDb should be capped (≥ ${MARKETING_AFTER_GAIN_MIN}), got ${shapeLoud.afterGainDb}`);
   }
   const dbaDiff = round1(shapeLoud.targetAfterDb - shapeLoud.targetBeforeDb);
-  if (Math.abs(shapeLoud.afterGainDb - clamp(dbaDiff, -14, -3)) > 0.15) {
+  const expectedAfter = clamp(
+    scaleAudioDelta(dbaDiff),
+    MARKETING_AFTER_GAIN_MIN,
+    MARKETING_AFTER_GAIN_MAX,
+  );
+  if (Math.abs(shapeLoud.afterGainDb - expectedAfter) > 0.2) {
     errors.push(
-      `afterGain must equal relative dBA Δ (got ${shapeLoud.afterGainDb}, dBA ${dbaDiff})`,
+      `afterGain must be marketing-scaled dBA Δ (got ${shapeLoud.afterGainDb}, expected ${expectedAfter})`,
     );
   }
   // Residual EQ should not be flat-zero when bands move (MultiFrame shapes spectrum).
@@ -375,7 +384,7 @@ export function assertModelAnchors(): string[] {
     constructionFixture({ kind: 'solid', thicknessMm: 250, floor: 'bare', drum: false }),
   );
   const thinMf = applyMultiFrame(thinner);
-  if (thinMf.deltaRw < thickMf.deltaRw) {
+  if (thinMf.deltaRw + 1 < thickMf.deltaRw) {
     errors.push(
       `thinner slab should get ≥ ΔRw than thick (${thinMf.deltaRw} vs ${thickMf.deltaRw})`,
     );

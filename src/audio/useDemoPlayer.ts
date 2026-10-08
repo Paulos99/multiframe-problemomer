@@ -313,8 +313,8 @@ function roomProcess(
  * Legacy: relative После vs missing shape — broadband Δ only, still on top of «До».
  */
 function legacyAfterGain(opts: AudioPlayOptions): number {
-  const air = Math.max(5, Math.min(12, Math.abs(opts.deltaRw ?? 8)));
-  const imp = Math.max(4, Math.min(10, Math.abs(opts.deltaLnw ?? 6)));
+  const air = Math.max(7, Math.min(16, Math.abs(opts.deltaRw ?? 8) * 1.5));
+  const imp = Math.max(6, Math.min(14, Math.abs(opts.deltaLnw ?? 6) * 1.5));
   if (opts.group === 'air') return -air;
   if (opts.group === 'impact') return -imp;
   return -((air + imp) / 2);

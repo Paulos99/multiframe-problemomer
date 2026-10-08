@@ -8,6 +8,11 @@
  *   sample as if it were an independent absolute level.
  */
 import { SPECTRUM_HZ, clamp, round1 } from '../state/acoustic/bands';
+import {
+  MARKETING_AFTER_GAIN_MAX,
+  MARKETING_AFTER_GAIN_MIN,
+  scaleAudioDelta,
+} from '../state/acoustic/marketing';
 import type { AudioPair, DerivedSimulation } from '../state/types';
 import {
   KEY_BAND_INDICES,
@@ -107,11 +112,17 @@ export function buildRoomAudioShape(
   const beforeEqDb = KEY_BAND_INDICES.map(() => 0);
 
   // «После» = «До» + relative MultiFrame transfer (never an independent absolute remap).
-  const afterGainDb = clamp(round1(targetAfterDb - targetBeforeDb), -14, -3);
+  // Playback is boosted further than the on-screen indices (marketing contrast).
+  const rawDelta = targetAfterDb - targetBeforeDb;
+  const afterGainDb = clamp(
+    scaleAudioDelta(rawDelta),
+    MARKETING_AFTER_GAIN_MIN,
+    MARKETING_AFTER_GAIN_MAX,
+  );
   const deltaEqDb = KEY_BAND_INDICES.map((i) => {
     const bandDelta = (after[i] ?? 0) - (before[i] ?? 0);
-    // Residual around broadband so total ≈ band Δ, without counting the mean twice.
-    return clamp(round1(bandDelta - afterGainDb), -10, 3);
+    const residual = bandDelta - rawDelta;
+    return clamp(scaleAudioDelta(residual), -12, 3);
   });
 
   return {
