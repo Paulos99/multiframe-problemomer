@@ -52,18 +52,31 @@ type DialogProps = {
 
 function SoundPressureHelpDialog({ highlightDb, onClose }: DialogProps) {
   const titleId = useId();
+  const closeRef = useRef<HTMLButtonElement>(null);
   const highlight =
     highlightDb != null && highlightDb > 0
       ? Math.min(20, Math.max(1, Math.round(Math.abs(highlightDb))))
       : null;
 
   useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    closeRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener('keydown', onKey);
+    };
   }, [onClose]);
+
+  useEffect(() => {
+    if (highlight == null) return;
+    const row = document.getElementById(`sp-row-${highlight}`);
+    row?.scrollIntoView({ block: 'nearest' });
+  }, [highlight]);
 
   return (
     <div
@@ -73,43 +86,54 @@ function SoundPressureHelpDialog({ highlightDb, onClose }: DialogProps) {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <dialog
-        className={styles.dialog}
-        open
+      <div
+        className={styles.sheet}
+        role="dialog"
+        aria-modal="true"
         aria-labelledby={titleId}
-        onCancel={(e) => {
-          e.preventDefault();
-          onClose();
-        }}
       >
         <header className={styles.head}>
-          <h2 id={titleId}>Разница уровней звукового давления</h2>
-          <p>
-            Процент «тише» в Проблемомере берётся из столбца «уменьшение звукового давления» по
-            разнице в дБ между «сейчас» и «с MultiFrame».
-          </p>
+          <div className={styles.headText}>
+            <h2 id={titleId}>Разница уровней звукового давления</h2>
+            <p>
+              Процент «тише» берётся из столбца «уменьшение» по разнице в дБ между «сейчас» и «с
+              MultiFrame».
+            </p>
+          </div>
+          <button
+            ref={closeRef}
+            type="button"
+            className={styles.closeX}
+            aria-label="Закрыть"
+            onClick={onClose}
+          >
+            <span aria-hidden>×</span>
+          </button>
         </header>
 
-        <div className={styles.tableWrap}>
+        <div className={styles.tableScroll}>
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>
-                  Разница в уровнях
-                  <br />
-                  звукового давления, дБ
+                <th scope="col">
+                  Разница
+                  <span>дБ</span>
                 </th>
-                <th>
-                  Уменьшение уровней
-                  <br />
-                  звукового давления в разах
+                <th scope="col">
+                  Уменьшение
+                  <span>в разах</span>
                 </th>
-                <th>Уменьшение звукового давления</th>
-                <th>Увеличение звукового давления</th>
-                <th>
-                  Увеличение уровней
-                  <br />
-                  звукового давления в разах
+                <th scope="col">
+                  Уменьшение
+                  <span>%</span>
+                </th>
+                <th scope="col">
+                  Увеличение
+                  <span>%</span>
+                </th>
+                <th scope="col">
+                  Увеличение
+                  <span>в разах</span>
                 </th>
               </tr>
             </thead>
@@ -117,9 +141,10 @@ function SoundPressureHelpDialog({ highlightDb, onClose }: DialogProps) {
               {SOUND_PRESSURE_TABLE.map((row) => (
                 <tr
                   key={row.db}
+                  id={`sp-row-${row.db}`}
                   className={highlight === row.db ? styles.highlight : undefined}
                 >
-                  <td className={styles.colDb}>{row.db} дБ</td>
+                  <td className={styles.colDb}>{row.db}</td>
                   <td className={styles.colDec}>{formatTimesRu(row.decreaseTimes)}</td>
                   <td>
                     <span className={styles.pillDec}>{row.decreasePct}%</span>
@@ -133,13 +158,7 @@ function SoundPressureHelpDialog({ highlightDb, onClose }: DialogProps) {
             </tbody>
           </table>
         </div>
-
-        <footer className={styles.foot}>
-          <button type="button" className={styles.closeBtn} onClick={onClose}>
-            Закрыть
-          </button>
-        </footer>
-      </dialog>
+      </div>
     </div>
   );
 }
