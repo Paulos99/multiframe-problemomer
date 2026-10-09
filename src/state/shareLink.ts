@@ -52,7 +52,7 @@ export function buildShareUrl(session: SessionState, origin = window.location.or
 
 /** Marketing line for messenger share sheet / clipboard blurb. */
 export const SHARE_MARKETING_BLURB =
-  'Посмотрите эффект MultiFrame: тише шаги и голоса сверху — бескаркасный потолок без потери высоты. Акустический профиль вашего объекта:';
+  'Насколько тише станет с MultiFrame? Пройдите бесплатный расчёт — акустический профиль вашей комнаты:';
 
 export function buildShareClipboardText(session: SessionState): string {
   return `${SHARE_MARKETING_BLURB}\n${buildShareUrl(session)}`;
