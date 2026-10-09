@@ -261,12 +261,24 @@
   background: var(--accent-color);
 }
 
-.kpiValueClassMuted {
-  font-size: clamp(13px, 1.15vw, 15px);
+.kpiCardClass .kpiValueClass,
+.kpiCardClass .kpiValueClassMuted {
+  margin: 0;
+  font-size: 13px;
   font-weight: 750;
   letter-spacing: -0.02em;
-  line-height: 1.25;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+.kpiValueClassMuted {
   color: var(--text-secondary);
+}
+
+.kpiCardClass .kpiValueClass {
+  color: var(--accent-color);
 }
 
 .kpiCardClass .kpiMiniRail {
