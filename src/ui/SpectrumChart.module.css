@@ -13,6 +13,13 @@
     transform var(--duration-normal) var(--ease-out);
 }
 
+.wrapTall {
+  padding: 14px 14px 12px;
+  border-radius: 18px;
+  background: var(--bg-card);
+  gap: 8px;
+}
+
 .wrap:hover {
   border-color: rgba(1, 100, 79, 0.28);
   box-shadow: var(--shadow-md);
@@ -44,6 +51,44 @@
   color: var(--text-secondary);
 }
 
+.captionRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.seriesToggles {
+  display: inline-flex;
+  gap: 0;
+  padding: 2px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-color);
+  background: var(--bg-subtle);
+}
+
+.seriesBtn {
+  appearance: none;
+  border: none;
+  margin: 0;
+  padding: 5px 10px;
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.seriesBtnOn {
+  color: #fff;
+  background: var(--accent-color);
+  box-shadow: var(--shadow-sm);
+}
+
 .indexBadge {
   flex-shrink: 0;
   display: flex;
@@ -57,6 +102,10 @@
   font-size: 11px;
   line-height: 1.25;
   color: var(--text-secondary);
+}
+
+.wrapTall .indexBadge {
+  background: var(--bg-subtle);
 }
 
 .indexBadge b {
@@ -160,6 +209,27 @@
   font-variant-numeric: tabular-nums;
 }
 
+.tooltipDash {
+  min-width: 140px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  gap: 4px;
+  font-size: 12px;
+  box-shadow: 0 12px 28px rgba(17, 24, 39, 0.14);
+}
+
+.tooltipDelta {
+  margin-top: 2px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border-color);
+  color: var(--accent-color);
+  font-weight: 650;
+}
+
+.tooltipDelta b {
+  color: var(--accent-color);
+}
+
 .grid {
   stroke: var(--border-color);
   stroke-width: 1;
@@ -201,7 +271,11 @@
 
 .gain {
   fill: var(--accent-color);
-  opacity: 0.18;
+  opacity: 0.14;
+}
+
+.afterArea {
+  opacity: 1;
 }
 
 .before {
@@ -214,10 +288,18 @@
 
 .after {
   stroke: var(--accent-color);
-  stroke-width: 2;
+  stroke-width: 2.25;
   stroke-linejoin: round;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
+}
+
+.wrapTall .before {
+  stroke-width: 2.25;
+}
+
+.wrapTall .after {
+  stroke-width: 2.75;
 }
 
 .legend {

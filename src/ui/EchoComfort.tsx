@@ -7,6 +7,8 @@ import styles from './EchoComfort.module.css';
 
 type Props = {
   sim: DerivedSimulation;
+  /** Wide dashboard: ring gauges instead of horizontal bars. */
+  variant?: 'default' | 'dashboard';
 };
 
 function PlayIcon({ playing }: { playing: boolean }) {
@@ -21,7 +23,41 @@ function PlayIcon({ playing }: { playing: boolean }) {
   return <span className={styles.playGlyph} aria-hidden />;
 }
 
-export function EchoComfort({ sim }: Props) {
+function EchoRing({
+  pct,
+  label,
+  accent,
+}: {
+  pct: number;
+  label: string;
+  accent?: boolean;
+}) {
+  const r = 34;
+  const c = 2 * Math.PI * r;
+  const clamped = Math.max(0, Math.min(100, pct));
+  const dash = (clamped / 100) * c;
+  return (
+    <div className={`${styles.ring} ${accent ? styles.ringAccent : ''}`}>
+      <svg viewBox="0 0 80 80" className={styles.ringSvg} aria-hidden>
+        <circle className={styles.ringTrack} cx="40" cy="40" r={r} />
+        <circle
+          className={styles.ringValue}
+          cx="40"
+          cy="40"
+          r={r}
+          strokeDasharray={`${dash} ${c}`}
+          transform="rotate(-90 40 40)"
+        />
+      </svg>
+      <div className={styles.ringCenter}>
+        <b>{pct}%</b>
+        <span>{label}</span>
+      </div>
+    </div>
+  );
+}
+
+export function EchoComfort({ sim, variant = 'default' }: Props) {
   const { activeId, progress, play, stop } = useDemoPlayer();
   const rev = sim.reverb;
   const pair = ECHO_CLAP_PAIR;
@@ -31,13 +67,17 @@ export function EchoComfort({ sim }: Props) {
   const beforeOn = activeId === beforeId;
   const afterOn = activeId === afterId;
   const echoDrop = rev.echoInRoomBefore - rev.echoInRoomAfter;
+  const dashboard = variant === 'dashboard';
 
   useEffect(() => {
     void preloadDemoAudio([pair.beforeSrc]);
   }, [pair.beforeSrc]);
 
   return (
-    <section className={styles.wrap} aria-label="Эхо в комнате (акустический комфорт)">
+    <section
+      className={`${styles.wrap} ${dashboard ? styles.wrapDash : ''}`}
+      aria-label="Эхо в комнате (акустический комфорт)"
+    >
       <header className={styles.head}>
         <h3>Эхо в комнате (акустический комфорт)</h3>
         <p>
@@ -45,39 +85,53 @@ export function EchoComfort({ sim }: Props) {
         </p>
       </header>
 
-      <div
-        className={styles.scale}
-        role="img"
-        aria-label={`Эхо в помещении: сейчас ${rev.echoInRoomBefore}%, с MultiFrame ${rev.echoInRoomAfter}%. Меньше — лучше.`}
-      >
-        <p className={styles.scaleCaption}>
-          Порхающее эхо в комнате · чем меньше процент, тем суше звук
-        </p>
-        <div className={styles.scaleRow}>
-          <span className={styles.scaleLabel}>Сейчас</span>
-          <div className={styles.track}>
-            <span className={styles.fillBefore} style={{ width: `${rev.echoInRoomBefore}%` }} />
-          </div>
-          <b className={styles.pct}>{rev.echoInRoomBefore}%</b>
+      {dashboard ? (
+        <div
+          className={styles.rings}
+          role="img"
+          aria-label={`Эхо в помещении: сейчас ${rev.echoInRoomBefore}%, с MultiFrame ${rev.echoInRoomAfter}%. Меньше — лучше.`}
+        >
+          <EchoRing pct={rev.echoInRoomBefore} label="Сейчас" />
+          <EchoRing pct={rev.echoInRoomAfter} label="После" accent />
+          {echoDrop > 0 ? (
+            <p className={styles.scaleDelta}>≈ на {echoDrop}% меньше эха в помещении</p>
+          ) : null}
         </div>
-        <div className={styles.scaleRow}>
-          <span className={styles.scaleLabel}>С MultiFrame</span>
-          <div className={styles.track}>
-            <span className={styles.fillAfter} style={{ width: `${rev.echoInRoomAfter}%` }} />
+      ) : (
+        <div
+          className={styles.scale}
+          role="img"
+          aria-label={`Эхо в помещении: сейчас ${rev.echoInRoomBefore}%, с MultiFrame ${rev.echoInRoomAfter}%. Меньше — лучше.`}
+        >
+          <p className={styles.scaleCaption}>
+            Порхающее эхо в комнате · чем меньше процент, тем суше звук
+          </p>
+          <div className={styles.scaleRow}>
+            <span className={styles.scaleLabel}>Сейчас</span>
+            <div className={styles.track}>
+              <span className={styles.fillBefore} style={{ width: `${rev.echoInRoomBefore}%` }} />
+            </div>
+            <b className={styles.pct}>{rev.echoInRoomBefore}%</b>
           </div>
-          <b className={styles.pctMf}>{rev.echoInRoomAfter}%</b>
+          <div className={styles.scaleRow}>
+            <span className={styles.scaleLabel}>С MultiFrame</span>
+            <div className={styles.track}>
+              <span className={styles.fillAfter} style={{ width: `${rev.echoInRoomAfter}%` }} />
+            </div>
+            <b className={styles.pctMf}>{rev.echoInRoomAfter}%</b>
+          </div>
+          {echoDrop > 0 ? (
+            <p className={styles.scaleDelta}>≈ на {echoDrop}% меньше эха в помещении</p>
+          ) : null}
         </div>
-        {echoDrop > 0 ? (
-          <p className={styles.scaleDelta}>≈ на {echoDrop}% меньше эха в помещении</p>
-        ) : null}
-      </div>
+      )}
 
       <div className={styles.player}>
         <strong className={styles.playerTitle}>{pair.label}</strong>
         <div className={styles.controls}>
           <button
             type="button"
-            className={`${styles.btn} ${styles.before} ${beforeOn ? styles.playing : ''}`}
+            className={`${styles.btn} ${styles.before} ${beforeOn ? styles.playing : ''} ${dashboard ? styles.btnChip : ''}`}
             aria-pressed={beforeOn}
             aria-label={beforeOn ? `Пауза: До, ${pair.label}` : `Слушать До: ${pair.label}`}
             onClick={() => {
@@ -105,7 +159,7 @@ export function EchoComfort({ sim }: Props) {
           </button>
           <button
             type="button"
-            className={`${styles.btn} ${styles.after} ${afterOn ? styles.playing : ''}`}
+            className={`${styles.btn} ${styles.after} ${afterOn ? styles.playing : ''} ${dashboard ? styles.btnChip : ''}`}
             aria-pressed={afterOn}
             aria-label={afterOn ? `Пауза: После, ${pair.label}` : `Слушать После: ${pair.label}`}
             onClick={() => {

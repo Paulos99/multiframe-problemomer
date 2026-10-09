@@ -1,4 +1,12 @@
-import { useCallback, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from 'react';
 import type { SpectrumSeries } from '../state/spectrum';
 import { SoundPressureHelpButton } from './SoundPressureHelp';
 import styles from './SpectrumChart.module.css';
@@ -8,6 +16,8 @@ type IndexBadge = {
   before: number;
   after: number;
 };
+
+export type SpectrumSeriesMode = 'both' | 'before' | 'after';
 
 type Props = {
   title: string;
@@ -23,6 +33,14 @@ type Props = {
   reductionPct?: number;
   /** Larger plot for desktop dashboard. */
   tall?: boolean;
+  /** Show series toggles (wide dashboard). */
+  showSeriesToggles?: boolean;
+  /** Controlled series visibility (optional). */
+  seriesMode?: SpectrumSeriesMode;
+  onSeriesModeChange?: (mode: SpectrumSeriesMode) => void;
+  /** Shared hover Hz across charts (desktop sync). */
+  externalHz?: number | null;
+  onHzHover?: (hz: number | null) => void;
 };
 
 type HoverPoint = {
@@ -33,6 +51,8 @@ type HoverPoint = {
   yBefore: number;
   yAfter: number;
 };
+
+type Pt = { x: number; y: number };
 
 function xAt(hz: number, hzMin: number, hzMax: number, x0: number, w: number): number {
   const t =
@@ -45,7 +65,7 @@ function yAt(v: number, yMin: number, yMax: number, y0: number, h: number): numb
   return y0 + h - t * h;
 }
 
-function polyline(
+function toPoints(
   hz: readonly number[],
   values: number[],
   x0: number,
@@ -54,45 +74,47 @@ function polyline(
   h: number,
   yMin: number,
   yMax: number,
-): string {
+): Pt[] {
   const hzMin = hz[0] ?? 100;
   const hzMax = hz[hz.length - 1] ?? 5000;
-  return values
-    .map((v, i) => {
-      const x = xAt(hz[i] ?? hzMin, hzMin, hzMax, x0, w);
-      const y = yAt(v, yMin, yMax, y0, h);
-      return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
-    })
-    .join(' ');
+  return values.map((v, i) => ({
+    x: xAt(hz[i] ?? hzMin, hzMin, hzMax, x0, w),
+    y: yAt(v, yMin, yMax, y0, h),
+  }));
 }
 
-function gainArea(
-  hz: readonly number[],
-  before: number[],
-  after: number[],
-  x0: number,
-  y0: number,
-  w: number,
-  h: number,
-  yMin: number,
-  yMax: number,
-): string {
-  const hzMin = hz[0] ?? 100;
-  const hzMax = hz[hz.length - 1] ?? 5000;
-  const afterPts = after.map((v, i) => {
-    const x = xAt(hz[i] ?? hzMin, hzMin, hzMax, x0, w);
-    const y = yAt(v, yMin, yMax, y0, h);
-    return `${x.toFixed(1)},${y.toFixed(1)}`;
-  });
-  const beforePts = before
-    .map((v, i) => {
-      const x = xAt(hz[i] ?? hzMin, hzMin, hzMax, x0, w);
-      const y = yAt(v, yMin, yMax, y0, h);
-      return `${x.toFixed(1)},${y.toFixed(1)}`;
-    })
-    .reverse();
-  if (!afterPts.length) return '';
-  return `M${afterPts.join(' L')} L${beforePts.join(' L')} Z`;
+/** Smooth cubic path through points (Catmull-Rom → Bezier). */
+function smoothPath(pts: Pt[]): string {
+  if (!pts.length) return '';
+  if (pts.length === 1) return `M${pts[0]!.x.toFixed(1)},${pts[0]!.y.toFixed(1)}`;
+  let d = `M${pts[0]!.x.toFixed(1)},${pts[0]!.y.toFixed(1)}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1] ?? pts[i]!;
+    const p1 = pts[i]!;
+    const p2 = pts[i + 1]!;
+    const p3 = pts[i + 2] ?? p2;
+    const c1x = p1.x + (p2.x - p0.x) / 6;
+    const c1y = p1.y + (p2.y - p0.y) / 6;
+    const c2x = p2.x - (p3.x - p1.x) / 6;
+    const c2y = p2.y - (p3.y - p1.y) / 6;
+    d += ` C${c1x.toFixed(1)},${c1y.toFixed(1)} ${c2x.toFixed(1)},${c2y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
+  }
+  return d;
+}
+
+function areaUnder(pts: Pt[], yBase: number): string {
+  if (!pts.length) return '';
+  const first = pts[0]!;
+  const last = pts[pts.length - 1]!;
+  return `${smoothPath(pts)} L${last.x.toFixed(1)},${yBase.toFixed(1)} L${first.x.toFixed(1)},${yBase.toFixed(1)} Z`;
+}
+
+function gainBand(beforePts: Pt[], afterPts: Pt[]): string {
+  if (!beforePts.length || !afterPts.length) return '';
+  const beforeRev = [...beforePts].reverse();
+  return `M${afterPts.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' L')} L${beforeRev
+    .map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`)
+    .join(' L')} Z`;
 }
 
 function niceRange(min: number, max: number): { yMin: number; yMax: number; ticks: number[] } {
@@ -114,7 +136,6 @@ function formatHz(hz: number): string {
   return String(Math.round(hz));
 }
 
-/** Sample spectrum curves at continuous Hz (log-lerp between neighbouring bands). */
 function sampleAt(
   hzList: readonly number[],
   before: number[],
@@ -156,15 +177,21 @@ export function SpectrumChart({
   reductionDb,
   reductionPct,
   tall = false,
+  showSeriesToggles = false,
+  seriesMode: seriesModeProp,
+  onSeriesModeChange,
+  externalHz,
+  onHzHover,
 }: Props) {
-  const padL = 28;
-  const padR = 10;
-  const padT = 10;
-  const padB = 22;
-  const W = tall ? 580 : 360;
-  const H = tall ? 320 : 168;
+  const padL = tall ? 34 : 28;
+  const padR = tall ? 14 : 10;
+  const padT = tall ? 14 : 10;
+  const padB = tall ? 28 : 22;
+  const W = tall ? 640 : 360;
+  const H = tall ? 360 : 168;
   const plotW = W - padL - padR;
   const plotH = H - padT - padB;
+  const yBase = padT + plotH;
 
   const all = [...series.before, ...series.after];
   const rawMin = Math.min(...all);
@@ -173,33 +200,58 @@ export function SpectrumChart({
   const hzMin = series.hz[0] ?? 100;
   const hzMax = series.hz[series.hz.length - 1] ?? 5000;
 
-  const beforePath = polyline(
-    series.hz,
-    series.before,
-    padL,
-    padT,
-    plotW,
-    plotH,
-    yMin,
-    yMax,
-  );
-  const afterPath = polyline(series.hz, series.after, padL, padT, plotW, plotH, yMin, yMax);
-  const area = gainArea(
-    series.hz,
-    series.before,
-    series.after,
-    padL,
-    padT,
-    plotW,
-    plotH,
-    yMin,
-    yMax,
-  );
+  const beforePts = toPoints(series.hz, series.before, padL, padT, plotW, plotH, yMin, yMax);
+  const afterPts = toPoints(series.hz, series.after, padL, padT, plotW, plotH, yMin, yMax);
+  const beforePath = smoothPath(beforePts);
+  const afterPath = smoothPath(afterPts);
+  const afterFill = areaUnder(afterPts, yBase);
+  const band = gainBand(beforePts, afterPts);
 
   const xLabels = [100, 250, 500, 1000, 2000, 5000];
   const [hover, setHover] = useState<HoverPoint | null>(null);
   const [active, setActive] = useState(false);
+  const [localMode, setLocalMode] = useState<SpectrumSeriesMode>('both');
+  const mode = seriesModeProp ?? localMode;
   const leaveTimer = useRef<number | null>(null);
+  const gradId = useId().replace(/:/g, '');
+  const showBefore = mode === 'both' || mode === 'before';
+  const showAfter = mode === 'both' || mode === 'after';
+
+  const setMode = (next: SpectrumSeriesMode) => {
+    onSeriesModeChange?.(next);
+    if (seriesModeProp == null) setLocalMode(next);
+  };
+
+  const applyHz = useCallback(
+    (targetHz: number, announce: boolean) => {
+      const sample = sampleAt(series.hz, series.before, series.after, targetHz);
+      const sx = xAt(sample.hz, hzMin, hzMax, padL, plotW);
+      setHover({
+        hz: sample.hz,
+        before: sample.before,
+        after: sample.after,
+        x: sx,
+        yBefore: yAt(sample.before, yMin, yMax, padT, plotH),
+        yAfter: yAt(sample.after, yMin, yMax, padT, plotH),
+      });
+      setActive(true);
+      if (announce) onHzHover?.(sample.hz);
+    },
+    [hzMax, hzMin, onHzHover, padL, plotH, plotW, series.after, series.before, series.hz, yMax, yMin],
+  );
+
+  useEffect(() => {
+    if (externalHz == null) {
+      setActive(false);
+      setHover(null);
+      return;
+    }
+    if (leaveTimer.current != null) {
+      window.clearTimeout(leaveTimer.current);
+      leaveTimer.current = null;
+    }
+    applyHz(externalHz, false);
+  }, [applyHz, externalHz]);
 
   const onMove = useCallback(
     (e: ReactPointerEvent<SVGSVGElement>) => {
@@ -216,19 +268,9 @@ export function SpectrumChart({
       }
       const t = (sx - padL) / plotW;
       const logHz = Math.log10(hzMin) + t * (Math.log10(hzMax) - Math.log10(hzMin));
-      const targetHz = 10 ** logHz;
-      const sample = sampleAt(series.hz, series.before, series.after, targetHz);
-      setHover({
-        hz: sample.hz,
-        before: sample.before,
-        after: sample.after,
-        x: sx,
-        yBefore: yAt(sample.before, yMin, yMax, padT, plotH),
-        yAfter: yAt(sample.after, yMin, yMax, padT, plotH),
-      });
-      setActive(true);
+      applyHz(10 ** logHz, true);
     },
-    [hzMax, hzMin, plotH, plotW, series.after, series.before, series.hz, yMax, yMin],
+    [W, applyHz, hzMax, hzMin, padL, padR, plotW],
   );
 
   const onLeave = useCallback(() => {
@@ -236,8 +278,9 @@ export function SpectrumChart({
     leaveTimer.current = window.setTimeout(() => {
       setHover(null);
       leaveTimer.current = null;
+      onHzHover?.(null);
     }, 180);
-  }, []);
+  }, [onHzHover]);
 
   const tooltipStyle = useMemo(() => {
     if (!hover) return undefined;
@@ -250,31 +293,56 @@ export function SpectrumChart({
     } as const;
   }, [hover, active]);
 
+  const delta = hover ? hover.after - hover.before : 0;
+
   return (
-    <figure className={styles.wrap}>
+    <figure className={`${styles.wrap} ${tall ? styles.wrapTall : ''}`}>
       <figcaption className={styles.captionRow}>
         <div className={styles.captionText}>
           <strong>{title}</strong>
           <span>{subtitle}</span>
         </div>
-        {indexBadge ? (
-          <div className={styles.indexBadge} aria-label={`${indexBadge.kind} до и после`}>
-            <b>{indexBadge.kind}</b>
-            <span>
-              ≈ {Math.round(indexBadge.before)}
-              <span aria-hidden> → </span>≈ {Math.round(indexBadge.after)}
-            </span>
-            {reductionPct != null && reductionDb != null && reductionDb > 0 ? (
-              <span className={styles.quieterBadge}>
-                ≈ {reductionPct}% тише
-                <SoundPressureHelpButton
-                  highlightDb={reductionDb}
-                  label={`Таблица снижения для ${indexBadge.kind}`}
-                />
+        <div className={styles.captionRight}>
+          {showSeriesToggles ? (
+            <div className={styles.seriesToggles} role="group" aria-label="Серии графика">
+              {(
+                [
+                  ['both', 'Обе'],
+                  ['before', 'Сейчас'],
+                  ['after', 'MultiFrame'],
+                ] as const
+              ).map(([id, label]) => (
+                <button
+                  key={id}
+                  type="button"
+                  className={`${styles.seriesBtn} ${mode === id ? styles.seriesBtnOn : ''}`}
+                  aria-pressed={mode === id}
+                  onClick={() => setMode(id)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          ) : null}
+          {indexBadge ? (
+            <div className={styles.indexBadge} aria-label={`${indexBadge.kind} до и после`}>
+              <b>{indexBadge.kind}</b>
+              <span>
+                ≈ {Math.round(indexBadge.before)}
+                <span aria-hidden> → </span>≈ {Math.round(indexBadge.after)}
               </span>
-            ) : null}
-          </div>
-        ) : null}
+              {reductionPct != null && reductionDb != null && reductionDb > 0 ? (
+                <span className={styles.quieterBadge}>
+                  ≈ {reductionPct}% тише
+                  <SoundPressureHelpButton
+                    highlightDb={reductionDb}
+                    label={`Таблица снижения для ${indexBadge.kind}`}
+                  />
+                </span>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
       </figcaption>
 
       <div className={styles.plot}>
@@ -286,6 +354,13 @@ export function SpectrumChart({
           onPointerMove={onMove}
           onPointerLeave={onLeave}
         >
+          <defs>
+            <linearGradient id={`afterFill-${gradId}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="var(--accent-color)" stopOpacity="0.28" />
+              <stop offset="100%" stopColor="var(--accent-color)" stopOpacity="0.02" />
+            </linearGradient>
+          </defs>
+
           {yTicks.map((tick) => {
             const y = yAt(tick, yMin, yMax, padT, plotH);
             return (
@@ -317,9 +392,12 @@ export function SpectrumChart({
             {yLabel}
           </text>
 
-          <path d={area} className={styles.gain} />
-          <path d={beforePath} className={styles.before} fill="none" />
-          <path d={afterPath} className={styles.after} fill="none" />
+          {showAfter ? (
+            <path d={afterFill} className={styles.afterArea} fill={`url(#afterFill-${gradId})`} />
+          ) : null}
+          {showBefore && showAfter ? <path d={band} className={styles.gain} /> : null}
+          {showBefore ? <path d={beforePath} className={styles.before} fill="none" /> : null}
+          {showAfter ? <path d={afterPath} className={styles.after} fill="none" /> : null}
 
           {hover ? (
             <g
@@ -333,35 +411,50 @@ export function SpectrumChart({
                 y2={padT + plotH}
                 className={styles.hoverLine}
               />
-              <circle cx={hover.x} cy={hover.yBefore} r={2.8} className={styles.dotBefore} />
-              <circle cx={hover.x} cy={hover.yAfter} r={3.1} className={styles.dotAfter} />
+              {showBefore ? (
+                <circle cx={hover.x} cy={hover.yBefore} r={tall ? 4 : 2.8} className={styles.dotBefore} />
+              ) : null}
+              {showAfter ? (
+                <circle cx={hover.x} cy={hover.yAfter} r={tall ? 4.4 : 3.1} className={styles.dotAfter} />
+              ) : null}
             </g>
           ) : null}
         </svg>
 
         {hover ? (
-          <div className={styles.tooltip} style={tooltipStyle} role="status">
+          <div className={`${styles.tooltip} ${tall ? styles.tooltipDash : ''}`} style={tooltipStyle} role="status">
             <strong>{formatHz(hover.hz)} Гц</strong>
-            <span>
-              {beforeLabel}: <b>{hover.before.toFixed(1)} дБ</b>
-            </span>
-            <span>
-              {afterLabel}: <b>{hover.after.toFixed(1)} дБ</b>
-            </span>
+            {showBefore ? (
+              <span>
+                {beforeLabel}: <b>{hover.before.toFixed(1)} дБ</b>
+              </span>
+            ) : null}
+            {showAfter ? (
+              <span>
+                {afterLabel}: <b>{hover.after.toFixed(1)} дБ</b>
+              </span>
+            ) : null}
+            {showBefore && showAfter ? (
+              <span className={styles.tooltipDelta}>
+                Δ <b>{delta >= 0 ? '+' : ''}{delta.toFixed(1)} дБ</b>
+              </span>
+            ) : null}
           </div>
         ) : null}
       </div>
 
-      <ul className={styles.legend}>
-        <li>
-          <span className={styles.swatchBefore} />
-          {beforeLabel}
-        </li>
-        <li>
-          <span className={styles.swatchAfter} />
-          {afterLabel}
-        </li>
-      </ul>
+      {!showSeriesToggles && !tall ? (
+        <ul className={styles.legend}>
+          <li>
+            <span className={styles.swatchBefore} />
+            {beforeLabel}
+          </li>
+          <li>
+            <span className={styles.swatchAfter} />
+            {afterLabel}
+          </li>
+        </ul>
+      ) : null}
     </figure>
   );
 }

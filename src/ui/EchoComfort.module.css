@@ -9,6 +9,90 @@
   box-shadow: var(--shadow-sm);
 }
 
+.wrapDash {
+  gap: 14px;
+}
+
+.rings {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 14px;
+  align-items: start;
+  justify-items: center;
+}
+
+.rings .scaleDelta {
+  grid-column: 1 / -1;
+  text-align: center;
+  margin: 0;
+}
+
+.ring {
+  position: relative;
+  width: 88px;
+  height: 88px;
+}
+
+.ringSvg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.ringTrack {
+  fill: none;
+  stroke: var(--border-color);
+  stroke-width: 7;
+}
+
+.ringValue {
+  fill: none;
+  stroke: #7a8790;
+  stroke-width: 7;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.7s var(--ease-out);
+}
+
+.ringAccent .ringValue {
+  stroke: var(--accent-color);
+}
+
+.ringCenter {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  pointer-events: none;
+}
+
+.ringCenter b {
+  font-size: 16px;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+.ringAccent .ringCenter b {
+  color: var(--accent-color);
+}
+
+.ringCenter span {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.btnChip {
+  border-radius: var(--radius-pill);
+  min-height: 40px;
+  padding: 6px 12px 6px 8px;
+}
+
 .head h3 {
   margin: 0 0 4px;
   font-size: 16px;

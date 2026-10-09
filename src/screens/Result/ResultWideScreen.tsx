@@ -1,5 +1,7 @@
+import { useCallback, useState } from 'react';
 import { Button } from '../../ui/Button';
-import { SpectrumChart } from '../../ui/SpectrumChart';
+import { EchoComfort } from '../../ui/EchoComfort';
+import { SpectrumChart, type SpectrumSeriesMode } from '../../ui/SpectrumChart';
 import { useSession } from '../../state/SessionContext';
 import type { ClassLabel } from '../../state/types';
 import { officialComfortLabel } from '../../state/simulation';
@@ -71,7 +73,11 @@ function ComfortRail({ before, after }: { before: ClassLabel; after: ClassLabel 
               key={step.id}
               className={`${styles.railSeg} ${reached ? styles.railSegOn : ''} ${isBefore || isAfter ? styles.railSegFocus : ''}`}
             >
-              <span className={styles.railDot} data-before={isBefore ? '' : undefined} data-after={isAfter ? '' : undefined} />
+              <span
+                className={styles.railDot}
+                data-before={isBefore ? '' : undefined}
+                data-after={isAfter ? '' : undefined}
+              />
               <span className={styles.railLetter}>{step.letter}</span>
               <span className={styles.railName}>{step.name}</span>
               <div className={styles.railMarks}>
@@ -92,14 +98,80 @@ function ComfortRail({ before, after }: { before: ClassLabel; after: ClassLabel 
   );
 }
 
+function DeltaBars({ before, after, invert }: { before: number; after: number; invert?: boolean }) {
+  const max = Math.max(before, after, 1);
+  const bH = Math.round((before / max) * 100);
+  const aH = Math.round((after / max) * 100);
+  const better = invert ? after < before : after > before;
+  return (
+    <div className={styles.kpiBars} aria-hidden>
+      <span className={styles.kpiBar} style={{ height: `${Math.max(18, bH)}%` }} title="Сейчас" />
+      <span
+        className={`${styles.kpiBar} ${styles.kpiBarAfter} ${better ? styles.kpiBarBetter : ''}`}
+        style={{ height: `${Math.max(18, aH)}%` }}
+        title="После"
+      />
+    </div>
+  );
+}
+
+function QuietRing({ pct }: { pct: number }) {
+  const r = 22;
+  const c = 2 * Math.PI * r;
+  const clamped = Math.max(0, Math.min(100, pct));
+  const dash = (clamped / 100) * c;
+  return (
+    <div className={styles.kpiRing} aria-hidden>
+      <svg viewBox="0 0 56 56" className={styles.kpiRingSvg}>
+        <circle className={styles.kpiRingTrack} cx="28" cy="28" r={r} />
+        <circle
+          className={styles.kpiRingValue}
+          cx="28"
+          cy="28"
+          r={r}
+          strokeDasharray={`${dash} ${c}`}
+          transform="rotate(-90 28 28)"
+        />
+      </svg>
+      <span className={styles.kpiRingPct}>{pct}%</span>
+    </div>
+  );
+}
+
+function MiniClassRail({ before, after }: { before: ClassLabel; after: ClassLabel }) {
+  const bi = stepIndex(before);
+  const ai = stepIndex(after);
+  return (
+    <div className={styles.kpiMiniRail} aria-hidden>
+      {RAIL_STEPS.map((step, i) => {
+        const on = i <= Math.max(bi, ai);
+        const isBefore = step.id === before;
+        const isAfter = step.id === after;
+        return (
+          <span
+            key={step.id}
+            className={`${styles.kpiMiniSeg} ${on ? styles.kpiMiniSegOn : ''} ${isBefore ? styles.kpiMiniBefore : ''} ${isAfter ? styles.kpiMiniAfter : ''}`}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
 export function ResultWideScreen() {
   const { goBack } = useSession();
   const p = useResultProfile();
+  const [seriesMode, setSeriesMode] = useState<SpectrumSeriesMode>('both');
+  const [hoverHz, setHoverHz] = useState<number | null>(null);
+  const onHzHover = useCallback((hz: number | null) => {
+    setHoverHz(hz);
+  }, []);
 
   const deltaRw = Math.abs(Math.round(p.sim.delta.Rw));
   const deltaLnw = Math.abs(Math.round(p.sim.delta.Lnw));
   const quieterAir = p.sim.perceivedAirPct;
   const quieterImpact = p.sim.perceivedImpactPct;
+  const quieterMax = Math.max(quieterAir, quieterImpact);
 
   const objectCells: { label: string; value: string }[] = [
     { label: 'Перекрытие', value: p.slabContext },
@@ -135,33 +207,45 @@ export function ResultWideScreen() {
       <section className={styles.kpiRow} data-reveal aria-label="Ключевые показатели">
         <article className={styles.kpiCard}>
           <span className={styles.kpiLabel}>Δ Rw · воздух</span>
-          <strong className={styles.kpiValue}>
-            +{deltaRw}
-            <em>дБ</em>
-          </strong>
+          <div className={styles.kpiMain}>
+            <strong className={styles.kpiValue}>
+              +{deltaRw}
+              <em>дБ</em>
+            </strong>
+            <DeltaBars before={p.sim.before.Rw} after={p.sim.after.Rw} />
+          </div>
           <span className={styles.kpiPill}>изоляция ↑</span>
         </article>
         <article className={styles.kpiCard}>
           <span className={styles.kpiLabel}>Δ Lnw · удар</span>
-          <strong className={styles.kpiValue}>
-            −{deltaLnw}
-            <em>дБ</em>
-          </strong>
+          <div className={styles.kpiMain}>
+            <strong className={styles.kpiValue}>
+              −{deltaLnw}
+              <em>дБ</em>
+            </strong>
+            <DeltaBars before={p.sim.before.Lnw} after={p.sim.after.Lnw} invert />
+          </div>
           <span className={styles.kpiPill}>шум ↓</span>
         </article>
         <article className={styles.kpiCard}>
           <span className={styles.kpiLabel}>Тише на слух</span>
-          <strong className={styles.kpiValue}>
-            ≈{Math.max(quieterAir, quieterImpact)}
-            <em>%</em>
-          </strong>
+          <div className={styles.kpiMain}>
+            <strong className={styles.kpiValue}>
+              ≈{quieterMax}
+              <em>%</em>
+            </strong>
+            <QuietRing pct={quieterMax} />
+          </div>
           <span className={styles.kpiPill}>
             воздух {quieterAir}% · удар {quieterImpact}%
           </span>
         </article>
         <article className={`${styles.kpiCard} ${styles.kpiCardAccent}`}>
           <span className={styles.kpiLabel}>Класс с MultiFrame</span>
-          <strong className={styles.kpiValueClass}>«{p.afterOfficial}»</strong>
+          <div className={styles.kpiMain}>
+            <strong className={styles.kpiValueClass}>«{p.afterOfficial}»</strong>
+            <MiniClassRail before={p.hybridBefore} after={p.hybridAfter} />
+          </div>
           <span className={styles.kpiPillLight}>было «{p.beforeOfficial}»</span>
         </article>
       </section>
@@ -219,7 +303,9 @@ export function ResultWideScreen() {
 
         <div className={styles.compareGrid}>
           <div className={styles.compareCard}>
-            <h3>Сейчас</h3>
+            <h3>
+              <span className={styles.compareChip}>Сейчас</span>
+            </h3>
             <div className={styles.feltStack}>
               <FeltScale
                 title="Воздушный шум (голоса и музыка)"
@@ -239,7 +325,9 @@ export function ResultWideScreen() {
           </div>
 
           <div className={`${styles.compareCard} ${styles.compareAfter}`}>
-            <h3>С MultiFrame</h3>
+            <h3>
+              <span className={styles.compareChipAccent}>MultiFrame</span>
+            </h3>
             <div className={styles.feltStack}>
               <FeltScale
                 title="Воздушный шум (голоса и музыка)"
@@ -278,7 +366,9 @@ export function ResultWideScreen() {
           </div>
         </header>
         <div className={styles.listenBody}>
-          <div className={styles.listenEcho}>{p.echoNode}</div>
+          <div className={styles.listenEcho}>
+            <EchoComfort sim={p.sim} variant="dashboard" />
+          </div>
           <div className={styles.listenAudio}>{p.audioNode}</div>
         </div>
       </section>
@@ -291,18 +381,32 @@ export function ResultWideScreen() {
               Чем выше линия, тем лучше перекрытие изолирует шум на этой частоте.
             </p>
           </div>
-          <div className={styles.chartsLegend} aria-hidden>
-            <span>
-              <i className={styles.legNow} /> Сейчас
-            </span>
-            <span>
-              <i className={styles.legAfter} /> MultiFrame
-            </span>
+          <div className={styles.chartsToggles} role="group" aria-label="Серии графиков">
+            {(
+              [
+                ['both', 'Обе'],
+                ['before', 'Сейчас'],
+                ['after', 'MultiFrame'],
+              ] as const
+            ).map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                className={`${styles.chartsToggle} ${seriesMode === id ? styles.chartsToggleOn : ''}`}
+                aria-pressed={seriesMode === id}
+                onClick={() => setSeriesMode(id)}
+              >
+                {label}
+              </button>
+            ))}
           </div>
         </header>
         <div className={styles.chartsGrid}>
           <SpectrumChart
             tall
+            seriesMode={seriesMode}
+            externalHz={hoverHz}
+            onHzHover={onHzHover}
             title="Воздушный шум (голоса и музыка)"
             subtitle="изоляция от голосов и музыки сверху"
             series={p.sim.airSpectrum}
@@ -313,6 +417,9 @@ export function ResultWideScreen() {
           />
           <SpectrumChart
             tall
+            seriesMode={seriesMode}
+            externalHz={hoverHz}
+            onHzHover={onHzHover}
             title="Ударный шум (шаги и падения)"
             subtitle="изоляция от шагов и падений"
             series={p.sim.impactSpectrum}
