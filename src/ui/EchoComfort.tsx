@@ -68,7 +68,7 @@ export function EchoComfort({ sim }: Props) {
           <b className={styles.pctMf}>{rev.echoInRoomAfter}%</b>
         </div>
         {echoDrop > 0 ? (
-          <p className={styles.scaleDelta}>≈ на {echoDrop}% меньше порхания</p>
+          <p className={styles.scaleDelta}>≈ на {echoDrop}% меньше эха в помещении</p>
         ) : null}
       </div>
 
