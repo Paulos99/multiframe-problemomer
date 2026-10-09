@@ -26,25 +26,50 @@ export function EchoComfortRings({
   before,
   after,
   compact,
+  hoverPlay,
 }: {
   /** Echo % before (higher = worse). Rings show comfort = 100 − echo. */
   before: number;
   after: number;
   compact?: boolean;
+  /** Parent bumps this (e.g. KPI card hover) to replay both rings. */
+  hoverPlay?: number;
 }) {
   const comfortBefore = Math.max(0, Math.min(100, 100 - before));
   const comfortAfter = Math.max(0, Math.min(100, 100 - after));
   const echoDrop = before - after;
+  const [localHover, setLocalHover] = useState(0);
+  const ownedByParent = hoverPlay != null;
+  const play = ownedByParent ? hoverPlay : localHover;
+
   return (
     <div
       className={`${styles.rings} ${compact ? styles.ringsCompact : ''}`}
       role="img"
       aria-label={`Акустический комфорт: сейчас ${comfortBefore}%, с MultiFrame ${comfortAfter}%. Больше — лучше. Эхо снизилось на ${Math.max(0, echoDrop)}%.`}
+      onMouseEnter={() => {
+        if (!ownedByParent) setLocalHover((n) => n + 1);
+      }}
     >
-      <EchoRing pct={comfortBefore} label="Сейчас" compact={compact} delayMs={0} />
-      <EchoRing pct={comfortAfter} label="После" accent compact={compact} delayMs={120} />
+      <EchoRing
+        pct={comfortBefore}
+        label="Сейчас"
+        compact={compact}
+        delayMs={0}
+        hoverPlay={play}
+      />
+      <EchoRing
+        pct={comfortAfter}
+        label="После"
+        accent
+        compact={compact}
+        delayMs={120}
+        hoverPlay={play}
+      />
       {echoDrop > 0 ? (
-        <p className={styles.scaleDelta}>≈ на {echoDrop}% меньше эха</p>
+        <p className={`${styles.scaleDelta} ${styles.scaleDeltaPill}`}>
+          ≈ на {echoDrop}% меньше эха
+        </p>
       ) : null}
     </div>
   );
@@ -68,12 +93,15 @@ function EchoRing({
   accent,
   compact,
   delayMs = 0,
+  hoverPlay = 0,
 }: {
   pct: number;
   label: string;
   accent?: boolean;
   compact?: boolean;
   delayMs?: number;
+  /** Parent bumps this to replay both rings together. */
+  hoverPlay?: number;
 }) {
   const r = compact ? 26 : 34;
   const vb = compact ? 64 : 80;
@@ -144,11 +172,15 @@ function EchoRing({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- replay only on pct / mount
   }, [clamped, delayMs]);
 
+  useEffect(() => {
+    if (hoverPlay > 0) runFill(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional hover replay
+  }, [hoverPlay]);
+
   return (
     <div
       ref={rootRef}
       className={`${styles.ring} ${accent ? styles.ringAccent : ''} ${compact ? styles.ringCompact : ''}`}
-      onMouseEnter={() => runFill(true)}
     >
       <svg viewBox={`0 0 ${vb} ${vb}`} className={styles.ringSvg} aria-hidden>
         <circle className={styles.ringTrack} cx={mid} cy={mid} r={r} />

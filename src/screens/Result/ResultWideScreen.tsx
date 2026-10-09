@@ -20,17 +20,19 @@ function prefersReducedMotion(): boolean {
   );
 }
 
-/** Hover replay: count from 0 → target (same feel as comfort rings). */
+/** Count 0 → target; parent bumps `replayKey` on card hover. */
 function CountUpValue({
   value,
   prefix = '',
   suffix,
   className,
+  replayKey = 0,
 }: {
   value: number;
   prefix?: string;
   suffix?: ReactNode;
   className?: string;
+  replayKey?: number;
 }) {
   const [display, setDisplay] = useState(value);
   const cancelRef = useRef<() => void>(() => {});
@@ -41,7 +43,8 @@ function CountUpValue({
 
   useEffect(() => () => cancelRef.current(), []);
 
-  const run = () => {
+  useEffect(() => {
+    if (replayKey === 0) return;
     cancelRef.current();
     if (prefersReducedMotion()) {
       setDisplay(value);
@@ -60,14 +63,120 @@ function CountUpValue({
     };
     raf = requestAnimationFrame(tick);
     cancelRef.current = () => cancelAnimationFrame(raf);
-  };
+  }, [replayKey, value]);
 
   return (
-    <strong className={className} onMouseEnter={run}>
+    <strong className={className}>
       {prefix}
       {display}
       {suffix}
     </strong>
+  );
+}
+
+function useHoverReplay() {
+  const [replayKey, setReplayKey] = useState(0);
+  return {
+    replayKey,
+    onMouseEnter: () => setReplayKey((n) => n + 1),
+  };
+}
+
+function KpiRow({
+  deltaRw,
+  deltaLnw,
+  quieterAir,
+  quieterImpact,
+  quieterMax,
+  echoBefore,
+  echoAfter,
+  rwBefore,
+  rwAfter,
+  lnwBefore,
+  lnwAfter,
+}: {
+  deltaRw: number;
+  deltaLnw: number;
+  quieterAir: number;
+  quieterImpact: number;
+  quieterMax: number;
+  echoBefore: number;
+  echoAfter: number;
+  rwBefore: number;
+  rwAfter: number;
+  lnwBefore: number;
+  lnwAfter: number;
+}) {
+  const rw = useHoverReplay();
+  const lnw = useHoverReplay();
+  const comfort = useHoverReplay();
+  const quieter = useHoverReplay();
+
+  return (
+    <section
+      className={`${styles.kpiRow} ${styles.driftSoft}`}
+      data-reveal
+      aria-label="Ключевые показатели"
+    >
+      <article className={styles.kpiCard} onMouseEnter={rw.onMouseEnter}>
+        <span className={styles.kpiLabel}>Δ Rw · изоляция воздушного шума</span>
+        <div className={styles.kpiMain}>
+          <CountUpValue
+            className={styles.kpiValue}
+            value={deltaRw}
+            prefix="+"
+            suffix={<em>дБ</em>}
+            replayKey={rw.replayKey}
+          />
+          <DeltaBars before={rwBefore} after={rwAfter} />
+        </div>
+        {quieterAir > 0 ? (
+          <span className={styles.kpiPill}>≈ на {quieterAir}% тише</span>
+        ) : (
+          <span className={styles.kpiPillLight}>без заметного снижения</span>
+        )}
+      </article>
+      <article className={styles.kpiCard} onMouseEnter={lnw.onMouseEnter}>
+        <span className={styles.kpiLabel}>Δ Lnw · уровень ударного шума</span>
+        <div className={styles.kpiMain}>
+          <CountUpValue
+            className={styles.kpiValue}
+            value={deltaLnw}
+            prefix="−"
+            suffix={<em>дБ</em>}
+            replayKey={lnw.replayKey}
+          />
+          <DeltaBars before={lnwBefore} after={lnwAfter} invert />
+        </div>
+        {quieterImpact > 0 ? (
+          <span className={styles.kpiPill}>≈ на {quieterImpact}% тише</span>
+        ) : (
+          <span className={styles.kpiPillLight}>без заметного снижения</span>
+        )}
+      </article>
+      <article className={styles.kpiCard} onMouseEnter={comfort.onMouseEnter}>
+        <span className={styles.kpiLabel}>Акустический комфорт</span>
+        <EchoComfortRings
+          before={echoBefore}
+          after={echoAfter}
+          compact
+          hoverPlay={comfort.replayKey}
+        />
+      </article>
+      <article className={styles.kpiCard} onMouseEnter={quieter.onMouseEnter}>
+        <span className={styles.kpiLabel}>Тише на слух</span>
+        <CountUpValue
+          className={styles.kpiValue}
+          value={quieterMax}
+          prefix="≈"
+          suffix={<em>%</em>}
+          replayKey={quieter.replayKey}
+        />
+        <span className={styles.kpiPill}>
+          воздух {quieterAir}% · удар {quieterImpact}%
+        </span>
+      </article>
+    </section>
   );
 }
 
@@ -178,66 +287,19 @@ export function ResultWideScreen() {
         </dl>
       </section>
 
-      <section className={`${styles.kpiRow} ${styles.driftSoft}`} data-reveal aria-label="Ключевые показатели">
-        <article className={styles.kpiCard}>
-          <span className={styles.kpiLabel}>
-            Δ Rw · изоляция воздушного шума
-          </span>
-          <div className={styles.kpiMain}>
-            <CountUpValue
-              className={styles.kpiValue}
-              value={deltaRw}
-              prefix="+"
-              suffix={<em>дБ</em>}
-            />
-            <DeltaBars before={p.sim.before.Rw} after={p.sim.after.Rw} />
-          </div>
-          {quieterAir > 0 ? (
-            <span className={styles.kpiPill}>≈ на {quieterAir}% тише</span>
-          ) : (
-            <span className={styles.kpiPillLight}>без заметного снижения</span>
-          )}
-        </article>
-        <article className={styles.kpiCard}>
-          <span className={styles.kpiLabel}>
-            Δ Lnw · уровень ударного шума
-          </span>
-          <div className={styles.kpiMain}>
-            <CountUpValue
-              className={styles.kpiValue}
-              value={deltaLnw}
-              prefix="−"
-              suffix={<em>дБ</em>}
-            />
-            <DeltaBars before={p.sim.before.Lnw} after={p.sim.after.Lnw} invert />
-          </div>
-          {quieterImpact > 0 ? (
-            <span className={styles.kpiPill}>≈ на {quieterImpact}% тише</span>
-          ) : (
-            <span className={styles.kpiPillLight}>без заметного снижения</span>
-          )}
-        </article>
-        <article className={styles.kpiCard}>
-          <span className={styles.kpiLabel}>Акустический комфорт</span>
-          <EchoComfortRings
-            before={p.sim.reverb.echoInRoomBefore}
-            after={p.sim.reverb.echoInRoomAfter}
-            compact
-          />
-        </article>
-        <article className={styles.kpiCard}>
-          <span className={styles.kpiLabel}>Тише на слух</span>
-          <CountUpValue
-            className={styles.kpiValue}
-            value={quieterMax}
-            prefix="≈"
-            suffix={<em>%</em>}
-          />
-          <span className={styles.kpiPill}>
-            воздух {quieterAir}% · удар {quieterImpact}%
-          </span>
-        </article>
-      </section>
+      <KpiRow
+        deltaRw={deltaRw}
+        deltaLnw={deltaLnw}
+        quieterAir={quieterAir}
+        quieterImpact={quieterImpact}
+        quieterMax={quieterMax}
+        echoBefore={p.sim.reverb.echoInRoomBefore}
+        echoAfter={p.sim.reverb.echoInRoomAfter}
+        rwBefore={p.sim.before.Rw}
+        rwAfter={p.sim.after.Rw}
+        lnwBefore={p.sim.before.Lnw}
+        lnwAfter={p.sim.after.Lnw}
+      />
 
       <section className={`${styles.panel} ${styles.driftSoft}`} data-reveal aria-label="Нормы комфорта для жилья">
         <div className={styles.normsHead}>
@@ -465,14 +527,17 @@ export function ResultWideScreen() {
         </section>
       </div>
 
-      <div className={styles.footerActions}>
-        <Button variant="ghost" onClick={goBack}>
+      <nav className={styles.footerActions} aria-label="Действия после расчёта">
+        <button type="button" className={styles.footerBtn} onClick={goBack}>
+          <span className={styles.footerBtnIcon} aria-hidden>
+            ←
+          </span>
           Назад
-        </Button>
-        <Button variant="ghost" onClick={p.restart}>
+        </button>
+        <button type="button" className={styles.footerBtnAccent} onClick={p.restart}>
           Пройти ещё раз
-        </Button>
-      </div>
+        </button>
+      </nav>
     </div>
   );
 }
