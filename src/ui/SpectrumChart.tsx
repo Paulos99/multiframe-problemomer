@@ -161,8 +161,8 @@ export function SpectrumChart({
   const padR = 10;
   const padT = 10;
   const padB = 22;
-  const W = tall ? 560 : 360;
-  const H = tall ? 300 : 168;
+  const W = tall ? 580 : 360;
+  const H = tall ? 320 : 168;
   const plotW = W - padL - padR;
   const plotH = H - padT - padB;
 
