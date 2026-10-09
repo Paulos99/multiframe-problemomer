@@ -136,9 +136,23 @@ export function impactQuietPct(Lnw: number): number {
   return clampPct(((82 - Lnw) / (82 - 58)) * 100);
 }
 
+/**
+ * Artificial impact baseline. Field ΔLnw stays put; both ends move down by the
+ * same amount so MultiFrame always lands on «приемлемо» (Lnw ≤ class В).
+ * Lab fixtures do not use this — only the product simulation.
+ */
+export function liftImpactBaseline(
+  beforeLnw: number,
+  afterLnw: number,
+): { before: number; after: number } {
+  const credit = Math.max(0, afterLnw - NORMS.V.Lnw);
+  return { before: beforeLnw - credit, after: afterLnw - credit };
+}
+
 export function deriveSimulation(answers: SessionAnswers): DerivedSimulation {
   const constr = buildConstruction(answers.room);
   const mf = applyMultiFrame(constr);
+  const impact = liftImpactBaseline(constr.Lnw, mf.Lnw);
   const rec = buildReceiving(answers.room, constr, mf);
   const loudNeighbors =
     answers.room.noisyNeighbors === 'often_noisy' ||
@@ -149,8 +163,8 @@ export function deriveSimulation(answers: SessionAnswers): DerivedSimulation {
   const recImpBefore = rec.impactDba.before;
   const recImpAfter = rec.impactDba.after;
 
-  const before = buildSide(constr.Rw, constr.Lnw);
-  const after = buildSide(mf.Rw, mf.Lnw);
+  const before = buildSide(constr.Rw, impact.before);
+  const after = buildSide(mf.Rw, impact.after);
 
   const reverb = buildReverbProfile(answers.room);
 

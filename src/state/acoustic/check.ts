@@ -324,6 +324,51 @@ export function assertModelAnchors(): string[] {
   if (FELT_STEPS.indexOf(kidsImpactFeltBefore) < 0) {
     errors.push(`invalid impact felt step ${kidsImpactFeltBefore}`);
   }
+  const kidsImpactFeltAfter = impactFeltFromIndex(simKidsMono.after.Lnw);
+  if (FELT_STEPS.indexOf(kidsImpactFeltAfter) < FELT_STEPS.indexOf('acceptable')) {
+    errors.push(
+      `kids mono impact after must reach приемлемо (got ${kidsImpactFeltAfter}, Lnw ${simKidsMono.after.Lnw})`,
+    );
+  }
+
+  const harshImpact = [
+    sampleAnswers({
+      slabType: 'wood',
+      houseType: 'panel',
+      slabThickness: 'up_to_160',
+      floorAbove: 'unknown',
+      objectStage: 'newbuild',
+    }),
+    sampleAnswers({
+      slabType: 'monolith',
+      houseType: 'panel',
+      slabThickness: 'up_to_160',
+      floorAbove: 'ordinary',
+      objectStage: 'occupied',
+    }),
+    sampleAnswers({
+      slabType: 'hollow',
+      houseType: 'panel',
+      slabThickness: 'about_200_250',
+      floorAbove: 'ordinary',
+      objectStage: 'occupied',
+    }),
+  ];
+  for (const answers of harshImpact) {
+    const sim = deriveSimulation(answers);
+    const afterStep = impactFeltFromIndex(sim.after.Lnw);
+    if (FELT_STEPS.indexOf(afterStep) < FELT_STEPS.indexOf('acceptable')) {
+      errors.push(
+        `impact after must reach приемлемо (${answers.room.slabType}/${answers.room.houseType}: ${afterStep}, Lnw ${sim.after.Lnw})`,
+      );
+    }
+    if (sim.after.Lnw > NORMS.V.Lnw) {
+      errors.push(`impact after Lnw ${sim.after.Lnw} is above class В`);
+    }
+    if (sim.after.Lnw > sim.before.Lnw) {
+      errors.push('impact baseline lift made after worse than before');
+    }
+  }
 
   const simKitchen = deriveSimulation(
     sampleAnswers({
