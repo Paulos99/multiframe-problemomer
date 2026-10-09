@@ -1,5 +1,7 @@
-/** Inline SVG for PDF/HTML reports — same geometry as SpectrumChart. */
+/** Inline SVG for PDF/HTML reports — dashboard-quality spectrum charts. */
 import type { SpectrumSeries } from './types';
+
+type Pt = { x: number; y: number };
 
 function xAt(hz: number, hzMin: number, hzMax: number, x0: number, w: number): number {
   const t =
@@ -24,10 +26,14 @@ function niceRange(min: number, max: number): { yMin: number; yMax: number; tick
 }
 
 function formatHz(hz: number): string {
-  return hz >= 1000 ? `${hz / 1000}k` : String(hz);
+  if (hz >= 1000) {
+    const k = hz / 1000;
+    return Number.isInteger(k) ? `${k}k` : `${k.toFixed(1)}k`;
+  }
+  return String(Math.round(hz));
 }
 
-function polyline(
+function toPts(
   hz: readonly number[],
   values: number[],
   x0: number,
@@ -36,45 +42,47 @@ function polyline(
   h: number,
   yMin: number,
   yMax: number,
-): string {
+): Pt[] {
   const hzMin = hz[0] ?? 100;
   const hzMax = hz[hz.length - 1] ?? 5000;
-  return values
-    .map((v, i) => {
-      const x = xAt(hz[i] ?? hzMin, hzMin, hzMax, x0, w);
-      const y = yAt(v, yMin, yMax, y0, h);
-      return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
-    })
-    .join(' ');
+  return values.map((v, i) => ({
+    x: xAt(hz[i] ?? hzMin, hzMin, hzMax, x0, w),
+    y: yAt(v, yMin, yMax, y0, h),
+  }));
 }
 
-function gainArea(
-  hz: readonly number[],
-  before: number[],
-  after: number[],
-  x0: number,
-  y0: number,
-  w: number,
-  h: number,
-  yMin: number,
-  yMax: number,
-): string {
-  const hzMin = hz[0] ?? 100;
-  const hzMax = hz[hz.length - 1] ?? 5000;
-  const afterPts = after.map((v, i) => {
-    const x = xAt(hz[i] ?? hzMin, hzMin, hzMax, x0, w);
-    const y = yAt(v, yMin, yMax, y0, h);
-    return `${x.toFixed(1)},${y.toFixed(1)}`;
-  });
-  const beforePts = before
-    .map((v, i) => {
-      const x = xAt(hz[i] ?? hzMin, hzMin, hzMax, x0, w);
-      const y = yAt(v, yMin, yMax, y0, h);
-      return `${x.toFixed(1)},${y.toFixed(1)}`;
-    })
-    .reverse();
-  if (!afterPts.length) return '';
-  return `M${afterPts.join(' L')} L${beforePts.join(' L')} Z`;
+/** Catmull-Rom → cubic Bezier (same as SpectrumChart). */
+function smoothPath(pts: Pt[]): string {
+  if (!pts.length) return '';
+  if (pts.length === 1) return `M${pts[0]!.x.toFixed(1)},${pts[0]!.y.toFixed(1)}`;
+  let d = `M${pts[0]!.x.toFixed(1)},${pts[0]!.y.toFixed(1)}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1] ?? pts[i]!;
+    const p1 = pts[i]!;
+    const p2 = pts[i + 1]!;
+    const p3 = pts[i + 2] ?? p2;
+    const c1x = p1.x + (p2.x - p0.x) / 6;
+    const c1y = p1.y + (p2.y - p0.y) / 6;
+    const c2x = p2.x - (p3.x - p1.x) / 6;
+    const c2y = p2.y - (p3.y - p1.y) / 6;
+    d += ` C${c1x.toFixed(1)},${c1y.toFixed(1)} ${c2x.toFixed(1)},${c2y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
+  }
+  return d;
+}
+
+function areaUnder(pts: Pt[], yBase: number): string {
+  if (!pts.length) return '';
+  const first = pts[0]!;
+  const last = pts[pts.length - 1]!;
+  return `${smoothPath(pts)} L${last.x.toFixed(1)},${yBase.toFixed(1)} L${first.x.toFixed(1)},${yBase.toFixed(1)} Z`;
+}
+
+function gainBand(beforePts: Pt[], afterPts: Pt[]): string {
+  if (!beforePts.length || !afterPts.length) return '';
+  const beforeRev = [...beforePts].reverse();
+  return `M${afterPts.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' L')} L${beforeRev
+    .map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`)
+    .join(' L')} Z`;
 }
 
 export function spectrumChartSvg(
@@ -85,51 +93,51 @@ export function spectrumChartSvg(
     indexKind: 'Rw' | 'Lnw';
     indexBefore: number;
     indexAfter: number;
-    /** SVG canvas height in user units (default 260). */
+    quieterPct?: number;
+    /** SVG canvas height in user units (default 280). */
     height?: number;
   },
 ): string {
-  const padL = 36;
-  const padR = 12;
-  const padT = 14;
-  const padB = 28;
-  const W = 640;
-  const H = opts.height ?? 260;
+  const padL = 42;
+  const padR = 14;
+  const padT = 16;
+  const padB = 30;
+  const W = 700;
+  const H = opts.height ?? 280;
   const plotW = W - padL - padR;
   const plotH = H - padT - padB;
   const all = [...series.before, ...series.after];
   const { yMin, yMax, ticks } = niceRange(Math.min(...all), Math.max(...all));
   const hzMin = series.hz[0] ?? 100;
   const hzMax = series.hz[series.hz.length - 1] ?? 5000;
-  const beforePath = polyline(series.hz, series.before, padL, padT, plotW, plotH, yMin, yMax);
-  const afterPath = polyline(series.hz, series.after, padL, padT, plotW, plotH, yMin, yMax);
-  const area = gainArea(
-    series.hz,
-    series.before,
-    series.after,
-    padL,
-    padT,
-    plotW,
-    plotH,
-    yMin,
-    yMax,
-  );
+  const beforePts = toPts(series.hz, series.before, padL, padT, plotW, plotH, yMin, yMax);
+  const afterPts = toPts(series.hz, series.after, padL, padT, plotW, plotH, yMin, yMax);
+  const beforePath = smoothPath(beforePts);
+  const afterPath = smoothPath(afterPts);
+  const fillPath = areaUnder(afterPts, padT + plotH);
+  const band = gainBand(beforePts, afterPts);
   const xLabels = [100, 250, 500, 1000, 2000, 5000];
+  const gradId = `af-${opts.indexKind}-${Math.round(opts.indexAfter)}`;
 
   const grid = ticks
     .map((tick) => {
       const y = yAt(tick, yMin, yMax, padT, plotH);
-      return `<line x1="${padL}" x2="${W - padR}" y1="${y}" y2="${y}" stroke="#e1e5e8" stroke-width="1"/>
-        <text x="${padL - 6}" y="${y + 3}" text-anchor="end" fill="#5f6b73" font-size="9" font-weight="500">${tick}</text>`;
+      return `<line x1="${padL}" x2="${W - padR}" y1="${y}" y2="${y}" stroke="#e4ebe7" stroke-width="1"/>
+        <text x="${padL - 8}" y="${y + 3.5}" text-anchor="end" fill="#68757e" font-size="11" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">${tick}</text>`;
     })
     .join('');
 
   const xTicks = xLabels
     .map((hz) => {
       const x = xAt(hz, hzMin, hzMax, padL, plotW);
-      return `<text x="${x}" y="${H - 8}" text-anchor="middle" fill="#5f6b73" font-size="9" font-weight="500">${formatHz(hz)}</text>`;
+      return `<text x="${x}" y="${H - 8}" text-anchor="middle" fill="#68757e" font-size="11" font-weight="600" font-family="Segoe UI, system-ui, sans-serif">${formatHz(hz)}</text>`;
     })
     .join('');
+
+  const quieter =
+    opts.quieterPct != null && opts.quieterPct > 0
+      ? `<span class="badge-quiet">≈ ${opts.quieterPct}% тише</span>`
+      : '';
 
   return `<figure class="chart">
   <figcaption>
@@ -137,16 +145,48 @@ export function spectrumChartSvg(
       <strong>${opts.title}</strong>
       <span>${opts.subtitle}</span>
     </div>
-    <div class="badge"><b>${opts.indexKind}</b><span>≈ ${Math.round(opts.indexBefore)} → ≈ ${Math.round(opts.indexAfter)}</span></div>
+    <div class="badge">
+      <b>${opts.indexKind}</b>
+      <span>≈ ${Math.round(opts.indexBefore)} → ≈ ${Math.round(opts.indexAfter)}</span>
+      ${quieter}
+    </div>
   </figcaption>
   <svg viewBox="0 0 ${W} ${H}" width="100%" xmlns="http://www.w3.org/2000/svg" role="img">
+    <defs>
+      <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#01644f" stop-opacity="0.32"/>
+        <stop offset="100%" stop-color="#01644f" stop-opacity="0.03"/>
+      </linearGradient>
+    </defs>
     ${grid}
     ${xTicks}
-    <text x="12" y="${padT + plotH / 2}" fill="#5f6b73" font-size="9" font-weight="500" text-anchor="middle" transform="rotate(-90 12 ${padT + plotH / 2})">дБ</text>
-    <path d="${area}" fill="#01644f" opacity="0.18"/>
-    <path d="${beforePath}" fill="none" stroke="#7a8790" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="${afterPath}" fill="none" stroke="#01644f" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/>
+    <text x="13" y="${padT + plotH / 2}" fill="#68757e" font-size="11" font-weight="650" text-anchor="middle" font-family="Segoe UI, system-ui, sans-serif" transform="rotate(-90 13 ${padT + plotH / 2})">дБ</text>
+    <path d="${fillPath}" fill="url(#${gradId})"/>
+    <path d="${band}" fill="#01644f" opacity="0.12"/>
+    <path d="${beforePath}" fill="none" stroke="#7a8790" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="${afterPath}" fill="none" stroke="#01644f" stroke-width="2.7" stroke-linejoin="round" stroke-linecap="round"/>
   </svg>
-  <ul class="legend"><li><i class="sw-b"></i>Сейчас</li><li><i class="sw-a"></i>С MultiFrame</li></ul>
+  <ul class="legend"><li><i class="sw-b"></i>Сейчас</li><li><i class="sw-a"></i>MultiFrame</li></ul>
 </figure>`;
+}
+
+/** Compact SVG comfort ring for PDF KPI cards. */
+export function comfortRingSvg(pct: number, label: string, accent: boolean): string {
+  const clamped = Math.max(0, Math.min(100, Math.round(pct)));
+  const size = 92;
+  const r = 36;
+  const c = 2 * Math.PI * r;
+  const offset = c * (1 - clamped / 100);
+  const stroke = accent ? '#01644f' : '#7a8790';
+  const color = accent ? '#01644f' : '#152018';
+  const mid = size / 2;
+  return `<div class="ring">
+    <svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="${mid}" cy="${mid}" r="${r}" fill="none" stroke="#e1e8e4" stroke-width="8"/>
+      <circle cx="${mid}" cy="${mid}" r="${r}" fill="none" stroke="${stroke}" stroke-width="8" stroke-linecap="round"
+        stroke-dasharray="${c.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}"
+        transform="rotate(-90 ${mid} ${mid})"/>
+    </svg>
+    <div class="ring-center" style="color:${color}"><b>${clamped}%</b><span>${label}</span></div>
+  </div>`;
 }

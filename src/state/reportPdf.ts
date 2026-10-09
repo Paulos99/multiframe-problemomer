@@ -1,8 +1,9 @@
 /**
- * Acoustic profile PDF — multi-page A4 document (one canvas per page → jsPDF).
- * Designed as a room acoustic passport, not a screenshot dump.
+ * Acoustic profile PDF — multi-page A4, dashboard-styled (not a Word dump).
  */
+import QRCode from 'qrcode';
 import {
+  CALCULATOR_URL,
   HOUSE_TYPE_OPTIONS,
   ROOM_TYPE_LABELS,
   ROOM_WISH_OPTIONS,
@@ -24,7 +25,7 @@ import {
 } from './simulation';
 import { buildLeadHandoff, withDerived } from './session';
 import { buildAirSpectrum, buildImpactSpectrum } from './spectrum';
-import { spectrumChartSvg } from './chartSvg';
+import { comfortRingSvg, spectrumChartSvg } from './chartSvg';
 import { wishScenarioLine, stretchDrumLine } from './wish';
 import {
   buildShareClipboardText,
@@ -37,14 +38,16 @@ import type { ClassLabel } from './types';
 const PAGE_W = 794;
 const PAGE_H = 1123;
 
+const SITE_URL = 'https://stp-multiframe.ru';
+
 const PILLARS = [
   {
     title: 'Звукоизоляция и акустический комфорт',
-    text: 'Снижает воздушный и ударный шум — в комнате становится спокойнее.',
+    text: 'Снижает шум сверху и поглощает звук в комнате — меньше эха, спокойнее пространство.',
   },
   {
     title: 'Безопасность',
-    text: 'Материалы для жилых помещений: спальня, детская, кухня и ванная.',
+    text: 'Материалы безопасны для жилых помещений: спальня, детская, кухня и ванная.',
   },
   {
     title: 'Экологичность',
@@ -52,13 +55,15 @@ const PILLARS = [
   },
   {
     title: 'Быстрый монтаж',
-    text: 'Сначала панели, потом натяжное полотно. Без каркаса и без лишней потери высоты.',
+    text: 'Сначала панели, затем натяжное полотно — без каркаса и без долгой стройки.',
   },
   {
     title: 'Универсальность',
-    text: 'Подходит к любому перекрытию и к любой стадии ремонта.',
+    text: 'Подходит к любому типу перекрытия на любой стадии ремонта.',
   },
 ] as const;
+
+type QrBundle = { site: string; calc: string };
 
 function optLabel<T extends string>(
   options: { id: T; label: string }[],
@@ -89,12 +94,32 @@ function formatDateRu(d = new Date()): string {
   });
 }
 
+async function buildQrBundle(): Promise<QrBundle> {
+  const opts = {
+    width: 280,
+    margin: 1,
+    color: { dark: '#0c332c', light: '#ffffff' },
+    errorCorrectionLevel: 'M' as const,
+  };
+  const [site, calc] = await Promise.all([
+    QRCode.toDataURL(SITE_URL, opts),
+    QRCode.toDataURL(CALCULATOR_URL, opts),
+  ]);
+  return { site, calc };
+}
+
 function pageChrome(page: number, total: number, roomLine: string): string {
   return `
   <div class="page-top">
     <div class="brand-row">
-      <span class="brand">StP MultiFrame</span>
-      <span class="doc-type">Акустический профиль помещения</span>
+      <div class="brand-lockup">
+        <span class="brand-mark">StP</span>
+        <div>
+          <span class="brand">MultiFrame</span>
+          <span class="brand-sub">Проблемомер</span>
+        </div>
+      </div>
+      <span class="doc-type">Акустический профиль</span>
     </div>
     <div class="meta-row">
       <span>${escapeHtml(roomLine)}</span>
@@ -102,12 +127,12 @@ function pageChrome(page: number, total: number, roomLine: string): string {
     </div>
   </div>
   <div class="page-bottom">
-    <span>stp-multiframe.ru · MultiFrame Проблемомер</span>
+    <span>stp-multiframe.ru · экспертная оценка, не инженерный расчёт</span>
     <span>${page} / ${total}</span>
   </div>`;
 }
 
-function buildReportDocument(session: SessionState): string {
+function buildReportDocument(session: SessionState, qr: QrBundle): string {
   const handoff = buildLeadHandoff(session);
   const room = handoff.room;
   const slab = resolveSlab(room);
@@ -134,13 +159,21 @@ function buildReportDocument(session: SessionState): string {
   const airSeries = buildAirSpectrum(session.answers);
   const impactSeries = buildImpactSpectrum(session.answers);
 
+  const deltaRw = Math.abs(Math.round(sim.delta.Rw));
+  const deltaLnw = Math.abs(Math.round(sim.delta.Lnw));
+  const quieterMax = Math.max(sim.perceivedAirPct, sim.perceivedImpactPct);
+  const comfortBefore = Math.max(0, Math.min(100, 100 - rev.echoInRoomBefore));
+  const comfortAfter = Math.max(0, Math.min(100, 100 - rev.echoInRoomAfter));
+  const echoDrop = Math.max(0, rev.echoInRoomBefore - rev.echoInRoomAfter);
+
   const airSvg = spectrumChartSvg(airSeries, {
     title: 'Воздушный шум (голоса и музыка)',
     subtitle: 'изоляция от голосов и музыки сверху',
     indexKind: 'Rw',
     indexBefore: b.Rw,
     indexAfter: a.Rw,
-    height: 210,
+    quieterPct: sim.perceivedAirPct,
+    height: 268,
   });
   const impactSvg = spectrumChartSvg(impactSeries, {
     title: 'Ударный шум (шаги и падения)',
@@ -148,12 +181,13 @@ function buildReportDocument(session: SessionState): string {
     indexKind: 'Lnw',
     indexBefore: b.Lnw,
     indexAfter: a.Lnw,
-    height: 210,
+    quieterPct: sim.perceivedImpactPct,
+    height: 268,
   });
 
   const pillars = PILLARS.map(
-    (p, i) =>
-      `<li><span class="n">${i + 1}</span><div><strong>${escapeHtml(p.title)}</strong><p>${escapeHtml(p.text)}</p></div></li>`,
+    (p) =>
+      `<li class="pillar"><span class="pillar-mark"></span><div><strong>${escapeHtml(p.title)}</strong><p>${escapeHtml(p.text)}</p></div></li>`,
   ).join('');
 
   const wishBlock =
@@ -163,354 +197,483 @@ function buildReportDocument(session: SessionState): string {
         ? `<p class="lead">${escapeHtml(drum)}</p>`
         : `<p class="lead">Прогноз по голосам и шагам сверху для этого перекрытия.</p>`;
 
+  const normRow = (key: string, label: string, rw: string, lnw: string, muted?: boolean) => {
+    const isNow = key === hybridBefore;
+    const isMf = key === hybridAfter;
+    const pills = [
+      isNow ? `<span class="pill-now">Сейчас</span>` : '',
+      isMf ? `<span class="pill-mf">MultiFrame</span>` : '',
+    ].join('');
+    return `<tr class="${muted ? 'muted' : ''} ${isNow || isMf ? 'marked' : ''}">
+      <td><span class="norm-level">${escapeHtml(label)}${pills}</span></td>
+      <td>${rw}</td><td>${lnw}</td>
+    </tr>`;
+  };
+
   const TOTAL = 4;
 
   return `<!DOCTYPE html>
 <html lang="ru"><head><meta charset="utf-8" />
 <style>
   * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; background: #fff; }
+  html, body { margin: 0; padding: 0; background: #f4f7f6; }
   body {
     font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
     color: #152018;
     -webkit-font-smoothing: antialiased;
   }
-  .sheet { width: ${PAGE_W}px; background: #fff; }
+  .sheet { width: ${PAGE_W}px; background: #f4f7f6; }
 
   .page {
     width: ${PAGE_W}px;
     height: ${PAGE_H}px;
-    padding: 36px 44px 52px;
+    padding: 28px 36px 48px;
     position: relative;
-    background: #fff;
+    background:
+      radial-gradient(120% 60% at 100% 0%, rgba(1,100,79,.06), transparent 55%),
+      #f4f7f6;
     overflow: hidden;
   }
   .page::before {
     content: "";
-    position: absolute; left: 0; top: 0; right: 0; height: 5px;
-    background: linear-gradient(90deg, #01644f 0%, #1a8f72 55%, #01644f 100%);
+    position: absolute; left: 0; top: 0; right: 0; height: 6px;
+    background: linear-gradient(90deg, #0c332c 0%, #01644f 45%, #2ab38b 100%);
   }
 
-  .page-top { margin-bottom: 22px; padding-bottom: 12px; border-bottom: 1px solid #d7e2dc; }
+  .page-top { margin-bottom: 18px; }
   .brand-row {
-    display: flex; justify-content: space-between; align-items: baseline;
-    gap: 16px; margin-bottom: 6px;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 16px; margin-bottom: 8px;
+  }
+  .brand-lockup { display: flex; align-items: center; gap: 10px; }
+  .brand-mark {
+    display: grid; place-items: center;
+    width: 34px; height: 34px; border-radius: 10px;
+    background: linear-gradient(135deg, #0c332c, #01644f);
+    color: #fff; font-size: 11px; font-weight: 800; letter-spacing: .04em;
   }
   .brand {
-    font-size: 12px; font-weight: 800; letter-spacing: .12em;
-    text-transform: uppercase; color: #01644f;
+    display: block; font-size: 15px; font-weight: 800; letter-spacing: -.02em; color: #0f1c16;
+  }
+  .brand-sub {
+    display: block; font-size: 11px; font-weight: 650; color: #5f6b73; margin-top: 1px;
   }
   .doc-type {
-    font-size: 11px; font-weight: 650; color: #5f6b73; letter-spacing: .02em;
+    font-size: 11px; font-weight: 750; color: #01644f;
+    letter-spacing: .08em; text-transform: uppercase;
+    padding: 6px 10px; border-radius: 999px;
+    background: rgba(1,100,79,.1);
   }
   .meta-row {
     display: flex; justify-content: space-between; gap: 12px;
-    font-size: 11px; color: #5f6b73;
+    font-size: 11px; color: #5f6b73; padding-top: 8px;
+    border-top: 1px solid #dce6e1;
   }
 
   .page-bottom {
-    position: absolute; left: 44px; right: 44px; bottom: 22px;
+    position: absolute; left: 36px; right: 36px; bottom: 18px;
     display: flex; justify-content: space-between; gap: 12px;
-    padding-top: 10px; border-top: 1px solid #d7e2dc;
+    padding-top: 10px; border-top: 1px solid #dce6e1;
     font-size: 10px; color: #7a8790;
   }
 
   .hero-title {
-    margin: 0 0 6px;
-    font-size: 28px; font-weight: 750; letter-spacing: -.025em; line-height: 1.15;
+    margin: 0 0 4px;
+    font-size: 26px; font-weight: 800; letter-spacing: -.03em; line-height: 1.15;
     color: #0f1c16;
   }
   .hero-sub {
-    margin: 0 0 18px;
-    font-size: 14px; color: #5f6b73; line-height: 1.4;
+    margin: 0 0 16px;
+    font-size: 13px; color: #5f6b73; line-height: 1.4;
   }
-  .hero-sub b { color: #01644f; font-weight: 700; }
+  .hero-sub b { color: #01644f; font-weight: 750; }
 
-  .sec {
-    margin: 0 0 10px;
-    display: flex; align-items: baseline; gap: 10px;
+  .object {
+    display: grid; grid-template-columns: 120px 1fr; gap: 0;
+    border-radius: 18px; overflow: hidden; margin-bottom: 14px;
+    background: linear-gradient(135deg, #0c332c 0%, #01644f 55%, #0f463c 100%);
+    color: #e8f2ef; box-shadow: 0 10px 28px rgba(1,100,79,.22);
   }
-  .sec .idx {
-    font-size: 11px; font-weight: 800; letter-spacing: .1em;
+  .object-label {
+    display: flex; flex-direction: column; justify-content: center;
+    gap: 4px; padding: 16px 14px 16px 18px;
+    border-right: 1px solid rgba(255,255,255,.12);
+  }
+  .object-label span {
+    font-size: 9px; font-weight: 750; letter-spacing: .14em; text-transform: uppercase; opacity: .7;
+  }
+  .object-label strong { font-size: 18px; font-weight: 800; letter-spacing: -.02em; }
+  .object-grid {
+    margin: 0; padding: 12px 12px 12px 8px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  }
+  .object-grid div {
+    padding: 10px 11px; border-radius: 12px;
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.1);
+  }
+  .object-grid dt {
+    margin: 0 0 3px; font-size: 9px; font-weight: 650;
+    letter-spacing: .04em; text-transform: uppercase; opacity: .65;
+  }
+  .object-grid dd {
+    margin: 0; font-size: 12px; font-weight: 700; line-height: 1.3; color: #fff;
+  }
+
+  .kpi-row {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+    margin-bottom: 16px;
+  }
+  .kpi {
+    display: flex; flex-direction: column; gap: 8px;
+    padding: 14px 13px 13px; border-radius: 16px;
+    background: #fff; border: 1px solid #dce6e1;
+    box-shadow: 0 1px 2px rgba(17,24,39,.04), 0 8px 18px rgba(17,24,39,.04);
+    min-width: 0; min-height: 118px;
+  }
+  .kpi .k {
+    font-size: 10.5px; font-weight: 650; color: #5f6b73; line-height: 1.25;
+  }
+  .kpi .v {
+    font-size: 28px; font-weight: 850; letter-spacing: -.04em; line-height: 1;
+    font-variant-numeric: tabular-nums; color: #0f1c16;
+  }
+  .kpi .v em {
+    font-style: normal; font-size: 12px; font-weight: 700;
+    color: #5f6b73; margin-left: 3px; vertical-align: .15em;
+  }
+  .kpi .pill {
+    align-self: flex-start;
+    display: inline-flex; align-items: center;
+    padding: 3px 8px; border-radius: 999px;
+    font-size: 10px; font-weight: 750; color: #01644f;
+    background: rgba(1,100,79,.12);
+  }
+
+  .card {
+    padding: 14px 16px; border-radius: 16px;
+    background: #fff; border: 1px solid #dce6e1;
+    box-shadow: 0 1px 2px rgba(17,24,39,.04), 0 8px 18px rgba(17,24,39,.04);
+    margin-bottom: 12px;
+  }
+  .card h2 {
+    margin: 0 0 8px; font-size: 14px; font-weight: 800; letter-spacing: -.02em;
+  }
+  .sec-idx {
+    display: inline-block; margin-right: 8px;
+    font-size: 10px; font-weight: 800; letter-spacing: .1em;
     color: #01644f; text-transform: uppercase;
   }
-  .sec h2 {
-    margin: 0; font-size: 15px; font-weight: 750; letter-spacing: -.01em;
-  }
-  .block { margin-bottom: 18px; }
 
-  .passport {
-    width: 100%; border-collapse: collapse;
-    border: 1px solid #d7e2dc; border-radius: 4px; overflow: hidden;
+  .compare {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
   }
-  .passport th, .passport td {
-    padding: 10px 12px; text-align: left; vertical-align: top;
-    border-bottom: 1px solid #e6eeea; font-size: 12.5px; line-height: 1.35;
+  .cmp {
+    padding: 18px 16px; border-radius: 14px; border: 1px solid #dce6e1; background: #f7faf8;
+    min-height: 148px;
   }
-  .passport tr:last-child th, .passport tr:last-child td { border-bottom: none; }
-  .passport th {
-    width: 28%; font-size: 11px; font-weight: 650; color: #5f6b73;
-    background: #f4f8f6; letter-spacing: .02em;
+  .cmp.after {
+    background: linear-gradient(155deg, #01644f, #0c332c);
+    border-color: #01644f; color: #fff;
   }
-  .passport td { font-weight: 650; color: #152018; background: #fff; }
-
-  .status-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  .cmp .k {
+    font-size: 11px; font-weight: 800; letter-spacing: .1em;
+    text-transform: uppercase; opacity: .75; margin-bottom: 8px;
   }
-  .status {
-    border: 1px solid #d7e2dc; padding: 12px 14px; background: #fff;
-  }
-  .status .k {
-    font-size: 10px; font-weight: 800; letter-spacing: .08em;
-    text-transform: uppercase; color: #5f6b73; margin-bottom: 6px;
-  }
-  .status .v { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
-  .status .s { font-size: 11.5px; color: #5f6b73; }
-
-  .comfort-banner {
-    margin-top: 10px; padding: 12px 14px;
-    background: #f0f7f4; border-left: 3px solid #01644f;
-  }
-  .comfort-banner .k {
-    font-size: 10px; font-weight: 800; letter-spacing: .08em;
-    text-transform: uppercase; color: #5f6b73;
-  }
-  .comfort-banner .v {
-    margin-top: 4px; font-size: 16px; font-weight: 750; color: #0f1c16;
-  }
+  .cmp h3 { margin: 0 0 10px; font-size: 17px; font-weight: 800; line-height: 1.25; }
+  .cmp .nums { font-size: 13px; font-variant-numeric: tabular-nums; opacity: .95; }
+  .cmp .chips { margin-top: 8px; font-size: 12px; opacity: .85; }
 
   .lead { margin: 0 0 6px; font-size: 13px; line-height: 1.45; }
   .muted { margin: 0; font-size: 12px; line-height: 1.4; color: #5f6b73; }
 
-  .felt { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+  .felt { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
   .felt-row {
     display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
-    padding: 10px 12px; border: 1px solid #d7e2dc; background: #fafcfb;
-    font-size: 12.5px; line-height: 1.35;
+    padding: 14px 14px; border-radius: 12px; border: 1px solid #dce6e1; background: #f7faf8;
+    font-size: 13px; line-height: 1.4;
   }
   .felt-row .pct {
     flex-shrink: 0; color: #01644f; font-weight: 800; white-space: nowrap;
+    padding: 3px 8px; border-radius: 999px; background: rgba(1,100,79,.12); font-size: 11px;
   }
 
-  .compare {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px;
+  .comfort-row {
+    display: grid; grid-template-columns: 1fr 1.15fr; gap: 12px; margin-top: 14px;
   }
-  .cmp {
-    padding: 14px; border: 1px solid #d7e2dc; background: #fff;
+  .rings-card {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 12px; min-height: 220px;
+    padding: 18px 14px; border-radius: 14px; border: 1px solid #dce6e1;
+    background: linear-gradient(165deg, #fff, #f3f8f6 90%);
   }
-  .cmp.now { background: #f7f9f8; }
-  .cmp.after {
-    background: #01644f; border-color: #01644f; color: #fff;
+  .rings {
+    display: flex; gap: 22px; align-items: center; justify-content: center;
   }
-  .cmp .k {
-    font-size: 10px; font-weight: 800; letter-spacing: .1em;
-    text-transform: uppercase; opacity: .8; margin-bottom: 6px;
+  .ring { position: relative; width: 92px; height: 92px; }
+  .ring-center {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 2px; pointer-events: none;
   }
-  .cmp h3 { margin: 0 0 8px; font-size: 15px; font-weight: 750; line-height: 1.25; }
-  .cmp .nums { font-size: 12.5px; font-variant-numeric: tabular-nums; opacity: .95; }
-  .cmp .chips { margin-top: 6px; font-size: 11px; opacity: .8; }
+  .ring-center b {
+    font-size: 18px; font-weight: 850; letter-spacing: -.03em; line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .ring-center span { font-size: 10px; font-weight: 700; color: #5f6b73; }
+  .echo-pill {
+    display: inline-flex; padding: 5px 11px; border-radius: 999px;
+    font-size: 12px; font-weight: 750; color: #01644f; background: rgba(1,100,79,.12);
+  }
 
-  .delta-strip {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-    margin: 0 0 14px;
+  .norms {
+    width: 100%; border-collapse: collapse; font-size: 12px;
+    border: 1px solid #dce6e1; border-radius: 12px; overflow: hidden; background: #f7faf8;
   }
-  .delta-item {
-    padding: 12px 14px; border: 1px solid #d7e2dc; background: #f4f8f6;
+  .norms th, .norms td {
+    padding: 9px 12px; border-bottom: 1px solid #e4ebe7; text-align: left;
   }
-  .delta-item .k {
-    font-size: 10px; font-weight: 800; letter-spacing: .08em;
-    text-transform: uppercase; color: #5f6b73;
+  .norms tr:last-child td { border-bottom: none; }
+  .norms th {
+    background: #eef5f1; color: #5f6b73; font-size: 11px; font-weight: 700;
   }
-  .delta-item .v {
-    margin-top: 4px; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums;
+  .norms td:nth-child(2), .norms td:nth-child(3),
+  .norms th:nth-child(2), .norms th:nth-child(3) {
+    text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 700;
   }
-  .delta-item .d { margin-top: 2px; font-size: 12px; color: #01644f; font-weight: 750; }
+  .norms tr.muted td { color: #7a8790; }
+  .norms tr.marked td { background: rgba(1,100,79,.08); }
+  .norm-level { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+  .pill-now, .pill-mf {
+    display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 999px;
+    font-size: 9px; font-weight: 800; letter-spacing: .02em; color: #fff;
+  }
+  .pill-now { background: #68757e; }
+  .pill-mf { background: #01644f; }
 
   .note {
     margin: 0 0 12px; font-size: 12px; color: #5f6b73; line-height: 1.4;
   }
 
+  .delta-strip {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 0 12px;
+  }
+  .delta-item {
+    padding: 12px 14px; border-radius: 14px; border: 1px solid #dce6e1; background: #fff;
+  }
+  .delta-item .k {
+    font-size: 10px; font-weight: 750; letter-spacing: .04em;
+    text-transform: uppercase; color: #5f6b73;
+  }
+  .delta-item .v {
+    margin-top: 4px; font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums;
+  }
+  .delta-item .d { margin-top: 3px; font-size: 12px; color: #01644f; font-weight: 750; }
+
   .chart {
-    margin: 0 0 14px; padding: 12px 14px 10px;
-    border: 1px solid #d7e2dc; background: #fafcfb;
+    margin: 0 0 12px; padding: 12px 14px 10px; border-radius: 16px;
+    border: 1px solid #dce6e1; background: #fff;
+    box-shadow: 0 1px 2px rgba(17,24,39,.04), 0 8px 18px rgba(17,24,39,.04);
   }
   .chart:last-of-type { margin-bottom: 0; }
   .chart figcaption {
     display: flex; justify-content: space-between; gap: 10px;
     align-items: flex-start; margin-bottom: 6px;
   }
-  .chart figcaption strong { display: block; font-size: 13px; font-weight: 750; }
+  .chart figcaption strong { display: block; font-size: 13px; font-weight: 800; letter-spacing: -.01em; }
   .chart figcaption span { display: block; font-size: 11px; color: #5f6b73; margin-top: 2px; }
   .badge {
-    flex-shrink: 0; text-align: right; background: #fff; border: 1px solid #d7e2dc;
-    padding: 4px 8px; font-size: 10.5px; color: #5f6b73;
+    flex-shrink: 0; text-align: right; background: #f7faf8; border: 1px solid #dce6e1;
+    padding: 5px 9px; border-radius: 10px; font-size: 10.5px; color: #5f6b73;
   }
-  .badge b { display: block; color: #152018; font-size: 11.5px; }
+  .badge b { display: block; color: #152018; font-size: 12px; font-weight: 800; }
+  .badge-quiet {
+    display: inline-block; margin-top: 3px; padding: 2px 7px; border-radius: 999px;
+    font-size: 10px; font-weight: 750; color: #01644f; background: rgba(1,100,79,.12);
+  }
   .legend {
     list-style: none; margin: 6px 0 0; padding: 0;
-    display: flex; gap: 14px; font-size: 11px; color: #5f6b73;
+    display: flex; gap: 14px; font-size: 11px; color: #5f6b73; font-weight: 650;
   }
   .legend i {
-    display: inline-block; width: 14px; height: 2px; border-radius: 1px;
+    display: inline-block; width: 16px; height: 3px; border-radius: 999px;
     margin-right: 6px; vertical-align: middle;
   }
   .sw-b { background: #7a8790; } .sw-a { background: #01644f; }
 
-  .norms-title {
-    margin: 14px 0 8px;
-    font-size: 13px; font-weight: 750; color: #0f1c16; letter-spacing: -.01em;
+  .pillars {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
   }
-  .norms {
-    width: 100%; border-collapse: collapse; font-size: 12px;
-    border: 1px solid #d7e2dc;
+  .pillar {
+    display: flex; gap: 10px; padding: 12px;
+    border-radius: 12px; border: 1px solid #dce6e1; background: #f7faf8;
   }
-  .norms th, .norms td {
-    padding: 9px 10px; border-bottom: 1px solid #e6eeea; text-align: left;
+  .pillar-mark {
+    flex: 0 0 4px; border-radius: 999px; background: #01644f; align-self: stretch; min-height: 1.2em;
   }
-  .norms tr:last-child td { border-bottom: none; }
-  .norms th {
-    background: #f4f8f6; color: #5f6b73; font-size: 11px; font-weight: 650;
-  }
-  .norms td:nth-child(2), .norms td:nth-child(3),
-  .norms th:nth-child(2), .norms th:nth-child(3) {
-    text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums;
-  }
-  .norms tr.muted td { color: #7a8790; }
+  .pillar strong { display: block; font-size: 12.5px; font-weight: 800; margin-bottom: 3px; letter-spacing: -.01em; }
+  .pillar p { margin: 0; font-size: 11.5px; color: #5f6b73; line-height: 1.4; }
+  .pillars .pillar:last-child:nth-child(odd) { grid-column: 1 / -1; }
 
-  .pillars { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-  .pillars li {
-    display: grid; grid-template-columns: 26px 1fr; gap: 10px; align-items: start;
-    padding: 8px 0; border-bottom: 1px solid #e6eeea;
+  .qr-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px;
   }
-  .pillars li:last-child { border-bottom: none; }
-  .pillars .n {
-    box-sizing: border-box;
-    width: 26px; height: 26px; min-width: 26px; max-width: 26px;
-    border-radius: 50%;
-    display: grid; place-items: center;
-    background: #e8f3ef; color: #01644f;
-    font-size: 11px; font-weight: 800; line-height: 1;
-    font-variant-numeric: tabular-nums;
-    flex-shrink: 0;
+  .qr-card {
+    display: flex; gap: 16px; align-items: center;
+    padding: 18px 16px; border-radius: 16px;
+    border: 1px solid rgba(1,100,79,.22);
+    background: linear-gradient(165deg, rgba(1,100,79,.12), #fff 55%);
+    box-shadow: 0 8px 20px rgba(1,100,79,.08);
   }
-  .pillars strong { display: block; font-size: 12.5px; margin-bottom: 2px; }
-  .pillars p { margin: 0; font-size: 11.5px; color: #5f6b73; line-height: 1.4; }
+  .qr-card img {
+    width: 118px; height: 118px; border-radius: 14px;
+    border: 1px solid #dce6e1; background: #fff; flex-shrink: 0;
+  }
+  .qr-card .qr-k {
+    font-size: 10px; font-weight: 800; letter-spacing: .08em;
+    text-transform: uppercase; color: #01644f; margin-bottom: 5px;
+  }
+  .qr-card strong {
+    display: block; font-size: 15px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 5px;
+  }
+  .qr-card p { margin: 0; font-size: 12px; color: #5f6b73; line-height: 1.4; }
+  .qr-card .qr-url {
+    display: block; margin-top: 6px; font-size: 11px; font-weight: 700;
+    color: #0c332c; word-break: break-all;
+  }
 
   .closing {
-    margin-top: 16px; padding: 14px;
-    border: 1px solid #d7e2dc; background: #f4f8f6;
-    font-size: 12px; line-height: 1.45; color: #5f6b73;
+    margin-top: 16px; padding: 16px 18px; border-radius: 14px;
+    border: 1px solid rgba(1,100,79,.2);
+    background: linear-gradient(165deg, rgba(1,100,79,.1), #fff 60%);
+    font-size: 12.5px; line-height: 1.45; color: #5f6b73;
   }
   .closing b { color: #152018; }
 </style></head><body>
 <div class="sheet" id="mf-report-root">
 
-  <!-- PAGE 1: passport + situation -->
+  <!-- PAGE 1 -->
   <section class="page" data-page="1">
     ${pageChrome(1, TOTAL, roomLine)}
     <h1 class="hero-title">Акустический профиль помещения</h1>
     <p class="hero-sub">Объект: <b>${escapeHtml(roomName)}</b>, ${escapeHtml(area)}. Эффект MultiFrame для этого помещения.</p>
 
-    <div class="block">
-      <div class="sec"><span class="idx">01</span><h2>Паспорт объекта</h2></div>
-      <table class="passport">
-        <tr><th>Помещение</th><td>${escapeHtml(roomName)} · ${escapeHtml(area)}</td></tr>
-        <tr><th>Тип дома</th><td>${escapeHtml(optLabel(HOUSE_TYPE_OPTIONS, room.houseType))}</td></tr>
-        <tr><th>Перекрытие</th><td>${escapeHtml(slabLabel)}</td></tr>
-        <tr><th>Задача</th><td>${escapeHtml(optLabel(ROOM_WISH_OPTIONS, room.roomWish))}</td></tr>
-      </table>
+    <section class="object" aria-label="Объект">
+      <div class="object-label">
+        <span>Параметры</span>
+        <strong>Объект</strong>
+      </div>
+      <dl class="object-grid">
+        <div><dt>Перекрытие</dt><dd>${escapeHtml(slabLabel)}</dd></div>
+        <div><dt>Тип дома</dt><dd>${escapeHtml(optLabel(HOUSE_TYPE_OPTIONS, room.houseType))}</dd></div>
+        <div><dt>Комната</dt><dd>${escapeHtml(roomName)} · ${escapeHtml(area)}</dd></div>
+        <div><dt>Задача</dt><dd>${escapeHtml(optLabel(ROOM_WISH_OPTIONS, room.roomWish))}</dd></div>
+      </dl>
+    </section>
+
+    <div class="kpi-row">
+      <article class="kpi">
+        <span class="k">Δ Rw · изоляция воздушного шума</span>
+        <span class="v">+${deltaRw}<em>дБ</em></span>
+        <span class="pill">≈ на ${sim.perceivedAirPct}% тише</span>
+      </article>
+      <article class="kpi">
+        <span class="k">Δ Lnw · уровень ударного шума</span>
+        <span class="v">−${deltaLnw}<em>дБ</em></span>
+        <span class="pill">≈ на ${sim.perceivedImpactPct}% тише</span>
+      </article>
+      <article class="kpi">
+        <span class="k">Тише на слух</span>
+        <span class="v">≈${quieterMax}<em>%</em></span>
+        <span class="pill">воздух ${sim.perceivedAirPct}% · удар ${sim.perceivedImpactPct}%</span>
+      </article>
+      <article class="kpi">
+        <span class="k">Акустический комфорт</span>
+        <span class="v">${comfortBefore} → ${comfortAfter}<em>%</em></span>
+        ${echoDrop > 0 ? `<span class="pill">≈ на ${echoDrop}% меньше эха</span>` : `<span class="pill">комфорт комнаты</span>`}
+      </article>
     </div>
 
-    <div class="block">
-      <div class="sec"><span class="idx">02</span><h2>Исходное состояние</h2></div>
-      <div class="status-grid">
-        <div class="status">
-          <div class="k">Воздушный шум</div>
-          <div class="v">${FELT_STEP_LABELS[airNow]}</div>
-          <div class="s">Rw ≈ ${Math.round(b.Rw)} дБ · класс ${chipLabel(airClassFor(b.Rw))}</div>
-        </div>
-        <div class="status">
-          <div class="k">Ударный шум</div>
-          <div class="v">${FELT_STEP_LABELS[impactNow]}</div>
-          <div class="s">Lnw ≈ ${Math.round(b.Lnw)} дБ · класс ${chipLabel(impactClassFor(b.Lnw))}</div>
-        </div>
-      </div>
-      <div class="comfort-banner">
-        <div class="k">Класс комфорта помещения сейчас</div>
-        <div class="v">«${escapeHtml(officialComfortLabel(hybridBefore))}»</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PAGE 2: forecast + norms (п. 03) -->
-  <section class="page" data-page="2">
-    ${pageChrome(2, TOTAL, roomLine)}
-    <div class="block" style="margin-bottom:0">
-      <div class="sec"><span class="idx">03</span><h2>Прогноз с MultiFrame</h2></div>
-      ${wishBlock}
-      <div class="felt">
-        <div class="felt-row">
-          <span>Воздух · ${FELT_STEP_LABELS[airNow]} → <b>${FELT_STEP_LABELS[airAfter]}</b> · Rw ≈ ${Math.round(b.Rw)} дБ → ≈ ${Math.round(a.Rw)} дБ</span>
-          <span class="pct">≈ ${sim.perceivedAirPct}% тише</span>
-        </div>
-        <div class="felt-row">
-          <span>Удар · ${FELT_STEP_LABELS[impactNow]} → <b>${FELT_STEP_LABELS[impactAfter]}</b> · Lnw ≈ ${Math.round(b.Lnw)} дБ → ≈ ${Math.round(a.Lnw)} дБ</span>
-          <span class="pct">≈ ${sim.perceivedImpactPct}% тише</span>
-        </div>
-      </div>
+    <div class="card" style="margin-bottom:0">
+      <h2><span class="sec-idx">01</span>Класс комфорта</h2>
       <div class="compare">
-        <div class="cmp now">
+        <div class="cmp">
           <div class="k">Сейчас</div>
           <h3>«${escapeHtml(officialComfortLabel(hybridBefore))}»</h3>
-          <div class="nums">Rw ≈ ${b.Rw} дБ · Lnw ≈ ${b.Lnw} дБ</div>
+          <div class="nums">Rw ≈ ${Math.round(b.Rw)} дБ · Lnw ≈ ${Math.round(b.Lnw)} дБ</div>
           <div class="chips">воздух ${chipLabel(airClassFor(b.Rw))} · удар ${chipLabel(impactClassFor(b.Lnw))}</div>
         </div>
         <div class="cmp after">
           <div class="k">С MultiFrame</div>
           <h3>«${escapeHtml(officialComfortLabel(hybridAfter))}»</h3>
-          <div class="nums">Rw ≈ ${a.Rw} дБ · Lnw ≈ ${a.Lnw} дБ</div>
+          <div class="nums">Rw ≈ ${Math.round(a.Rw)} дБ · Lnw ≈ ${Math.round(a.Lnw)} дБ</div>
           <div class="chips">воздух ${chipLabel(airClassFor(a.Rw))} · удар ${chipLabel(impactClassFor(a.Lnw))}</div>
         </div>
-      </div>
-      <div class="comfort-banner" style="margin-top:12px">
-        <div class="k">Порхающее эхо в помещении</div>
-        <div class="v">${rev.echoInRoomBefore}% → ${rev.echoInRoomAfter}%</div>
-      </div>
-      <p class="muted" style="margin-top:6px">Меньше процент — суше звук в комнате. MultiFrame гасит эхо в помещении, а не только шум сверху.</p>
-
-      <h3 class="norms-title">Нормы комфорта для жилья · СП 51.13330.2011</h3>
-      <table class="norms">
-        <thead><tr><th>Уровень</th><th>Rw, дБ</th><th>Lnw, дБ</th></tr></thead>
-        <tbody>
-          <tr><td>Высокий комфорт (А)</td><td>≥ ${NORMS.A.Rw}</td><td>≤ ${NORMS.A.Lnw}</td></tr>
-          <tr><td>Комфорт (Б)</td><td>≥ ${NORMS.B.Rw}</td><td>≤ ${NORMS.B.Lnw}</td></tr>
-          <tr><td>Допустимый (В)</td><td>≥ ${NORMS.V.Rw}</td><td>≤ ${NORMS.V.Lnw}</td></tr>
-          <tr class="muted"><td>Ниже допустимого</td><td>&lt; ${NORMS.V.Rw}</td><td>&gt; ${NORMS.V.Lnw}</td></tr>
-        </tbody>
-      </table>
-      <div class="comfort-banner" style="margin-top:10px">
-        <div class="k">Класс комфорта с MultiFrame</div>
-        <div class="v">«${escapeHtml(officialComfortLabel(hybridAfter))}»</div>
       </div>
     </div>
   </section>
 
-  <!-- PAGE 3: spectra -->
+  <!-- PAGE 2 -->
+  <section class="page" data-page="2">
+    ${pageChrome(2, TOTAL, roomLine)}
+    <div class="card">
+      <h2><span class="sec-idx">02</span>Прогноз с MultiFrame</h2>
+      ${wishBlock}
+      <div class="felt">
+        <div class="felt-row">
+          <span>Воздух · ${FELT_STEP_LABELS[airNow]} → <b>${FELT_STEP_LABELS[airAfter]}</b> · Rw ≈ ${Math.round(b.Rw)} → ≈ ${Math.round(a.Rw)} дБ</span>
+          <span class="pct">≈ ${sim.perceivedAirPct}% тише</span>
+        </div>
+        <div class="felt-row">
+          <span>Удар · ${FELT_STEP_LABELS[impactNow]} → <b>${FELT_STEP_LABELS[impactAfter]}</b> · Lnw ≈ ${Math.round(b.Lnw)} → ≈ ${Math.round(a.Lnw)} дБ</span>
+          <span class="pct">≈ ${sim.perceivedImpactPct}% тише</span>
+        </div>
+      </div>
+      <div class="comfort-row">
+        <div class="rings-card">
+          <div class="rings">
+            ${comfortRingSvg(comfortBefore, 'Сейчас', false)}
+            ${comfortRingSvg(comfortAfter, 'После', true)}
+          </div>
+          ${echoDrop > 0 ? `<span class="echo-pill">≈ на ${echoDrop}% меньше эха</span>` : ''}
+          <p class="muted" style="text-align:center;margin-top:2px">MultiFrame — звукоизоляция и звукопоглощение в комнате</p>
+        </div>
+        <div>
+          <h2 style="margin:0 0 8px;font-size:13px">Нормы комфорта жилья</h2>
+          <p class="muted" style="margin-bottom:8px">по СП 51.13330.2011 · Rw больше лучше · Lnw меньше лучше</p>
+          <table class="norms">
+            <thead><tr><th>Уровень</th><th>Rw</th><th>Lnw</th></tr></thead>
+            <tbody>
+              ${normRow('A', 'Высокий комфорт (А)', `≥ ${NORMS.A.Rw}`, `≤ ${NORMS.A.Lnw}`)}
+              ${normRow('B', 'Комфорт (Б)', `≥ ${NORMS.B.Rw}`, `≤ ${NORMS.B.Lnw}`)}
+              ${normRow('V', 'Допустимый (В)', `≥ ${NORMS.V.Rw}`, `≤ ${NORMS.V.Lnw}`)}
+              ${normRow('below', 'Ниже допустимого', `&lt; ${NORMS.V.Rw}`, `&gt; ${NORMS.V.Lnw}`, true)}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:0;margin-top:12px">
+      <h2><span class="sec-idx">03</span>Уникальность MultiFrame</h2>
+      <ul class="pillars">${pillars}</ul>
+    </div>
+  </section>
+
+  <!-- PAGE 3 -->
   <section class="page" data-page="3">
     ${pageChrome(3, TOTAL, roomLine)}
-    <div class="sec"><span class="idx">04</span><h2>Изоляция по частотам</h2></div>
-    <p class="note">Чем выше линия на графике, тем лучше перекрытие изолирует шум на этой частоте.</p>
+    <h2 style="margin:0 0 6px;font-size:15px;font-weight:800"><span class="sec-idx">04</span>Изоляция по частотам</h2>
+    <p class="note">Чем выше линия, тем лучше перекрытие изолирует шум на этой частоте.</p>
 
     <div class="delta-strip">
       <div class="delta-item">
-        <div class="k">Воздушный шум · Rw</div>
-        <div class="v">${b.Rw} → ${a.Rw} дБ</div>
-        <div class="d">Разница +${Math.abs(sim.delta.Rw)} дБ</div>
+        <div class="k">Изоляция воздушного шума · Rw</div>
+        <div class="v">${Math.round(b.Rw)} → ${Math.round(a.Rw)} дБ</div>
+        <div class="d">Δ +${deltaRw} дБ · ≈ на ${sim.perceivedAirPct}% тише</div>
       </div>
       <div class="delta-item">
-        <div class="k">Ударный шум · Lnw</div>
-        <div class="v">${b.Lnw} → ${a.Lnw} дБ</div>
-        <div class="d">Разница −${Math.abs(sim.delta.Lnw)} дБ</div>
+        <div class="k">Уровень ударного шума · Lnw</div>
+        <div class="v">${Math.round(b.Lnw)} → ${Math.round(a.Lnw)} дБ</div>
+        <div class="d">Δ −${deltaLnw} дБ · ≈ на ${sim.perceivedImpactPct}% тише</div>
       </div>
     </div>
 
@@ -518,21 +681,51 @@ function buildReportDocument(session: SessionState): string {
     ${impactSvg}
   </section>
 
-  <!-- PAGE 4: system -->
+  <!-- PAGE 4 -->
   <section class="page" data-page="4">
     ${pageChrome(4, TOTAL, roomLine)}
-    <div class="block">
-      <div class="sec"><span class="idx">05</span><h2>О системе MultiFrame</h2></div>
-      <ul class="pillars">${pillars}</ul>
+    <h1 class="hero-title">Продолжите с MultiFrame</h1>
+    <p class="hero-sub">Отсканируйте QR-код камерой телефона — сайт бренда или калькулятор комплектации.</p>
+
+    <div class="qr-row" style="margin-top:18px;grid-template-columns:1fr;gap:18px">
+      <div class="qr-card" style="padding:28px 24px;min-height:200px">
+        <img src="${qr.site}" alt="QR код сайта MultiFrame" width="168" height="168" style="width:168px;height:168px" />
+        <div>
+          <div class="qr-k">Сайт MultiFrame</div>
+          <strong style="font-size:22px">stp-multiframe.ru</strong>
+          <p style="font-size:13.5px;margin-top:4px">Официальный сайт: продукт, монтаж и акустический комфорт потолка.</p>
+          <span class="qr-url">${escapeHtml(SITE_URL)}</span>
+        </div>
+      </div>
+      <div class="qr-card" style="padding:28px 24px;min-height:200px">
+        <img src="${qr.calc}" alt="QR код калькулятора MultiFrame" width="168" height="168" style="width:168px;height:168px" />
+        <div>
+          <div class="qr-k">Калькулятор</div>
+          <strong style="font-size:22px">Рассчитать количество</strong>
+          <p style="font-size:13.5px;margin-top:4px">Подбор комплектации MultiFrame под площадь и задачу объекта.</p>
+          <span class="qr-url">${escapeHtml(CALCULATOR_URL)}</span>
+        </div>
+      </div>
     </div>
 
     <div class="closing">
       Документ собран по ответам в Проблемомере для объекта «${escapeHtml(roomName)}».
+      Это <b>экспертная оценка</b>, не инженерный расчёт и не гарантия цифр.
     </div>
   </section>
 
 </div>
 </body></html>`;
+}
+
+/** HTML document used for PDF rasterization (also handy for visual preview). */
+export async function buildAcousticProfileHtml(session: SessionState): Promise<string> {
+  const full = session.derived ? session : withDerived(session);
+  if (!full.derived) {
+    throw new Error('Нет расчёта для отчёта');
+  }
+  const qr = await buildQrBundle();
+  return buildReportDocument(full, qr);
 }
 
 /** Prefetch pdf libs so the click is not waiting on the network. */
@@ -593,7 +786,8 @@ export async function downloadAcousticProfilePdf(session: SessionState): Promise
     throw new Error('Нет расчёта для отчёта');
   }
 
-  const html = buildReportDocument(full);
+  const qr = await buildQrBundle();
+  const html = buildReportDocument(full, qr);
   const iframe = document.createElement('iframe');
   iframe.setAttribute('aria-hidden', 'true');
   iframe.setAttribute('title', 'PDF');
@@ -607,7 +801,7 @@ export async function downloadAcousticProfilePdf(session: SessionState): Promise
     'opacity:0.01',
     'pointer-events:none',
     'z-index:2147483646',
-    'background:#fff',
+    'background:#f4f7f6',
   ].join(';');
   document.body.appendChild(iframe);
 
@@ -617,6 +811,20 @@ export async function downloadAcousticProfilePdf(session: SessionState): Promise
     if (pages.length === 0) {
       throw new Error('Не удалось собрать отчёт');
     }
+
+    // Wait for QR images inside iframe to decode.
+    const imgs = Array.from(idoc.images);
+    await Promise.all(
+      imgs.map(
+        (img) =>
+          img.complete
+            ? Promise.resolve()
+            : new Promise<void>((res) => {
+                img.onload = () => res();
+                img.onerror = () => res();
+              }),
+      ),
+    );
 
     const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
       import('html2canvas'),
@@ -636,7 +844,7 @@ export async function downloadAcousticProfilePdf(session: SessionState): Promise
       const pageEl = pages[i]!;
       const canvas = await html2canvas(pageEl, {
         scale: 2,
-        backgroundColor: '#ffffff',
+        backgroundColor: '#f4f7f6',
         useCORS: true,
         logging: false,
         foreignObjectRendering: false,
