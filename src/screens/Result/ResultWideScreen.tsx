@@ -26,7 +26,15 @@ function stepIndex(cls: ClassLabel): number {
   return RAIL_STEPS.findIndex((s) => s.id === cls);
 }
 
-function ComfortRail({ before, after }: { before: ClassLabel; after: ClassLabel }) {
+function ComfortRail({
+  before,
+  after,
+  compact,
+}: {
+  before: ClassLabel;
+  after: ClassLabel;
+  compact?: boolean;
+}) {
   const beforeLabel = officialComfortLabel(before);
   const afterLabel = officialComfortLabel(after);
   const same = before === after;
@@ -36,7 +44,7 @@ function ComfortRail({ before, after }: { before: ClassLabel; after: ClassLabel 
 
   return (
     <div
-      className={styles.rail}
+      className={`${styles.rail} ${compact ? styles.railCompact : ''}`}
       role="img"
       aria-label={
         same
@@ -104,14 +112,21 @@ function DeltaBars({ before, after, invert }: { before: number; after: number; i
   const bH = Math.round((before / max) * 100);
   const aH = Math.round((after / max) * 100);
   const better = invert ? after < before : after > before;
+  const beforeDb = Math.round(before);
+  const afterDb = Math.round(after);
   return (
     <div className={styles.kpiBars} aria-hidden>
-      <span className={styles.kpiBar} style={{ height: `${Math.max(18, bH)}%` }} title="Сейчас" />
-      <span
-        className={`${styles.kpiBar} ${styles.kpiBarAfter} ${better ? styles.kpiBarBetter : ''}`}
-        style={{ height: `${Math.max(18, aH)}%` }}
-        title="После"
-      />
+      <span className={styles.kpiBarWrap}>
+        <span className={styles.kpiBar} style={{ height: `${Math.max(18, bH)}%` }} />
+        <span className={styles.kpiBarTip}>Сейчас · {beforeDb} дБ</span>
+      </span>
+      <span className={styles.kpiBarWrap}>
+        <span
+          className={`${styles.kpiBar} ${styles.kpiBarAfter} ${better ? styles.kpiBarBetter : ''}`}
+          style={{ height: `${Math.max(18, aH)}%` }}
+        />
+        <span className={styles.kpiBarTip}>MultiFrame · {afterDb} дБ</span>
+      </span>
     </div>
   );
 }
@@ -229,6 +244,14 @@ export function ResultWideScreen() {
           <span className={styles.kpiPill}>шум ↓</span>
         </article>
         <article className={styles.kpiCard}>
+          <span className={styles.kpiLabel}>Акустический комфорт</span>
+          <EchoComfortRings
+            before={p.sim.reverb.echoInRoomBefore}
+            after={p.sim.reverb.echoInRoomAfter}
+            compact
+          />
+        </article>
+        <article className={styles.kpiCard}>
           <span className={styles.kpiLabel}>Тише на слух</span>
           <div className={styles.kpiMain}>
             <strong className={styles.kpiValue}>
@@ -240,14 +263,6 @@ export function ResultWideScreen() {
           <span className={styles.kpiPill}>
             воздух {quieterAir}% · удар {quieterImpact}%
           </span>
-        </article>
-        <article className={styles.kpiCard}>
-          <span className={styles.kpiLabel}>Акустический комфорт</span>
-          <EchoComfortRings
-            before={p.sim.reverb.echoInRoomBefore}
-            after={p.sim.reverb.echoInRoomAfter}
-            compact
-          />
         </article>
         <article className={`${styles.kpiCard} ${styles.kpiCardAccent} ${styles.kpiCardClass}`}>
           <span className={styles.kpiLabel}>Класс комфорта</span>
@@ -303,106 +318,76 @@ export function ResultWideScreen() {
         </div>
       </section>
 
-      <section className={styles.effect} data-reveal aria-label="Сейчас и с MultiFrame">
-        <div className={styles.effectTop}>
-          <h2>Сейчас и с MultiFrame</h2>
-        </div>
+      <section className={styles.effectListen} data-reveal aria-label="Эффективность и сравнение на слух">
+        <div className={styles.effectCol}>
+          <header className={styles.effectTop}>
+            <h2>Эффективность MultiFrame</h2>
+          </header>
 
-        {p.showScenarioAside ? (
-          <aside className={styles.scenario} aria-label="Ваша задача">
-            {p.scenarioLine ? <p>{p.scenarioLine}</p> : null}
-            {p.drumLine ? <p className={styles.scenarioExtra}>{p.drumLine}</p> : null}
-            {p.soundCorrection ? <p className={styles.scenarioExtra}>{p.soundCorrection}</p> : null}
-          </aside>
-        ) : null}
+          {p.showScenarioAside ? (
+            <aside className={styles.scenario} aria-label="Ваша задача">
+              {p.scenarioLine ? <p>{p.scenarioLine}</p> : null}
+              {p.drumLine ? <p className={styles.scenarioExtra}>{p.drumLine}</p> : null}
+              {p.soundCorrection ? <p className={styles.scenarioExtra}>{p.soundCorrection}</p> : null}
+            </aside>
+          ) : null}
 
-        <div className={styles.compareGrid}>
-          <div className={styles.compareCard}>
-            <h3>
-              <span className={styles.compareChip}>Сейчас</span>
-            </h3>
-            <div className={styles.feltStack}>
-              <FeltScale
-                title="Воздушный шум (голоса и музыка)"
-                now={p.airNowFelt}
-                indexKind="Rw"
-                nowIndex={p.sim.before.Rw}
-                mode="nowOnly"
-              />
-              <FeltScale
-                title="Ударный шум (шаги и падения)"
-                now={p.impactNowFelt}
-                indexKind="Lnw"
-                nowIndex={p.sim.before.Lnw}
-                mode="nowOnly"
-              />
-            </div>
+          <div className={styles.feltStack}>
+            <FeltScale
+              title="Воздушный шум (голоса и музыка)"
+              now={p.airNowFelt}
+              after={p.airAfterFelt}
+              indexKind="Rw"
+              nowIndex={p.sim.before.Rw}
+              afterIndex={p.sim.after.Rw}
+              quieterPct={p.sim.perceivedAirPct}
+              quieterDeltaDb={Math.abs(p.sim.delta.Rw)}
+              mode="nowAndAfter"
+            />
+            <FeltScale
+              title="Ударный шум (шаги и падения)"
+              now={p.impactNowFelt}
+              after={p.impactAfterFelt}
+              indexKind="Lnw"
+              nowIndex={p.sim.before.Lnw}
+              afterIndex={p.sim.after.Lnw}
+              quieterPct={p.sim.perceivedImpactPct}
+              quieterDeltaDb={Math.abs(p.sim.delta.Lnw)}
+              mode="nowAndAfter"
+            />
           </div>
 
-          <div className={`${styles.compareCard} ${styles.compareAfter}`}>
-            <h3>
-              <span className={styles.compareChipAccent}>MultiFrame</span>
-            </h3>
-            <div className={styles.feltStack}>
-              <FeltScale
-                title="Воздушный шум (голоса и музыка)"
-                now={p.airNowFelt}
-                after={p.airAfterFelt}
-                indexKind="Rw"
-                nowIndex={p.sim.before.Rw}
-                afterIndex={p.sim.after.Rw}
-                quieterPct={p.sim.perceivedAirPct}
-                quieterDeltaDb={Math.abs(p.sim.delta.Rw)}
-                mode="nowAndAfter"
-              />
-              <FeltScale
-                title="Ударный шум (шаги и падения)"
-                now={p.impactNowFelt}
-                after={p.impactAfterFelt}
-                indexKind="Lnw"
-                nowIndex={p.sim.before.Lnw}
-                afterIndex={p.sim.after.Lnw}
-                quieterPct={p.sim.perceivedImpactPct}
-                quieterDeltaDb={Math.abs(p.sim.delta.Lnw)}
-                mode="nowAndAfter"
-              />
-            </div>
-          </div>
+          <ComfortRail before={p.hybridBefore} after={p.hybridAfter} compact />
         </div>
 
-        <ComfortRail before={p.hybridBefore} after={p.hybridAfter} />
-      </section>
-
-      <section className={styles.listen} data-reveal aria-label="Сравнить на слух">
-        <header className={styles.listenHead}>
-          <div>
+        <div className={styles.listenSide} aria-label="Сравнить на слух">
+          <header className={styles.listenSideHead}>
             <h2>Сравнить на слух</h2>
             <p className={styles.panelLead}>Эхо в комнате и звук сверху — до и после.</p>
-          </div>
-        </header>
-        <div className={styles.listenBody}>
-          <div className={styles.listenCol}>
-            <header className={styles.listenColHead}>
-              <h3>
-                Эхо в комнате <span>(акустический комфорт)</span>
-              </h3>
-              <p>Перфорация гасит эхо в самой комнате — послушайте хлопки до и после.</p>
-            </header>
-            <EchoComfort sim={p.sim} variant="dashboard" showGauges={false} hideHead />
-          </div>
-          <div className={`${styles.listenCol} ${styles.listenColAudio}`}>
-            <header className={styles.listenColHead}>
-              <h3>
-                Звукоизоляция <span>(снижение шума)</span>
-              </h3>
-              <p>Шум сверху — до и после MultiFrame.</p>
-            </header>
-            <CompactAudio
-              pairs={p.session.audio.pairs}
-              sim={p.sim}
-              wish={p.wish}
-              hideHead
-            />
+          </header>
+          <div className={styles.listenSideBody}>
+            <div className={styles.listenCol}>
+              <header className={styles.listenColHead}>
+                <h3>
+                  Эхо в комнате <span>(акустический комфорт)</span>
+                </h3>
+              </header>
+              <EchoComfort sim={p.sim} variant="dashboard" showGauges={false} hideHead />
+            </div>
+            <div className={styles.listenCol}>
+              <header className={styles.listenColHead}>
+                <h3>
+                  Звукоизоляция <span>(снижение шума)</span>
+                </h3>
+              </header>
+              <CompactAudio
+                pairs={p.session.audio.pairs}
+                sim={p.sim}
+                wish={p.wish}
+                hideHead
+                stacked
+              />
+            </div>
           </div>
         </div>
       </section>

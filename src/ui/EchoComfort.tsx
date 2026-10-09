@@ -20,21 +20,24 @@ export function EchoComfortRings({
   after,
   compact,
 }: {
+  /** Echo % before (higher = worse). Rings show comfort = 100 − echo. */
   before: number;
   after: number;
   compact?: boolean;
 }) {
-  const drop = before - after;
+  const comfortBefore = Math.max(0, Math.min(100, 100 - before));
+  const comfortAfter = Math.max(0, Math.min(100, 100 - after));
+  const echoDrop = before - after;
   return (
     <div
       className={`${styles.rings} ${compact ? styles.ringsCompact : ''}`}
       role="img"
-      aria-label={`Эхо в помещении: сейчас ${before}%, с MultiFrame ${after}%. Меньше — лучше.`}
+      aria-label={`Акустический комфорт: сейчас ${comfortBefore}%, с MultiFrame ${comfortAfter}%. Больше — лучше. Эхо снизилось на ${Math.max(0, echoDrop)}%.`}
     >
-      <EchoRing pct={before} label="Сейчас" compact={compact} />
-      <EchoRing pct={after} label="После" accent compact={compact} />
-      {drop > 0 ? (
-        <p className={styles.scaleDelta}>≈ на {drop}% меньше эха</p>
+      <EchoRing pct={comfortBefore} label="Сейчас" compact={compact} />
+      <EchoRing pct={comfortAfter} label="После" accent compact={compact} />
+      {echoDrop > 0 ? (
+        <p className={styles.scaleDelta}>≈ на {echoDrop}% меньше эха</p>
       ) : null}
     </div>
   );

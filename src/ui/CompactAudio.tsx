@@ -30,9 +30,17 @@ type Props = {
   wish?: RoomWishOption;
   /** Hide built-in header when parent column provides the title. */
   hideHead?: boolean;
+  /** Stack noise groups vertically (narrow side column). */
+  stacked?: boolean;
 };
 
-export function CompactAudio({ pairs, sim, wish = 'general', hideHead = false }: Props) {
+export function CompactAudio({
+  pairs,
+  sim,
+  wish = 'general',
+  hideHead = false,
+  stacked = false,
+}: Props) {
   const { activeId, progress, play, stop } = useDemoPlayer();
   const groups = wishAudioOrder(wish);
   const primary = wishPrimaryGroup(wish);
@@ -54,7 +62,7 @@ export function CompactAudio({ pairs, sim, wish = 'general', hideHead = false }:
         </header>
       ) : null}
 
-      <div className={styles.groups}>
+      <div className={`${styles.groups} ${stacked ? styles.groupsStack : ''}`}>
         {groups.map((group) => {
           const groupPairs = pairs.filter((p) => p.group === group);
           if (!groupPairs.length) return null;

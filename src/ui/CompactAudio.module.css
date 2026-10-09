@@ -36,6 +36,15 @@
   gap: 0;
 }
 
+.groupsStack {
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.groupsStack .group {
+  padding: 0;
+}
+
 .group {
   display: flex;
   flex-direction: column;
