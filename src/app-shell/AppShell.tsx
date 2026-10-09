@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useLenis } from 'lenis/react';
 import styles from './AppShell.module.css';
 import { Header } from './Header';
 import { ProgressDots } from './ProgressDots';
@@ -44,10 +45,19 @@ function useScrollReveal(step: string) {
   }, [step]);
 }
 
+function useScrollTopOnStep(step: string) {
+  const lenis = useLenis();
+  useEffect(() => {
+    if (lenis) lenis.scrollTo(0, { immediate: true });
+    else window.scrollTo(0, 0);
+  }, [step, lenis]);
+}
+
 export function AppShell() {
   const { session, goNext, goBack, canGoNext } = useSession();
   const { step } = session;
   useScrollReveal(step);
+  useScrollTopOnStep(step);
   const isProcessing = step === 'processing';
   const showNav = step !== 'start' && !isProcessing;
   const showProgress = step !== 'start' && !isProcessing;
