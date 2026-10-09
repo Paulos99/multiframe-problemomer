@@ -227,10 +227,13 @@ export function assertModelAnchors(): string[] {
       `До muffling too open for dry stems (${shapeLoud.mufflingHzBefore} Hz)`,
     );
   }
-  if (shapeLoud.mufflingHzAfter <= shapeLoud.mufflingHzBefore + 200) {
+  if (Math.abs(shapeLoud.mufflingHzAfter - shapeLoud.mufflingHzBefore) > 1) {
     errors.push(
-      `После muffling should open vs До (${shapeLoud.mufflingHzBefore} → ${shapeLoud.mufflingHzAfter})`,
+      `После muffling should match До timbre (${shapeLoud.mufflingHzBefore} → ${shapeLoud.mufflingHzAfter})`,
     );
+  }
+  if (shapeLoud.deltaEqDb.some((d) => d > 0.05)) {
+    errors.push('После EQ must not brighten vs muffled До');
   }
   // Residual EQ should not be flat-zero when bands move (MultiFrame shapes spectrum).
   const residualEnergy = shapeLoud.deltaEqDb.reduce((a, b) => a + Math.abs(b), 0);
