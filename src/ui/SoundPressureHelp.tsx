@@ -154,6 +154,11 @@ function SoundPressureHelpDialog({ highlightDb, onClose }: DialogProps) {
             </tbody>
           </table>
         </div>
+
+        <p className={styles.footnote}>
+          дБ — логарифмическая величина: шаг в дБ не равен шагу в процентах. Например, −2 дБ — это
+          уже ≈21% тише, а не 2%.
+        </p>
       </div>
     </div>
   );
