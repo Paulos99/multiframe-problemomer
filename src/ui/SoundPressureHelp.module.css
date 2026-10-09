@@ -172,9 +172,8 @@
 }
 
 .table tbody tr.highlight td {
-  background: #dcefe8;
+  background: #e5f3ed;
   font-weight: 700;
-  box-shadow: inset 3px 0 0 #01644f;
 }
 
 .colDb {
