@@ -1380,6 +1380,30 @@
   border: 1px solid rgba(1, 100, 79, 0.14);
   border-radius: var(--radius-md);
   background: var(--bg-subtle);
+  cursor: default;
+  transition:
+    background var(--duration-normal) var(--ease-out),
+    border-color var(--duration-normal) var(--ease-out),
+    box-shadow var(--duration-normal) var(--ease-out),
+    transform var(--duration-normal) var(--ease-out);
+}
+
+.uniqPillar:hover {
+  background: color-mix(in srgb, var(--accent-soft) 70%, var(--bg-card));
+  border-color: rgba(1, 100, 79, 0.42);
+  box-shadow:
+    0 0 0 1px rgba(1, 100, 79, 0.12),
+    0 8px 22px rgba(1, 100, 79, 0.12);
+  transform: translateY(-2px);
+}
+
+.uniqPillar:hover .uniqPillarMark {
+  width: 4px;
+  box-shadow: 0 0 12px rgba(1, 100, 79, 0.45);
+}
+
+.uniqPillar:hover .uniqPillarBody strong {
+  color: var(--accent-color);
 }
 
 .uniqPillarMark {
@@ -1387,6 +1411,9 @@
   width: 3px;
   border-radius: var(--radius-pill);
   background: var(--accent-color);
+  transition:
+    width var(--duration-normal) var(--ease-out),
+    box-shadow var(--duration-normal) var(--ease-out);
 }
 
 .uniqPillarBody {
@@ -1402,6 +1429,7 @@
   line-height: 1.28;
   letter-spacing: -0.01em;
   color: var(--text-primary);
+  transition: color var(--duration-normal) var(--ease-out);
 }
 
 .uniqPillarBody p {
@@ -1904,6 +1932,18 @@
   border-radius: var(--radius-md);
   border: 1px solid rgba(1, 100, 79, 0.16);
   background: var(--bg-subtle);
+  transition:
+    border-color var(--duration-normal) var(--ease-out),
+    box-shadow var(--duration-normal) var(--ease-out),
+    background var(--duration-normal) var(--ease-out),
+    transform var(--duration-normal) var(--ease-out);
+}
+
+.feltScale:hover {
+  border-color: rgba(1, 100, 79, 0.38);
+  background: color-mix(in srgb, var(--accent-soft) 35%, var(--bg-subtle));
+  box-shadow: 0 8px 24px rgba(1, 100, 79, 0.1);
+  transform: translateY(-1px);
 }
 
 .feltHead {
@@ -1997,6 +2037,26 @@
   box-shadow: 0 0 0 1px rgba(122, 135, 144, 0.35);
   transform: translateX(-50%);
   z-index: 1;
+  transition:
+    transform var(--duration-normal) var(--ease-spring),
+    background var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-normal) var(--ease-out);
+}
+
+.feltStep:hover .feltDot {
+  transform: translateX(-50%) scale(1.35);
+  background: var(--accent-color);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+.feltStep[data-edge='start']:hover .feltDot,
+.feltStep[data-edge='end']:hover .feltDot {
+  transform: scale(1.35);
+}
+
+.feltStep:hover .feltLabel {
+  color: var(--accent-color);
+  font-weight: 750;
 }
 
 .feltStep[data-edge='start'] .feltDot {

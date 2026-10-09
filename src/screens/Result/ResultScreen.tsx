@@ -309,7 +309,7 @@ export function ResultScreen() {
 
   return (
     <Screen dense title="Акустический профиль помещения">
-      <section className={styles.block} aria-label="Нормы комфорта для жилья">
+      <section className={styles.block} data-reveal aria-label="Нормы комфорта для жилья">
         <header className={styles.sectionHead}>
           <h2>Нормы комфорта для жилья</h2>
           <p>
@@ -363,7 +363,7 @@ export function ResultScreen() {
         </div>
       </section>
 
-      <section className={styles.block} aria-label="Текущая ситуация">
+      <section className={styles.block} data-reveal aria-label="Текущая ситуация">
         <header className={styles.sectionHead}>
           <h2>Текущая ситуация</h2>
         </header>
@@ -421,7 +421,7 @@ export function ResultScreen() {
         </p>
       </section>
 
-      <section className={styles.block} aria-label="С MultiFrame">
+      <section className={styles.block} data-reveal aria-label="С MultiFrame">
         <header className={styles.sectionHead}>
           <h2>С MultiFrame</h2>
         </header>
@@ -478,7 +478,7 @@ export function ResultScreen() {
         </div>
       </section>
 
-      <section className={styles.reasons} aria-label="Уникальность системы MultiFrame">
+      <section className={styles.reasons} data-reveal aria-label="Уникальность системы MultiFrame">
         <header className={styles.sectionHead}>
           <h2>Уникальность системы MultiFrame</h2>
           <p>Эффективно. Безопасно. Без долгой стройки.</p>
@@ -497,7 +497,7 @@ export function ResultScreen() {
         </ul>
       </section>
 
-      <section className={styles.nextStep} aria-label="Следующий шаг">
+      <section className={styles.nextStep} data-reveal aria-label="Следующий шаг">
         <header>
           <h2>Следующий шаг</h2>
           <p>Профиль комнаты готов. В калькуляторе можно подобрать комплектацию MultiFrame.</p>

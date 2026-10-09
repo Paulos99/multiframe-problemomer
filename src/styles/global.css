@@ -14,6 +14,13 @@ body,
 
 html {
   -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 body {
@@ -26,6 +33,9 @@ body {
     var(--bg-page);
   line-height: 1.45;
   -webkit-font-smoothing: antialiased;
+  /* Firefox scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(1, 100, 79, 0.55) transparent;
 }
 
 body.theme-dark {
@@ -97,5 +107,116 @@ img {
   }
   50% {
     filter: brightness(1.08);
+  }
+}
+
+@keyframes revealUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* —— Custom scrollbar: «акустическая шкала» —— */
+::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+
+::-webkit-scrollbar-track {
+  margin: 6px 3px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 12%, rgba(1, 100, 79, 0.22), transparent 3px),
+    radial-gradient(circle at 50% 28%, rgba(1, 100, 79, 0.14), transparent 2.5px),
+    radial-gradient(circle at 50% 44%, rgba(1, 100, 79, 0.22), transparent 3px),
+    radial-gradient(circle at 50% 60%, rgba(1, 100, 79, 0.14), transparent 2.5px),
+    radial-gradient(circle at 50% 76%, rgba(1, 100, 79, 0.22), transparent 3px),
+    radial-gradient(circle at 50% 92%, rgba(1, 100, 79, 0.14), transparent 2.5px),
+    linear-gradient(90deg, rgba(1, 100, 79, 0.06), rgba(244, 247, 246, 0.95) 40%, rgba(1, 100, 79, 0.08));
+  box-shadow: inset 0 0 0 1px rgba(1, 100, 79, 0.12);
+}
+
+::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background:
+    linear-gradient(
+      180deg,
+      #2bb890 0%,
+      #01644f 38%,
+      #014837 72%,
+      #1a8f72 100%
+    ) padding-box;
+  background-clip: padding-box;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(1, 100, 79, 0.28),
+    0 6px 16px rgba(1, 100, 79, 0.32);
+  min-height: 56px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background:
+    linear-gradient(180deg, #3dcea4 0%, #018568 40%, #015a47 100%) padding-box;
+  background-clip: padding-box;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 0 0 1px rgba(1, 100, 79, 0.4),
+    0 0 22px rgba(1, 100, 79, 0.42);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(180deg, #01644f 0%, #013028 100%) padding-box;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+body.theme-dark {
+  scrollbar-color: rgba(42, 179, 139, 0.55) rgba(0, 0, 0, 0.2);
+}
+
+body.theme-dark::-webkit-scrollbar-track {
+  background:
+    linear-gradient(180deg, rgba(42, 179, 139, 0.06), rgba(42, 179, 139, 0.12) 50%, rgba(42, 179, 139, 0.06)),
+    repeating-linear-gradient(180deg, transparent 0 10px, rgba(42, 179, 139, 0.08) 10px 11px);
+  border-left-color: rgba(42, 179, 139, 0.12);
+}
+
+body.theme-dark::-webkit-scrollbar-thumb {
+  background:
+    linear-gradient(180deg, #3ec9a0 0%, #2ab38b 50%, #1a7f5f 100%) padding-box,
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2), transparent 40%) border-box;
+  background-clip: padding-box, border-box;
+}
+
+/* Scroll-reveal targets (toggled by JS) */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.55s var(--ease-out),
+    transform 0.55s var(--ease-out);
+  will-change: opacity, transform;
+}
+
+[data-reveal].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }

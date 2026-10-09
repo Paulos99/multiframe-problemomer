@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import styles from './AppShell.module.css';
 import { Header } from './Header';
 import { ProgressDots } from './ProgressDots';
@@ -9,9 +10,44 @@ import { RoomScreen } from '../screens/Room/RoomScreen';
 import { ProcessingScreen } from '../screens/Processing/ProcessingScreen';
 import { ResultScreen } from '../screens/Result/ResultScreen';
 
+function useScrollReveal(step: string) {
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.querySelectorAll('[data-reveal]').forEach((el) => {
+        el.classList.add('is-revealed');
+      });
+      return;
+    }
+
+    const nodes = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]'));
+    if (!nodes.length) return;
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-revealed');
+            io.unobserve(entry.target);
+          }
+        }
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -6% 0px' },
+    );
+
+    for (const node of nodes) {
+      node.classList.remove('is-revealed');
+      io.observe(node);
+    }
+
+    return () => io.disconnect();
+  }, [step]);
+}
+
 export function AppShell() {
   const { session, goNext, goBack, canGoNext } = useSession();
   const { step } = session;
+  useScrollReveal(step);
   const isProcessing = step === 'processing';
   const showNav = step !== 'start' && !isProcessing;
   const showProgress = step !== 'start' && !isProcessing;

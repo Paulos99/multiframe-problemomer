@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, type PointerEvent as ReactPointerEvent } from 'react';
+import { useCallback, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import type { SpectrumSeries } from '../state/spectrum';
 import { SoundPressureHelpButton } from './SoundPressureHelp';
 import styles from './SpectrumChart.module.css';
@@ -24,7 +24,6 @@ type Props = {
 };
 
 type HoverPoint = {
-  i: number;
   hz: number;
   before: number;
   after: number;
@@ -106,20 +105,42 @@ function niceRange(min: number, max: number): { yMin: number; yMax: number; tick
 }
 
 function formatHz(hz: number): string {
-  return hz >= 1000 ? `${hz / 1000}k` : String(hz);
+  if (hz >= 1000) {
+    const k = hz / 1000;
+    return Number.isInteger(k) ? `${k}k` : `${k.toFixed(1)}k`;
+  }
+  return String(Math.round(hz));
 }
 
-function nearestBandIndex(hzList: readonly number[], targetHz: number): number {
-  let best = 0;
-  let bestDist = Infinity;
-  for (let i = 0; i < hzList.length; i++) {
-    const d = Math.abs(Math.log10(hzList[i]!) - Math.log10(targetHz));
-    if (d < bestDist) {
-      bestDist = d;
-      best = i;
-    }
+/** Sample spectrum curves at continuous Hz (log-lerp between neighbouring bands). */
+function sampleAt(
+  hzList: readonly number[],
+  before: number[],
+  after: number[],
+  targetHz: number,
+): { hz: number; before: number; after: number } {
+  const n = hzList.length;
+  if (n === 0) return { hz: targetHz, before: 0, after: 0 };
+  if (n === 1) return { hz: hzList[0]!, before: before[0]!, after: after[0]! };
+
+  if (targetHz <= hzList[0]!) {
+    return { hz: hzList[0]!, before: before[0]!, after: after[0]! };
   }
-  return best;
+  if (targetHz >= hzList[n - 1]!) {
+    return { hz: hzList[n - 1]!, before: before[n - 1]!, after: after[n - 1]! };
+  }
+
+  let i = 0;
+  while (i < n - 1 && hzList[i + 1]! < targetHz) i++;
+  const h0 = hzList[i]!;
+  const h1 = hzList[i + 1]!;
+  const t =
+    (Math.log10(targetHz) - Math.log10(h0)) / Math.max(1e-6, Math.log10(h1) - Math.log10(h0));
+  return {
+    hz: targetHz,
+    before: before[i]! + t * (before[i + 1]! - before[i]!),
+    after: after[i]! + t * (after[i + 1]! - after[i]!),
+  };
 }
 
 export function SpectrumChart({
@@ -174,35 +195,46 @@ export function SpectrumChart({
 
   const xLabels = [100, 250, 500, 1000, 2000, 5000];
   const [hover, setHover] = useState<HoverPoint | null>(null);
+  const [active, setActive] = useState(false);
+  const leaveTimer = useRef<number | null>(null);
 
   const onMove = useCallback(
     (e: ReactPointerEvent<SVGSVGElement>) => {
+      if (leaveTimer.current != null) {
+        window.clearTimeout(leaveTimer.current);
+        leaveTimer.current = null;
+      }
       const svg = e.currentTarget;
       const rect = svg.getBoundingClientRect();
       const sx = ((e.clientX - rect.left) / rect.width) * W;
       if (sx < padL || sx > W - padR) {
-        setHover(null);
+        setActive(false);
         return;
       }
       const t = (sx - padL) / plotW;
       const logHz = Math.log10(hzMin) + t * (Math.log10(hzMax) - Math.log10(hzMin));
       const targetHz = 10 ** logHz;
-      const i = nearestBandIndex(series.hz, targetHz);
-      const hz = series.hz[i]!;
-      const before = series.before[i]!;
-      const after = series.after[i]!;
+      const sample = sampleAt(series.hz, series.before, series.after, targetHz);
       setHover({
-        i,
-        hz,
-        before,
-        after,
-        x: xAt(hz, hzMin, hzMax, padL, plotW),
-        yBefore: yAt(before, yMin, yMax, padT, plotH),
-        yAfter: yAt(after, yMin, yMax, padT, plotH),
+        hz: sample.hz,
+        before: sample.before,
+        after: sample.after,
+        x: sx,
+        yBefore: yAt(sample.before, yMin, yMax, padT, plotH),
+        yAfter: yAt(sample.after, yMin, yMax, padT, plotH),
       });
+      setActive(true);
     },
     [hzMax, hzMin, plotH, plotW, series.after, series.before, series.hz, yMax, yMin],
   );
+
+  const onLeave = useCallback(() => {
+    setActive(false);
+    leaveTimer.current = window.setTimeout(() => {
+      setHover(null);
+      leaveTimer.current = null;
+    }, 180);
+  }, []);
 
   const tooltipStyle = useMemo(() => {
     if (!hover) return undefined;
@@ -211,8 +243,9 @@ export function SpectrumChart({
     return {
       left: `${leftPct}%`,
       transform: flip ? 'translate(-100%, 0)' : 'translate(0, 0)',
+      opacity: active ? 1 : 0,
     } as const;
-  }, [hover]);
+  }, [hover, active]);
 
   return (
     <figure className={styles.wrap}>
@@ -248,7 +281,7 @@ export function SpectrumChart({
           role="img"
           aria-label={`${title}: ${beforeLabel} и ${afterLabel}. Чем выше линия, тем лучше изоляция. Наведите курсор, чтобы увидеть дБ по частоте.`}
           onPointerMove={onMove}
-          onPointerLeave={() => setHover(null)}
+          onPointerLeave={onLeave}
         >
           {yTicks.map((tick) => {
             const y = yAt(tick, yMin, yMax, padT, plotH);
@@ -286,7 +319,10 @@ export function SpectrumChart({
           <path d={afterPath} className={styles.after} fill="none" />
 
           {hover ? (
-            <g className={styles.hoverLayer} pointerEvents="none">
+            <g
+              className={`${styles.hoverLayer} ${active ? styles.hoverLayerOn : ''}`}
+              pointerEvents="none"
+            >
               <line
                 x1={hover.x}
                 x2={hover.x}
@@ -294,8 +330,8 @@ export function SpectrumChart({
                 y2={padT + plotH}
                 className={styles.hoverLine}
               />
-              <circle cx={hover.x} cy={hover.yBefore} r={2.4} className={styles.dotBefore} />
-              <circle cx={hover.x} cy={hover.yAfter} r={2.6} className={styles.dotAfter} />
+              <circle cx={hover.x} cy={hover.yBefore} r={2.8} className={styles.dotBefore} />
+              <circle cx={hover.x} cy={hover.yAfter} r={3.1} className={styles.dotAfter} />
             </g>
           ) : null}
         </svg>

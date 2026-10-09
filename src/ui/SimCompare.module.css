@@ -110,6 +110,15 @@
   align-items: center;
   gap: 6px;
   opacity: 0.55;
+  cursor: default;
+  transition:
+    opacity var(--duration-normal) var(--ease-out),
+    transform var(--duration-normal) var(--ease-out);
+}
+
+.scaleStep:hover {
+  opacity: 1;
+  transform: translateY(-2px);
 }
 
 .scaleDot {
@@ -118,6 +127,16 @@
   border-radius: 50%;
   background: var(--border-color, #e1e5e8);
   border: 2px solid transparent;
+  transition:
+    transform var(--duration-normal) var(--ease-spring),
+    background var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-normal) var(--ease-out);
+}
+
+.scaleStep:hover .scaleDot {
+  transform: scale(1.35);
+  background: var(--accent-color, #01644f);
+  box-shadow: 0 0 0 4px rgba(1, 100, 79, 0.2);
 }
 
 .scaleName {

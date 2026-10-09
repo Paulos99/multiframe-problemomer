@@ -101,8 +101,17 @@
 }
 
 .play:hover {
-  transform: translateY(-1px);
-  border-color: rgba(1, 100, 79, 0.4);
+  transform: translateY(-3px);
+  border-color: rgba(1, 100, 79, 0.5);
+  box-shadow: var(--shadow-md);
+}
+
+.play:hover .icon {
+  transform: scale(1.06);
+}
+
+.play .icon {
+  transition: transform var(--duration-normal) var(--ease-spring);
 }
 
 .after {

@@ -112,6 +112,32 @@
   font-weight: 650;
   cursor: pointer;
   overflow: hidden;
+  transition:
+    border-color var(--duration-normal) var(--ease-out),
+    background var(--duration-normal) var(--ease-out),
+    box-shadow var(--duration-normal) var(--ease-out),
+    transform var(--duration-normal) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn.before:hover {
+  border-color: rgba(122, 135, 144, 0.65);
+  background: color-mix(in srgb, #7a8790 12%, var(--bg-subtle));
+}
+
+.btn.after:hover {
+  border-color: rgba(1, 100, 79, 0.5);
+  background: color-mix(in srgb, var(--accent-soft) 70%, var(--bg-subtle));
+  color: var(--accent-color);
 }
 
 .btn.before.playing {
@@ -122,6 +148,14 @@
 .btn.after.playing {
   border-color: rgba(1, 100, 79, 0.45);
   background: rgba(1, 100, 79, 0.12);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn:hover,
+  .btn:active {
+    transform: none;
+  }
 }
 
 .playGlyph {
