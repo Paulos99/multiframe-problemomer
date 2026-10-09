@@ -136,7 +136,15 @@ export function spectrumChartSvg(
 
   const quieter =
     opts.quieterPct != null && opts.quieterPct > 0
-      ? `<span class="badge-quiet">≈ ${opts.quieterPct}% тише</span>`
+      ? (() => {
+          const text = `≈ ${opts.quieterPct}% тише`;
+          const fontSize = 10;
+          const padX = 8;
+          const height = 20;
+          const width = Math.max(36, Math.ceil(text.length * fontSize * 0.72 + padX * 2));
+          const radius = height / 2;
+          return `<svg class="pill-svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="${width}" height="${height}" rx="${radius}" ry="${radius}" fill="#dceee8"/><text x="${(width / 2).toFixed(1)}" y="${(height / 2).toFixed(1)}" text-anchor="middle" dominant-baseline="central" fill="#01644f" font-size="${fontSize}" font-weight="750" font-family="Segoe UI, system-ui, sans-serif">${text}</text></svg>`;
+        })()
       : '';
 
   return `<figure class="chart">

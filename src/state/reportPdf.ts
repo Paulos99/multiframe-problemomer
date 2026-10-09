@@ -64,6 +64,8 @@ const PILLARS = [
 ] as const;
 
 type QrBundle = { site: string; calc: string };
+type LogoBundle = { stp: string; mf: string };
+type ReportAssets = { qr: QrBundle; logos: LogoBundle };
 
 function optLabel<T extends string>(
   options: { id: T; label: string }[],
@@ -94,9 +96,92 @@ function formatDateRu(d = new Date()): string {
   });
 }
 
+async function blobToDataUrl(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(new Error('Не удалось прочитать логотип'));
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function fetchDataUrl(url: string): Promise<string> {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Не удалось загрузить ${url}`);
+  return blobToDataUrl(await res.blob());
+}
+
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error('Логотип не загрузился'));
+    img.src = src;
+  });
+}
+
+/** Match site light-header look: `filter: brightness(0)` baked into pixels. */
+export async function darkenLogoDataUrl(src: string): Promise<string> {
+  const img = await loadImage(src);
+  const canvas = document.createElement('canvas');
+  canvas.width = img.naturalWidth || img.width;
+  canvas.height = img.naturalHeight || img.height;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return src;
+  ctx.drawImage(img, 0, 0);
+  const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const px = data.data;
+  for (let i = 0; i < px.length; i += 4) {
+    if ((px[i + 3] ?? 0) < 8) continue;
+    px[i] = 0;
+    px[i + 1] = 0;
+    px[i + 2] = 0;
+  }
+  ctx.putImageData(data, 0, 0);
+  return canvas.toDataURL('image/png');
+}
+
+/** Site logos from /public — darkened data URLs for iframe/html2canvas. */
+export async function buildLogoBundle(logos?: LogoBundle): Promise<LogoBundle> {
+  if (logos?.stp && logos?.mf) {
+    if (typeof document === 'undefined') return logos;
+    const [stp, mf] = await Promise.all([
+      darkenLogoDataUrl(logos.stp),
+      darkenLogoDataUrl(logos.mf),
+    ]);
+    return { stp, mf };
+  }
+  const base = new URL(import.meta.env.BASE_URL || '/', window.location.href);
+  const [rawStp, rawMf] = await Promise.all([
+    fetchDataUrl(new URL('logo-stp.png', base).href),
+    fetchDataUrl(new URL('logo-multiframe.png', base).href),
+  ]);
+  const [stp, mf] = await Promise.all([
+    darkenLogoDataUrl(rawStp),
+    darkenLogoDataUrl(rawMf),
+  ]);
+  return { stp, mf };
+}
+
+/** SVG pill — html2canvas paints these without the CSS border-radius drift. */
+function pillSvg(
+  text: string,
+  opts: { bg: string; fg: string; fontSize?: number; padX?: number; height?: number },
+): string {
+  const fontSize = opts.fontSize ?? 10;
+  const padX = opts.padX ?? 10;
+  const height = opts.height ?? 22;
+  const width = Math.max(36, Math.ceil(text.length * fontSize * 0.72 + padX * 2));
+  const radius = height / 2;
+  return `<svg class="pill-svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <rect width="${width}" height="${height}" rx="${radius}" ry="${radius}" fill="${opts.bg}"/>
+  <text x="${(width / 2).toFixed(1)}" y="${(height / 2).toFixed(1)}" text-anchor="middle" dominant-baseline="central" fill="${opts.fg}" font-size="${fontSize}" font-weight="750" font-family="Segoe UI, system-ui, sans-serif">${escapeHtml(text)}</text>
+</svg>`;
+}
+
 async function buildQrBundle(): Promise<QrBundle> {
   const opts = {
-    width: 280,
+    width: 160,
     margin: 1,
     color: { dark: '#0c332c', light: '#ffffff' },
     errorCorrectionLevel: 'M' as const,
@@ -108,18 +193,21 @@ async function buildQrBundle(): Promise<QrBundle> {
   return { site, calc };
 }
 
-function pageChrome(page: number, total: number, roomLine: string): string {
+function pageChrome(
+  page: number,
+  total: number,
+  roomLine: string,
+  logos: LogoBundle,
+): string {
   return `
   <div class="page-top">
     <div class="brand-row">
       <div class="brand-lockup">
-        <span class="brand-mark">StP</span>
-        <div>
-          <span class="brand">MultiFrame</span>
-          <span class="brand-sub">Проблемомер</span>
-        </div>
+        <img class="logo-stp" src="${logos.stp}" alt="StP" width="40" height="40" />
+        <img class="logo-mf" src="${logos.mf}" alt="MultiFrame" height="26" />
+        <span class="brand-sub">Проблемомер</span>
       </div>
-      <span class="doc-type">Акустический профиль</span>
+      ${pillSvg('Акустический профиль', { bg: '#dceee8', fg: '#01644f', fontSize: 11, padX: 12, height: 26 })}
     </div>
     <div class="meta-row">
       <span>${escapeHtml(roomLine)}</span>
@@ -132,7 +220,8 @@ function pageChrome(page: number, total: number, roomLine: string): string {
   </div>`;
 }
 
-function buildReportDocument(session: SessionState, qr: QrBundle): string {
+function buildReportDocument(session: SessionState, assets: ReportAssets): string {
+  const { qr, logos } = assets;
   const handoff = buildLeadHandoff(session);
   const room = handoff.room;
   const slab = resolveSlab(room);
@@ -200,15 +289,32 @@ function buildReportDocument(session: SessionState, qr: QrBundle): string {
   const normRow = (key: string, label: string, rw: string, lnw: string, muted?: boolean) => {
     const isNow = key === hybridBefore;
     const isMf = key === hybridAfter;
-    const pills = [
-      isNow ? `<span class="pill-now">Сейчас</span>` : '',
-      isMf ? `<span class="pill-mf">MultiFrame</span>` : '',
-    ].join('');
+    const mark = isMf
+      ? pillSvg('MultiFrame', { bg: '#01644f', fg: '#ffffff', fontSize: 9, padX: 8, height: 20 })
+      : isNow
+        ? pillSvg('Сейчас', { bg: '#68757e', fg: '#ffffff', fontSize: 9, padX: 8, height: 20 })
+        : '';
     return `<tr class="${muted ? 'muted' : ''} ${isNow || isMf ? 'marked' : ''}">
-      <td><span class="norm-level">${escapeHtml(label)}${pills}</span></td>
+      <td><span class="norm-name">${escapeHtml(label)}</span></td>
       <td>${rw}</td><td>${lnw}</td>
+      <td>${mark}</td>
     </tr>`;
   };
+
+  const normsTable = `
+    <div class="norms-block">
+      <h2>Нормы комфорта жилья</h2>
+      <p class="muted" style="margin-bottom:8px">по СП 51.13330.2011 · Rw больше лучше · Lnw меньше лучше</p>
+      <table class="norms">
+        <thead><tr><th>Уровень</th><th>Rw</th><th>Lnw</th><th></th></tr></thead>
+        <tbody>
+          ${normRow('A', 'Высокий комфорт (А)', `≥ ${NORMS.A.Rw}`, `≤ ${NORMS.A.Lnw}`)}
+          ${normRow('B', 'Комфорт (Б)', `≥ ${NORMS.B.Rw}`, `≤ ${NORMS.B.Lnw}`)}
+          ${normRow('V', 'Допустимый (В)', `≥ ${NORMS.V.Rw}`, `≤ ${NORMS.V.Lnw}`)}
+          ${normRow('below', 'Ниже допустимого', `&lt; ${NORMS.V.Rw}`, `&gt; ${NORMS.V.Lnw}`, true)}
+        </tbody>
+      </table>
+    </div>`;
 
   const TOTAL = 4;
 
@@ -245,25 +351,20 @@ function buildReportDocument(session: SessionState, qr: QrBundle): string {
     display: flex; justify-content: space-between; align-items: center;
     gap: 16px; margin-bottom: 8px;
   }
-  .brand-lockup { display: flex; align-items: center; gap: 10px; }
-  .brand-mark {
-    display: grid; place-items: center;
-    width: 34px; height: 34px; border-radius: 10px;
-    background: linear-gradient(135deg, #0c332c, #01644f);
-    color: #fff; font-size: 11px; font-weight: 800; letter-spacing: .04em;
+  .brand-lockup { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .logo-stp {
+    width: 40px; height: 40px; object-fit: contain; flex: 0 0 auto;
+    display: block;
   }
-  .brand {
-    display: block; font-size: 15px; font-weight: 800; letter-spacing: -.02em; color: #0f1c16;
+  .logo-mf {
+    height: 26px; width: auto; max-width: 150px; object-fit: contain;
+    flex: 0 0 auto; display: block;
   }
   .brand-sub {
-    display: block; font-size: 11px; font-weight: 650; color: #5f6b73; margin-top: 1px;
+    font-size: 13px; font-weight: 650; color: #5f6b73; white-space: nowrap;
+    padding-left: 8px; border-left: 1px solid #dce6e1; line-height: 1.2;
   }
-  .doc-type {
-    font-size: 11px; font-weight: 750; color: #01644f;
-    letter-spacing: .08em; text-transform: uppercase;
-    padding: 6px 10px; border-radius: 999px;
-    background: rgba(1,100,79,.1);
-  }
+  .pill-svg { display: inline-block; vertical-align: middle; flex-shrink: 0; }
   .meta-row {
     display: flex; justify-content: space-between; gap: 12px;
     font-size: 11px; color: #5f6b73; padding-top: 8px;
@@ -341,13 +442,7 @@ function buildReportDocument(session: SessionState, qr: QrBundle): string {
     font-style: normal; font-size: 12px; font-weight: 700;
     color: #5f6b73; margin-left: 3px; vertical-align: .15em;
   }
-  .kpi .pill {
-    align-self: flex-start;
-    display: inline-flex; align-items: center;
-    padding: 3px 8px; border-radius: 999px;
-    font-size: 10px; font-weight: 750; color: #01644f;
-    background: rgba(1,100,79,.12);
-  }
+  .kpi .pill-svg { align-self: flex-start; margin-top: 2px; }
 
   .card {
     padding: 14px 16px; border-radius: 16px;
@@ -388,48 +483,49 @@ function buildReportDocument(session: SessionState, qr: QrBundle): string {
 
   .felt { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
   .felt-row {
-    display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
     padding: 14px 14px; border-radius: 12px; border: 1px solid #dce6e1; background: #f7faf8;
     font-size: 13px; line-height: 1.4;
   }
-  .felt-row .pct {
-    flex-shrink: 0; color: #01644f; font-weight: 800; white-space: nowrap;
-    padding: 3px 8px; border-radius: 999px; background: rgba(1,100,79,.12); font-size: 11px;
-  }
-
   .comfort-row {
-    display: grid; grid-template-columns: 1fr 1.15fr; gap: 12px; margin-top: 14px;
+    display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 14px;
   }
   .rings-card {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 12px; min-height: 220px;
-    padding: 18px 14px; border-radius: 14px; border: 1px solid #dce6e1;
-    background: linear-gradient(165deg, #fff, #f3f8f6 90%);
+    display: block; text-align: center;
+    padding: 16px 14px; border-radius: 14px; border: 1px solid #dce6e1;
+    background: #f7faf8;
+  }
+  .rings-title {
+    margin: 0 0 12px; font-size: 13px; font-weight: 800; letter-spacing: -.01em;
+    color: #0f1c16; text-align: center;
   }
   .rings {
-    display: flex; gap: 22px; align-items: center; justify-content: center;
+    display: block; text-align: center; margin: 0 auto 10px;
   }
-  .ring { position: relative; width: 92px; height: 92px; }
+  .ring {
+    position: relative; width: 92px; height: 92px;
+    display: inline-block; margin: 0 12px; vertical-align: top;
+  }
   .ring-center {
-    position: absolute; inset: 0; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 2px; pointer-events: none;
+    position: absolute; left: 0; right: 0; top: 28px; text-align: center;
+    pointer-events: none;
   }
   .ring-center b {
-    font-size: 18px; font-weight: 850; letter-spacing: -.03em; line-height: 1;
+    display: block; font-size: 18px; font-weight: 800; letter-spacing: -.03em; line-height: 1.1;
     font-variant-numeric: tabular-nums;
   }
-  .ring-center span { font-size: 10px; font-weight: 700; color: #5f6b73; }
-  .echo-pill {
-    display: inline-flex; padding: 5px 11px; border-radius: 999px;
-    font-size: 12px; font-weight: 750; color: #01644f; background: rgba(1,100,79,.12);
+  .ring-center span {
+    display: block; margin-top: 2px; font-size: 10px; font-weight: 700; color: #5f6b73;
   }
-
+  .norms-block { margin-top: 12px; }
+  .norms-block h2 { margin: 0 0 6px; font-size: 13px; font-weight: 800; }
   .norms {
     width: 100%; border-collapse: collapse; font-size: 12px;
-    border: 1px solid #dce6e1; border-radius: 12px; overflow: hidden; background: #f7faf8;
+    border: 1px solid #dce6e1; background: #f7faf8;
   }
   .norms th, .norms td {
     padding: 9px 12px; border-bottom: 1px solid #e4ebe7; text-align: left;
+    vertical-align: middle;
   }
   .norms tr:last-child td { border-bottom: none; }
   .norms th {
@@ -439,15 +535,12 @@ function buildReportDocument(session: SessionState, qr: QrBundle): string {
   .norms th:nth-child(2), .norms th:nth-child(3) {
     text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 700;
   }
-  .norms tr.muted td { color: #7a8790; }
-  .norms tr.marked td { background: rgba(1,100,79,.08); }
-  .norm-level { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 6px; }
-  .pill-now, .pill-mf {
-    display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 999px;
-    font-size: 9px; font-weight: 800; letter-spacing: .02em; color: #fff;
+  .norms td:nth-child(4), .norms th:nth-child(4) {
+    text-align: right; white-space: nowrap; width: 1%;
   }
-  .pill-now { background: #68757e; }
-  .pill-mf { background: #01644f; }
+  .norms tr.muted td { color: #7a8790; }
+  .norms tr.marked td { background: #e7f3ef; }
+  .norm-name { font-weight: 700; }
 
   .note {
     margin: 0 0 12px; font-size: 12px; color: #5f6b73; line-height: 1.4;
@@ -485,10 +578,6 @@ function buildReportDocument(session: SessionState, qr: QrBundle): string {
     padding: 5px 9px; border-radius: 10px; font-size: 10.5px; color: #5f6b73;
   }
   .badge b { display: block; color: #152018; font-size: 12px; font-weight: 800; }
-  .badge-quiet {
-    display: inline-block; margin-top: 3px; padding: 2px 7px; border-radius: 999px;
-    font-size: 10px; font-weight: 750; color: #01644f; background: rgba(1,100,79,.12);
-  }
   .legend {
     list-style: none; margin: 6px 0 0; padding: 0;
     display: flex; gap: 14px; font-size: 11px; color: #5f6b73; font-weight: 650;
@@ -515,37 +604,36 @@ function buildReportDocument(session: SessionState, qr: QrBundle): string {
   .pillars .pillar:last-child:nth-child(odd) { grid-column: 1 / -1; }
 
   .qr-row {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;
   }
   .qr-card {
-    display: flex; gap: 16px; align-items: center;
-    padding: 18px 16px; border-radius: 16px;
+    display: flex; gap: 12px; align-items: center;
+    padding: 14px 12px; border-radius: 14px;
     border: 1px solid rgba(1,100,79,.22);
-    background: linear-gradient(165deg, rgba(1,100,79,.12), #fff 55%);
-    box-shadow: 0 8px 20px rgba(1,100,79,.08);
+    background: #eef7f3;
   }
   .qr-card img {
-    width: 118px; height: 118px; border-radius: 14px;
+    width: 84px; height: 84px; border-radius: 10px;
     border: 1px solid #dce6e1; background: #fff; flex-shrink: 0;
   }
   .qr-card .qr-k {
     font-size: 10px; font-weight: 800; letter-spacing: .08em;
-    text-transform: uppercase; color: #01644f; margin-bottom: 5px;
+    text-transform: uppercase; color: #01644f; margin-bottom: 4px;
   }
   .qr-card strong {
-    display: block; font-size: 15px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 5px;
+    display: block; font-size: 14px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 3px;
   }
-  .qr-card p { margin: 0; font-size: 12px; color: #5f6b73; line-height: 1.4; }
+  .qr-card p { margin: 0; font-size: 11.5px; color: #5f6b73; line-height: 1.35; }
   .qr-card .qr-url {
-    display: block; margin-top: 6px; font-size: 11px; font-weight: 700;
+    display: block; margin-top: 5px; font-size: 10.5px; font-weight: 700;
     color: #0c332c; word-break: break-all;
   }
 
   .closing {
-    margin-top: 16px; padding: 16px 18px; border-radius: 14px;
+    margin-top: 12px; padding: 12px 14px; border-radius: 12px;
     border: 1px solid rgba(1,100,79,.2);
-    background: linear-gradient(165deg, rgba(1,100,79,.1), #fff 60%);
-    font-size: 12.5px; line-height: 1.45; color: #5f6b73;
+    background: #eef7f3;
+    font-size: 12px; line-height: 1.45; color: #5f6b73;
   }
   .closing b { color: #152018; }
 </style></head><body>
@@ -553,7 +641,7 @@ function buildReportDocument(session: SessionState, qr: QrBundle): string {
 
   <!-- PAGE 1 -->
   <section class="page" data-page="1">
-    ${pageChrome(1, TOTAL, roomLine)}
+    ${pageChrome(1, TOTAL, roomLine, logos)}
     <h1 class="hero-title">Акустический профиль помещения</h1>
     <p class="hero-sub">Объект: <b>${escapeHtml(roomName)}</b>, ${escapeHtml(area)}. Эффект MultiFrame для этого помещения.</p>
 
@@ -574,22 +662,26 @@ function buildReportDocument(session: SessionState, qr: QrBundle): string {
       <article class="kpi">
         <span class="k">Δ Rw · изоляция воздушного шума</span>
         <span class="v">+${deltaRw}<em>дБ</em></span>
-        <span class="pill">≈ на ${sim.perceivedAirPct}% тише</span>
+        ${pillSvg(`≈ на ${sim.perceivedAirPct}% тише`, { bg: '#dceee8', fg: '#01644f' })}
       </article>
       <article class="kpi">
         <span class="k">Δ Lnw · уровень ударного шума</span>
         <span class="v">−${deltaLnw}<em>дБ</em></span>
-        <span class="pill">≈ на ${sim.perceivedImpactPct}% тише</span>
+        ${pillSvg(`≈ на ${sim.perceivedImpactPct}% тише`, { bg: '#dceee8', fg: '#01644f' })}
       </article>
       <article class="kpi">
         <span class="k">Тише на слух</span>
         <span class="v">≈${quieterMax}<em>%</em></span>
-        <span class="pill">воздух ${sim.perceivedAirPct}% · удар ${sim.perceivedImpactPct}%</span>
+        ${pillSvg(`воздух ${sim.perceivedAirPct}% · удар ${sim.perceivedImpactPct}%`, { bg: '#dceee8', fg: '#01644f', fontSize: 9, padX: 8 })}
       </article>
       <article class="kpi">
         <span class="k">Акустический комфорт</span>
         <span class="v">${comfortBefore} → ${comfortAfter}<em>%</em></span>
-        ${echoDrop > 0 ? `<span class="pill">≈ на ${echoDrop}% меньше эха</span>` : `<span class="pill">комфорт комнаты</span>`}
+        ${
+          echoDrop > 0
+            ? pillSvg(`≈ на ${echoDrop}% меньше эха`, { bg: '#dceee8', fg: '#01644f' })
+            : pillSvg('комфорт комнаты', { bg: '#dceee8', fg: '#01644f' })
+        }
       </article>
     </div>
 
@@ -609,59 +701,54 @@ function buildReportDocument(session: SessionState, qr: QrBundle): string {
           <div class="chips">воздух ${chipLabel(airClassFor(a.Rw))} · удар ${chipLabel(impactClassFor(a.Lnw))}</div>
         </div>
       </div>
+      ${normsTable}
     </div>
   </section>
 
   <!-- PAGE 2 -->
   <section class="page" data-page="2">
-    ${pageChrome(2, TOTAL, roomLine)}
-    <div class="card">
+    ${pageChrome(2, TOTAL, roomLine, logos)}
+    <div class="card" style="margin-bottom:0">
       <h2><span class="sec-idx">02</span>Прогноз с MultiFrame</h2>
       ${wishBlock}
       <div class="felt">
         <div class="felt-row">
           <span>Воздух · ${FELT_STEP_LABELS[airNow]} → <b>${FELT_STEP_LABELS[airAfter]}</b> · Rw ≈ ${Math.round(b.Rw)} → ≈ ${Math.round(a.Rw)} дБ</span>
-          <span class="pct">≈ ${sim.perceivedAirPct}% тише</span>
+          ${pillSvg(`≈ ${sim.perceivedAirPct}% тише`, { bg: '#dceee8', fg: '#01644f', fontSize: 11, height: 24 })}
         </div>
         <div class="felt-row">
           <span>Удар · ${FELT_STEP_LABELS[impactNow]} → <b>${FELT_STEP_LABELS[impactAfter]}</b> · Lnw ≈ ${Math.round(b.Lnw)} → ≈ ${Math.round(a.Lnw)} дБ</span>
-          <span class="pct">≈ ${sim.perceivedImpactPct}% тише</span>
+          ${pillSvg(`≈ ${sim.perceivedImpactPct}% тише`, { bg: '#dceee8', fg: '#01644f', fontSize: 11, height: 24 })}
         </div>
       </div>
       <div class="comfort-row">
         <div class="rings-card">
+          <h3 class="rings-title">Акустический комфорт</h3>
           <div class="rings">
             ${comfortRingSvg(comfortBefore, 'Сейчас', false)}
             ${comfortRingSvg(comfortAfter, 'После', true)}
           </div>
-          ${echoDrop > 0 ? `<span class="echo-pill">≈ на ${echoDrop}% меньше эха</span>` : ''}
-          <p class="muted" style="text-align:center;margin-top:2px">MultiFrame — звукоизоляция и звукопоглощение в комнате</p>
-        </div>
-        <div>
-          <h2 style="margin:0 0 8px;font-size:13px">Нормы комфорта жилья</h2>
-          <p class="muted" style="margin-bottom:8px">по СП 51.13330.2011 · Rw больше лучше · Lnw меньше лучше</p>
-          <table class="norms">
-            <thead><tr><th>Уровень</th><th>Rw</th><th>Lnw</th></tr></thead>
-            <tbody>
-              ${normRow('A', 'Высокий комфорт (А)', `≥ ${NORMS.A.Rw}`, `≤ ${NORMS.A.Lnw}`)}
-              ${normRow('B', 'Комфорт (Б)', `≥ ${NORMS.B.Rw}`, `≤ ${NORMS.B.Lnw}`)}
-              ${normRow('V', 'Допустимый (В)', `≥ ${NORMS.V.Rw}`, `≤ ${NORMS.V.Lnw}`)}
-              ${normRow('below', 'Ниже допустимого', `&lt; ${NORMS.V.Rw}`, `&gt; ${NORMS.V.Lnw}`, true)}
-            </tbody>
-          </table>
+          ${
+            echoDrop > 0
+              ? pillSvg(`≈ на ${echoDrop}% меньше эха`, {
+                  bg: '#dceee8',
+                  fg: '#01644f',
+                  fontSize: 12,
+                  height: 26,
+                  padX: 12,
+                })
+              : ''
+          }
+          <p class="muted" style="text-align:center;margin-top:10px">MultiFrame — звукоизоляция и звукопоглощение в комнате</p>
         </div>
       </div>
-    </div>
-    <div class="card" style="margin-bottom:0;margin-top:12px">
-      <h2><span class="sec-idx">03</span>Уникальность MultiFrame</h2>
-      <ul class="pillars">${pillars}</ul>
     </div>
   </section>
 
   <!-- PAGE 3 -->
   <section class="page" data-page="3">
-    ${pageChrome(3, TOTAL, roomLine)}
-    <h2 style="margin:0 0 6px;font-size:15px;font-weight:800"><span class="sec-idx">04</span>Изоляция по частотам</h2>
+    ${pageChrome(3, TOTAL, roomLine, logos)}
+    <h2 style="margin:0 0 6px;font-size:15px;font-weight:800"><span class="sec-idx">03</span>Изоляция по частотам</h2>
     <p class="note">Чем выше линия, тем лучше перекрытие изолирует шум на этой частоте.</p>
 
     <div class="delta-strip">
@@ -683,26 +770,31 @@ function buildReportDocument(session: SessionState, qr: QrBundle): string {
 
   <!-- PAGE 4 -->
   <section class="page" data-page="4">
-    ${pageChrome(4, TOTAL, roomLine)}
-    <h1 class="hero-title">Продолжите с MultiFrame</h1>
-    <p class="hero-sub">Отсканируйте QR-код камерой телефона — сайт бренда или калькулятор комплектации.</p>
+    ${pageChrome(4, TOTAL, roomLine, logos)}
+    <div class="card">
+      <h2><span class="sec-idx">04</span>Уникальность MultiFrame</h2>
+      <ul class="pillars">${pillars}</ul>
+    </div>
 
-    <div class="qr-row" style="margin-top:18px;grid-template-columns:1fr;gap:18px">
-      <div class="qr-card" style="padding:28px 24px;min-height:200px">
-        <img src="${qr.site}" alt="QR код сайта MultiFrame" width="168" height="168" style="width:168px;height:168px" />
+    <h2 style="margin:14px 0 4px;font-size:15px;font-weight:800">Продолжите с MultiFrame</h2>
+    <p class="hero-sub" style="margin-bottom:0">Отсканируйте QR — сайт бренда или калькулятор комплектации.</p>
+
+    <div class="qr-row">
+      <div class="qr-card">
+        <img src="${qr.site}" alt="QR код сайта MultiFrame" width="84" height="84" />
         <div>
-          <div class="qr-k">Сайт MultiFrame</div>
-          <strong style="font-size:22px">stp-multiframe.ru</strong>
-          <p style="font-size:13.5px;margin-top:4px">Официальный сайт: продукт, монтаж и акустический комфорт потолка.</p>
+          <div class="qr-k">Сайт</div>
+          <strong>stp-multiframe.ru</strong>
+          <p>Официальный сайт MultiFrame</p>
           <span class="qr-url">${escapeHtml(SITE_URL)}</span>
         </div>
       </div>
-      <div class="qr-card" style="padding:28px 24px;min-height:200px">
-        <img src="${qr.calc}" alt="QR код калькулятора MultiFrame" width="168" height="168" style="width:168px;height:168px" />
+      <div class="qr-card">
+        <img src="${qr.calc}" alt="QR код калькулятора MultiFrame" width="84" height="84" />
         <div>
           <div class="qr-k">Калькулятор</div>
-          <strong style="font-size:22px">Рассчитать количество</strong>
-          <p style="font-size:13.5px;margin-top:4px">Подбор комплектации MultiFrame под площадь и задачу объекта.</p>
+          <strong>Рассчитать количество</strong>
+          <p>Подбор комплектации под объект</p>
           <span class="qr-url">${escapeHtml(CALCULATOR_URL)}</span>
         </div>
       </div>
@@ -719,13 +811,16 @@ function buildReportDocument(session: SessionState, qr: QrBundle): string {
 }
 
 /** HTML document used for PDF rasterization (also handy for visual preview). */
-export async function buildAcousticProfileHtml(session: SessionState): Promise<string> {
+export async function buildAcousticProfileHtml(
+  session: SessionState,
+  logos?: LogoBundle,
+): Promise<string> {
   const full = session.derived ? session : withDerived(session);
   if (!full.derived) {
     throw new Error('Нет расчёта для отчёта');
   }
-  const qr = await buildQrBundle();
-  return buildReportDocument(full, qr);
+  const [qr, logoBundle] = await Promise.all([buildQrBundle(), buildLogoBundle(logos)]);
+  return buildReportDocument(full, { qr, logos: logoBundle });
 }
 
 /** Prefetch pdf libs so the click is not waiting on the network. */
@@ -786,8 +881,8 @@ export async function downloadAcousticProfilePdf(session: SessionState): Promise
     throw new Error('Нет расчёта для отчёта');
   }
 
-  const qr = await buildQrBundle();
-  const html = buildReportDocument(full, qr);
+  const [qr, logos] = await Promise.all([buildQrBundle(), buildLogoBundle()]);
+  const html = buildReportDocument(full, { qr, logos });
   const iframe = document.createElement('iframe');
   iframe.setAttribute('aria-hidden', 'true');
   iframe.setAttribute('title', 'PDF');
