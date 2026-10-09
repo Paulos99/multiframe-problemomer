@@ -37,9 +37,9 @@ export function EchoComfort({ sim }: Props) {
   }, [pair.beforeSrc]);
 
   return (
-    <section className={styles.wrap} aria-label="Эхо в самой комнате">
+    <section className={styles.wrap} aria-label="Эхо в комнате (акустический комфорт)">
       <header className={styles.head}>
-        <h3>Эхо в самой комнате</h3>
+        <h3>Эхо в комнате (акустический комфорт)</h3>
         <p>
           MultiFrame — не только изоляция сверху. Перфорация гасит эхо в самой комнате.
         </p>

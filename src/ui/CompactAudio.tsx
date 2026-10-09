@@ -21,7 +21,7 @@ const GROUP_TITLES: Record<AudioPair['group'], string> = {
   air: 'Воздушный шум',
   impact: 'Ударный шум',
   mixed: 'Смешанный шум',
-  echo: 'Эхо в комнате',
+  echo: 'Эхо в комнате (акустический комфорт)',
 };
 
 type Props = {
