@@ -669,7 +669,7 @@ export async function shareAcousticProfile(
   try {
     if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
       await navigator.share({
-        title: 'Насколько тише станет с MultiFrame?',
+        title: 'Ощутите эффект звукоизоляции',
         text: SHARE_MARKETING_BLURB,
         url,
       });
