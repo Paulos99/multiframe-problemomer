@@ -1707,6 +1707,12 @@
   }
 }
 
+.layoutBar {
+  display: flex;
+  justify-content: flex-end;
+  margin: -4px 0 0;
+}
+
 /* Result v2: norms → now → MultiFrame → why → CTA */
 .block {
   display: flex;

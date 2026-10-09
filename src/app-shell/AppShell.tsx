@@ -10,8 +10,10 @@ import { StartScreen } from '../screens/Start/StartScreen';
 import { RoomScreen } from '../screens/Room/RoomScreen';
 import { ProcessingScreen } from '../screens/Processing/ProcessingScreen';
 import { ResultScreen } from '../screens/Result/ResultScreen';
+import { ResultWideScreen } from '../screens/Result/ResultWideScreen';
+import { useResultLayout } from '../screens/Result/useResultLayout';
 
-function useScrollReveal(step: string) {
+function useScrollReveal(deps: string) {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -42,7 +44,7 @@ function useScrollReveal(step: string) {
     }
 
     return () => io.disconnect();
-  }, [step]);
+  }, [deps]);
 }
 
 function useScrollTopOnStep(step: string) {
@@ -56,13 +58,16 @@ function useScrollTopOnStep(step: string) {
 export function AppShell() {
   const { session, goNext, goBack, canGoNext } = useSession();
   const { step } = session;
-  useScrollReveal(step);
-  useScrollTopOnStep(step);
+  const { layout, preference, setLayout, isDesktop } = useResultLayout();
   const isProcessing = step === 'processing';
-  const showNav = step !== 'start' && !isProcessing;
+  const isResult = step === 'result';
+  const isResultWide = isResult && layout === 'wide';
+  const revealKey = `${step}:${isResult ? layout : ''}`;
+  useScrollReveal(revealKey);
+  useScrollTopOnStep(revealKey);
+  const showNav = step !== 'start' && !isProcessing && !isResultWide;
   const showProgress = step !== 'start' && !isProcessing;
   const showHeader = !isProcessing;
-  const isResult = step === 'result';
 
   let content = null;
   switch (step) {
@@ -76,7 +81,16 @@ export function AppShell() {
       content = <ProcessingScreen />;
       break;
     case 'result':
-      content = <ResultScreen />;
+      content =
+        layout === 'wide' ? (
+          <ResultWideScreen layoutPreference={preference} onLayoutChange={setLayout} />
+        ) : (
+          <ResultScreen
+            showLayoutToggle={isDesktop}
+            layoutPreference={preference}
+            onLayoutChange={setLayout}
+          />
+        );
       break;
   }
 
@@ -85,11 +99,13 @@ export function AppShell() {
 
   return (
     <div
-      className={`${styles.shell} ${showNav ? styles.withFooter : ''} ${isProcessing ? styles.processing : ''}`}
+      className={`${styles.shell} ${showNav ? styles.withFooter : ''} ${isProcessing ? styles.processing : ''} ${isResultWide ? styles.shellWide : ''}`}
     >
       {showHeader ? <Header /> : null}
       {showProgress ? <ProgressDots /> : null}
-      <main className={`${styles.main} ${isProcessing ? styles.mainProcessing : ''}`}>
+      <main
+        className={`${styles.main} ${isProcessing ? styles.mainProcessing : ''} ${isResultWide ? styles.mainWide : ''}`}
+      >
         {content}
       </main>
       {showNav ? (

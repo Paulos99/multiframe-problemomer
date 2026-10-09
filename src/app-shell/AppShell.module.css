@@ -22,6 +22,16 @@
   padding: 0;
 }
 
+/* Desktop Result wide: stretch shell chrome to instrument canvas */
+.shellWide {
+  --max-w: 1400px;
+}
+
+.mainWide {
+  width: min(100%, 1400px);
+  padding-bottom: 36px;
+}
+
 .processing {
   /* Full-bleed green ceremony owns the viewport */
   background: #01644f;
@@ -34,5 +44,9 @@
 
   .mainProcessing {
     padding: 0;
+  }
+
+  .mainWide {
+    padding: 20px 28px 48px;
   }
 }
