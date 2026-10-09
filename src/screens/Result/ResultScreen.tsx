@@ -248,20 +248,13 @@ export function ResultScreen() {
     if (pdfBusy) return;
     setPdfBusy(true);
     setPdfError(false);
-    // Open now, while we still have the click gesture — later pdf.save() is often blocked.
-    const preview = window.open('', '_blank');
-    if (preview) {
-      preview.document.write(
-        '<!doctype html><title>PDF</title><p style="font-family:sans-serif;padding:24px">Готовим PDF…</p>',
-      );
-      preview.document.close();
-    }
+    // Keep this tab focused: a blank «Готовим PDF…» tab steals focus and pauses
+    // requestAnimationFrame / html2canvas until the user returns here.
     try {
-      await downloadAcousticProfilePdf(session, preview);
+      await downloadAcousticProfilePdf(session);
     } catch (err) {
       console.error('[pdf]', err);
       setPdfError(true);
-      preview?.close();
     } finally {
       setPdfBusy(false);
     }
@@ -458,7 +451,7 @@ export function ResultScreen() {
         <div className={styles.charts}>
           <header>
             <h3>Изоляция по частотам</h3>
-            <p>Чем выше линия, тем лучше потолок держит шум на этой частоте.</p>
+            <p>Чем выше линия на графике, тем лучше перекрытие изолирует шум на этой частоте.</p>
           </header>
           {airChart}
           {impactChart}

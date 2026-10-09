@@ -4,7 +4,6 @@
  */
 import {
   HOUSE_TYPE_OPTIONS,
-  HYBRID_CLASS_LABELS,
   ROOM_TYPE_LABELS,
   ROOM_WISH_OPTIONS,
   SLAB_THICKNESS_OPTIONS,
@@ -164,7 +163,7 @@ function buildReportDocument(session: SessionState): string {
         ? `<p class="lead">${escapeHtml(drum)}</p>`
         : `<p class="lead">Прогноз по голосам и шагам сверху для этого перекрытия.</p>`;
 
-  const TOTAL = 3;
+  const TOTAL = 4;
 
   return `<!DOCTYPE html>
 <html lang="ru"><head><meta charset="utf-8" />
@@ -357,6 +356,10 @@ function buildReportDocument(session: SessionState): string {
   }
   .sw-b { background: #7a8790; } .sw-a { background: #01644f; }
 
+  .norms-title {
+    margin: 14px 0 8px;
+    font-size: 13px; font-weight: 750; color: #0f1c16; letter-spacing: -.01em;
+  }
   .norms {
     width: 100%; border-collapse: collapse; font-size: 12px;
     border: 1px solid #d7e2dc;
@@ -376,15 +379,19 @@ function buildReportDocument(session: SessionState): string {
 
   .pillars { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
   .pillars li {
-    display: grid; grid-template-columns: 22px 1fr; gap: 10px; align-items: start;
+    display: grid; grid-template-columns: 26px 1fr; gap: 10px; align-items: start;
     padding: 8px 0; border-bottom: 1px solid #e6eeea;
   }
   .pillars li:last-child { border-bottom: none; }
   .pillars .n {
-    width: 22px; height: 22px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
+    box-sizing: border-box;
+    width: 26px; height: 26px; min-width: 26px; max-width: 26px;
+    border-radius: 50%;
+    display: grid; place-items: center;
     background: #e8f3ef; color: #01644f;
-    font-size: 11px; font-weight: 800;
+    font-size: 11px; font-weight: 800; line-height: 1;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
   }
   .pillars strong { display: block; font-size: 12.5px; margin-bottom: 2px; }
   .pillars p { margin: 0; font-size: 11.5px; color: #5f6b73; line-height: 1.4; }
@@ -433,7 +440,11 @@ function buildReportDocument(session: SessionState): string {
         <div class="v">«${escapeHtml(officialComfortLabel(hybridBefore))}»</div>
       </div>
     </div>
+  </section>
 
+  <!-- PAGE 2: forecast + norms (п. 03) -->
+  <section class="page" data-page="2">
+    ${pageChrome(2, TOTAL, roomLine)}
     <div class="block" style="margin-bottom:0">
       <div class="sec"><span class="idx">03</span><h2>Прогноз с MultiFrame</h2></div>
       ${wishBlock}
@@ -465,38 +476,9 @@ function buildReportDocument(session: SessionState): string {
         <div class="k">Порхающее эхо в помещении</div>
         <div class="v">${rev.echoInRoomBefore}% → ${rev.echoInRoomAfter}%</div>
       </div>
-      <p class="muted" style="margin-top:6px">Меньше процент — суше в комнате. MultiFrame снимает порхание, не только шум сверху.</p>
-    </div>
-  </section>
+      <p class="muted" style="margin-top:6px">Меньше процент — суше звук в комнате. MultiFrame гасит эхо в помещении, а не только шум сверху.</p>
 
-  <!-- PAGE 2: spectra -->
-  <section class="page" data-page="2">
-    ${pageChrome(2, TOTAL, roomLine)}
-    <div class="sec"><span class="idx">04</span><h2>Как потолок держит шум по частотам</h2></div>
-    <p class="note">Чем выше линия, тем лучше потолок держит шум на этой частоте. Зелёная заливка — выигрыш MultiFrame.</p>
-
-    <div class="delta-strip">
-      <div class="delta-item">
-        <div class="k">Воздушный шум · Rw</div>
-        <div class="v">${b.Rw} → ${a.Rw} дБ</div>
-        <div class="d">Δ +${Math.abs(sim.delta.Rw)} дБ</div>
-      </div>
-      <div class="delta-item">
-        <div class="k">Ударный шум · Lnw</div>
-        <div class="v">${b.Lnw} → ${a.Lnw} дБ</div>
-        <div class="d">Δ −${Math.abs(sim.delta.Lnw)} дБ</div>
-      </div>
-    </div>
-
-    ${airSvg}
-    ${impactSvg}
-  </section>
-
-  <!-- PAGE 3: norms + system -->
-  <section class="page" data-page="3">
-    ${pageChrome(3, TOTAL, roomLine)}
-    <div class="block">
-      <div class="sec"><span class="idx">05</span><h2>Нормы комфорта для жилья · СП 51.13330.2011</h2></div>
+      <h3 class="norms-title">Нормы комфорта для жилья · СП 51.13330.2011</h3>
       <table class="norms">
         <thead><tr><th>Уровень</th><th>Rw, дБ</th><th>Lnw, дБ</th></tr></thead>
         <tbody>
@@ -506,15 +488,41 @@ function buildReportDocument(session: SessionState): string {
           <tr class="muted"><td>Ниже допустимого</td><td>&lt; ${NORMS.V.Rw}</td><td>&gt; ${NORMS.V.Lnw}</td></tr>
         </tbody>
       </table>
-      <div class="comfort-banner" style="margin-top:12px">
+      <div class="comfort-banner" style="margin-top:10px">
         <div class="k">Класс комфорта с MultiFrame</div>
         <div class="v">«${escapeHtml(officialComfortLabel(hybridAfter))}»</div>
       </div>
-      <p class="muted" style="margin-top:8px">Класс комфорта: ${escapeHtml(HYBRID_CLASS_LABELS[hybridBefore])} → ${escapeHtml(HYBRID_CLASS_LABELS[hybridAfter])}.</p>
+    </div>
+  </section>
+
+  <!-- PAGE 3: spectra -->
+  <section class="page" data-page="3">
+    ${pageChrome(3, TOTAL, roomLine)}
+    <div class="sec"><span class="idx">04</span><h2>Изоляция по частотам</h2></div>
+    <p class="note">Чем выше линия на графике, тем лучше перекрытие изолирует шум на этой частоте.</p>
+
+    <div class="delta-strip">
+      <div class="delta-item">
+        <div class="k">Воздушный шум · Rw</div>
+        <div class="v">${b.Rw} → ${a.Rw} дБ</div>
+        <div class="d">Разница +${Math.abs(sim.delta.Rw)} дБ</div>
+      </div>
+      <div class="delta-item">
+        <div class="k">Ударный шум · Lnw</div>
+        <div class="v">${b.Lnw} → ${a.Lnw} дБ</div>
+        <div class="d">Разница −${Math.abs(sim.delta.Lnw)} дБ</div>
+      </div>
     </div>
 
+    ${airSvg}
+    ${impactSvg}
+  </section>
+
+  <!-- PAGE 4: system -->
+  <section class="page" data-page="4">
+    ${pageChrome(4, TOTAL, roomLine)}
     <div class="block">
-      <div class="sec"><span class="idx">06</span><h2>О системе MultiFrame</h2></div>
+      <div class="sec"><span class="idx">05</span><h2>О системе MultiFrame</h2></div>
       <ul class="pillars">${pillars}</ul>
     </div>
 
@@ -565,7 +573,7 @@ function loadIframeDocument(iframe: HTMLIFrameElement, html: string): Promise<Do
   });
 }
 
-function triggerDownload(blob: Blob, filename: string, preview: Window | null): void {
+function triggerDownload(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -575,26 +583,13 @@ function triggerDownload(blob: Blob, filename: string, preview: Window | null): 
   document.body.appendChild(a);
   a.click();
   a.remove();
-
-  if (preview && !preview.closed) {
-    try {
-      preview.location.replace(url);
-    } catch {
-      preview.close();
-    }
-  }
-
   window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
 
 /** Render report as one A4 page image each → PDF download. */
-export async function downloadAcousticProfilePdf(
-  session: SessionState,
-  preview: Window | null = null,
-): Promise<void> {
+export async function downloadAcousticProfilePdf(session: SessionState): Promise<void> {
   const full = session.derived ? session : withDerived(session);
   if (!full.derived) {
-    preview?.close();
     throw new Error('Нет расчёта для отчёта');
   }
 
@@ -658,11 +653,7 @@ export async function downloadAcousticProfilePdf(
     const roomName = room.roomType ? ROOM_TYPE_LABELS[room.roomType] : 'komnata';
     const safe = roomName.replace(/[^\wа-яА-ЯёЁ\-]+/gi, '_').slice(0, 24);
     const filename = `MultiFrame_результаты_${safe}_${room.ceilingAreaM2 ?? 'area'}.pdf`;
-    const blob = pdf.output('blob');
-    triggerDownload(blob, filename, preview);
-  } catch (err) {
-    preview?.close();
-    throw err;
+    triggerDownload(pdf.output('blob'), filename);
   } finally {
     iframe.remove();
   }

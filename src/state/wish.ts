@@ -68,5 +68,5 @@ export function wishSoundCorrectionLine(wish: RoomWishOption): string | null {
 /** Stretch-ceiling drum effect — auto from planned ceiling, not a Q8 card. */
 export function stretchDrumLine(plannedCeiling: PlannedCeilingOption): string | null {
   if (plannedCeiling !== 'stretch_planned') return null;
-  return 'Под обычным натяжным потолком зазор может гудеть, как барабан, и усиливать шум сверху. MultiFrame это снимает.';
+  return 'Под обычным натяжным потолком зазор может гудеть, как барабан, и усиливать шум сверху. Панели MultiFrame убирают этот эффект.';
 }

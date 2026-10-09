@@ -41,7 +41,7 @@ export function EchoComfort({ sim }: Props) {
       <header className={styles.head}>
         <h3>Эхо в самой комнате</h3>
         <p>
-          MultiFrame — не только изоляция сверху. Перфорация снимает порхающее эхо в помещении.
+          MultiFrame — не только изоляция сверху. Перфорация гасит эхо в самой комнате.
         </p>
       </header>
 
