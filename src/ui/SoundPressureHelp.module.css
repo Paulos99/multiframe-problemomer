@@ -213,14 +213,19 @@
 
 .footnote {
   flex-shrink: 0;
+  width: 100%;
+  box-sizing: border-box;
   margin: 0;
   padding: 12px 18px 14px;
   border-top: 1px solid #e6eeea;
   font-size: 12px;
   font-weight: 400;
-  line-height: 1.4;
+  line-height: 1.45;
   color: #5f6b73;
   background: #f8fbf9;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 @media (max-width: 480px) {

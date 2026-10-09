@@ -156,8 +156,8 @@ function SoundPressureHelpDialog({ highlightDb, onClose }: DialogProps) {
         </div>
 
         <p className={styles.footnote}>
-          дБ — логарифмическая величина, именно поэтому снижение звука в 6 дБ равно уменьшению на 50%
-          или в 2 раза
+          дБ — логарифмическая величина, именно поэтому снижение звука в 6&nbsp;дБ равно уменьшению
+          на 50% или в 2 раза
         </p>
       </div>
     </div>
