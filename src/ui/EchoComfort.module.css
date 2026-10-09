@@ -377,13 +377,14 @@
 }
 
 .btn.before.playing {
-  border-color: #7a8790;
-  box-shadow: 0 0 0 2px rgba(122, 135, 144, 0.25);
+  border-color: rgba(180, 60, 40, 0.45);
+  background: rgba(180, 60, 40, 0.1);
 }
 
 .btn.after.playing {
-  border-color: var(--accent-color);
-  box-shadow: 0 0 0 2px var(--accent-soft);
+  border-color: rgba(1, 100, 79, 0.45);
+  background: rgba(1, 100, 79, 0.12);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 @media (prefers-reduced-motion: reduce) {

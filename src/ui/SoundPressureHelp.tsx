@@ -1,5 +1,6 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useLenis } from 'lenis/react';
 import {
   formatTimesRu,
   SOUND_PRESSURE_TABLE,
@@ -55,24 +56,59 @@ function SoundPressureHelpDialog({ highlightDb, onClose }: DialogProps) {
   const titleId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const backdropRef = useRef<HTMLDivElement>(null);
+  const closingRef = useRef(false);
+  const lenis = useLenis();
+  const [visible, setVisible] = useState(false);
   const highlight =
     highlightDb != null && highlightDb > 0
       ? Math.min(20, Math.max(1, Math.round(Math.abs(highlightDb))))
       : null;
 
-  useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    closeRef.current?.focus();
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => {
-      document.body.style.overflow = prev;
-      window.removeEventListener('keydown', onKey);
-    };
+  const requestClose = useCallback(() => {
+    if (closingRef.current) return;
+    closingRef.current = true;
+    setVisible(false);
+    window.setTimeout(onClose, 220);
   }, [onClose]);
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setVisible(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
+  useEffect(() => {
+    const prevOverflow = document.body.style.overflow;
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    lenis?.stop();
+    closeRef.current?.focus();
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') requestClose();
+    };
+
+    const blockPageScroll = (e: WheelEvent | TouchEvent) => {
+      const scroller = scrollRef.current;
+      if (scroller && scroller.contains(e.target as Node)) return;
+      e.preventDefault();
+    };
+
+    const backdrop = backdropRef.current;
+    window.addEventListener('keydown', onKey);
+    backdrop?.addEventListener('wheel', blockPageScroll, { passive: false });
+    backdrop?.addEventListener('touchmove', blockPageScroll, { passive: false });
+
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      lenis?.start();
+      window.removeEventListener('keydown', onKey);
+      backdrop?.removeEventListener('wheel', blockPageScroll);
+      backdrop?.removeEventListener('touchmove', blockPageScroll);
+    };
+  }, [lenis, requestClose]);
 
   useEffect(() => {
     if (highlight == null || !scrollRef.current) return;
@@ -89,14 +125,15 @@ function SoundPressureHelpDialog({ highlightDb, onClose }: DialogProps) {
 
   return createPortal(
     <div
-      className={styles.backdrop}
+      ref={backdropRef}
+      className={`${styles.backdrop} ${visible ? styles.backdropOpen : ''}`}
       role="presentation"
       onMouseDown={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (e.target === e.currentTarget) requestClose();
       }}
     >
       <div
-        className={styles.sheet}
+        className={`${styles.sheet} ${visible ? styles.sheetOpen : ''}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
@@ -111,7 +148,7 @@ function SoundPressureHelpDialog({ highlightDb, onClose }: DialogProps) {
             type="button"
             className={styles.closeX}
             aria-label="Закрыть"
-            onClick={onClose}
+            onClick={requestClose}
           >
             <span aria-hidden>×</span>
           </button>

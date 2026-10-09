@@ -6,6 +6,7 @@
   border-radius: var(--radius-md);
   border: 1px solid rgba(1, 100, 79, 0.16);
   background: var(--bg-subtle);
+  overflow: hidden;
   transition:
     border-color var(--duration-normal) var(--ease-out),
     box-shadow var(--duration-normal) var(--ease-out),
@@ -63,7 +64,7 @@
 .feltTrack {
   position: relative;
   height: 72px;
-  margin: 10px 2px 0;
+  margin: 10px 0 0;
   overflow: visible;
 }
 
@@ -168,6 +169,15 @@
   animation: feltMarkIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
 }
 
+:global([data-reveal].is-revealed) .feltStepActive[data-edge='start'] .feltMark,
+:global([data-reveal].is-revealed) .feltStepActive[data-edge='start'] .feltMarkMf,
+:global([data-reveal].is-revealed) .feltStepActive[data-edge='start'] .feltMarkBoth,
+:global([data-reveal].is-revealed) .feltStepActive[data-edge='end'] .feltMark,
+:global([data-reveal].is-revealed) .feltStepActive[data-edge='end'] .feltMarkMf,
+:global([data-reveal].is-revealed) .feltStepActive[data-edge='end'] .feltMarkBoth {
+  animation-name: feltMarkInEdge;
+}
+
 @keyframes feltDotPop {
   from {
     transform: translateX(-50%) scale(0.55);
@@ -198,6 +208,17 @@
   to {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes feltMarkInEdge {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -267,6 +288,7 @@
 .feltStep[data-edge='start'] .feltMarkBoth {
   left: 0;
   transform: none;
+  animation-name: markerInEdge;
 }
 
 .feltStep[data-edge='end'] .feltMark,
@@ -275,6 +297,7 @@
   left: auto;
   right: 0;
   transform: none;
+  animation-name: markerInEdge;
 }
 
 .feltMark {
@@ -306,6 +329,17 @@
   to {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes markerInEdge {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 

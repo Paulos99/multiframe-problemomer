@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Button } from '../../ui/Button';
 import { CompactAudio } from '../../ui/CompactAudio';
 import { EchoComfort, EchoComfortRings } from '../../ui/EchoComfort';
@@ -12,6 +12,64 @@ import {
   useResultProfile,
 } from './resultShared';
 import styles from './ResultWideScreen.module.css';
+
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+}
+
+/** Hover replay: count from 0 → target (same feel as comfort rings). */
+function CountUpValue({
+  value,
+  prefix = '',
+  suffix,
+  className,
+}: {
+  value: number;
+  prefix?: string;
+  suffix?: ReactNode;
+  className?: string;
+}) {
+  const [display, setDisplay] = useState(value);
+  const cancelRef = useRef<() => void>(() => {});
+
+  useEffect(() => {
+    setDisplay(value);
+  }, [value]);
+
+  useEffect(() => () => cancelRef.current(), []);
+
+  const run = () => {
+    cancelRef.current();
+    if (prefersReducedMotion()) {
+      setDisplay(value);
+      return;
+    }
+    setDisplay(0);
+    const start = performance.now();
+    const dur = 720;
+    let raf = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / dur);
+      const eased = 1 - (1 - t) ** 3;
+      setDisplay(Math.round(value * eased));
+      if (t < 1) raf = requestAnimationFrame(tick);
+      else cancelRef.current = () => {};
+    };
+    raf = requestAnimationFrame(tick);
+    cancelRef.current = () => cancelAnimationFrame(raf);
+  };
+
+  return (
+    <strong className={className} onMouseEnter={run}>
+      {prefix}
+      {display}
+      {suffix}
+    </strong>
+  );
+}
 
 function DeltaBars({ before, after, invert }: { before: number; after: number; invert?: boolean }) {
   const max = Math.max(before, after, 1);
@@ -122,12 +180,16 @@ export function ResultWideScreen() {
 
       <section className={`${styles.kpiRow} ${styles.driftSoft}`} data-reveal aria-label="Ключевые показатели">
         <article className={styles.kpiCard}>
-          <span className={styles.kpiLabel}>Δ Rw · воздушный шум</span>
+          <span className={styles.kpiLabel}>
+            Δ Rw · изоляция воздушного шума
+          </span>
           <div className={styles.kpiMain}>
-            <strong className={styles.kpiValue}>
-              +{deltaRw}
-              <em>дБ</em>
-            </strong>
+            <CountUpValue
+              className={styles.kpiValue}
+              value={deltaRw}
+              prefix="+"
+              suffix={<em>дБ</em>}
+            />
             <DeltaBars before={p.sim.before.Rw} after={p.sim.after.Rw} />
           </div>
           {quieterAir > 0 ? (
@@ -137,12 +199,16 @@ export function ResultWideScreen() {
           )}
         </article>
         <article className={styles.kpiCard}>
-          <span className={styles.kpiLabel}>Δ Lnw · ударный шум</span>
+          <span className={styles.kpiLabel}>
+            Δ Lnw · уровень ударного шума
+          </span>
           <div className={styles.kpiMain}>
-            <strong className={styles.kpiValue}>
-              −{deltaLnw}
-              <em>дБ</em>
-            </strong>
+            <CountUpValue
+              className={styles.kpiValue}
+              value={deltaLnw}
+              prefix="−"
+              suffix={<em>дБ</em>}
+            />
             <DeltaBars before={p.sim.before.Lnw} after={p.sim.after.Lnw} invert />
           </div>
           {quieterImpact > 0 ? (
@@ -161,10 +227,12 @@ export function ResultWideScreen() {
         </article>
         <article className={styles.kpiCard}>
           <span className={styles.kpiLabel}>Тише на слух</span>
-          <strong className={styles.kpiValue}>
-            ≈{quieterMax}
-            <em>%</em>
-          </strong>
+          <CountUpValue
+            className={styles.kpiValue}
+            value={quieterMax}
+            prefix="≈"
+            suffix={<em>%</em>}
+          />
           <span className={styles.kpiPill}>
             воздух {quieterAir}% · удар {quieterImpact}%
           </span>
