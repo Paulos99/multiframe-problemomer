@@ -68,19 +68,12 @@
 }
 
 .head h2 {
-  margin: 0 0 6px;
+  margin: 0;
   font-size: 17px;
   font-weight: 750;
   letter-spacing: -0.02em;
   line-height: 1.25;
   color: #0f1c16;
-}
-
-.head p {
-  margin: 0;
-  font-size: 12.5px;
-  line-height: 1.4;
-  color: #5f6b73;
 }
 
 .closeX {

@@ -95,10 +95,6 @@ function SoundPressureHelpDialog({ highlightDb, onClose }: DialogProps) {
         <header className={styles.head}>
           <div className={styles.headText}>
             <h2 id={titleId}>Разница уровней звукового давления</h2>
-            <p>
-              Процент «тише» берётся из столбца «уменьшение» по разнице в дБ между «сейчас» и «с
-              MultiFrame».
-            </p>
           </div>
           <button
             ref={closeRef}
