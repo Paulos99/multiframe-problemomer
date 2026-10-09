@@ -61,7 +61,10 @@ Base path для GitHub Pages: `/multiframe-problemomer/`.
 
 ## Аналитика (анонимно)
 
-Только метрики воронки/каналов/CTA — **без лидов и контактов**. Документация и шаблоны ссылок: [docs/analytics.md](docs/analytics.md).
+Только метрики воронки/каналов/CTA — **без лидов и контактов**.
+
+- **Для команды маркетинга (хостинг, секреты, Метрика, таблица, ссылки):** [docs/ИНСТРУКЦИЯ_ДЛЯ_МАРКЕТИНГА.md](docs/ИНСТРУКЦИЯ_ДЛЯ_МАРКЕТИНГА.md)
+- Техническая шпаргалка: [docs/analytics.md](docs/analytics.md)
 
 Опционально в `.env` / GitHub Secrets: `VITE_YM_ID`, `VITE_ANALYTICS_INGEST_URL` (см. [.env.example](.env.example)).
 
