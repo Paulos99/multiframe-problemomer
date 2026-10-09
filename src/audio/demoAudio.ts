@@ -33,15 +33,15 @@ export const DEMO_AUDIO_PAIRS: AudioPair[] = [
   },
 ];
 
-/** Clap for room-echo demo (separate from isolation pairs). */
+/** Four dry claps — room reverb (До/После) applied at playback from object stage. */
 export const ECHO_CLAP_PAIR: AudioPair = {
   id: 'echo_clap',
-  label: 'Хлопок в комнате',
+  label: 'Хлопки в комнате',
   group: 'echo',
   beforeLabel: 'До',
   afterLabel: 'После',
-  beforeSrc: `${base}audio/clap.wav`,
-  afterSrc: `${base}audio/clap.wav`,
+  beforeSrc: `${base}audio/clap.mp3`,
+  afterSrc: `${base}audio/clap.mp3`,
 };
 
 /** Unique stem URLs for prefetch / decode. */
@@ -71,6 +71,6 @@ export const AUDIO_GROUP_LABELS = {
   mixed: { title: 'Смешанный шум', help: 'И воздух, и удар сразу, как пылесос.' },
   echo: {
     title: 'Эхо в комнате (акустический комфорт)',
-    help: 'Хлопок показывает порхающее эхо в помещении.',
+    help: 'Четыре хлопка показывают эхо в помещении до и после MultiFrame.',
   },
 } as const;
