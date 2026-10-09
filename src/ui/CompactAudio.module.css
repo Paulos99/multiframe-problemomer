@@ -6,6 +6,11 @@
   border-top: 1px solid var(--border-color);
 }
 
+.wrapEmbedded {
+  padding-top: 0;
+  border-top: none;
+}
+
 .head {
   display: flex;
   flex-direction: column;

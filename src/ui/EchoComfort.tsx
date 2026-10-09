@@ -7,9 +7,38 @@ import styles from './EchoComfort.module.css';
 
 type Props = {
   sim: DerivedSimulation;
-  /** Wide dashboard: ring gauges instead of horizontal bars. */
+  /** Wide dashboard: chip play controls; gauges optional. */
   variant?: 'default' | 'dashboard';
+  /** Ring gauges (dashboard). Set false when rings live in KPI row. */
+  showGauges?: boolean;
+  /** Hide local header when parent column already titles the block. */
+  hideHead?: boolean;
 };
+
+export function EchoComfortRings({
+  before,
+  after,
+  compact,
+}: {
+  before: number;
+  after: number;
+  compact?: boolean;
+}) {
+  const drop = before - after;
+  return (
+    <div
+      className={`${styles.rings} ${compact ? styles.ringsCompact : ''}`}
+      role="img"
+      aria-label={`Эхо в помещении: сейчас ${before}%, с MultiFrame ${after}%. Меньше — лучше.`}
+    >
+      <EchoRing pct={before} label="Сейчас" compact={compact} />
+      <EchoRing pct={after} label="После" accent compact={compact} />
+      {drop > 0 ? (
+        <p className={styles.scaleDelta}>≈ на {drop}% меньше эха</p>
+      ) : null}
+    </div>
+  );
+}
 
 function PlayIcon({ playing }: { playing: boolean }) {
   if (playing) {
@@ -27,26 +56,32 @@ function EchoRing({
   pct,
   label,
   accent,
+  compact,
 }: {
   pct: number;
   label: string;
   accent?: boolean;
+  compact?: boolean;
 }) {
-  const r = 34;
+  const r = compact ? 26 : 34;
+  const vb = compact ? 64 : 80;
+  const mid = vb / 2;
   const c = 2 * Math.PI * r;
   const clamped = Math.max(0, Math.min(100, pct));
   const dash = (clamped / 100) * c;
   return (
-    <div className={`${styles.ring} ${accent ? styles.ringAccent : ''}`}>
-      <svg viewBox="0 0 80 80" className={styles.ringSvg} aria-hidden>
-        <circle className={styles.ringTrack} cx="40" cy="40" r={r} />
+    <div
+      className={`${styles.ring} ${accent ? styles.ringAccent : ''} ${compact ? styles.ringCompact : ''}`}
+    >
+      <svg viewBox={`0 0 ${vb} ${vb}`} className={styles.ringSvg} aria-hidden>
+        <circle className={styles.ringTrack} cx={mid} cy={mid} r={r} />
         <circle
           className={styles.ringValue}
-          cx="40"
-          cy="40"
+          cx={mid}
+          cy={mid}
           r={r}
           strokeDasharray={`${dash} ${c}`}
-          transform="rotate(-90 40 40)"
+          transform={`rotate(-90 ${mid} ${mid})`}
         />
       </svg>
       <div className={styles.ringCenter}>
@@ -57,7 +92,12 @@ function EchoRing({
   );
 }
 
-export function EchoComfort({ sim, variant = 'default' }: Props) {
+export function EchoComfort({
+  sim,
+  variant = 'default',
+  showGauges = true,
+  hideHead = false,
+}: Props) {
   const { activeId, progress, play, stop } = useDemoPlayer();
   const rev = sim.reverb;
   const pair = ECHO_CLAP_PAIR;
@@ -78,26 +118,20 @@ export function EchoComfort({ sim, variant = 'default' }: Props) {
       className={`${styles.wrap} ${dashboard ? styles.wrapDash : ''}`}
       aria-label="Эхо в комнате (акустический комфорт)"
     >
-      <header className={styles.head}>
-        <h3>Эхо в комнате (акустический комфорт)</h3>
-        <p>
-          MultiFrame — не только изоляция сверху. Перфорация гасит эхо в самой комнате.
-        </p>
-      </header>
+      {!hideHead ? (
+        <header className={styles.head}>
+          <h3>Эхо в комнате (акустический комфорт)</h3>
+          <p>
+            MultiFrame — не только изоляция сверху. Перфорация гасит эхо в самой комнате.
+          </p>
+        </header>
+      ) : null}
 
-      {dashboard ? (
-        <div
-          className={styles.rings}
-          role="img"
-          aria-label={`Эхо в помещении: сейчас ${rev.echoInRoomBefore}%, с MultiFrame ${rev.echoInRoomAfter}%. Меньше — лучше.`}
-        >
-          <EchoRing pct={rev.echoInRoomBefore} label="Сейчас" />
-          <EchoRing pct={rev.echoInRoomAfter} label="После" accent />
-          {echoDrop > 0 ? (
-            <p className={styles.scaleDelta}>≈ на {echoDrop}% меньше эха в помещении</p>
-          ) : null}
-        </div>
-      ) : (
+      {dashboard && showGauges ? (
+        <EchoComfortRings before={rev.echoInRoomBefore} after={rev.echoInRoomAfter} />
+      ) : null}
+
+      {!dashboard ? (
         <div
           className={styles.scale}
           role="img"
@@ -124,7 +158,7 @@ export function EchoComfort({ sim, variant = 'default' }: Props) {
             <p className={styles.scaleDelta}>≈ на {echoDrop}% меньше эха в помещении</p>
           ) : null}
         </div>
-      )}
+      ) : null}
 
       <div className={styles.player}>
         <strong className={styles.playerTitle}>{pair.label}</strong>

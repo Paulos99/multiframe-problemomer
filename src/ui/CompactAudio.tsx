@@ -28,9 +28,11 @@ type Props = {
   pairs: AudioPair[];
   sim: DerivedSimulation;
   wish?: RoomWishOption;
+  /** Hide built-in header when parent column provides the title. */
+  hideHead?: boolean;
 };
 
-export function CompactAudio({ pairs, sim, wish = 'general' }: Props) {
+export function CompactAudio({ pairs, sim, wish = 'general', hideHead = false }: Props) {
   const { activeId, progress, play, stop } = useDemoPlayer();
   const groups = wishAudioOrder(wish);
   const primary = wishPrimaryGroup(wish);
@@ -41,11 +43,16 @@ export function CompactAudio({ pairs, sim, wish = 'general' }: Props) {
   }, [pairs]);
 
   return (
-    <section className={styles.wrap} aria-label="Сравнить звук до и после">
-      <header className={styles.head}>
-        <h3>Послушайте «До» и «После»</h3>
-        <p>{wishAudioLead(wish)}</p>
-      </header>
+    <section
+      className={`${styles.wrap} ${hideHead ? styles.wrapEmbedded : ''}`}
+      aria-label="Сравнить звук до и после"
+    >
+      {!hideHead ? (
+        <header className={styles.head}>
+          <h3>Послушайте «До» и «После»</h3>
+          <p>{wishAudioLead(wish)}</p>
+        </header>
+      ) : null}
 
       <div className={styles.groups}>
         {groups.map((group) => {

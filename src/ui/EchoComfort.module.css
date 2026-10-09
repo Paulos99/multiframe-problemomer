@@ -21,16 +21,31 @@
   justify-items: center;
 }
 
-.rings .scaleDelta {
+.ringsCompact {
+  gap: 6px 8px;
+  width: 100%;
+}
+
+.rings .scaleDelta,
+.ringsCompact .scaleDelta {
   grid-column: 1 / -1;
   text-align: center;
   margin: 0;
+}
+
+.ringsCompact .scaleDelta {
+  font-size: 11px;
 }
 
 .ring {
   position: relative;
   width: 88px;
   height: 88px;
+}
+
+.ringCompact {
+  width: 64px;
+  height: 64px;
 }
 
 .ringSvg {
@@ -77,6 +92,10 @@
   color: var(--text-primary);
 }
 
+.ringCompact .ringCenter b {
+  font-size: 13px;
+}
+
 .ringAccent .ringCenter b {
   color: var(--accent-color);
 }
@@ -85,6 +104,15 @@
   font-size: 10px;
   font-weight: 700;
   color: var(--text-secondary);
+}
+
+.ringCompact .ringCenter span {
+  font-size: 9px;
+}
+
+.ringCompact .ringTrack,
+.ringCompact .ringValue {
+  stroke-width: 6;
 }
 
 .btnChip {

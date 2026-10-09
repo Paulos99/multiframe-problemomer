@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { Button } from '../../ui/Button';
-import { EchoComfort } from '../../ui/EchoComfort';
+import { CompactAudio } from '../../ui/CompactAudio';
+import { EchoComfort, EchoComfortRings } from '../../ui/EchoComfort';
 import { SpectrumChart, type SpectrumSeriesMode } from '../../ui/SpectrumChart';
 import { useSession } from '../../state/SessionContext';
 import type { ClassLabel } from '../../state/types';
@@ -240,13 +241,27 @@ export function ResultWideScreen() {
             воздух {quieterAir}% · удар {quieterImpact}%
           </span>
         </article>
-        <article className={`${styles.kpiCard} ${styles.kpiCardAccent}`}>
-          <span className={styles.kpiLabel}>Класс с MultiFrame</span>
-          <div className={styles.kpiMain}>
-            <strong className={styles.kpiValueClass}>«{p.afterOfficial}»</strong>
-            <MiniClassRail before={p.hybridBefore} after={p.hybridAfter} />
+        <article className={styles.kpiCard}>
+          <span className={styles.kpiLabel}>Акустический комфорт</span>
+          <EchoComfortRings
+            before={p.sim.reverb.echoInRoomBefore}
+            after={p.sim.reverb.echoInRoomAfter}
+            compact
+          />
+        </article>
+        <article className={`${styles.kpiCard} ${styles.kpiCardAccent} ${styles.kpiCardClass}`}>
+          <span className={styles.kpiLabel}>Класс комфорта</span>
+          <div className={styles.kpiClassCompare}>
+            <div className={styles.kpiClassCol}>
+              <span className={styles.kpiClassTag}>Сейчас</span>
+              <strong className={styles.kpiValueClassMuted}>«{p.beforeOfficial}»</strong>
+            </div>
+            <div className={styles.kpiClassCol}>
+              <span className={styles.kpiClassTagAccent}>MultiFrame</span>
+              <strong className={styles.kpiValueClass}>«{p.afterOfficial}»</strong>
+            </div>
           </div>
-          <span className={styles.kpiPillLight}>было «{p.beforeOfficial}»</span>
+          <MiniClassRail before={p.hybridBefore} after={p.hybridAfter} />
         </article>
       </section>
 
@@ -366,10 +381,29 @@ export function ResultWideScreen() {
           </div>
         </header>
         <div className={styles.listenBody}>
-          <div className={styles.listenEcho}>
-            <EchoComfort sim={p.sim} variant="dashboard" />
+          <div className={styles.listenCol}>
+            <header className={styles.listenColHead}>
+              <h3>
+                Эхо в комнате <span>(акустический комфорт)</span>
+              </h3>
+              <p>Перфорация гасит эхо в самой комнате — послушайте хлопки до и после.</p>
+            </header>
+            <EchoComfort sim={p.sim} variant="dashboard" showGauges={false} hideHead />
           </div>
-          <div className={styles.listenAudio}>{p.audioNode}</div>
+          <div className={`${styles.listenCol} ${styles.listenColAudio}`}>
+            <header className={styles.listenColHead}>
+              <h3>
+                Звукоизоляция <span>(снижение шума)</span>
+              </h3>
+              <p>Шум сверху — до и после MultiFrame.</p>
+            </header>
+            <CompactAudio
+              pairs={p.session.audio.pairs}
+              sim={p.sim}
+              wish={p.wish}
+              hideHead
+            />
+          </div>
         </div>
       </section>
 
