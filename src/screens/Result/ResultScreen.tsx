@@ -121,10 +121,10 @@ function FeltScale({
       role="img"
       aria-label={
         mode === 'nowOnly'
-          ? `${title}: сейчас ${FELT_STEP_LABELS[now]}, ${indexKind} ≈ ${nowVal}`
-          : `${title}: сейчас ${FELT_STEP_LABELS[now]}, ${indexKind} ≈ ${nowVal}; с MultiFrame ${
+          ? `${title}: сейчас ${FELT_STEP_LABELS[now]}, ${indexKind} ≈ ${nowVal} дБ`
+          : `${title}: сейчас ${FELT_STEP_LABELS[now]}, ${indexKind} ≈ ${nowVal} дБ; с MultiFrame ${
               after ? FELT_STEP_LABELS[after] : ''
-            }${afterVal != null ? `, ${indexKind} ≈ ${afterVal}` : ''}${
+            }${afterVal != null ? `, ${indexKind} ≈ ${afterVal} дБ` : ''}${
               quieterPct != null ? `, станет на ≈ ${quieterPct}% тише` : ''
             }`
       }
@@ -145,15 +145,15 @@ function FeltScale({
       <p className={styles.feltDb}>
         {mode === 'nowOnly' || afterVal == null ? (
           <>
-            Сейчас: <b>{indexKind} ≈ {nowVal}</b>
+            Сейчас: <b>{indexKind} ≈ {nowVal} дБ</b>
             <span> · {direction}</span>
           </>
         ) : (
           <>
             <b>{indexKind}</b>:{' '}
-            <b>≈ {nowVal}</b>
+            <b>≈ {nowVal} дБ</b>
             <span aria-hidden> → </span>
-            <b>≈ {afterVal}</b>
+            <b>≈ {afterVal} дБ</b>
             <span> · {direction}</span>
           </>
         )}

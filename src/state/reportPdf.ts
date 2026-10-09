@@ -450,11 +450,11 @@ function buildReportDocument(session: SessionState): string {
       ${wishBlock}
       <div class="felt">
         <div class="felt-row">
-          <span>Воздух · ${FELT_STEP_LABELS[airNow]} → <b>${FELT_STEP_LABELS[airAfter]}</b> · Rw ≈ ${Math.round(b.Rw)} → ≈ ${Math.round(a.Rw)}</span>
+          <span>Воздух · ${FELT_STEP_LABELS[airNow]} → <b>${FELT_STEP_LABELS[airAfter]}</b> · Rw ≈ ${Math.round(b.Rw)} дБ → ≈ ${Math.round(a.Rw)} дБ</span>
           <span class="pct">≈ ${sim.perceivedAirPct}% тише</span>
         </div>
         <div class="felt-row">
-          <span>Удар · ${FELT_STEP_LABELS[impactNow]} → <b>${FELT_STEP_LABELS[impactAfter]}</b> · Lnw ≈ ${Math.round(b.Lnw)} → ≈ ${Math.round(a.Lnw)}</span>
+          <span>Удар · ${FELT_STEP_LABELS[impactNow]} → <b>${FELT_STEP_LABELS[impactAfter]}</b> · Lnw ≈ ${Math.round(b.Lnw)} дБ → ≈ ${Math.round(a.Lnw)} дБ</span>
           <span class="pct">≈ ${sim.perceivedImpactPct}% тише</span>
         </div>
       </div>
