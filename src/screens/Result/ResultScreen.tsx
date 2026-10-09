@@ -4,30 +4,16 @@ import {
   FeltScale,
   MULTIFRAME_PILLARS,
   NORM_ROWS,
-  ResultLayoutToggle,
   useResultProfile,
 } from './resultShared';
-import type { ResultLayout } from './useResultLayout';
 import styles from './ResultScreen.module.css';
 
-export function ResultScreen({
-  showLayoutToggle = false,
-  layoutPreference = 'classic',
-  onLayoutChange,
-}: {
-  showLayoutToggle?: boolean;
-  layoutPreference?: ResultLayout;
-  onLayoutChange?: (next: ResultLayout) => void;
-} = {}) {
+/** Classic vertical Result — kept for mobile and as rollback target for desktop. */
+export function ResultScreen() {
   const p = useResultProfile();
 
   return (
     <Screen dense title="Акустический профиль помещения">
-      {showLayoutToggle && onLayoutChange ? (
-        <div className={styles.layoutBar}>
-          <ResultLayoutToggle preference={layoutPreference} onChange={onLayoutChange} />
-        </div>
-      ) : null}
       <section className={styles.block} data-reveal aria-label="Нормы комфорта для жилья">
         <header className={styles.sectionHead}>
           <h2>Нормы комфорта для жилья</h2>

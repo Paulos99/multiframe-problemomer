@@ -1,211 +1,152 @@
 .root {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 22px;
   width: 100%;
   min-width: 0;
 }
 
-/* ——— Hero: virtual acoustic profile ——— */
-.hero {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 16px 24px;
-  align-items: end;
-  padding: 22px 24px 20px;
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(1, 100, 79, 0.2);
-  background:
-    linear-gradient(135deg, rgba(1, 100, 79, 0.1) 0%, transparent 42%),
-    linear-gradient(180deg, var(--bg-card), color-mix(in srgb, var(--bg-subtle) 55%, var(--bg-card)));
-  box-shadow: var(--shadow-md);
-  overflow: hidden;
-}
-
-.hero::before {
-  content: '';
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 4px;
-  background: linear-gradient(180deg, var(--accent-color), rgba(1, 100, 79, 0.35));
-}
-
-.heroMain {
+/* ——— Title only ——— */
+.titleBar {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-  padding-left: 8px;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 4px 2px 0;
 }
 
-.heroEyebrow {
+.titleBar h1 {
   margin: 0;
-  font-size: 11px;
-  font-weight: 750;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--accent-color);
-}
-
-.hero h1 {
-  margin: 0;
-  font-size: clamp(22px, 2.1vw, 28px);
+  font-size: clamp(24px, 2.2vw, 30px);
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.15;
   color: var(--text-primary);
 }
 
-.heroStatus {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.45;
-  color: var(--text-secondary);
+/* ——— Object: distinct spec sheet ——— */
+.objectSpec {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0 28px;
+  align-items: stretch;
+  padding: 0;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(1, 100, 79, 0.22);
+  background:
+    linear-gradient(90deg, #01644f 0, #01644f 6px, transparent 6px),
+    linear-gradient(180deg, #0f3d34 0%, #164a3f 100%);
+  color: #e8f2ef;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
 }
 
-.heroStatus b {
+.objectSpecLabel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 20px 8px 20px 22px;
+  min-width: 7.5rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.objectSpecLabel span {
+  font-size: 10px;
   font-weight: 750;
-  color: var(--text-primary);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.7;
 }
 
-.heroMeta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 4px;
-}
-
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-color);
-  background: color-mix(in srgb, var(--bg-card) 80%, transparent);
-  font-size: 12px;
-  font-weight: 650;
-  color: var(--text-secondary);
-}
-
-.chip strong {
+.objectSpecLabel strong {
+  font-size: 18px;
   font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  color: var(--text-primary);
+  letter-spacing: -0.02em;
 }
 
-.chipAccent {
-  border-color: rgba(1, 100, 79, 0.28);
-  background: color-mix(in srgb, var(--accent-soft) 50%, var(--bg-card));
-  color: var(--accent-color);
+.objectSpecGrid {
+  margin: 0;
+  padding: 16px 18px 16px 4px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px 12px;
 }
 
-.chipAccent strong {
-  color: var(--accent-color);
-}
-
-.heroTools {
+.objectSpecGrid div {
   display: flex;
-  align-items: flex-start;
-  padding-top: 2px;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* ——— Panels ——— */
+.objectSpecGrid dt {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
+.objectSpecGrid dd {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #fff;
+}
+
+/* ——— Shared panel ——— */
 .panel {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 18px 18px 16px;
+  padding: 18px 20px;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-color);
   background: var(--bg-card);
   min-width: 0;
 }
 
-.panelHead {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.panel h2 {
   margin: 0;
-}
-
-.panelHead h2 {
-  margin: 0;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--text-primary);
 }
 
-.panelHead p {
-  margin: 0;
+.panelLead {
+  margin: -6px 0 0;
   font-size: 13px;
   line-height: 1.4;
   color: var(--text-secondary);
 }
 
-.panelKicker {
-  margin: 0 0 2px;
-  font-size: 10px;
-  font-weight: 750;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--accent-color);
-}
-
-/* Context row */
-.contextRow {
-  display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.2fr);
-  gap: 16px;
-}
-
-.objectGrid {
-  margin: 0;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px 14px;
-}
-
-.objectGrid div {
+/* ——— Norms compact ——— */
+.normsHead {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-  padding: 8px 10px;
-  border-radius: var(--radius-sm);
-  background: var(--bg-subtle);
-  border: 1px solid transparent;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 20px;
 }
 
-.objectGrid dt {
-  margin: 0;
-  font-size: 11px;
-  font-weight: 650;
-  color: var(--text-secondary);
-}
-
-.objectGrid dd {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.35;
-  color: var(--text-primary);
-}
-
-.indexDefs {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin: 0 0 4px;
-}
-
-.indexDefs p {
+.normDefs {
   margin: 0;
   font-size: 12px;
-  line-height: 1.4;
   color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.normDefs b {
+  color: var(--text-primary);
+  font-weight: 750;
 }
 
 .tableWrap {
@@ -223,7 +164,7 @@
 
 .normTable th,
 .normTable td {
-  padding: 8px 10px;
+  padding: 9px 12px;
   text-align: left;
   border-bottom: 1px solid var(--border-color);
 }
@@ -233,15 +174,6 @@
   font-weight: 700;
   color: var(--text-secondary);
   background: color-mix(in srgb, var(--bg-card) 70%, var(--bg-subtle));
-  vertical-align: top;
-}
-
-.normTable thead th span {
-  display: block;
-  margin-top: 2px;
-  font-size: 10px;
-  font-weight: 550;
-  opacity: 0.85;
 }
 
 .normTable th + th,
@@ -273,63 +205,80 @@
   font-weight: 650 !important;
 }
 
-/* Effect hero row */
-.effectRow {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
-  gap: 16px;
-}
-
-.effectNow {
+/* ——— Effect: main program screen ——— */
+.effect {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 22px 22px 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(1, 100, 79, 0.22);
   background:
-    linear-gradient(160deg, rgba(122, 135, 144, 0.08), transparent 50%),
-    var(--bg-card);
-}
-
-.effectAfter {
-  border-color: rgba(1, 100, 79, 0.28);
-  background:
-    linear-gradient(155deg, rgba(1, 100, 79, 0.12), transparent 48%),
+    linear-gradient(155deg, rgba(1, 100, 79, 0.08), transparent 40%),
     var(--bg-card);
   box-shadow: var(--shadow-md);
 }
 
-.feltStack {
+.effectTop {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 24px;
 }
 
-.comfortClass {
-  margin: 2px 0 0;
-  padding: 12px 14px;
+.effectTop h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.deltaStrip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.delta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 7.5rem;
+  padding: 10px 14px;
   border-radius: var(--radius-md);
-  border: 1px solid rgba(1, 100, 79, 0.18);
-  background: color-mix(in srgb, var(--accent-soft) 45%, var(--bg-card));
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  border: 1px solid rgba(1, 100, 79, 0.2);
+  background: color-mix(in srgb, var(--accent-soft) 40%, var(--bg-card));
 }
 
-.comfortClass span {
-  font-size: 12px;
+.delta span {
+  font-size: 11px;
   font-weight: 650;
   color: var(--text-secondary);
 }
 
-.comfortClass b {
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  color: var(--text-primary);
+.delta strong {
+  font-size: 22px;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  color: var(--accent-color);
+  line-height: 1.1;
+}
+
+.delta em {
+  font-style: normal;
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--text-secondary);
 }
 
 .scenario {
   margin: 0;
   padding: 12px 14px;
   border-radius: var(--radius-md);
-  border: 1px solid rgba(1, 100, 79, 0.22);
-  background: color-mix(in srgb, var(--accent-soft) 70%, var(--bg-card));
+  border: 1px solid rgba(1, 100, 79, 0.18);
+  background: color-mix(in srgb, var(--accent-soft) 55%, var(--bg-card));
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -347,79 +296,251 @@
   color: var(--text-secondary) !important;
 }
 
-.metricStrip {
+.compareGrid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 2px;
-}
-
-.metric {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 12px 12px 11px;
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(1, 100, 79, 0.16);
-  background: color-mix(in srgb, var(--accent-soft) 30%, var(--bg-card));
-}
-
-.metric span {
-  font-size: 11px;
-  font-weight: 650;
-  color: var(--text-secondary);
-}
-
-.metric strong {
-  font-size: clamp(14px, 1.35vw, 20px);
-  font-weight: 850;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.03em;
-  color: var(--accent-color);
-  line-height: 1.15;
-}
-
-.metric em {
-  font-style: normal;
-  font-size: 12px;
-  font-weight: 650;
-  color: var(--text-secondary);
-}
-
-/* Evidence */
-.evidenceRow {
-  display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
   gap: 16px;
 }
 
-.evidenceStack {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.chartsPanel {
+.compareCol {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-width: 0;
+}
+
+.compareCol h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--text-secondary);
+}
+
+.compareAfter h3 {
+  color: var(--accent-color);
+}
+
+.feltStack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Comfort ladder */
+.ladder {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 16px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(1, 100, 79, 0.18);
+  background: var(--bg-subtle);
+}
+
+.ladderHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.ladderHead strong {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.ladderShift {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.ladderShift b {
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.ladderShift .to {
+  color: var(--accent-color);
+}
+
+.ladderTrack {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  position: relative;
+}
+
+.ladderStep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 8px 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  text-align: center;
+  min-width: 0;
+}
+
+.ladderStepActive {
+  border-color: rgba(1, 100, 79, 0.45);
+  background: color-mix(in srgb, var(--accent-soft) 45%, var(--bg-card));
+  box-shadow: 0 0 0 1px rgba(1, 100, 79, 0.12);
+}
+
+.ladderStepLetter {
+  font-size: 18px;
+  font-weight: 850;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
+.ladderStepMuted .ladderStepLetter {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.ladderStepName {
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.25;
+  color: var(--text-secondary);
+}
+
+.ladderMarks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  min-height: 22px;
+}
+
+.ladderMark,
+.ladderMarkMf {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 7px;
+  border-radius: var(--radius-pill);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.ladderMark {
+  color: #fff;
+  background: #68757e;
+}
+
+.ladderMarkMf {
+  color: #fff;
+  background: var(--accent-color);
+}
+
+/* ——— Listen suite ——— */
+.listen {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  overflow: hidden;
+}
+
+.listenHead {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--border-color);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--accent-soft) 35%, var(--bg-card)), var(--bg-card));
+}
+
+.listenHead h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.listenBody {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.15fr);
+  gap: 0;
+}
+
+.listenEcho,
+.listenAudio {
+  padding: 16px 18px 18px;
+  min-width: 0;
+}
+
+.listenAudio {
+  border-left: 1px solid var(--border-color);
+  background: var(--bg-subtle);
+}
+
+/* Flatten nested component chrome inside listen shell */
+.listenEcho :global(section),
+.listenAudio :global(section) {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.listenEcho :global(header h3),
+.listenAudio :global(header h3) {
+  font-size: 14px;
+}
+
+.listenAudio :global(section) {
+  padding-top: 0;
+  border-top: none;
+}
+
+/* ——— Charts full width ——— */
+.charts {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px 20px 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+}
+
+.charts h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 .chartsGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  align-items: start;
+  gap: 16px;
+  align-items: stretch;
 }
 
-.chartsLead {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.4;
-  color: var(--text-secondary);
+.chartsGrid > * {
+  min-height: 280px;
 }
 
-/* Closing */
+/* ——— Close ——— */
 .closeRow {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.85fr);
@@ -439,7 +560,7 @@
 .uniqPillar {
   display: flex;
   gap: 10px;
-  padding: 12px 12px 11px;
+  padding: 12px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
   background: var(--bg-subtle);
@@ -465,7 +586,6 @@
   font-size: 13px;
   font-weight: 800;
   letter-spacing: -0.01em;
-  color: var(--text-primary);
 }
 
 .uniqPillarBody p {
@@ -510,28 +630,46 @@
   flex-wrap: wrap;
   gap: 8px;
   justify-content: flex-start;
-  padding-top: 4px;
+  padding-top: 2px;
 }
 
 @media (max-width: 1200px) {
-  .chartsGrid {
+  .objectSpecGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .listenBody {
     grid-template-columns: 1fr;
   }
 
-  .metricStrip {
+  .listenAudio {
+    border-left: none;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .chartsGrid {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 1100px) {
-  .contextRow,
-  .effectRow,
-  .evidenceRow,
+  .compareGrid,
   .closeRow {
     grid-template-columns: 1fr;
   }
 
-  .hero {
+  .objectSpec {
     grid-template-columns: 1fr;
+  }
+
+  .objectSpecLabel {
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 16px 18px 12px 22px;
+  }
+
+  .objectSpecGrid {
+    padding: 12px 14px 16px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

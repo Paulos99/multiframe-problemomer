@@ -21,6 +21,8 @@ type Props = {
   /** |Δ| index for «тише %» from the sound-pressure table. */
   reductionDb?: number;
   reductionPct?: number;
+  /** Larger plot for desktop dashboard. */
+  tall?: boolean;
 };
 
 type HoverPoint = {
@@ -153,13 +155,14 @@ export function SpectrumChart({
   indexBadge,
   reductionDb,
   reductionPct,
+  tall = false,
 }: Props) {
   const padL = 28;
   const padR = 10;
   const padT = 10;
   const padB = 22;
-  const W = 360;
-  const H = 168;
+  const W = tall ? 560 : 360;
+  const H = tall ? 300 : 168;
   const plotW = W - padL - padR;
   const plotH = H - padT - padB;
 

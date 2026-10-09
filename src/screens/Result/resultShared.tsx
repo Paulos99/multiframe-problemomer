@@ -341,6 +341,8 @@ export function useResultProfile() {
     restart,
     room,
     sim,
+    hybridBefore,
+    hybridAfter,
     beforeOfficial,
     afterOfficial,
     airNowFelt,

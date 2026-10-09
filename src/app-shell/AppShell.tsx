@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLenis } from 'lenis/react';
 import styles from './AppShell.module.css';
 import { Header } from './Header';
@@ -11,7 +11,24 @@ import { RoomScreen } from '../screens/Room/RoomScreen';
 import { ProcessingScreen } from '../screens/Processing/ProcessingScreen';
 import { ResultScreen } from '../screens/Result/ResultScreen';
 import { ResultWideScreen } from '../screens/Result/ResultWideScreen';
-import { useResultLayout } from '../screens/Result/useResultLayout';
+
+const DESKTOP_MQ = '(min-width: 1024px)';
+
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia(DESKTOP_MQ).matches : false,
+  );
+
+  useEffect(() => {
+    const mql = window.matchMedia(DESKTOP_MQ);
+    const onChange = () => setIsDesktop(mql.matches);
+    onChange();
+    mql.addEventListener('change', onChange);
+    return () => mql.removeEventListener('change', onChange);
+  }, []);
+
+  return isDesktop;
+}
 
 function useScrollReveal(deps: string) {
   useEffect(() => {
@@ -58,11 +75,11 @@ function useScrollTopOnStep(step: string) {
 export function AppShell() {
   const { session, goNext, goBack, canGoNext } = useSession();
   const { step } = session;
-  const { layout, preference, setLayout, isDesktop } = useResultLayout();
+  const isDesktop = useIsDesktop();
   const isProcessing = step === 'processing';
   const isResult = step === 'result';
-  const isResultWide = isResult && layout === 'wide';
-  const revealKey = `${step}:${isResult ? layout : ''}`;
+  const isResultWide = isResult && isDesktop;
+  const revealKey = `${step}:${isResultWide ? 'wide' : 'classic'}`;
   useScrollReveal(revealKey);
   useScrollTopOnStep(revealKey);
   const showNav = step !== 'start' && !isProcessing && !isResultWide;
@@ -81,16 +98,7 @@ export function AppShell() {
       content = <ProcessingScreen />;
       break;
     case 'result':
-      content =
-        layout === 'wide' ? (
-          <ResultWideScreen layoutPreference={preference} onLayoutChange={setLayout} />
-        ) : (
-          <ResultScreen
-            showLayoutToggle={isDesktop}
-            layoutPreference={preference}
-            onLayoutChange={setLayout}
-          />
-        );
+      content = isResultWide ? <ResultWideScreen /> : <ResultScreen />;
       break;
   }
 
