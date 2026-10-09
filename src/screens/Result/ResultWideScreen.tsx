@@ -5,7 +5,6 @@ import { EchoComfort, EchoComfortRings } from '../../ui/EchoComfort';
 import { SpectrumChart, type SpectrumSeriesMode } from '../../ui/SpectrumChart';
 import { useSession } from '../../state/SessionContext';
 import type { ClassLabel } from '../../state/types';
-import { officialComfortLabel } from '../../state/simulation';
 import {
   FeltScale,
   MULTIFRAME_PILLARS,
@@ -13,99 +12,6 @@ import {
   useResultProfile,
 } from './resultShared';
 import styles from './ResultWideScreen.module.css';
-
-/** Worse → better along the SP hybrid ladder. */
-const RAIL_STEPS: { id: ClassLabel; letter: string; name: string }[] = [
-  { id: 'below', letter: 'ниже', name: 'Ниже' },
-  { id: 'V', letter: 'В', name: 'Допустимый' },
-  { id: 'B', letter: 'Б', name: 'Комфорт' },
-  { id: 'A', letter: 'А', name: 'Высокий' },
-];
-
-function stepIndex(cls: ClassLabel): number {
-  return RAIL_STEPS.findIndex((s) => s.id === cls);
-}
-
-function ComfortRail({
-  before,
-  after,
-  compact,
-}: {
-  before: ClassLabel;
-  after: ClassLabel;
-  compact?: boolean;
-}) {
-  const beforeLabel = officialComfortLabel(before);
-  const afterLabel = officialComfortLabel(after);
-  const same = before === after;
-  const bi = stepIndex(before);
-  const ai = stepIndex(after);
-  const fillTo = Math.max(bi, ai);
-
-  return (
-    <div
-      className={`${styles.rail} ${compact ? styles.railCompact : ''}`}
-      role="img"
-      aria-label={
-        same
-          ? `Класс комфорта: ${beforeLabel}`
-          : `Класс комфорта: сейчас ${beforeLabel}, с MultiFrame ${afterLabel}`
-      }
-    >
-      <div className={styles.railHead}>
-        <strong>Класс комфорта помещения</strong>
-        <p className={styles.railShift}>
-          {same ? (
-            <>
-              Остаётся <b className={styles.to}>«{afterLabel}»</b>
-            </>
-          ) : (
-            <>
-              <span className={styles.railPillMuted}>Сейчас · {beforeLabel}</span>
-              <span className={styles.railPill}>После · {afterLabel}</span>
-            </>
-          )}
-        </p>
-      </div>
-
-      <div className={styles.railTrack} aria-hidden>
-        <span
-          className={styles.railFill}
-          style={{ width: `${((fillTo + 0.5) / RAIL_STEPS.length) * 100}%` }}
-        />
-        {RAIL_STEPS.map((step, i) => {
-          const isBefore = step.id === before;
-          const isAfter = step.id === after;
-          const reached = i <= fillTo;
-          return (
-            <div
-              key={step.id}
-              className={`${styles.railSeg} ${reached ? styles.railSegOn : ''} ${isBefore || isAfter ? styles.railSegFocus : ''}`}
-            >
-              <span
-                className={styles.railDot}
-                data-before={isBefore ? '' : undefined}
-                data-after={isAfter ? '' : undefined}
-              />
-              <span className={styles.railLetter}>{step.letter}</span>
-              <span className={styles.railName}>{step.name}</span>
-              <div className={styles.railMarks}>
-                {isBefore && isAfter && same ? (
-                  <span className={styles.markNow}>Сейчас · После</span>
-                ) : (
-                  <>
-                    {isBefore ? <span className={styles.markNow}>Сейчас</span> : null}
-                    {isAfter && !same ? <span className={styles.markAfter}>После</span> : null}
-                  </>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
 
 function DeltaBars({ before, after, invert }: { before: number; after: number; invert?: boolean }) {
   const max = Math.max(before, after, 1);
@@ -154,26 +60,6 @@ function QuietRing({ pct }: { pct: number }) {
   );
 }
 
-function MiniClassRail({ before, after }: { before: ClassLabel; after: ClassLabel }) {
-  const bi = stepIndex(before);
-  const ai = stepIndex(after);
-  return (
-    <div className={styles.kpiMiniRail} aria-hidden>
-      {RAIL_STEPS.map((step, i) => {
-        const on = i <= Math.max(bi, ai);
-        const isBefore = step.id === before;
-        const isAfter = step.id === after;
-        return (
-          <span
-            key={step.id}
-            className={`${styles.kpiMiniSeg} ${on ? styles.kpiMiniSegOn : ''} ${isBefore ? styles.kpiMiniBefore : ''} ${isAfter ? styles.kpiMiniAfter : ''}`}
-          />
-        );
-      })}
-    </div>
-  );
-}
-
 export function ResultWideScreen() {
   const { goBack } = useSession();
   const p = useResultProfile();
@@ -188,6 +74,8 @@ export function ResultWideScreen() {
   const quieterAir = p.sim.perceivedAirPct;
   const quieterImpact = p.sim.perceivedImpactPct;
   const quieterMax = Math.max(quieterAir, quieterImpact);
+  const classNow = p.hybridBefore as ClassLabel;
+  const classMf = p.hybridAfter as ClassLabel;
 
   const objectCells: { label: string; value: string }[] = [
     { label: 'Перекрытие', value: p.slabContext },
@@ -222,7 +110,7 @@ export function ResultWideScreen() {
 
       <section className={styles.kpiRow} data-reveal aria-label="Ключевые показатели">
         <article className={styles.kpiCard}>
-          <span className={styles.kpiLabel}>Δ Rw · воздух</span>
+          <span className={styles.kpiLabel}>Δ Rw · воздушный шум</span>
           <div className={styles.kpiMain}>
             <strong className={styles.kpiValue}>
               +{deltaRw}
@@ -230,10 +118,14 @@ export function ResultWideScreen() {
             </strong>
             <DeltaBars before={p.sim.before.Rw} after={p.sim.after.Rw} />
           </div>
-          <span className={styles.kpiPill}>изоляция ↑</span>
+          {quieterAir > 0 ? (
+            <span className={styles.kpiPill}>≈ на {quieterAir}% тише</span>
+          ) : (
+            <span className={styles.kpiPillLight}>без заметного снижения</span>
+          )}
         </article>
         <article className={styles.kpiCard}>
-          <span className={styles.kpiLabel}>Δ Lnw · удар</span>
+          <span className={styles.kpiLabel}>Δ Lnw · ударный шум</span>
           <div className={styles.kpiMain}>
             <strong className={styles.kpiValue}>
               −{deltaLnw}
@@ -241,7 +133,11 @@ export function ResultWideScreen() {
             </strong>
             <DeltaBars before={p.sim.before.Lnw} after={p.sim.after.Lnw} invert />
           </div>
-          <span className={styles.kpiPill}>шум ↓</span>
+          {quieterImpact > 0 ? (
+            <span className={styles.kpiPill}>≈ на {quieterImpact}% тише</span>
+          ) : (
+            <span className={styles.kpiPillLight}>без заметного снижения</span>
+          )}
         </article>
         <article className={styles.kpiCard}>
           <span className={styles.kpiLabel}>Акустический комфорт</span>
@@ -264,20 +160,6 @@ export function ResultWideScreen() {
             воздух {quieterAir}% · удар {quieterImpact}%
           </span>
         </article>
-        <article className={`${styles.kpiCard} ${styles.kpiCardAccent} ${styles.kpiCardClass}`}>
-          <span className={styles.kpiLabel}>Класс комфорта</span>
-          <div className={styles.kpiClassCompare}>
-            <div className={styles.kpiClassCol}>
-              <span className={styles.kpiClassTag}>Сейчас</span>
-              <strong className={styles.kpiValueClassMuted}>«{p.beforeOfficial}»</strong>
-            </div>
-            <div className={styles.kpiClassCol}>
-              <span className={styles.kpiClassTagAccent}>MultiFrame</span>
-              <strong className={styles.kpiValueClass}>«{p.afterOfficial}»</strong>
-            </div>
-          </div>
-          <MiniClassRail before={p.hybridBefore} after={p.hybridAfter} />
-        </article>
       </section>
 
       <section className={styles.panel} data-reveal aria-label="Нормы комфорта для жилья">
@@ -297,22 +179,37 @@ export function ResultWideScreen() {
               </tr>
             </thead>
             <tbody>
-              {NORM_ROWS.map((r) => (
-                <tr key={r.key} className={r.muted ? styles.normBelow : undefined}>
-                  <td>
-                    <span className={styles.normLevel}>
-                      <span className={styles.normDot} data-muted={r.muted ? '' : undefined} />
-                      {r.label}
-                    </span>
-                  </td>
-                  <td>
-                    {r.rw} <em>дБ</em>
-                  </td>
-                  <td>
-                    {r.lnw} <em>дБ</em>
-                  </td>
-                </tr>
-              ))}
+              {NORM_ROWS.map((r) => {
+                const isNow = r.key === classNow;
+                const isMf = r.key === classMf;
+                return (
+                  <tr
+                    key={r.key}
+                    className={`${r.muted ? styles.normBelow : ''} ${isNow || isMf ? styles.normRowMarked : ''}`}
+                  >
+                    <td>
+                      <span className={styles.normLevel}>
+                        <span className={styles.normDots} aria-hidden>
+                          {isNow ? <span className={`${styles.normDot} ${styles.normDotNow}`} /> : null}
+                          {isMf ? <span className={`${styles.normDot} ${styles.normDotMf}`} /> : null}
+                          {!isNow && !isMf ? (
+                            <span className={`${styles.normDot} ${styles.normDotIdle}`} />
+                          ) : null}
+                        </span>
+                        <span className={styles.normLevelLabel}>{r.label}</span>
+                        {isNow ? <span className={styles.normPillNow}>Сейчас</span> : null}
+                        {isMf ? <span className={styles.normPillMf}>MultiFrame</span> : null}
+                      </span>
+                    </td>
+                    <td>
+                      {r.rw} <em>дБ</em>
+                    </td>
+                    <td>
+                      {r.lnw} <em>дБ</em>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -356,8 +253,6 @@ export function ResultWideScreen() {
               mode="nowAndAfter"
             />
           </div>
-
-          <ComfortRail before={p.hybridBefore} after={p.hybridAfter} compact />
         </div>
 
         <div className={styles.listenSide} aria-label="Сравнить на слух">

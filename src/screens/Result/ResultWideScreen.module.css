@@ -103,7 +103,7 @@
 /* ——— KPI row (Quixotic-style) ——— */
 .kpiRow {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -523,24 +523,77 @@
 .normLevel {
   display: inline-flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
+.normDots {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex: 0 0 auto;
+  min-width: 14px;
+}
+
 .normDot {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: var(--accent-color);
   flex: 0 0 auto;
 }
 
-.normDot[data-muted] {
-  background: #9aa4ab;
+.normDotIdle {
+  background: #c5ccd1;
+}
+
+.normDotNow {
+  background: #68757e;
+  box-shadow: 0 0 0 2px rgba(104, 117, 126, 0.2);
+}
+
+.normDotMf {
+  background: var(--accent-color);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.normLevelLabel {
+  font-weight: 650;
+}
+
+.normPillNow,
+.normPillMf {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.normPillNow {
+  color: #fff;
+  background: #68757e;
+}
+
+.normPillMf {
+  color: #fff;
+  background: var(--accent-color);
+}
+
+.normRowMarked td {
+  background: color-mix(in srgb, var(--accent-soft) 22%, var(--bg-subtle));
 }
 
 .normBelow td {
   color: var(--text-secondary) !important;
   font-weight: 650 !important;
+}
+
+.normBelow.normRowMarked td {
+  color: var(--text-primary) !important;
 }
 
 /* ——— Effect + Listen side-by-side ——— */
@@ -1050,7 +1103,7 @@
 
 @media (max-width: 1400px) {
   .kpiRow {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
