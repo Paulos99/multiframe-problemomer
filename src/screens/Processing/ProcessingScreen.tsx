@@ -4,6 +4,8 @@ import { preloadDemoAudio, unlockDemoAudio } from '../../audio/useDemoPlayer';
 import { useSession } from '../../state/SessionContext';
 import styles from './ProcessingScreen.module.css';
 
+const BASE = import.meta.env.BASE_URL;
+
 const STATUS_LINES = [
   'Собираем модель вашего помещения',
   'Считываем перекрытие и тип дома',
@@ -117,6 +119,16 @@ export function ProcessingScreen() {
   return (
     <div className={overlayClass} role="status" aria-busy={phase !== 'exit'} aria-live="polite">
       <div className={styles.glow} aria-hidden />
+      <div className={styles.brand}>
+        <img
+          className={styles.logo}
+          src={`${BASE}logo-multiframe.png`}
+          alt="MultiFrame"
+          width={320}
+          height={72}
+        />
+        <p className={styles.tagline}>звукоизоляция нового поколения</p>
+      </div>
       <div className={styles.center}>
         <div className={styles.statusStage}>
           {outgoing ? (

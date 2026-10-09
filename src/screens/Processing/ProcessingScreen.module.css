@@ -31,12 +31,52 @@
     transform 0.85s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.exiting .center {
+.exiting .center,
+.exiting .brand {
   opacity: 0;
   transform: translateY(6px);
   transition:
     opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1),
     transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.exiting .brand {
+  transform: translate(-50%, 6px);
+}
+
+.brand {
+  position: absolute;
+  z-index: 1;
+  top: max(28px, calc(var(--safe-top, 0px) + 20px));
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(88vw, 340px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.logo {
+  width: min(78vw, 300px);
+  height: auto;
+  max-height: 88px;
+  object-fit: contain;
+  /* PNG уже светлый — на зелёном фоне остаётся белым */
+  filter: brightness(0) invert(1);
+  opacity: 0.98;
+}
+
+.tagline {
+  margin: 0;
+  max-width: 22em;
+  font-size: clamp(0.85rem, 2.8vw, 1.05rem);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .glow {
@@ -177,7 +217,9 @@
   .overlay,
   .exiting,
   .exiting .center,
+  .exiting .brand,
   .center,
+  .brand,
   .fill {
     transition: none !important;
   }
