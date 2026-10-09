@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { preloadDemoAudio, useDemoPlayer } from '../audio/useDemoPlayer';
 import { ECHO_CLAP_PAIR } from '../audio/demoAudio';
 import { buildRoomAudioShapeForPair } from '../audio/roomAudioShape';
@@ -14,6 +14,13 @@ type Props = {
   /** Hide local header when parent column already titles the block. */
   hideHead?: boolean;
 };
+
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+}
 
 export function EchoComfortRings({
   before,
@@ -34,8 +41,8 @@ export function EchoComfortRings({
       role="img"
       aria-label={`Акустический комфорт: сейчас ${comfortBefore}%, с MultiFrame ${comfortAfter}%. Больше — лучше. Эхо снизилось на ${Math.max(0, echoDrop)}%.`}
     >
-      <EchoRing pct={comfortBefore} label="Сейчас" compact={compact} />
-      <EchoRing pct={comfortAfter} label="После" accent compact={compact} />
+      <EchoRing pct={comfortBefore} label="Сейчас" compact={compact} delayMs={0} />
+      <EchoRing pct={comfortAfter} label="После" accent compact={compact} delayMs={120} />
       {echoDrop > 0 ? (
         <p className={styles.scaleDelta}>≈ на {echoDrop}% меньше эха</p>
       ) : null}
@@ -60,35 +67,113 @@ function EchoRing({
   label,
   accent,
   compact,
+  delayMs = 0,
 }: {
   pct: number;
   label: string;
   accent?: boolean;
   compact?: boolean;
+  delayMs?: number;
 }) {
   const r = compact ? 26 : 34;
   const vb = compact ? 64 : 80;
   const mid = vb / 2;
   const c = 2 * Math.PI * r;
   const clamped = Math.max(0, Math.min(100, pct));
-  const dash = (clamped / 100) * c;
+  const targetOffset = c * (1 - clamped / 100);
+
+  const rootRef = useRef<HTMLDivElement>(null);
+  const cancelRef = useRef<() => void>(() => {});
+  const [playId, setPlayId] = useState(0);
+  const [displayPct, setDisplayPct] = useState(0);
+  const [fillMs, setFillMs] = useState(900);
+  const [animDelay, setAnimDelay] = useState(delayMs);
+
+  const runFill = (fromHover: boolean) => {
+    cancelRef.current();
+    if (prefersReducedMotion()) {
+      setDisplayPct(clamped);
+      setAnimDelay(0);
+      setPlayId((n) => n + 1);
+      return;
+    }
+    const dur = fromHover ? 700 : 900;
+    const startDelay = fromHover ? 0 : delayMs;
+    setFillMs(dur);
+    setAnimDelay(startDelay);
+    setDisplayPct(0);
+    setPlayId((n) => n + 1);
+
+    const start = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, Math.max(0, (now - start - startDelay) / dur));
+      const eased = 1 - (1 - t) ** 3;
+      setDisplayPct(Math.round(clamped * eased));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    cancelRef.current = () => cancelAnimationFrame(raf);
+  };
+
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const parentReveal = el.closest('[data-reveal]');
+    const start = () => runFill(false);
+
+    if (!parentReveal || parentReveal.classList.contains('is-revealed')) {
+      const t = window.setTimeout(start, 40);
+      return () => {
+        window.clearTimeout(t);
+        cancelRef.current();
+      };
+    }
+
+    const mo = new MutationObserver(() => {
+      if (parentReveal.classList.contains('is-revealed')) {
+        start();
+        mo.disconnect();
+      }
+    });
+    mo.observe(parentReveal, { attributes: true, attributeFilter: ['class'] });
+    return () => {
+      mo.disconnect();
+      cancelRef.current();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- replay only on pct / mount
+  }, [clamped, delayMs]);
+
   return (
     <div
+      ref={rootRef}
       className={`${styles.ring} ${accent ? styles.ringAccent : ''} ${compact ? styles.ringCompact : ''}`}
+      onMouseEnter={() => runFill(true)}
     >
       <svg viewBox={`0 0 ${vb} ${vb}`} className={styles.ringSvg} aria-hidden>
         <circle className={styles.ringTrack} cx={mid} cy={mid} r={r} />
         <circle
+          key={playId}
           className={styles.ringValue}
           cx={mid}
           cy={mid}
           r={r}
-          strokeDasharray={`${dash} ${c}`}
+          style={
+            {
+              strokeDasharray: c,
+              strokeDashoffset: c,
+              ['--ring-target']: String(targetOffset),
+              animationDuration: `${fillMs}ms`,
+              animationDelay: `${animDelay}ms`,
+            } as CSSProperties
+          }
           transform={`rotate(-90 ${mid} ${mid})`}
         />
       </svg>
       <div className={styles.ringCenter}>
-        <b>{pct}%</b>
+        <b key={playId} className={styles.ringPct}>
+          {displayPct}%
+        </b>
         <span>{label}</span>
       </div>
     </div>

@@ -286,10 +286,71 @@
 
 .wrapTall .before {
   stroke-width: 2.25;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
 }
 
 .wrapTall .after {
   stroke-width: 2.75;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.wrapTall .gain,
+.wrapTall .afterArea {
+  opacity: 0;
+}
+
+:global([data-reveal].is-revealed) .wrapTall .before {
+  animation: chartDraw 1.05s cubic-bezier(0.22, 1, 0.36, 1) 0.08s forwards;
+}
+
+:global([data-reveal].is-revealed) .wrapTall .after {
+  animation: chartDraw 1.05s cubic-bezier(0.22, 1, 0.36, 1) 0.22s forwards;
+}
+
+:global([data-reveal].is-revealed) .wrapTall .afterArea {
+  animation: chartFadeIn 0.7s ease-out 0.45s forwards;
+}
+
+:global([data-reveal].is-revealed) .wrapTall .gain {
+  animation: chartFadeInGain 0.7s ease-out 0.45s forwards;
+}
+
+@keyframes chartDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes chartFadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes chartFadeInGain {
+  to {
+    opacity: 0.14;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wrapTall .before,
+  .wrapTall .after {
+    stroke-dashoffset: 0;
+    animation: none;
+  }
+
+  .wrapTall .gain {
+    opacity: 0.14;
+    animation: none;
+  }
+
+  .wrapTall .afterArea {
+    opacity: 1;
+    animation: none;
+  }
 }
 
 .legend {

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '../../ui/Button';
 import { CompactAudio } from '../../ui/CompactAudio';
 import { EchoComfort, EchoComfortRings } from '../../ui/EchoComfort';
@@ -23,13 +23,16 @@ function DeltaBars({ before, after, invert }: { before: number; after: number; i
   return (
     <div className={styles.kpiBars} aria-hidden>
       <span className={styles.kpiBarWrap}>
-        <span className={styles.kpiBar} style={{ height: `${Math.max(18, bH)}%` }} />
+        <span
+          className={styles.kpiBar}
+          style={{ ['--bar-h' as string]: `${Math.max(18, bH)}%` }}
+        />
         <span className={styles.kpiBarTip}>Сейчас · {beforeDb} дБ</span>
       </span>
       <span className={styles.kpiBarWrap}>
         <span
           className={`${styles.kpiBar} ${styles.kpiBarAfter} ${better ? styles.kpiBarBetter : ''}`}
-          style={{ height: `${Math.max(18, aH)}%` }}
+          style={{ ['--bar-h' as string]: `${Math.max(18, aH)}%` }}
         />
         <span className={styles.kpiBarTip}>MultiFrame · {afterDb} дБ</span>
       </span>
@@ -37,9 +40,40 @@ function DeltaBars({ before, after, invert }: { before: number; after: number; i
   );
 }
 
+/** Soft depth drift while scrolling — premium “alive” feel without layout jump. */
+function useScrollDrift(active: boolean) {
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!active || typeof window === 'undefined') return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const root = rootRef.current;
+    if (!root) return;
+
+    let raf = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const y = window.scrollY || 0;
+        root.style.setProperty('--drift', `${Math.min(28, y * 0.035)}px`);
+        root.style.setProperty('--drift-soft', `${Math.min(14, y * 0.018)}px`);
+      });
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, [active]);
+
+  return rootRef;
+}
+
 export function ResultWideScreen() {
   const { goBack } = useSession();
   const p = useResultProfile();
+  const rootRef = useScrollDrift(true);
   const [hoverHz, setHoverHz] = useState<number | null>(null);
   const onHzHover = useCallback((hz: number | null) => {
     setHoverHz(hz);
@@ -64,12 +98,12 @@ export function ResultWideScreen() {
   objectCells.push({ label: 'Задача', value: p.wishLabel });
 
   return (
-    <div className={styles.root}>
+    <div className={styles.root} ref={rootRef}>
       <header className={styles.titleBar} data-reveal>
         <h1>Акустический профиль помещения</h1>
       </header>
 
-      <section className={styles.objectSpec} data-reveal aria-label="Объект">
+      <section className={`${styles.objectSpec} ${styles.driftSlow}`} data-reveal aria-label="Объект">
         <div className={styles.objectSpecLabel}>
           <span>Параметры</span>
           <strong>Объект</strong>
@@ -84,7 +118,7 @@ export function ResultWideScreen() {
         </dl>
       </section>
 
-      <section className={styles.kpiRow} data-reveal aria-label="Ключевые показатели">
+      <section className={`${styles.kpiRow} ${styles.driftSoft}`} data-reveal aria-label="Ключевые показатели">
         <article className={styles.kpiCard}>
           <span className={styles.kpiLabel}>Δ Rw · воздушный шум</span>
           <div className={styles.kpiMain}>
@@ -135,7 +169,7 @@ export function ResultWideScreen() {
         </article>
       </section>
 
-      <section className={styles.panel} data-reveal aria-label="Нормы комфорта для жилья">
+      <section className={`${styles.panel} ${styles.driftSoft}`} data-reveal aria-label="Нормы комфорта для жилья">
         <div className={styles.normsHead}>
           <h2>
             Нормы комфорта жилья{' '}
@@ -191,7 +225,7 @@ export function ResultWideScreen() {
         </div>
       </section>
 
-      <section className={styles.effectListen} data-reveal aria-label="Эффективность и сравнение на слух">
+      <section className={`${styles.effectListen} ${styles.driftSlow}`} data-reveal aria-label="Эффективность и сравнение на слух">
         <div className={styles.effectCol}>
           <header className={styles.effectTop}>
             <h2>Эффективность MultiFrame</h2>
@@ -263,7 +297,7 @@ export function ResultWideScreen() {
         </div>
       </section>
 
-      <section className={styles.charts} data-reveal aria-label="Изоляция по частотам">
+      <section className={`${styles.charts} ${styles.driftSoft}`} data-reveal aria-label="Изоляция по частотам">
         <header className={styles.chartsHead}>
           <div>
             <h2>Изоляция по частотам</h2>

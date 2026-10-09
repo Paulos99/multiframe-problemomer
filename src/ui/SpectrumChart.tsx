@@ -396,8 +396,12 @@ export function SpectrumChart({
             <path d={afterFill} className={styles.afterArea} fill={`url(#afterFill-${gradId})`} />
           ) : null}
           {showBefore && showAfter ? <path d={band} className={styles.gain} /> : null}
-          {showBefore ? <path d={beforePath} className={styles.before} fill="none" /> : null}
-          {showAfter ? <path d={afterPath} className={styles.after} fill="none" /> : null}
+          {showBefore ? (
+            <path d={beforePath} className={styles.before} fill="none" pathLength={1} />
+          ) : null}
+          {showAfter ? (
+            <path d={afterPath} className={styles.after} fill="none" pathLength={1} />
+          ) : null}
 
           {hover ? (
             <g

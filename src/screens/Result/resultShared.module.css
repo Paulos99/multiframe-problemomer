@@ -153,6 +153,63 @@
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
+:global([data-reveal].is-revealed) .feltStepActive .feltDot {
+  animation: feltDotPop 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}
+
+:global([data-reveal].is-revealed) .feltStepActive[data-edge='start'] .feltDot,
+:global([data-reveal].is-revealed) .feltStepActive[data-edge='end'] .feltDot {
+  animation-name: feltDotPopEdge;
+}
+
+:global([data-reveal].is-revealed) .feltStepActive .feltMark,
+:global([data-reveal].is-revealed) .feltStepActive .feltMarkMf,
+:global([data-reveal].is-revealed) .feltStepActive .feltMarkBoth {
+  animation: feltMarkIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+}
+
+@keyframes feltDotPop {
+  from {
+    transform: translateX(-50%) scale(0.55);
+    opacity: 0.4;
+  }
+  to {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes feltDotPopEdge {
+  from {
+    transform: scale(0.55);
+    opacity: 0.4;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes feltMarkIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :global([data-reveal].is-revealed) .feltStepActive .feltDot,
+  :global([data-reveal].is-revealed) .feltStepActive .feltMark,
+  :global([data-reveal].is-revealed) .feltStepActive .feltMarkMf,
+  :global([data-reveal].is-revealed) .feltStepActive .feltMarkBoth {
+    animation: none;
+  }
+}
+
 .feltLabel {
   position: absolute;
   top: 42px;

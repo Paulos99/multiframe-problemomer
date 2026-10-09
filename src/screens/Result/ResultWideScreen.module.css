@@ -1,9 +1,28 @@
 .root {
+  --drift: 0px;
+  --drift-soft: 0px;
   display: flex;
   flex-direction: column;
   gap: 18px;
   width: 100%;
   min-width: 0;
+}
+
+.driftSlow {
+  transform: translate3d(0, calc(var(--drift) * -0.35), 0);
+  will-change: transform;
+}
+
+.kpiRow.driftSoft,
+.panel.driftSoft,
+.charts.driftSoft {
+  transform: translate3d(0, calc(var(--drift-soft) * -0.5), 0);
+  will-change: transform;
+}
+
+.effectListen.driftSlow {
+  transform: translate3d(0, calc(var(--drift) * -0.22), 0);
+  will-change: transform;
 }
 
 /* ——— Title ——— */
@@ -161,18 +180,36 @@
 
 .kpiBar {
   width: 11px;
+  height: 0;
   border-radius: 4px 4px 2px 2px;
   background: #9aa4ab;
-  min-height: 6px;
+  min-height: 0;
+  transform-origin: bottom;
   transition:
     filter var(--duration-normal) var(--ease-out),
     transform var(--duration-normal) var(--ease-out);
 }
 
+:global([data-reveal].is-revealed) .kpiBar {
+  animation: barGrow 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+:global([data-reveal].is-revealed) .kpiBarWrap:nth-child(2) .kpiBar {
+  animation-delay: 0.12s;
+}
+
+@keyframes barGrow {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--bar-h, 40%);
+  }
+}
+
 .kpiBarWrap:hover .kpiBar {
   filter: brightness(1.08);
-  transform: scaleY(1.06);
-  transform-origin: bottom;
+  transform: scaleY(1.08);
 }
 
 .kpiBarAfter {
@@ -580,6 +617,21 @@
 .normDotMf {
   background: var(--accent-color);
   box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+:global([data-reveal].is-revealed) .normDotNow,
+:global([data-reveal].is-revealed) .normDotMf {
+  animation: normPulse 1.6s ease-in-out 0.35s 2;
+}
+
+@keyframes normPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.35);
+  }
 }
 
 .normLevelLabel {
@@ -1149,9 +1201,25 @@
   .objectSpecGrid div:hover,
   .uniqPillar,
   .uniqPillar:hover,
-  .uniqPillar:hover .uniqPillarMark {
+  .uniqPillar:hover .uniqPillarMark,
+  .driftSlow,
+  .kpiRow.driftSoft,
+  .panel.driftSoft,
+  .charts.driftSoft,
+  .effectListen.driftSlow {
     transform: none;
     transition: none;
+  }
+
+  :global([data-reveal].is-revealed) .kpiBar,
+  :global([data-reveal].is-revealed) .kpiBarWrap:nth-child(2) .kpiBar {
+    animation: none;
+    height: var(--bar-h, 40%);
+  }
+
+  :global([data-reveal].is-revealed) .normDotNow,
+  :global([data-reveal].is-revealed) .normDotMf {
+    animation: none;
   }
 }
 
