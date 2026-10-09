@@ -459,6 +459,11 @@ export function ResultScreen() {
           />
         </div>
 
+        <p className={styles.comfortClass}>
+          <span>Класс комфорта помещения</span>
+          <b>«{afterOfficial}»</b>
+        </p>
+
         <EchoComfort sim={sim} />
 
         <CompactAudio pairs={session.audio.pairs} sim={sim} wish={wish} />
@@ -471,11 +476,6 @@ export function ResultScreen() {
           {airChart}
           {impactChart}
         </div>
-
-        <p className={styles.comfortClass}>
-          <span>Класс комфорта помещения</span>
-          <b>«{afterOfficial}»</b>
-        </p>
       </section>
 
       <section className={styles.reasons} aria-label="Уникальность системы MultiFrame">
