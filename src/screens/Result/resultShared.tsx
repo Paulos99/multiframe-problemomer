@@ -1,7 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
-import { CompactAudio } from '../../ui/CompactAudio';
-import { EchoComfort } from '../../ui/EchoComfort';
-import { SpectrumChart } from '../../ui/SpectrumChart';
+import { useEffect, useState } from 'react';
 import { SoundPressureHelpButton } from '../../ui/SoundPressureHelp';
 import { useSession } from '../../state/SessionContext';
 import {
@@ -32,7 +29,6 @@ import {
 } from '../../state/reportPdf';
 import { wishScenarioLine, wishSoundCorrectionLine, stretchDrumLine } from '../../state/wish';
 import styles from './resultShared.module.css';
-import type { ResultLayout } from './useResultLayout';
 
 /** Official SP thresholds А/Б/В + explicit «ниже допустимого» band. */
 export const NORM_ROWS: { key: string; label: string; rw: string; lnw: string; muted?: boolean }[] =
@@ -193,36 +189,7 @@ export function FeltScale({
   );
 }
 
-export function ResultLayoutToggle({
-  preference,
-  onChange,
-}: {
-  preference: ResultLayout;
-  onChange: (next: ResultLayout) => void;
-}) {
-  return (
-    <div className={styles.layoutToggle} role="group" aria-label="Вид итогов">
-      <button
-        type="button"
-        className={`${styles.layoutToggleBtn} ${preference === 'wide' ? styles.layoutToggleBtnActive : ''}`}
-        aria-pressed={preference === 'wide'}
-        onClick={() => onChange('wide')}
-      >
-        Широкий
-      </button>
-      <button
-        type="button"
-        className={`${styles.layoutToggleBtn} ${preference === 'classic' ? styles.layoutToggleBtnActive : ''}`}
-        aria-pressed={preference === 'classic'}
-        onClick={() => onChange('classic')}
-      >
-        Классический
-      </button>
-    </div>
-  );
-}
-
-/** Shared derived data + actions for classic and wide Result screens. */
+/** Shared derived data + actions for the Result dashboard. */
 export function useResultProfile() {
   const { session, restart } = useSession();
   const room = session.answers.room;
@@ -251,8 +218,6 @@ export function useResultProfile() {
       ? `ориентир по типу дома (${houseLabel}), ~${slab.thicknessMm} мм`
       : `${slabTypeLabel}, ${slabThickLabel}`;
 
-  const airSpectrum = sim.airSpectrum;
-  const impactSpectrum = sim.impactSpectrum;
   const calcUrl = buildCalculatorUrl(session.cta);
   const objectAllUnknown =
     room.houseType === 'unknown' &&
@@ -310,32 +275,6 @@ export function useResultProfile() {
           ? 'Не удалось поделиться'
           : 'Поделиться';
 
-  const airChart: ReactNode = (
-    <SpectrumChart
-      title="Воздушный шум (голоса и музыка)"
-      subtitle="изоляция от голосов и музыки сверху"
-      series={airSpectrum}
-      yLabel="дБ"
-      indexBadge={{ kind: 'Rw', before: sim.before.Rw, after: sim.after.Rw }}
-      reductionDb={Math.abs(sim.delta.Rw)}
-      reductionPct={sim.perceivedAirPct}
-    />
-  );
-  const impactChart: ReactNode = (
-    <SpectrumChart
-      title="Ударный шум (шаги и падения)"
-      subtitle="изоляция от шагов и падений"
-      series={impactSpectrum}
-      yLabel="дБ"
-      indexBadge={{ kind: 'Lnw', before: sim.before.Lnw, after: sim.after.Lnw }}
-      reductionDb={Math.abs(sim.delta.Lnw)}
-      reductionPct={sim.perceivedImpactPct}
-    />
-  );
-
-  const echoNode = <EchoComfort sim={sim} />;
-  const audioNode = <CompactAudio pairs={session.audio.pairs} sim={sim} wish={wish} />;
-
   return {
     session,
     restart,
@@ -366,9 +305,5 @@ export function useResultProfile() {
     openConsultation,
     onDownloadProfile,
     onShare,
-    airChart,
-    impactChart,
-    echoNode,
-    audioNode,
   };
 }

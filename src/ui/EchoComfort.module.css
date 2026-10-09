@@ -460,6 +460,22 @@
   opacity: 0.55;
 }
 
+@media (max-width: 640px) {
+  .ringsCompact {
+    gap: 4px 6px;
+  }
+
+  .ringCompact {
+    width: 58px;
+    height: 58px;
+  }
+
+  .btnInline {
+    min-height: 42px;
+    padding: 8px 10px;
+  }
+}
+
 @media (max-width: 420px) {
   .scaleRow {
     grid-template-columns: 1fr auto;

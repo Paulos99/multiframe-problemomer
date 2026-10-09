@@ -353,6 +353,35 @@
   }
 }
 
+@media (max-width: 640px) {
+  .wrapTall {
+    padding: 12px 10px 10px;
+    border-radius: 16px;
+  }
+
+  .captionRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .captionRight {
+    align-items: flex-start;
+  }
+
+  .wrapTall .tick {
+    font-size: 11px;
+  }
+
+  .wrapTall .axisLabel {
+    font-size: 11px;
+  }
+
+  .indexBadge {
+    align-items: flex-start;
+  }
+}
+
 .legend {
   margin: 0;
   padding: 0 2px 2px;

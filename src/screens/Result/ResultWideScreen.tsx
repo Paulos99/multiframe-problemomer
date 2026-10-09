@@ -40,13 +40,15 @@ function DeltaBars({ before, after, invert }: { before: number; after: number; i
   );
 }
 
-/** Soft depth drift while scrolling — premium “alive” feel without layout jump. */
-function useScrollDrift(active: boolean) {
+/** Soft depth drift while scrolling — desktop only (skip touch / narrow). */
+function useScrollDrift() {
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!active || typeof window === 'undefined') return;
+    if (typeof window === 'undefined') return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (window.matchMedia('(max-width: 900px)').matches) return;
+    if (window.matchMedia('(hover: none)').matches) return;
     const root = rootRef.current;
     if (!root) return;
 
@@ -65,7 +67,7 @@ function useScrollDrift(active: boolean) {
       window.removeEventListener('scroll', onScroll);
       cancelAnimationFrame(raf);
     };
-  }, [active]);
+  }, []);
 
   return rootRef;
 }
@@ -73,7 +75,7 @@ function useScrollDrift(active: boolean) {
 export function ResultWideScreen() {
   const { goBack } = useSession();
   const p = useResultProfile();
-  const rootRef = useScrollDrift(true);
+  const rootRef = useScrollDrift();
   const [hoverHz, setHoverHz] = useState<number | null>(null);
   const onHzHover = useCallback((hz: number | null) => {
     setHoverHz(hz);

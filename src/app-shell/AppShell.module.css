@@ -22,14 +22,15 @@
   padding: 0;
 }
 
-/* Desktop Result wide: stretch shell chrome to instrument canvas */
+/* Result dashboard: full instrument canvas on every viewport */
 .shellWide {
   --max-w: 1400px;
 }
 
 .mainWide {
   width: min(100%, 1400px);
-  padding-bottom: 36px;
+  padding: 12px 14px 32px;
+  padding-bottom: calc(32px + var(--safe-bottom, 0px));
 }
 
 .processing {
@@ -47,6 +48,14 @@
   }
 
   .mainWide {
+    padding: 18px 22px 44px;
+    padding-bottom: calc(44px + var(--safe-bottom, 0px));
+  }
+}
+
+@media (min-width: 1024px) {
+  .mainWide {
     padding: 20px 28px 48px;
+    padding-bottom: calc(48px + var(--safe-bottom, 0px));
   }
 }

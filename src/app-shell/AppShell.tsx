@@ -1,34 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useLenis } from 'lenis/react';
 import styles from './AppShell.module.css';
 import { Header } from './Header';
 import { ProgressDots } from './ProgressDots';
 import { StickyCta } from './StickyCta';
 import { useSession } from '../state/SessionContext';
-import { buildCalculatorUrl } from '../state/session';
 import { StartScreen } from '../screens/Start/StartScreen';
 import { RoomScreen } from '../screens/Room/RoomScreen';
 import { ProcessingScreen } from '../screens/Processing/ProcessingScreen';
-import { ResultScreen } from '../screens/Result/ResultScreen';
 import { ResultWideScreen } from '../screens/Result/ResultWideScreen';
-
-const DESKTOP_MQ = '(min-width: 1024px)';
-
-function useIsDesktop() {
-  const [isDesktop, setIsDesktop] = useState(() =>
-    typeof window !== 'undefined' ? window.matchMedia(DESKTOP_MQ).matches : false,
-  );
-
-  useEffect(() => {
-    const mql = window.matchMedia(DESKTOP_MQ);
-    const onChange = () => setIsDesktop(mql.matches);
-    onChange();
-    mql.addEventListener('change', onChange);
-    return () => mql.removeEventListener('change', onChange);
-  }, []);
-
-  return isDesktop;
-}
 
 function useScrollReveal(deps: string) {
   useEffect(() => {
@@ -87,14 +67,13 @@ function useScrollTopOnStep(step: string) {
 export function AppShell() {
   const { session, goNext, goBack, canGoNext } = useSession();
   const { step } = session;
-  const isDesktop = useIsDesktop();
   const isProcessing = step === 'processing';
   const isResult = step === 'result';
-  const isResultWide = isResult && isDesktop;
-  const revealKey = `${step}:${isResultWide ? 'wide' : 'classic'}`;
+  const revealKey = step;
   useScrollReveal(revealKey);
   useScrollTopOnStep(revealKey);
-  const showNav = step !== 'start' && !isProcessing && !isResultWide;
+  /** Sticky footer only for wizard steps — Result has its own CTA block. */
+  const showNav = step !== 'start' && !isProcessing && !isResult;
   const showProgress = step !== 'start' && !isProcessing;
   const showHeader = !isProcessing;
 
@@ -110,37 +89,23 @@ export function AppShell() {
       content = <ProcessingScreen />;
       break;
     case 'result':
-      content = isResultWide ? <ResultWideScreen /> : <ResultScreen />;
+      content = <ResultWideScreen />;
       break;
   }
 
-  const ctaLabel = isResult ? 'Рассчитать количество MultiFrame' : 'Далее';
-  const calcUrl = isResult ? buildCalculatorUrl(session.cta) : null;
-
   return (
     <div
-      className={`${styles.shell} ${showNav ? styles.withFooter : ''} ${isProcessing ? styles.processing : ''} ${isResultWide ? styles.shellWide : ''}`}
+      className={`${styles.shell} ${showNav ? styles.withFooter : ''} ${isProcessing ? styles.processing : ''} ${isResult ? styles.shellWide : ''}`}
     >
       {showHeader ? <Header /> : null}
       {showProgress ? <ProgressDots /> : null}
       <main
-        className={`${styles.main} ${isProcessing ? styles.mainProcessing : ''} ${isResultWide ? styles.mainWide : ''}`}
+        className={`${styles.main} ${isProcessing ? styles.mainProcessing : ''} ${isResult ? styles.mainWide : ''}`}
       >
         {content}
       </main>
       {showNav ? (
-        <StickyCta
-          onBack={goBack}
-          onNext={() => {
-            if (isResult && calcUrl) {
-              window.open(calcUrl, '_blank', 'noopener,noreferrer');
-              return;
-            }
-            goNext();
-          }}
-          nextDisabled={isResult ? false : !canGoNext}
-          nextLabel={ctaLabel}
-        />
+        <StickyCta onBack={goBack} onNext={goNext} nextDisabled={!canGoNext} nextLabel="Далее" />
       ) : null}
     </div>
   );
