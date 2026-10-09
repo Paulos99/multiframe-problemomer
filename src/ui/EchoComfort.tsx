@@ -163,12 +163,12 @@ export function EchoComfort({
         </div>
       ) : null}
 
-      <div className={styles.player}>
+      <div className={`${styles.player} ${dashboard ? styles.playerDash : ''}`}>
         <strong className={styles.playerTitle}>{pair.label}</strong>
         <div className={styles.controls}>
           <button
             type="button"
-            className={`${styles.btn} ${styles.before} ${beforeOn ? styles.playing : ''} ${dashboard ? styles.btnChip : ''}`}
+            className={`${styles.btn} ${styles.before} ${beforeOn ? styles.playing : ''} ${dashboard ? styles.btnInline : ''}`}
             aria-pressed={beforeOn}
             aria-label={beforeOn ? `Пауза: До, ${pair.label}` : `Слушать До: ${pair.label}`}
             onClick={() => {
@@ -184,19 +184,26 @@ export function EchoComfort({
             <span className={styles.icon}>
               <PlayIcon playing={beforeOn} />
             </span>
-            <span className={styles.meta}>
-              <strong>До</strong>
-              <small>с эхом</small>
-              {beforeOn ? (
-                <span className={styles.bar} aria-hidden>
-                  <span style={{ width: `${Math.round(progress * 100)}%` }} />
-                </span>
-              ) : null}
-            </span>
+            {dashboard ? (
+              <>
+                <strong>До</strong>
+                <small className={styles.sideHint}>с эхом</small>
+              </>
+            ) : (
+              <span className={styles.meta}>
+                <strong>До</strong>
+                <small>с эхом</small>
+              </span>
+            )}
+            {beforeOn ? (
+              <span className={styles.bar} aria-hidden>
+                <span style={{ width: `${Math.round(progress * 100)}%` }} />
+              </span>
+            ) : null}
           </button>
           <button
             type="button"
-            className={`${styles.btn} ${styles.after} ${afterOn ? styles.playing : ''} ${dashboard ? styles.btnChip : ''}`}
+            className={`${styles.btn} ${styles.after} ${afterOn ? styles.playing : ''} ${dashboard ? styles.btnInline : ''}`}
             aria-pressed={afterOn}
             aria-label={afterOn ? `Пауза: После, ${pair.label}` : `Слушать После: ${pair.label}`}
             onClick={() => {
@@ -212,15 +219,22 @@ export function EchoComfort({
             <span className={styles.icon}>
               <PlayIcon playing={afterOn} />
             </span>
-            <span className={styles.meta}>
-              <strong>После</strong>
-              <small>меньше эха</small>
-              {afterOn ? (
-                <span className={styles.bar} aria-hidden>
-                  <span style={{ width: `${Math.round(progress * 100)}%` }} />
-                </span>
-              ) : null}
-            </span>
+            {dashboard ? (
+              <>
+                <strong>После</strong>
+                <small className={styles.sideHint}>меньше эха</small>
+              </>
+            ) : (
+              <span className={styles.meta}>
+                <strong>После</strong>
+                <small>меньше эха</small>
+              </span>
+            )}
+            {afterOn ? (
+              <span className={styles.bar} aria-hidden>
+                <span style={{ width: `${Math.round(progress * 100)}%` }} />
+              </span>
+            ) : null}
           </button>
         </div>
       </div>

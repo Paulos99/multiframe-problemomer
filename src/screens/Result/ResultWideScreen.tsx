@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 import { Button } from '../../ui/Button';
 import { CompactAudio } from '../../ui/CompactAudio';
 import { EchoComfort, EchoComfortRings } from '../../ui/EchoComfort';
-import { SpectrumChart, type SpectrumSeriesMode } from '../../ui/SpectrumChart';
+import { SpectrumChart } from '../../ui/SpectrumChart';
 import { useSession } from '../../state/SessionContext';
 import type { ClassLabel } from '../../state/types';
 import {
@@ -37,33 +37,9 @@ function DeltaBars({ before, after, invert }: { before: number; after: number; i
   );
 }
 
-function QuietRing({ pct }: { pct: number }) {
-  const r = 22;
-  const c = 2 * Math.PI * r;
-  const clamped = Math.max(0, Math.min(100, pct));
-  const dash = (clamped / 100) * c;
-  return (
-    <div className={styles.kpiRing} aria-hidden>
-      <svg viewBox="0 0 56 56" className={styles.kpiRingSvg}>
-        <circle className={styles.kpiRingTrack} cx="28" cy="28" r={r} />
-        <circle
-          className={styles.kpiRingValue}
-          cx="28"
-          cy="28"
-          r={r}
-          strokeDasharray={`${dash} ${c}`}
-          transform="rotate(-90 28 28)"
-        />
-      </svg>
-      <span className={styles.kpiRingPct}>{pct}%</span>
-    </div>
-  );
-}
-
 export function ResultWideScreen() {
   const { goBack } = useSession();
   const p = useResultProfile();
-  const [seriesMode, setSeriesMode] = useState<SpectrumSeriesMode>('both');
   const [hoverHz, setHoverHz] = useState<number | null>(null);
   const onHzHover = useCallback((hz: number | null) => {
     setHoverHz(hz);
@@ -149,13 +125,10 @@ export function ResultWideScreen() {
         </article>
         <article className={styles.kpiCard}>
           <span className={styles.kpiLabel}>Тише на слух</span>
-          <div className={styles.kpiMain}>
-            <strong className={styles.kpiValue}>
-              ≈{quieterMax}
-              <em>%</em>
-            </strong>
-            <QuietRing pct={quieterMax} />
-          </div>
+          <strong className={styles.kpiValue}>
+            ≈{quieterMax}
+            <em>%</em>
+          </strong>
           <span className={styles.kpiPill}>
             воздух {quieterAir}% · удар {quieterImpact}%
           </span>
@@ -164,7 +137,10 @@ export function ResultWideScreen() {
 
       <section className={styles.panel} data-reveal aria-label="Нормы комфорта для жилья">
         <div className={styles.normsHead}>
-          <h2>Нормы комфорта жилья</h2>
+          <h2>
+            Нормы комфорта жилья{' '}
+            <span className={styles.normsSp}>по СП 51.13330.2011</span>
+          </h2>
           <p className={styles.normDefs}>
             <b>Rw</b> воздух · больше лучше &nbsp;·&nbsp; <b>Lnw</b> удар · меньше лучше
           </p>
@@ -295,30 +271,18 @@ export function ResultWideScreen() {
               Чем выше линия, тем лучше перекрытие изолирует шум на этой частоте.
             </p>
           </div>
-          <div className={styles.chartsToggles} role="group" aria-label="Серии графиков">
-            {(
-              [
-                ['both', 'Обе'],
-                ['before', 'Сейчас'],
-                ['after', 'MultiFrame'],
-              ] as const
-            ).map(([id, label]) => (
-              <button
-                key={id}
-                type="button"
-                className={`${styles.chartsToggle} ${seriesMode === id ? styles.chartsToggleOn : ''}`}
-                aria-pressed={seriesMode === id}
-                onClick={() => setSeriesMode(id)}
-              >
-                {label}
-              </button>
-            ))}
+          <div className={styles.chartsLegend} aria-hidden>
+            <span>
+              <i className={styles.legNow} /> Сейчас
+            </span>
+            <span>
+              <i className={styles.legAfter} /> MultiFrame
+            </span>
           </div>
         </header>
         <div className={styles.chartsGrid}>
           <SpectrumChart
             tall
-            seriesMode={seriesMode}
             externalHz={hoverHz}
             onHzHover={onHzHover}
             title="Воздушный шум (голоса и музыка)"
@@ -331,7 +295,6 @@ export function ResultWideScreen() {
           />
           <SpectrumChart
             tall
-            seriesMode={seriesMode}
             externalHz={hoverHz}
             onHzHover={onHzHover}
             title="Ударный шум (шаги и падения)"

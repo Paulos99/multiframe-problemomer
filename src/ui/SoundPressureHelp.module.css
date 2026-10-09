@@ -25,16 +25,20 @@
 .backdrop {
   position: fixed;
   inset: 0;
-  z-index: 10000;
+  z-index: 2147483000;
   display: grid;
   place-items: center;
   padding: max(16px, env(safe-area-inset-top, 0px)) 16px
     max(16px, env(safe-area-inset-bottom, 0px));
   background: rgba(12, 22, 18, 0.55);
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  isolation: isolate;
 }
 
 .sheet {
+  position: relative;
+  z-index: 1;
   width: min(560px, calc(100vw - 32px));
   max-height: min(88vh, 720px);
   display: flex;
@@ -48,6 +52,7 @@
     0 4px 16px rgba(15, 28, 22, 0.08),
     0 24px 48px rgba(15, 28, 22, 0.18);
   overflow: hidden;
+  transform: none;
   color: #152018;
 }
 

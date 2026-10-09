@@ -81,6 +81,18 @@
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(6px);
+  transition:
+    transform 0.28s var(--ease-out),
+    background 0.28s var(--ease-out),
+    border-color 0.28s var(--ease-out),
+    box-shadow 0.28s var(--ease-out);
+}
+
+.objectSpecGrid div:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.32);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
 }
 
 .objectSpecGrid dt {
@@ -451,6 +463,20 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 8px 20px;
+}
+
+.normsHead h2 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 10px;
+}
+
+.normsSp {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--text-secondary);
 }
 
 .normDefs {
@@ -965,34 +991,33 @@
   letter-spacing: -0.02em;
 }
 
-.chartsToggles {
-  display: inline-flex;
-  gap: 0;
-  padding: 3px;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border-color);
-  background: var(--bg-subtle);
-}
-
-.chartsToggle {
-  appearance: none;
-  border: none;
-  margin: 0;
-  padding: 6px 12px;
-  border-radius: var(--radius-pill);
-  font: inherit;
+.chartsLegend {
+  display: flex;
+  gap: 14px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 650;
   color: var(--text-secondary);
-  background: transparent;
-  cursor: pointer;
-  white-space: nowrap;
 }
 
-.chartsToggleOn {
-  color: #fff;
+.chartsLegend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legNow,
+.legAfter {
+  width: 18px;
+  height: 3px;
+  border-radius: 999px;
+}
+
+.legNow {
+  background: #9aa4ab;
+}
+
+.legAfter {
   background: var(--accent-color);
-  box-shadow: var(--shadow-sm);
 }
 
 .chartsGrid {
@@ -1031,6 +1056,18 @@
   border-radius: 12px;
   border: 1px solid var(--border-color);
   background: var(--bg-subtle);
+  transition:
+    transform 0.28s var(--ease-out),
+    border-color 0.28s var(--ease-out),
+    box-shadow 0.28s var(--ease-out),
+    background 0.28s var(--ease-out);
+}
+
+.uniqPillar:hover {
+  transform: translateY(-3px);
+  border-color: rgba(1, 100, 79, 0.35);
+  background: color-mix(in srgb, var(--accent-soft) 35%, var(--bg-card));
+  box-shadow: 0 10px 22px rgba(17, 24, 39, 0.08);
 }
 
 .uniqPillarMark {
@@ -1040,6 +1077,12 @@
   background: var(--accent-color);
   align-self: stretch;
   min-height: 1.2em;
+  transition: transform 0.28s var(--ease-out), box-shadow 0.28s var(--ease-out);
+}
+
+.uniqPillar:hover .uniqPillarMark {
+  transform: scaleY(1.08);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .uniqPillarBody {
@@ -1099,6 +1142,17 @@
   gap: 8px;
   justify-content: flex-start;
   padding-top: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .objectSpecGrid div,
+  .objectSpecGrid div:hover,
+  .uniqPillar,
+  .uniqPillar:hover,
+  .uniqPillar:hover .uniqPillarMark {
+    transform: none;
+    transition: none;
+  }
 }
 
 @media (max-width: 1400px) {

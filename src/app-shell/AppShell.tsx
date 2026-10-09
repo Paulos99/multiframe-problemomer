@@ -43,20 +43,32 @@ function useScrollReveal(deps: string) {
     const nodes = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]'));
     if (!nodes.length) return;
 
+    let cascadeIndex = 0;
+
     const io = new IntersectionObserver(
       (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-revealed');
-            io.unobserve(entry.target);
-          }
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort(
+            (a, b) =>
+              a.target.getBoundingClientRect().top - b.target.getBoundingClientRect().top,
+          );
+        for (const entry of visible) {
+          const el = entry.target as HTMLElement;
+          io.unobserve(el);
+          el.style.setProperty('--reveal-delay', `${Math.min(cascadeIndex, 14) * 90}ms`);
+          cascadeIndex += 1;
+          // Force reflow so delay applies before the reveal class.
+          void el.offsetWidth;
+          el.classList.add('is-revealed');
         }
       },
-      { threshold: 0.12, rootMargin: '0px 0px -6% 0px' },
+      { threshold: 0.08, rootMargin: '0px 0px -4% 0px' },
     );
 
     for (const node of nodes) {
       node.classList.remove('is-revealed');
+      node.style.removeProperty('--reveal-delay');
       io.observe(node);
     }
 

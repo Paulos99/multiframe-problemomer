@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   formatTimesRu,
   SOUND_PRESSURE_TABLE,
@@ -53,6 +54,7 @@ type DialogProps = {
 function SoundPressureHelpDialog({ highlightDb, onClose }: DialogProps) {
   const titleId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const highlight =
     highlightDb != null && highlightDb > 0
       ? Math.min(20, Math.max(1, Math.round(Math.abs(highlightDb))))
@@ -73,12 +75,19 @@ function SoundPressureHelpDialog({ highlightDb, onClose }: DialogProps) {
   }, [onClose]);
 
   useEffect(() => {
-    if (highlight == null) return;
-    const row = document.getElementById(`sp-row-${highlight}`);
-    row?.scrollIntoView({ block: 'nearest' });
+    if (highlight == null || !scrollRef.current) return;
+    const row = scrollRef.current.querySelector<HTMLElement>(`#sp-row-${highlight}`);
+    if (!row) return;
+    const scroller = scrollRef.current;
+    const rowTop = row.offsetTop;
+    const rowH = row.offsetHeight;
+    const viewH = scroller.clientHeight;
+    scroller.scrollTop = Math.max(0, rowTop - viewH / 2 + rowH / 2);
   }, [highlight]);
 
-  return (
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
     <div
       className={styles.backdrop}
       role="presentation"
@@ -91,6 +100,7 @@ function SoundPressureHelpDialog({ highlightDb, onClose }: DialogProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
+        onMouseDown={(e) => e.stopPropagation()}
       >
         <header className={styles.head}>
           <div className={styles.headText}>
@@ -107,7 +117,7 @@ function SoundPressureHelpDialog({ highlightDb, onClose }: DialogProps) {
           </button>
         </header>
 
-        <div className={styles.tableScroll}>
+        <div className={styles.tableScroll} ref={scrollRef}>
           <table className={styles.table}>
             <thead>
               <tr>
@@ -160,6 +170,7 @@ function SoundPressureHelpDialog({ highlightDb, onClose }: DialogProps) {
           на 50% или в 2 раза
         </p>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

@@ -121,6 +121,54 @@
   padding: 6px 12px 6px 8px;
 }
 
+.playerDash {
+  border-top: none;
+  padding-top: 0;
+  gap: 6px;
+}
+
+.playerDash .playerTitle {
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--text-secondary);
+}
+
+.btnInline {
+  position: relative;
+  justify-content: flex-start;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.btnInline .icon {
+  width: 18px;
+  height: 18px;
+}
+
+.btnInline > strong {
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.sideHint {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.btnInline .bar {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 4px;
+  margin-top: 0;
+}
+
 .head h3 {
   margin: 0 0 4px;
   font-size: 16px;
