@@ -157,10 +157,10 @@ export interface DerivedSimulation {
   /** In-room L2(f) bands (1/3-oct) for truthful audio shaping. */
   receivedAirBands: { before: number[]; after: number[] };
   receivedImpactBands: { before: number[]; after: number[] };
-  /** Room-echo comfort % and playback tail params (demo, not ISO RT60). */
+  /** Room echo % (lower is better) and playback tail params (demo, not ISO RT60). */
   reverb: {
-    comfortBefore: number;
-    comfortAfter: number;
+    echoInRoomBefore: number;
+    echoInRoomAfter: number;
     rt60Before: number;
     rt60After: number;
     wetBefore: number;

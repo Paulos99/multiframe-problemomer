@@ -454,17 +454,20 @@ export function assertModelAnchors(): string[] {
   }
 
   const revOccupied = deriveSimulation(sampleAnswers({ objectStage: 'occupied' })).reverb;
-  if (revOccupied.comfortBefore !== 60 || revOccupied.comfortAfter !== 90) {
+  if (revOccupied.echoInRoomBefore !== 40 || revOccupied.echoInRoomAfter !== 10) {
     errors.push(
-      `occupied echo comfort should be 60→90 (got ${revOccupied.comfortBefore}→${revOccupied.comfortAfter})`,
+      `occupied echo in room should be 40→10 (got ${revOccupied.echoInRoomBefore}→${revOccupied.echoInRoomAfter})`,
     );
   }
   const revNewbuild = deriveSimulation(sampleAnswers({ objectStage: 'newbuild' })).reverb;
-  if (revNewbuild.comfortBefore !== 0) {
-    errors.push(`newbuild echo comfort before should be 0 (got ${revNewbuild.comfortBefore})`);
+  if (revNewbuild.echoInRoomBefore !== 100) {
+    errors.push(`newbuild echo in room before should be 100 (got ${revNewbuild.echoInRoomBefore})`);
   }
-  if (revNewbuild.comfortAfter < 45 || revNewbuild.comfortAfter > 55) {
-    errors.push(`newbuild echo comfort after should be ~50 (got ${revNewbuild.comfortAfter})`);
+  if (revNewbuild.echoInRoomAfter !== 50) {
+    errors.push(`newbuild echo in room after should be 50 (got ${revNewbuild.echoInRoomAfter})`);
+  }
+  if (revOccupied.echoInRoomAfter >= revOccupied.echoInRoomBefore) {
+    errors.push('MultiFrame must lower in-room echo %');
   }
   const revSmall = deriveSimulation(
     sampleAnswers({ objectStage: 'occupied', ceilingAreaM2: 12 }),

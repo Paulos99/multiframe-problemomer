@@ -6,9 +6,9 @@ import type { ObjectStageOption, RoomAnswers } from '../types';
 import { round1 } from './bands';
 
 export type ReverbProfile = {
-  /** Acoustic comfort from echo, % (0 bare → higher with furnishing / MultiFrame). */
-  comfortBefore: number;
-  comfortAfter: number;
+  /** Порхающее эхо в помещении, % (меньше — лучше). Не путать с Rw/Lnw. */
+  echoInRoomBefore: number;
+  echoInRoomAfter: number;
   /** Approximate decay time for impulse synthesis (seconds). */
   rt60Before: number;
   rt60After: number;
@@ -26,17 +26,17 @@ function areaM2(room: RoomAnswers): number {
   return room.ceilingAreaM2 && room.ceilingAreaM2 > 0 ? room.ceilingAreaM2 : AREA_ANCHOR_M2;
 }
 
-/** Comfort % before / after MultiFrame by object stage. */
-export function echoComfortPct(stage: ObjectStageOption): { before: number; after: number } {
+/** Echo in room, % — lower with furnishing / MultiFrame. */
+export function echoInRoomPct(stage: ObjectStageOption): { before: number; after: number } {
   switch (stage) {
     case 'newbuild':
-      return { before: 0, after: 50 };
+      return { before: 100, after: 50 };
     case 'renovation':
-      return { before: 25, after: 70 };
+      return { before: 75, after: 30 };
     case 'occupied':
     case 'unknown':
     default:
-      return { before: 60, after: 90 };
+      return { before: 40, after: 10 };
   }
 }
 
@@ -90,15 +90,15 @@ function flutterFor(stage: ObjectStageOption): { before: number; after: number }
 
 export function buildReverbProfile(room: RoomAnswers): ReverbProfile {
   const stage = room.objectStage;
-  const comfort = echoComfortPct(stage);
+  const echoPct = echoInRoomPct(stage);
   const scale = areaScale(areaM2(room));
   const rt = baseRt60(stage);
   const wet = wetFor(stage);
   const flutter = flutterFor(stage);
 
   return {
-    comfortBefore: comfort.before,
-    comfortAfter: comfort.after,
+    echoInRoomBefore: echoPct.before,
+    echoInRoomAfter: echoPct.after,
     rt60Before: round1(rt.before * scale),
     rt60After: round1(rt.after * scale),
     wetBefore: round1(Math.min(0.65, wet.before * (0.92 + 0.08 * scale))),

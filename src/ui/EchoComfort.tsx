@@ -30,7 +30,7 @@ export function EchoComfort({ sim }: Props) {
   const afterId = `${pair.id}:after`;
   const beforeOn = activeId === beforeId;
   const afterOn = activeId === afterId;
-  const deltaComfort = rev.comfortAfter - rev.comfortBefore;
+  const echoDrop = rev.echoInRoomBefore - rev.echoInRoomAfter;
 
   useEffect(() => {
     void preloadDemoAudio([pair.beforeSrc]);
@@ -46,60 +46,30 @@ export function EchoComfort({ sim }: Props) {
       </header>
 
       <div
-        className={styles.comfortBlock}
+        className={styles.scale}
         role="img"
-        aria-label={`Комфорт от эха: сейчас ${rev.comfortBefore}%, с MultiFrame ${rev.comfortAfter}%. Выше — меньше порхания.`}
+        aria-label={`Эхо в помещении: сейчас ${rev.echoInRoomBefore}%, с MultiFrame ${rev.echoInRoomAfter}%. Меньше — лучше.`}
       >
-        <div className={styles.comfortHead}>
-          <span className={styles.comfortKicker}>Комфорт от эха в комнате</span>
-          <p className={styles.comfortHint}>
-            Не громкость эха — насколько спокойно звучит помещение. Чем выше, тем меньше гулкости и
-            порхания.
-          </p>
-        </div>
-
-        <p className={styles.comfortJump}>
-          <span className={styles.comfortNow}>{rev.comfortBefore}%</span>
-          <span className={styles.comfortArrow} aria-hidden>
-            →
-          </span>
-          <span className={styles.comfortMf}>{rev.comfortAfter}%</span>
-          {deltaComfort > 0 ? (
-            <span className={styles.comfortDelta}>+{deltaComfort} к комфорту</span>
-          ) : null}
+        <p className={styles.scaleCaption}>
+          Порхающее эхо в комнате · чем меньше процент, тем суше звук
         </p>
-
-        <div className={styles.rangeTrack} aria-hidden>
-          <span className={styles.rangeAxis} />
-          <span
-            className={styles.rangeMarkBefore}
-            style={{ left: `${rev.comfortBefore}%` }}
-            title={`Сейчас: ${rev.comfortBefore}%`}
-          />
-          <span
-            className={styles.rangeMarkAfter}
-            style={{ left: `${rev.comfortAfter}%` }}
-            title={`С MultiFrame: ${rev.comfortAfter}%`}
-          />
-          {deltaComfort > 0 ? (
-            <span
-              className={styles.rangeSpan}
-              style={{
-                left: `${rev.comfortBefore}%`,
-                width: `${deltaComfort}%`,
-              }}
-            />
-          ) : null}
+        <div className={styles.scaleRow}>
+          <span className={styles.scaleLabel}>Сейчас</span>
+          <div className={styles.track}>
+            <span className={styles.fillBefore} style={{ width: `${rev.echoInRoomBefore}%` }} />
+          </div>
+          <b className={styles.pct}>{rev.echoInRoomBefore}%</b>
         </div>
-
-        <div className={styles.rangeLegend}>
-          <span>
-            <i className={styles.dotBefore} aria-hidden /> Сейчас · {rev.comfortBefore}%
-          </span>
-          <span>
-            <i className={styles.dotAfter} aria-hidden /> С MultiFrame · {rev.comfortAfter}%
-          </span>
+        <div className={styles.scaleRow}>
+          <span className={styles.scaleLabel}>С MultiFrame</span>
+          <div className={styles.track}>
+            <span className={styles.fillAfter} style={{ width: `${rev.echoInRoomAfter}%` }} />
+          </div>
+          <b className={styles.pctMf}>{rev.echoInRoomAfter}%</b>
         </div>
+        {echoDrop > 0 ? (
+          <p className={styles.scaleDelta}>≈ на {echoDrop}% меньше порхания</p>
+        ) : null}
       </div>
 
       <div className={styles.player}>

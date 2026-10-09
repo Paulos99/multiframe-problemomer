@@ -462,10 +462,10 @@ function buildReportDocument(session: SessionState): string {
         </div>
       </div>
       <div class="comfort-banner" style="margin-top:12px">
-        <div class="k">Комфорт от эха в комнате</div>
-        <div class="v">${rev.comfortBefore}% → ${rev.comfortAfter}%</div>
+        <div class="k">Порхающее эхо в помещении</div>
+        <div class="v">${rev.echoInRoomBefore}% → ${rev.echoInRoomAfter}%</div>
       </div>
-      <p class="muted" style="margin-top:6px">Выше процент — меньше гулкости и порхания (не громче эха). MultiFrame снимает порхающее эхо в помещении — не только шум сверху.</p>
+      <p class="muted" style="margin-top:6px">Меньше процент — суше в комнате. MultiFrame снимает порхание, не только шум сверху.</p>
     </div>
   </section>
 
