@@ -266,19 +266,23 @@ export function EchoComfort({
                 });
             }}
           >
-            <span className={styles.icon}>
-              <PlayIcon playing={beforeOn} />
-            </span>
             {dashboard ? (
-              <>
+              <span className={styles.btnCore}>
+                <span className={styles.icon}>
+                  <PlayIcon playing={beforeOn} />
+                </span>
                 <strong>До</strong>
-                <small className={styles.sideHint}>с эхом</small>
-              </>
-            ) : (
-              <span className={styles.meta}>
-                <strong>До</strong>
-                <small>с эхом</small>
               </span>
+            ) : (
+              <>
+                <span className={styles.icon}>
+                  <PlayIcon playing={beforeOn} />
+                </span>
+                <span className={styles.meta}>
+                  <strong>До</strong>
+                  <small>с эхом</small>
+                </span>
+              </>
             )}
             {beforeOn ? (
               <span className={styles.bar} aria-hidden>
@@ -301,19 +305,23 @@ export function EchoComfort({
                 });
             }}
           >
-            <span className={styles.icon}>
-              <PlayIcon playing={afterOn} />
-            </span>
             {dashboard ? (
-              <>
+              <span className={styles.btnCore}>
+                <span className={styles.icon}>
+                  <PlayIcon playing={afterOn} />
+                </span>
                 <strong>После</strong>
-                <small className={styles.sideHint}>меньше эха</small>
-              </>
-            ) : (
-              <span className={styles.meta}>
-                <strong>После</strong>
-                <small>меньше эха</small>
               </span>
+            ) : (
+              <>
+                <span className={styles.icon}>
+                  <PlayIcon playing={afterOn} />
+                </span>
+                <span className={styles.meta}>
+                  <strong>После</strong>
+                  <small>меньше эха</small>
+                </span>
+              </>
             )}
             {afterOn ? (
               <span className={styles.bar} aria-hidden>
