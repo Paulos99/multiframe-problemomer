@@ -21,6 +21,7 @@ import {
 import type { RoomAnswers, SessionAnswers } from '../types';
 import { buildRoomAudioShape, playbackGainForReceivedDb } from '../../audio/roomAudioShape';
 import { decodeRoomAnswers, encodeRoomAnswers, sessionFromShareToken } from '../shareLink';
+import { buildAnalyticsPayload } from '../../analytics/payload';
 
 function sampleRoom(over: Partial<RoomAnswers> = {}): RoomAnswers {
   return {
@@ -498,6 +499,15 @@ export function assertModelAnchors(): string[] {
   const sharedSession = sessionFromShareToken(token);
   if (!sharedSession || sharedSession.step !== 'result' || !sharedSession.derived) {
     errors.push('shareLink sessionFromShareToken must open Result with derived sim');
+  }
+  if (sharedSession) {
+    const analytics = buildAnalyticsPayload(sharedSession);
+    if (!analytics || analytics.source !== 'problemomer' || !analytics.sim.before.hybrid) {
+      errors.push('buildAnalyticsPayload must return anonymous Result payload');
+    }
+    if (analytics && ('name' in analytics || 'phone' in analytics)) {
+      errors.push('buildAnalyticsPayload must not include contact fields');
+    }
   }
 
   const revOccupied = deriveSimulation(sampleAnswers({ objectStage: 'occupied' })).reverb;

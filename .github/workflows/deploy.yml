@@ -32,6 +32,9 @@ jobs:
           cache: npm
 
       - name: Install and build
+        env:
+          VITE_YM_ID: ${{ secrets.VITE_YM_ID }}
+          VITE_ANALYTICS_INGEST_URL: ${{ secrets.VITE_ANALYTICS_INGEST_URL }}
         run: npm ci && npm run build
 
       # enablement: true — first run creates Pages site with build_type=workflow

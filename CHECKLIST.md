@@ -91,7 +91,7 @@ Mark what is active now. Everything unmarked is deferred and must be left alone:
 
 | Question                                                                                                             | Answer |
 | -------------------------------------------------------------------------------------------------------------------- | ------ |
-| Why the unmarked surfaces are deferred, if it needs explaining                                                       | MVP — один статический SPA на GitHub Pages. Нет серверного API, аккаунтов, SEO-лендинга и нативного приложения. Отдельный «website» не нужен: продукт сам является публичным webapp. Backend / mobile — только если позже появятся CRM-лиды, auth или магазинный оффлайн-режим. |
+| Why the unmarked surfaces are deferred, if it needs explaining                                                       | MVP — один статический SPA на GitHub Pages. Нет серверного API/auth/SEO-лендинга. Аналитика — клиентская Метрика + опциональный внешний ingest (без своей БД в репо). Backend / mobile — только если позже понадобятся auth или оффлайн. Лиды в приложении не собираем. |
 | If `mobile` is active: are Expo/EAS builds, Expo Push, and Maestro E2E needed now, or left unconfigured until later? | n/a (`mobile` deferred) |
 
 **ASSUMPTION:** vibe’s `webapp` usually means “behind sign-in”; here the SPA is public and unauthenticated. We still mark only `webapp` as active because it is the interactive product surface (not a content/SEO site).
@@ -105,7 +105,7 @@ Ask about product needs, not implementations. Mark what the first version actual
 - [ ] File, image, or media uploads → also answer _Files, images, and media_
 - [ ] Paid subscriptions or one-off payments → also answer _Payments_
 - [ ] Admin tools or roles
-- [x] External integrations (which: outbound handoff to MultiFRAME calculator URL; demo lead stub to console only — no real CRM)
+- [x] External integrations (which: MultiFRAME calculator URL; StP consultation link; optional Yandex Metrika + anonymous Result ingest — no CRM / no in-app leads)
 - [ ] Real-time chat, presence, collaboration, or live updates
 
 Product capabilities that **are** in the first version (not listed as vibe template toggles above — see ledger):
@@ -222,8 +222,9 @@ A capability with no row is `absent` by default. The State column always holds o
 | Saved sessions / cloud sync | absent | Session lives in memory for the visit. |
 | File/media uploads | absent | — |
 | Payments / checkout | absent | — |
-| Backend API / database | absent | Static SPA only. |
-| Real CRM / lead delivery | absent | Consultation goes to the live StP site form; no invented CRM endpoint in this app. |
+| Backend API / database | absent | Static SPA only; optional external ingest URL for anonymous analytics rows. |
+| Anonymous analytics | included | UTM/ref/mgr + Metrika goals + `buildAnalyticsPayload` ingest. No PII. See `docs/analytics.md`. |
+| Real CRM / lead delivery | absent | Consultation goes to the live StP site form; no in-app leads or CRM endpoint. |
 | Walls / partitions / floor systems | absent | Explicitly out of MVP scope. |
 | Polyblock product path | absent | Explicitly out of scope. |
 | Framed acoustic systems | absent | Explicitly out of scope. |

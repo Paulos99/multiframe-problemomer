@@ -3,6 +3,7 @@ import { useDemoPlayer, preloadDemoAudio } from '../audio/useDemoPlayer';
 import { buildRoomAudioShapeForPair } from '../audio/roomAudioShape';
 import type { AudioPair, DerivedSimulation, RoomWishOption } from '../state/types';
 import { wishAudioLead, wishAudioOrder, wishPrimaryGroup } from '../state/wish';
+import { track } from '../analytics';
 import styles from './CompactAudio.module.css';
 
 function PlayIcon({ playing }: { playing: boolean }) {
@@ -106,7 +107,12 @@ export function CompactAudio({
                           }
                           onClick={() => {
                             if (beforeOn) stop();
-                            else
+                            else {
+                              track('pm_audio_play', {
+                                group: pair.group,
+                                side: 'before',
+                                stem: pair.id,
+                              });
                               void play(beforeId, pair.beforeSrc, {
                                 side: 'before',
                                 group: pair.group,
@@ -114,6 +120,7 @@ export function CompactAudio({
                                 deltaRw: sim.delta.Rw,
                                 deltaLnw: Math.abs(sim.delta.Lnw),
                               });
+                            }
                           }}
                         >
                           <PlayIcon playing={beforeOn} />
@@ -137,7 +144,12 @@ export function CompactAudio({
                           }
                           onClick={() => {
                             if (afterOn) stop();
-                            else
+                            else {
+                              track('pm_audio_play', {
+                                group: pair.group,
+                                side: 'after',
+                                stem: pair.id,
+                              });
                               void play(afterId, pair.afterSrc, {
                                 side: 'after',
                                 group: pair.group,
@@ -145,6 +157,7 @@ export function CompactAudio({
                                 deltaRw: sim.delta.Rw,
                                 deltaLnw: Math.abs(sim.delta.Lnw),
                               });
+                            }
                           }}
                         >
                           <PlayIcon playing={afterOn} />

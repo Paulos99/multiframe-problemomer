@@ -59,6 +59,12 @@ Base path для GitHub Pages: `/multiframe-problemomer/`.
 - Ссылка калькулятора: `https://paulos99.github.io/MF_StP/?area=…`
 - Консультация: `https://stp-multiframe.ru/#section-partner`
 
+## Аналитика (анонимно)
+
+Только метрики воронки/каналов/CTA — **без лидов и контактов**. Документация и шаблоны ссылок: [docs/analytics.md](docs/analytics.md).
+
+Опционально в `.env` / GitHub Secrets: `VITE_YM_ID`, `VITE_ANALYTICS_INGEST_URL` (см. [.env.example](.env.example)).
+
 ## Деплой
 
 При пуше в `main` GitHub Actions (`/.github/workflows/deploy.yml`) собирает Vite-приложение и публикует артефакт через official Pages actions.

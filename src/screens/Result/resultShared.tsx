@@ -28,6 +28,7 @@ import {
   shareAcousticProfile,
 } from '../../state/reportPdf';
 import { wishScenarioLine, wishSoundCorrectionLine, stretchDrumLine } from '../../state/wish';
+import { eventParamsFromSession, track } from '../../analytics';
 import styles from './resultShared.module.css';
 
 /** Official SP thresholds А/Б/В + explicit «ниже допустимого» band. */
@@ -239,15 +240,18 @@ export function useResultProfile() {
   }, []);
 
   function openCalc() {
+    track('pm_cta_calc', eventParamsFromSession(session));
     window.open(calcUrl, '_blank', 'noopener,noreferrer');
   }
 
   function openConsultation() {
+    track('pm_cta_consult', eventParamsFromSession(session));
     window.open(CONSULTATION_URL, '_blank', 'noopener,noreferrer');
   }
 
   async function onDownloadProfile() {
     if (pdfBusy) return;
+    track('pm_pdf', eventParamsFromSession(session));
     setPdfBusy(true);
     setPdfError(false);
     try {
@@ -261,6 +265,7 @@ export function useResultProfile() {
   }
 
   async function onShare() {
+    track('pm_share', eventParamsFromSession(session));
     const result = await shareAcousticProfile(session);
     setShareState(result === 'failed' ? 'failed' : result);
     window.setTimeout(() => setShareState('idle'), 2500);

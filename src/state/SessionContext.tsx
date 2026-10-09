@@ -30,6 +30,8 @@ import {
   withDerived,
 } from './session';
 import { tryRestoreSharedSession } from './shareLink';
+import { resetAnalyticsSessionId } from '../analytics';
+import { useFunnelAnalytics } from '../analytics/useFunnelAnalytics';
 
 interface SessionApi {
   session: SessionState;
@@ -58,6 +60,7 @@ function initialSession(): SessionState {
 
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<SessionState>(initialSession);
+  useFunnelAnalytics(session);
 
   const patch = useCallback((fn: (s: SessionState) => SessionState) => {
     setSession((prev) => fn(prev));
@@ -140,6 +143,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const restart = useCallback(() => {
+    resetAnalyticsSessionId();
     setSession(createInitialSession());
     try {
       const url = new URL(window.location.href);

@@ -215,7 +215,10 @@ function classSide(Rw: number, Lnw: number) {
   };
 }
 
-/** Structured lead payload for CRM handoff (MVP: console stub). */
+/**
+ * Digest for PDF / clipboard summary. Not used for CRM.
+ * Anonymous analytics: see `buildAnalyticsPayload` in `src/analytics/payload.ts`.
+ */
 export function buildLeadHandoff(
   session: SessionState,
   contact?: { name?: string; phone?: string },

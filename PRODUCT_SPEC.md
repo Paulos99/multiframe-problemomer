@@ -800,6 +800,14 @@ Client path also: `buildClientSummary(session)` — plain-text digest for clipbo
 - `buildLeadHandoff` remains for `buildClientSummary` (clipboard digest).
 - Result motion is limited to scale markers and effect bars; Room progress remains. Honor `prefers-reduced-motion`.
 
+### Anonymous analytics (owner 2026-10-10)
+
+- **Metrics only** — funnel, channels, CTA clicks, demand segments. **No leads / phones / CRM.**
+- Soft attribution via URL: `utm_*`, `ref`, `mgr` (first-touch in `sessionStorage`). See `docs/analytics.md`.
+- Yandex Metrika goals: `pm_start`, `pm_room_step`, `pm_result_view`, `pm_cta_calc`, `pm_cta_consult`, `pm_share`, `pm_pdf`, `pm_audio_play` (gated by cookie consent; `VITE_YM_ID`).
+- On Result: `buildAnalyticsPayload` → optional `POST` to `VITE_ANALYTICS_INGEST_URL` (no contact fields).
+- Privacy note: `public/privacy.html`.
+
 ---
 
 ## Acceptance tests
