@@ -1,0 +1,155 @@
+.helpBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin-left: 4px;
+  padding: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.helpBtn:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(15, 28, 22, 0.45);
+}
+
+.dialog {
+  width: min(920px, 100%);
+  max-height: min(90vh, 720px);
+  overflow: auto;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-md);
+  background: #fff;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+}
+
+.head {
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid #d7e2dc;
+}
+
+.head h2 {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 750;
+  color: #0f1c16;
+}
+
+.head p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #5f6b73;
+}
+
+.tableWrap {
+  padding: 12px 16px 16px;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  min-width: 640px;
+}
+
+.table thead th {
+  padding: 10px 8px;
+  background: #01644f;
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 1.25;
+  border: 1px solid #015a47;
+}
+
+.table tbody td {
+  padding: 8px;
+  border-bottom: 1px solid #e6eeea;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.table tbody tr:nth-child(even) td {
+  background: #f7faf8;
+}
+
+.table tbody tr.highlight td {
+  background: #e8f3ef;
+  font-weight: 700;
+}
+
+.colDb {
+  font-weight: 800;
+  color: #152018;
+}
+
+.colDec {
+  color: #01644f;
+  font-weight: 650;
+}
+
+.colInc {
+  color: #9b2335;
+  font-weight: 650;
+}
+
+.pillDec,
+.pillInc {
+  display: inline-block;
+  min-width: 3.2em;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-weight: 750;
+}
+
+.pillDec {
+  background: #e8f3ef;
+  color: #01644f;
+}
+
+.pillInc {
+  background: #fdecef;
+  color: #9b2335;
+}
+
+.foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 0 16px 14px;
+}
+
+.closeBtn {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--bg-subtle);
+  font-weight: 650;
+  cursor: pointer;
+}

@@ -328,4 +328,5 @@ export const DISCLAIMER_SIMULATION = '';
 
 export const NORM_FOOTNOTE = 'Нормы комфорта жилья · СП 51.13330.2011';
 
-export const LOG_DB_FOOTNOTE = 'Минус 8 дБ ощущается примерно вдвое тише.';
+export const LOG_DB_FOOTNOTE =
+  'Процент «тише» — по таблице снижения звукового давления (например, −8 дБ ≈ 60%).';

@@ -32,6 +32,7 @@ import {
   shareAcousticProfile,
 } from '../../state/reportPdf';
 import { wishScenarioLine, wishSoundCorrectionLine, stretchDrumLine } from '../../state/wish';
+import { SoundPressureHelpButton } from '../../ui/SoundPressureHelp';
 import styles from './ResultScreen.module.css';
 
 /** Official SP thresholds А/Б/В + explicit «ниже допустимого» band. */
@@ -89,6 +90,7 @@ function FeltScale({
   now,
   after,
   quieterPct,
+  quieterDeltaDb,
   mode,
   indexKind,
   nowIndex,
@@ -98,6 +100,7 @@ function FeltScale({
   now: FeltStep;
   after?: FeltStep;
   quieterPct?: number;
+  quieterDeltaDb?: number;
   mode: 'nowOnly' | 'nowAndAfter';
   /** SP construction index shown on this axis (not room L2). */
   indexKind: 'Rw' | 'Lnw';
@@ -129,7 +132,13 @@ function FeltScale({
       <div className={styles.feltHead}>
         <strong>{title}</strong>
         {mode === 'nowAndAfter' && quieterPct != null ? (
-          <b>станет на ≈ {quieterPct}% тише</b>
+          <b className={styles.quieterLine}>
+            станет на ≈ {quieterPct}% тише
+            <SoundPressureHelpButton
+              highlightDb={quieterDeltaDb}
+              label={`Таблица снижения звукового давления для ${indexKind}`}
+            />
+          </b>
         ) : null}
       </div>
 
@@ -282,6 +291,8 @@ export function ResultScreen() {
       series={airSpectrum}
       yLabel="дБ"
       indexBadge={{ kind: 'Rw', before: sim.before.Rw, after: sim.after.Rw }}
+      reductionDb={Math.abs(sim.delta.Rw)}
+      reductionPct={sim.perceivedAirPct}
     />
   );
   const impactChart = (
@@ -291,6 +302,8 @@ export function ResultScreen() {
       series={impactSpectrum}
       yLabel="дБ"
       indexBadge={{ kind: 'Lnw', before: sim.before.Lnw, after: sim.after.Lnw }}
+      reductionDb={Math.abs(sim.delta.Lnw)}
+      reductionPct={sim.perceivedImpactPct}
     />
   );
 
@@ -430,6 +443,7 @@ export function ResultScreen() {
             nowIndex={sim.before.Rw}
             afterIndex={sim.after.Rw}
             quieterPct={sim.perceivedAirPct}
+            quieterDeltaDb={Math.abs(sim.delta.Rw)}
             mode="nowAndAfter"
           />
           <FeltScale
@@ -440,6 +454,7 @@ export function ResultScreen() {
             nowIndex={sim.before.Lnw}
             afterIndex={sim.after.Lnw}
             quieterPct={sim.perceivedImpactPct}
+            quieterDeltaDb={Math.abs(sim.delta.Lnw)}
             mode="nowAndAfter"
           />
         </div>

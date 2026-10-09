@@ -17,7 +17,10 @@ import { buildConstruction, resolveSlab } from './acoustic/construction';
 import { applyMultiFrame } from './acoustic/multiframe';
 import { buildReceiving, quietFromReceivedAir, quietFromReceivedImpact } from './acoustic/receiving';
 import { buildReverbProfile } from './acoustic/reverb';
+import { perceivedReductionPct } from './acoustic/soundPressureTable';
 import { seriesFromBands } from './spectrum';
+
+export { perceivedReductionPct } from './acoustic/soundPressureTable';
 
 export type { SlabKey };
 
@@ -107,21 +110,6 @@ function feelingFromReceived(
   if (side.classStatus === 'partial') return 'ok';
   if (side.Lnw >= 74 || side.Rw < 52) return 'bothers';
   return 'ok';
-}
-
-/**
- * Perceived loudness reduction % from |Δ| dB (psychoacoustic, not linear in dB or %).
- * Rule of thumb in this product: ~8 dB ≈ half as loud (see LOG_DB_FOOTNOTE).
- * loudness_after / loudness_before = 0.5^(Δ/8) → quieter% = (1 − ratio)·100.
- */
-export const HALF_LOUDNESS_DB = 8;
-
-export function perceivedReductionPct(absDeltaDb: number): number {
-  const d = Math.abs(absDeltaDb);
-  if (d < 0.05) return 0;
-  const ratio = Math.pow(0.5, d / HALF_LOUDNESS_DB);
-  const pct = (1 - ratio) * 100;
-  return Math.round(Math.min(75, Math.max(0, pct)));
 }
 
 export function comfortScore(Rw: number, Lnw: number): number {

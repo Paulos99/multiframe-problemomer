@@ -17,7 +17,6 @@ import {
   NORMS,
   FELT_STEPS,
   perceivedReductionPct,
-  HALF_LOUDNESS_DB,
 } from '../simulation';
 import type { RoomAnswers, SessionAnswers } from '../types';
 import { buildRoomAudioShape, playbackGainForReceivedDb } from '../../audio/roomAudioShape';
@@ -503,18 +502,14 @@ export function assertModelAnchors(): string[] {
     errors.push('echo clap shape: after should not be louder than before');
   }
 
-  // Loudness % is log in dB: half at HALF_LOUDNESS_DB, no fake 15% floor.
-  if (HALF_LOUDNESS_DB !== 8) {
-    errors.push(`HALF_LOUDNESS_DB should be 8 (got ${HALF_LOUDNESS_DB})`);
+  if (perceivedReductionPct(8) !== 60) {
+    errors.push(`8 dB should read as 60% quieter (got ${perceivedReductionPct(8)})`);
   }
-  if (perceivedReductionPct(HALF_LOUDNESS_DB) !== 50) {
-    errors.push(`−${HALF_LOUDNESS_DB} dB should read as ≈50% quieter`);
+  if (perceivedReductionPct(4) !== 37) {
+    errors.push(`4 dB should read as 37% quieter (got ${perceivedReductionPct(4)})`);
   }
-  if (perceivedReductionPct(4) < 28 || perceivedReductionPct(4) > 31) {
-    errors.push(`Δ 4 dB should be ≈29% quieter (got ${perceivedReductionPct(4)})`);
-  }
-  if (perceivedReductionPct(1.8) >= 15) {
-    errors.push('tiny Δ must not be floored up to 15%');
+  if (perceivedReductionPct(9) !== 65) {
+    errors.push(`9 dB should read as 65% quieter (got ${perceivedReductionPct(9)})`);
   }
   const pctSim = deriveSimulation(
     sampleAnswers({

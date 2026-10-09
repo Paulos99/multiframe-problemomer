@@ -1927,6 +1927,12 @@
   color: var(--accent-color);
 }
 
+.quieterLine {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
 .feltDb {
   margin: -2px 0 0;
   font-size: 13px;

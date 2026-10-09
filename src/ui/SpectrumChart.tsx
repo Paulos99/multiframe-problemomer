@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import type { SpectrumSeries } from '../state/spectrum';
+import { SoundPressureHelpButton } from './SoundPressureHelp';
 import styles from './SpectrumChart.module.css';
 
 type IndexBadge = {
@@ -17,6 +18,9 @@ type Props = {
   afterLabel?: string;
   /** Weighted index shown in the top-right corner (до → после). */
   indexBadge?: IndexBadge;
+  /** |Δ| index for «тише %» from the sound-pressure table. */
+  reductionDb?: number;
+  reductionPct?: number;
 };
 
 type HoverPoint = {
@@ -126,6 +130,8 @@ export function SpectrumChart({
   beforeLabel = 'Сейчас',
   afterLabel = 'С MultiFrame',
   indexBadge,
+  reductionDb,
+  reductionPct,
 }: Props) {
   const padL = 28;
   const padR = 10;
@@ -222,6 +228,15 @@ export function SpectrumChart({
               ≈ {Math.round(indexBadge.before)}
               <span aria-hidden> → </span>≈ {Math.round(indexBadge.after)}
             </span>
+            {reductionPct != null && reductionDb != null && reductionDb > 0 ? (
+              <span className={styles.quieterBadge}>
+                ≈ {reductionPct}% тише
+                <SoundPressureHelpButton
+                  highlightDb={reductionDb}
+                  label={`Таблица снижения для ${indexBadge.kind}`}
+                />
+              </span>
+            ) : null}
           </div>
         ) : null}
       </figcaption>
