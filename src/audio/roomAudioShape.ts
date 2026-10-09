@@ -111,6 +111,10 @@ export function playbackGainForReceivedDb(
   return clamp(round1(delta * 0.25), 0, 3);
 }
 
+/** Music «До» — neighbours rarely blast that loud; −30% amplitude ≈ −3.1 dB. */
+const AIR_BEFORE_LEVEL_SCALE = 0.7;
+const AIR_BEFORE_EXTRA_DB = round1(20 * Math.log10(AIR_BEFORE_LEVEL_SCALE));
+
 /**
  * Dry stems need a real through-slab low-pass.
  * До and После share the same muffling: После is quieter vs that muffled До,
@@ -185,7 +189,10 @@ export function buildRoomAudioShape(
     };
   }
 
-  const beforeGainDb = playbackGainForReceivedDb(targetBeforeDb, group);
+  const beforeGainDb = round1(
+    playbackGainForReceivedDb(targetBeforeDb, group) +
+      (group === 'air' ? AIR_BEFORE_EXTRA_DB : 0),
+  );
   const afterGainDb = isolationAfterGainDb(sim, group, targetBeforeDb, targetAfterDb);
   const slabHz = mufflingHz(sim, group);
   const rawDelta = targetAfterDb - targetBeforeDb;
