@@ -292,8 +292,7 @@ export function ResultWideScreen() {
       >
         <div className={styles.objectSpec}>
           <div className={styles.objectSpecLabel}>
-            <span>Параметры</span>
-            <strong>Объект</strong>
+            <strong>Параметры объекта</strong>
           </div>
           <dl className={styles.objectSpecGrid}>
             {objectCells.map((cell) => (

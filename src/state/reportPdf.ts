@@ -670,8 +670,7 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
 
     <section class="object" aria-label="Объект">
       <div class="object-label">
-        <span>Параметры</span>
-        <strong>Объект</strong>
+        <strong>Параметры объекта</strong>
       </div>
       <dl class="object-grid">
         <div><dt>Перекрытие</dt><dd>${escapeHtml(slabLabel)}</dd></div>
