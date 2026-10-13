@@ -285,47 +285,31 @@ export function ResultWideScreen() {
         <h1>Акустический профиль помещения</h1>
       </header>
 
-      <section className={`${styles.objectSpec} ${styles.driftSlow}`} data-reveal aria-label="Объект">
-        <div className={styles.objectSpecLabel}>
-          <span>Параметры</span>
-          <strong>Объект</strong>
+      <section
+        className={`${styles.objectCaseRow} ${styles.driftSlow}`}
+        data-reveal
+        aria-label="Объект и вердикт"
+      >
+        <div className={styles.objectSpec}>
+          <div className={styles.objectSpecLabel}>
+            <span>Параметры</span>
+            <strong>Объект</strong>
+          </div>
+          <dl className={styles.objectSpecGrid}>
+            {objectCells.map((cell) => (
+              <div key={cell.label}>
+                <dt>{cell.label}</dt>
+                <dd>{cell.value}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
-        <dl className={styles.objectSpecGrid}>
-          {objectCells.map((cell) => (
-            <div key={cell.label}>
-              <dt>{cell.label}</dt>
-              <dd>{cell.value}</dd>
-            </div>
-          ))}
-        </dl>
-      </section>
 
-      {p.storyParagraphs.length > 0 || p.recommendations.length > 0 ? (
-        <section
-          className={`${styles.personalBlock} ${styles.driftSoft}`}
-          data-reveal
-          aria-label="Персональные рекомендации"
-        >
-          {p.storyParagraphs.length > 0 ? (
-            <div className={styles.personalStory}>
-              <h2>В вашем случае</h2>
-              {p.storyParagraphs.map((para) => (
-                <p key={para.slice(0, 48)}>{para}</p>
-              ))}
-            </div>
-          ) : null}
-          {p.recommendations.length > 0 ? (
-            <div className={styles.recsBlock}>
-              <h2>Рекомендации</h2>
-              <ul>
-                {p.recommendations.map((item) => (
-                  <li key={item.slice(0, 48)}>{item}</li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-        </section>
-      ) : null}
+        <aside className={styles.caseVerdict} aria-label="В вашем случае">
+          <h2>В вашем случае</h2>
+          <p>{p.caseVerdictText}</p>
+        </aside>
+      </section>
 
       <KpiRow
         deltaRw={deltaRw}
@@ -404,10 +388,11 @@ export function ResultWideScreen() {
           </header>
 
           {p.showScenarioAside ? (
-            <aside className={styles.scenario} aria-label="Ваша задача">
-              {p.scenarioLine ? <p>{p.scenarioLine}</p> : null}
-              {p.drumLine ? <p className={styles.scenarioExtra}>{p.drumLine}</p> : null}
-              {p.soundCorrection ? <p className={styles.scenarioExtra}>{p.soundCorrection}</p> : null}
+            <aside className={styles.scenario} aria-label="Нюансы потолка">
+              {p.drumLine ? <p>{p.drumLine}</p> : null}
+              {p.soundCorrection ? (
+                <p className={styles.scenarioExtra}>{p.soundCorrection}</p>
+              ) : null}
             </aside>
           ) : null}
 

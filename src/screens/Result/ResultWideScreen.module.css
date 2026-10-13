@@ -42,12 +42,21 @@
 }
 
 /* ——— Object hero asset ——— */
+.objectCaseRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  align-items: stretch;
+  min-width: 0;
+}
+
 .objectSpec {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 0 20px;
+  gap: 0 12px;
   align-items: stretch;
   padding: 0;
+  min-width: 0;
   border-radius: 20px;
   border: 1px solid rgba(1, 100, 79, 0.28);
   background:
@@ -84,10 +93,10 @@
 
 .objectSpecGrid {
   margin: 0;
-  padding: 16px 18px 16px 8px;
+  padding: 14px 14px 14px 6px;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 8px 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
 }
 
 .objectSpecGrid div {
@@ -485,54 +494,34 @@
   opacity: 0.9;
 }
 
-.personalBlock {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 16px 24px;
-  padding: 18px 20px;
-  border-radius: var(--radius-md);
-  background: var(--bg-card);
+.caseVerdict {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 20px 22px;
+  border-radius: 20px;
   border: 1px solid var(--border-color);
+  background:
+    linear-gradient(160deg, rgba(1, 100, 79, 0.06), transparent 55%),
+    var(--bg-card);
   box-shadow: var(--shadow-sm);
 }
 
-.personalStory h2,
-.recsBlock h2 {
-  margin: 0 0 8px;
+.caseVerdict h2 {
+  margin: 0;
   font-size: 15px;
   font-weight: 800;
   letter-spacing: -0.01em;
+  color: var(--accent-color);
 }
 
-.personalStory p {
-  margin: 0 0 8px;
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--text-secondary);
-}
-
-.personalStory p:last-child {
-  margin-bottom: 0;
-}
-
-.recsBlock ul {
+.caseVerdict p {
   margin: 0;
-  padding: 0 0 0 1.1em;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.recsBlock li {
-  font-size: 13px;
-  line-height: 1.45;
+  font-size: 14px;
+  line-height: 1.55;
   color: var(--text-secondary);
-}
-
-@media (max-width: 720px) {
-  .personalBlock {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* ——— Shared panel / widget chrome ——— */
@@ -1380,10 +1369,6 @@
 }
 
 @media (max-width: 1200px) {
-  .objectSpecGrid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
   .effectListen {
     grid-template-columns: 1fr;
   }
@@ -1415,6 +1400,10 @@
 }
 
 @media (max-width: 900px) {
+  .objectCaseRow {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
   .root {
     gap: 14px;
   }

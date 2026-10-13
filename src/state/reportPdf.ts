@@ -15,7 +15,7 @@ import {
   shouldAskNoiseKind,
   type SessionState,
 } from './types';
-import { buildRecommendations, personalStory } from './recommendations';
+import { caseVerdict } from './recommendations';
 import { resolveSlab } from './acoustic/construction';
 import {
   airClassFor,
@@ -31,7 +31,7 @@ import {
 import { buildLeadHandoff, withDerived } from './session';
 import { buildAirSpectrum, buildImpactSpectrum } from './spectrum';
 import { comfortRingSvg, spectrumChartSvg } from './chartSvg';
-import { wishScenarioLine, stretchDrumLine } from './wish';
+import { stretchDrumLine } from './wish';
 import {
   buildShareClipboardText,
   buildShareUrl,
@@ -248,11 +248,9 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
   const airAfter = airFeltFromIndex(a.Rw);
   const impactNow = impactFeltFromIndex(b.Lnw);
   const impactAfter = impactFeltFromIndex(a.Lnw);
-  const scenario = wishScenarioLine(room.roomWish);
   const drum = stretchDrumLine(room.plannedCeiling);
   const noiseType = session.derived?.noiseType ?? 'mixed';
-  const story = personalStory(room, noiseType);
-  const recs = buildRecommendations(room, noiseType);
+  const verdict = caseVerdict(room, noiseType);
   const airSeries = buildAirSpectrum(session.answers);
   const impactSeries = buildImpactSpectrum(session.answers);
 
@@ -267,17 +265,10 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
     room.noisyNeighbors !== 'unknown'
       ? `<div><dt>Шум сверху</dt><dd>${escapeHtml(optLabel(NOISY_NEIGHBORS_OPTIONS, room.noisyNeighbors))}</dd></div>`
       : '';
-  const personalHtml =
-    story.length || recs.length
-      ? `<section class="personal">
-          ${story.map((p) => `<p>${escapeHtml(p)}</p>`).join('')}
-          ${
-            recs.length
-              ? `<h2>Рекомендации</h2><ul>${recs.map((r) => `<li>${escapeHtml(r)}</li>`).join('')}</ul>`
-              : ''
-          }
-        </section>`
-      : '';
+  const personalHtml = `<section class="personal">
+          <h2>В вашем случае</h2>
+          <p>${escapeHtml(verdict)}</p>
+        </section>`;
   const comfortBefore = Math.max(0, Math.min(100, 100 - rev.echoInRoomBefore));
   const comfortAfter = Math.max(0, Math.min(100, 100 - rev.echoInRoomAfter));
   const echoDrop = Math.max(0, rev.echoInRoomBefore - rev.echoInRoomAfter);
@@ -306,12 +297,7 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
       `<li class="pillar"><span class="pillar-mark"></span><div><strong>${escapeHtml(p.title)}</strong><p>${escapeHtml(p.text)}</p></div></li>`,
   ).join('');
 
-  const wishBlock =
-    room.roomWish !== 'other'
-      ? `<p class="lead">${escapeHtml(scenario)}</p>${drum ? `<p class="muted">${escapeHtml(drum)}</p>` : ''}`
-      : drum
-        ? `<p class="lead">${escapeHtml(drum)}</p>`
-        : `<p class="lead">Прогноз по голосам и шагам сверху для этого перекрытия.</p>`;
+  const wishBlock = `${drum ? `<p class="muted">${escapeHtml(drum)}</p>` : ''}`;
 
   const normRow = (key: string, label: string, rw: string, lnw: string, muted?: boolean) => {
     const isNow = key === hybridBefore;

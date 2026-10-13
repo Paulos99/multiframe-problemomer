@@ -31,8 +31,8 @@ import {
   prefetchAcousticProfilePdf,
   shareAcousticProfile,
 } from '../../state/reportPdf';
-import { buildRecommendations, personalStory } from '../../state/recommendations';
-import { wishScenarioLine, wishSoundCorrectionLine, stretchDrumLine } from '../../state/wish';
+import { caseVerdict } from '../../state/recommendations';
+import { wishSoundCorrectionLine, stretchDrumLine } from '../../state/wish';
 import { eventParamsFromSession, track } from '../../analytics';
 import styles from './resultShared.module.css';
 
@@ -226,28 +226,14 @@ export function useResultProfile() {
   const noiseType = session.derived?.noiseType ?? 'mixed';
   const soundCorrection = wishSoundCorrectionLine(wish);
   const drumLine = stretchDrumLine(room.plannedCeiling);
-  const storyParagraphs = personalStory(room, noiseType);
-  const recommendations = buildRecommendations(room, noiseType);
+  const caseVerdictText = caseVerdict(room, noiseType);
   const slabContext =
     room.slabType === 'unknown' && room.slabThickness === 'unknown'
       ? `ориентир по типу дома (${houseLabel}), ~${slab.thicknessMm} мм`
       : `${slabTypeLabel}, ${slabThickLabel}`;
 
   const calcUrl = buildCalculatorUrl(session.cta);
-  const objectAllUnknown =
-    room.houseType === 'unknown' &&
-    room.slabType === 'unknown' &&
-    room.slabThickness === 'unknown' &&
-    room.floorAbove === 'unknown' &&
-    room.noisyNeighbors === 'unknown' &&
-    room.objectStage === 'unknown' &&
-    room.plannedCeiling === 'unknown';
-  const showWishScenario = wish !== 'other' && !objectAllUnknown;
-  const showScenarioAside =
-    showWishScenario ||
-    Boolean(drumLine) ||
-    Boolean(soundCorrection) ||
-    storyParagraphs.length > 0;
+  const showScenarioAside = Boolean(drumLine) || Boolean(soundCorrection);
 
   const [shareState, setShareState] = useState<'idle' | 'shared' | 'copied' | 'failed'>('idle');
   const [pdfBusy, setPdfBusy] = useState(false);
@@ -321,12 +307,9 @@ export function useResultProfile() {
     noiseType,
     soundCorrection,
     drumLine,
-    storyParagraphs,
-    recommendations,
+    caseVerdictText,
     slabContext,
-    showWishScenario,
     showScenarioAside,
-    scenarioLine: showWishScenario ? wishScenarioLine(wish) : null,
     pdfBusy,
     pdfError,
     shareLabel,
