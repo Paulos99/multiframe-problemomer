@@ -320,7 +320,11 @@ export function ResultWideScreen() {
       >
         <aside className={styles.recommendations} aria-label="Рекомендации">
           <h2>Рекомендации:</h2>
-          <p>{p.caseVerdictText}</p>
+          <div className={styles.recommendationCopy}>
+            {p.caseVerdictParagraphs.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </div>
         </aside>
         <aside className={styles.productAbout} aria-label="Что такое MultiFrame">
           <h2>Что такое MultiFrame</h2>
@@ -334,7 +338,10 @@ export function ResultWideScreen() {
               loading="lazy"
               decoding="async"
             />
-            <p>{p.productBlurb}</p>
+            <div className={styles.productCopy}>
+              <strong>{p.productClaim}</strong>
+              <p>{p.productBlurb}</p>
+            </div>
           </div>
         </aside>
       </section>

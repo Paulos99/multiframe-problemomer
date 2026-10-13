@@ -32,9 +32,10 @@ import {
   shareAcousticProfile,
 } from '../../state/reportPdf';
 import {
-  caseVerdict,
+  caseVerdictParts,
   MULTIFRAME_PANEL_IMG,
   MULTIFRAME_PRODUCT_BLURB,
+  MULTIFRAME_PRODUCT_CLAIM,
 } from '../../state/recommendations';
 import { wishSoundCorrectionLine, stretchDrumLine } from '../../state/wish';
 import { eventParamsFromSession, track } from '../../analytics';
@@ -230,7 +231,7 @@ export function useResultProfile() {
   const noiseType = session.derived?.noiseType ?? 'mixed';
   const soundCorrection = wishSoundCorrectionLine(wish);
   const drumLine = stretchDrumLine(room.plannedCeiling);
-  const caseVerdictText = caseVerdict(room, noiseType);
+  const caseVerdictParagraphs = caseVerdictParts(room, noiseType);
   const slabContext =
     room.slabType === 'unknown' && room.slabThickness === 'unknown'
       ? `ориентир по типу дома (${houseLabel}), ~${slab.thicknessMm} мм`
@@ -311,7 +312,8 @@ export function useResultProfile() {
     noiseType,
     soundCorrection,
     drumLine,
-    caseVerdictText,
+    caseVerdictParagraphs,
+    productClaim: MULTIFRAME_PRODUCT_CLAIM,
     productBlurb: MULTIFRAME_PRODUCT_BLURB,
     productImageSrc: MULTIFRAME_PANEL_IMG,
     slabContext,

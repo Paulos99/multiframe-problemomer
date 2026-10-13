@@ -15,7 +15,11 @@ import {
   shouldAskNoiseKind,
   type SessionState,
 } from './types';
-import { caseVerdict, MULTIFRAME_PRODUCT_BLURB } from './recommendations';
+import {
+  caseVerdictParts,
+  MULTIFRAME_PRODUCT_BLURB,
+  MULTIFRAME_PRODUCT_CLAIM,
+} from './recommendations';
 import { resolveSlab } from './acoustic/construction';
 import {
   airClassFor,
@@ -250,7 +254,9 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
   const impactAfter = impactFeltFromIndex(a.Lnw);
   const drum = stretchDrumLine(room.plannedCeiling);
   const noiseType = session.derived?.noiseType ?? 'mixed';
-  const verdict = caseVerdict(room, noiseType);
+  const verdictHtml = caseVerdictParts(room, noiseType)
+    .map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`)
+    .join('');
   const airSeries = buildAirSpectrum(session.answers);
   const impactSeries = buildImpactSpectrum(session.answers);
 
@@ -268,13 +274,16 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
   const recProductHtml = `<section class="rec-product">
           <aside class="recs">
             <h2>Рекомендации:</h2>
-            <p>${escapeHtml(verdict)}</p>
+            <div class="rec-copy">${verdictHtml}</div>
           </aside>
           <aside class="product">
             <h2>Что такое MultiFrame</h2>
             <div class="product-body">
               <img src="${panel}" alt="Панель MultiFrame" />
-              <p>${escapeHtml(MULTIFRAME_PRODUCT_BLURB)}</p>
+              <div class="product-copy">
+                <strong>${escapeHtml(MULTIFRAME_PRODUCT_CLAIM)}</strong>
+                <p>${escapeHtml(MULTIFRAME_PRODUCT_BLURB)}</p>
+              </div>
             </div>
           </aside>
         </section>`;
@@ -659,7 +668,7 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
   }
   .closing b { color: #152018; }
   .rec-product {
-    display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 10px;
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;
     margin: 0 0 14px;
   }
   .recs, .product {
@@ -668,8 +677,12 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
   }
   .recs h2, .product h2 { margin: 0 0 6px; font-size: 13px; color: #01644f; }
   .recs p, .product p { margin: 0; font-size: 11px; line-height: 1.45; color: #5f6b73; }
+  .rec-copy { display: flex; flex-direction: column; gap: 3px; }
+  .rec-copy p:first-child { color: #152018; font-weight: 600; }
   .product-body { display: grid; grid-template-columns: 88px 1fr; gap: 10px; align-items: start; }
   .product-body img { width: 88px; height: auto; border-radius: 8px; border: 1px solid #d7e0dc; background: #fff; }
+  .product-copy { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+  .product-copy strong { font-size: 11.5px; line-height: 1.3; color: #152018; }
   .db-hint { display: block; margin-top: 6px; font-size: 10px; font-weight: 650; color: #68757e; }
 </style></head><body>
 <div class="sheet" id="mf-report-root">

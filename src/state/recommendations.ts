@@ -1,17 +1,8 @@
 import type {
-  HouseTypeOption,
   NoiseType,
-  PlannedCeilingOption,
   RoomAnswers,
   RoomWishOption,
-  SlabTypeOption,
 } from './types';
-import { shouldAskNoiseKind } from './types';
-
-function capitalize(s: string): string {
-  if (!s) return s;
-  return s.charAt(0).toUpperCase() + s.slice(1);
-}
 
 function endsWithPeriod(s: string): string {
   const t = s.trim();
@@ -19,170 +10,192 @@ function endsWithPeriod(s: string): string {
   return /[.!?…]$/.test(t) ? t : `${t}.`;
 }
 
-/** How this construction typically carries sound — expert characterization. */
-function acousticCharacter(room: RoomAnswers): string {
-  const house = room.houseType;
-  const slab = room.slabType;
-  const ceiling = room.plannedCeiling;
-
-  const slabBit = slabCharacter(slab, house);
-  const ceilingBit = ceilingCharacter(ceiling);
-  const place =
-    room.roomType === 'bedroom' || room.roomType === 'kids'
-      ? 'В жилой комнате, где важна тишина,'
-      : room.roomType === 'office'
-        ? 'В кабинете,'
-        : 'В этом помещении';
-
-  if (slabBit && ceilingBit) {
-    return `${place} ${slabBit}, а ${ceilingBit}`;
+function roomContext(room: RoomAnswers): string {
+  switch (room.roomType) {
+    case 'bedroom':
+      return 'В этой спальне';
+    case 'kids':
+      return 'В этой детской';
+    case 'living':
+      return 'В этой гостиной';
+    case 'kitchen':
+      return 'В этой кухне';
+    case 'office':
+      return 'В этом кабинете';
+    default:
+      return 'В этом помещении';
   }
-  if (slabBit) {
-    return `${place} ${slabBit}`;
-  }
-  if (ceilingBit) {
-    return `${place} ${ceilingBit}`;
-  }
-  return `${place} шум сверху проходит через плиту и зависит от того, что лежит между перекрытием и финишным потолком`;
 }
 
-function slabCharacter(slab: SlabTypeOption, house: HouseTypeOption): string | null {
+function slabDiagnosis(room: RoomAnswers): string {
+  const { slabType: slab, houseType: house } = room;
+
   if (slab === 'hollow' || (slab === 'unknown' && (house === 'panel' || house === 'block'))) {
-    return 'пустотная плита хорошо пропускает и удар, и голоса — конструкция «звонкая»';
+    return 'пустотная плита, которая заметно проводит разговоры и структурные удары';
   }
   if (slab === 'wood' || (slab === 'unknown' && house === 'wood')) {
-    return 'деревянное перекрытие слабо держит ударный шум и низкие частоты';
+    return 'лёгкое перекрытие, которое быстро отзывается на шаги, падения и низкие частоты';
   }
   if (slab === 'monolith' || (slab === 'unknown' && (house === 'monolith' || house === 'brick'))) {
-    return 'сплошная ж/б плита тяжелее пустотной, но в жилом доме без акустики сверху всё равно слышны и шаги, и речь';
+    return 'жёсткое железобетонное перекрытие: оно сдерживает часть голосов, но хорошо передаёт шаги и удары';
   }
-  if (house === 'panel') {
-    return 'в панельном доме перекрытие обычно пустотное и довольно «прозрачное» для шума соседей';
-  }
-  if (house === 'block') {
-    return 'в блочном доме перекрытие часто пустотное, и шум сверху доходит отчётливо';
-  }
-  return null;
+  return 'само перекрытие, через которое проходят и воздушный, и структурный шум';
 }
 
-function ceilingCharacter(ceiling: PlannedCeilingOption): string | null {
-  switch (ceiling) {
+function ceilingDiagnosis(room: RoomAnswers): string | null {
+  switch (room.plannedCeiling) {
     case 'stretch':
-      return 'воздушный зазор под обычным натяжным работает как барабан и может усиливать звук сверху';
+      return 'пустой зазор под натяжным потолком способен добавить звуку гулкий «барабанный» оттенок';
     case 'gypsum':
-      return 'гипсокартон или подвес сам по себе почти не спасает от шума через плиту';
+      return 'закрытая полость под ГКЛ без поглощающего слоя почти не меняет этот путь';
     case 'plaster':
-      return 'штукатурка или покраска почти не добавляют изоляции от соседей сверху';
+      return 'штукатурка или окраска акустически почти не меняют этот путь';
     case 'other_exists':
-      return 'уже смонтированный потолок мало что меняет, пока между плитой и финишем нет акустического слоя';
+      return 'готовая отделка не разрывает этот путь без специального акустического слоя';
     default:
       return null;
   }
 }
 
-function problemLine(room: RoomAnswers, noiseType: NoiseType): string | null {
-  const kind =
-    shouldAskNoiseKind(room.noisyNeighbors) && room.noiseKind !== 'unknown'
-      ? room.noiseKind
-      : null;
+function caseDiagnosis(room: RoomAnswers): string {
+  const ceiling = ceilingDiagnosis(room);
+  return `${roomContext(room)} главное акустическое слабое место — ${slabDiagnosis(room)}${
+    ceiling ? `; ${ceiling}` : ''
+  }`;
+}
 
-  const freq = room.noisyNeighbors;
-  let noisePart: string | null = null;
-  if (freq === 'often_noisy') {
-    if (kind === 'impact') noisePart = 'Сверху часто слышен топот и шаги — это мешает отдыхать';
-    else if (kind === 'airborne') noisePart = 'Сверху часто доходят голоса и музыка — фон не отпускает';
-    else if (kind === 'mixed') noisePart = 'Сверху часто слышны и шаги, и голоса — помещение почти не даёт тишины';
-    else noisePart = 'Сверху часто шумно — соседи слышны слишком отчётливо';
-  } else if (freq === 'sometimes_noisy') {
-    if (kind === 'impact') noisePart = 'Иногда сверху проходит топот — в такие моменты комната теряет комфорт';
-    else if (kind === 'airborne') noisePart = 'Иногда сверху пробиваются голоса и музыка';
-    else if (kind === 'mixed') noisePart = 'Иногда сверху слышны и шаги, и разговоры';
-    else noisePart = 'Шум сверху бывает не постоянно, но уже заметно снижает комфорт';
-  } else if (freq === 'usually_quiet') {
-    noisePart = 'Сейчас сверху обычно тихо, но запас по изоляции всё равно полезен на будущее';
-  } else if (noiseType === 'impact') {
-    noisePart = 'Главный риск здесь — ударный шум: шаги и падения через плиту';
-  } else if (noiseType === 'airborne') {
-    noisePart = 'Главный риск здесь — воздушный шум: речь и музыка через перекрытие';
+function roomEffect(room: RoomAnswers): string {
+  if (room.roomType === 'bedroom' || room.roomType === 'kids') {
+    return ' и мешает отдыху';
+  }
+  if (room.roomType === 'office') {
+    return ' и мешает сосредоточиться';
+  }
+  if (room.roomType === 'living') {
+    return ' и не даёт по-настоящему расслабиться';
+  }
+  return '';
+}
+
+function casePriority(room: RoomAnswers, noiseType: NoiseType): string {
+  const kind = room.noiseKind !== 'unknown' ? room.noiseKind : noiseType;
+
+  if (room.roomWish === 'privacy_out') {
+    return 'Если важна приватность, этот же слабый путь работает и в обратную сторону: речь и музыка из комнаты уходят через перекрытие наверх';
+  }
+  if (room.roomWish === 'music_recording') {
+    return 'Для музыки и записи здесь важна не только изоляция: жёсткий потолок возвращает отражения в комнату, удлиняя эхо и снижая разборчивость';
   }
 
-  const wish = room.roomWish;
-  let wishPart: string | null = null;
-  if (wish === 'from_above') wishPart = 'нужно, чтобы сверху стало заметно тише';
-  else if (wish === 'privacy_out') wishPart = 'важно, чтобы вас меньше было слышно сверху';
-  else if (wish === 'music_recording') wishPart = 'мешает эхо в самой комнате';
-  else if (wish === 'general') wishPart = 'нужен спокойный акустический фон';
+  if (room.noisyNeighbors === 'often_noisy') {
+    if (kind === 'impact') {
+      return `Регулярные шаги и удары сверху воспринимаются не как фон, а как резкие события, от которых трудно отвлечься${roomEffect(room)}`;
+    }
+    if (kind === 'airborne') {
+      return `Когда голоса и музыка слышны часто, важна уже не только громкость: их разборчивость постоянно перетягивает внимание${roomEffect(room)}`;
+    }
+    return `Поскольку шаги и голоса появляются часто, комната не успевает возвращаться к тишине — такой меняющийся фон быстрее всего утомляет${roomEffect(room)}`;
+  }
 
-  if (noisePart && wishPart) return `${noisePart} Вам ${wishPart}`;
-  if (noisePart) return noisePart;
-  if (wishPart) return `Вам ${wishPart}`;
-  return null;
+  if (room.noisyNeighbors === 'sometimes_noisy') {
+    if (kind === 'impact') {
+      return 'Даже эпизодические шаги и падения заметны сразу: удар приходит коротко и жёстко, поэтому его трудно воспринимать как фон';
+    }
+    if (kind === 'airborne') {
+      return 'Разговоры и музыка появляются не постоянно, но остаются разборчивыми — именно поэтому их трудно перестать замечать';
+    }
+    return 'Шум приходит эпизодами, но хорошо узнаётся: то шаги, то речь — каждый такой момент снова возвращает внимание к соседям';
+  }
+
+  if (room.noisyNeighbors === 'usually_quiet') {
+    return 'Сейчас сверху обычно спокойно, но у конструкции почти нет акустического запаса: при изменении режима у соседей звуки проявятся без дополнительного барьера';
+  }
+
+  if (kind === 'impact') {
+    return 'Главный риск этой конструкции — структурный удар: шаги и падения входят в плиту и распространяются по ней дальше точки контакта';
+  }
+  if (kind === 'airborne') {
+    return 'Главный риск этой конструкции — разборчивые голоса и музыка, которые проходят через перекрытие и потолочную полость';
+  }
+  return 'У конструкции есть два уязвимых канала сразу: плита проводит шаги, а потолочная полость сохраняет голоса и музыку разборчивыми';
+}
+
+function installTiming(room: RoomAnswers): string {
+  if (room.objectStage === 'newbuild' || room.objectStage === 'renovation') {
+    return 'MultiFrame здесь важно заложить до финишного потолка';
+  }
+  if (room.objectStage === 'occupied') {
+    return 'MultiFrame здесь логично поставить при ближайшей доработке потолка';
+  }
+  return 'MultiFrame здесь нужен под финишным потолком';
 }
 
 function multiFrameHelp(room: RoomAnswers, noiseType: NoiseType): string {
-  const impactHeavy =
-    noiseType === 'impact' ||
-    noiseType === 'mixed' ||
-    room.noiseKind === 'impact' ||
-    room.noiseKind === 'mixed';
-  const airHeavy =
-    noiseType === 'airborne' ||
-    room.noiseKind === 'airborne' ||
-    room.roomWish === 'privacy_out';
-  const drum = room.plannedCeiling === 'stretch';
+  const kind = room.noiseKind !== 'unknown' ? room.noiseKind : noiseType;
+  const impactHeavy = kind === 'impact' || kind === 'mixed';
+  const hasDrum = room.plannedCeiling === 'stretch';
 
-  const timing =
-    room.objectStage === 'newbuild' || room.objectStage === 'renovation'
-      ? 'лучше заложить панели до финишного потолка'
-      : room.objectStage === 'occupied'
-        ? 'можно поставить при замене или доработке потолка'
-        : 'стоит поставить под финишный потолок';
-
-  let core: string;
+  let effect: string;
   if (room.roomWish === 'music_recording') {
-    core = `MultiFrame ${timing}: панель гасит эхо в комнате и одновременно смягчает фон сверху`;
+    effect = 'панели сократят хвост отражений в комнате и одновременно добавят барьер на пути шума через плиту';
   } else if (room.roomWish === 'privacy_out') {
-    core = `MultiFrame ${timing}: слой под потолком глушит голоса и музыку, которые уходят вверх через плиту`;
-  } else if (impactHeavy && airHeavy) {
-    core = `MultiFrame ${timing}: удар сверху станет мягче, голоса и музыка — тише`;
-  } else if (impactHeavy) {
-    core = `MultiFrame ${timing}: топот и шаги сверху станут заметно мягче`;
-  } else if (airHeavy) {
-    core = `MultiFrame ${timing}: голоса и музыка сверху станут заметно мягче`;
-  } else if (drum) {
-    core = `MultiFrame ${timing}: панели убирают «барабан» под натяжным и делают фон сверху спокойнее`;
+    effect = 'панели добавят поглощение со стороны комнаты и ослабят путь голоса вверх';
+  } else if (kind === 'mixed') {
+    effect = hasDrum
+      ? 'панели снимут резонанс полости, снизят разборчивость голосов и смягчат шаги'
+      : 'панели снизят разборчивость голосов и сделают шаги менее резкими';
+  } else if (kind === 'impact') {
+    effect = hasDrum
+      ? 'панели снимут резонанс полости и сделают шаги и удары менее резкими'
+      : 'панели добавят поглощение под перекрытием и смягчат шаги и удары';
+  } else if (kind === 'airborne') {
+    effect = hasDrum
+      ? 'панели снимут резонанс полости и снизят разборчивость голосов и музыки'
+      : 'панели добавят поглощение под перекрытием и снизят разборчивость голосов и музыки';
   } else {
-    core = `MultiFrame ${timing}: сверху станет тише, а в комнате спокойнее`;
+    effect = 'панели превратят пустую потолочную полость в работающий акустический слой';
   }
 
-  if (impactHeavy) {
-    core +=
-      '. Полную норму по удару часто добивает ещё пол у соседа сверху — потолок закрывает свою часть задачи';
-  } else if (drum) {
-    core += '. Именно акустический слой под полотном решает усиление в зазоре';
+  let honesty = '';
+  if (impactHeavy && room.floorAbove === 'floating') {
+    honesty =
+      '; плавающий пол сверху уже снимает основную часть структурного удара, а система доработает остаточный шум как второй акустический рубеж';
+  } else if (impactHeavy && room.floorAbove === 'ordinary') {
+    honesty =
+      '; потолок смягчит удар, но максимальный результат даёт развязанный пол у источника';
+  } else if (impactHeavy) {
+    honesty =
+      '; по ударному шуму итог зависит и от конструкции пола сверху';
   }
 
-  return endsWithPeriod(capitalize(core));
+  return `${installTiming(room)}: ${effect}${honesty}`;
 }
 
 /**
  * Expert recommendations for Result: acoustic character + problem + MultiFrame help.
- * 2–3 connected sentences; answers shape wording without sounding like a field dump.
+ * Three connected sentences: diagnosis → lived effect → case-specific solution.
  */
-export function caseVerdict(room: RoomAnswers, noiseType: NoiseType): string {
-  const s1 = endsWithPeriod(acousticCharacter(room));
-  const problem = problemLine(room, noiseType);
-  const s3 = multiFrameHelp(room, noiseType);
-
-  if (problem) {
-    return `${s1} ${endsWithPeriod(problem)} ${s3}`;
-  }
-  return `${s1} ${s3}`;
+export function caseVerdictParts(
+  room: RoomAnswers,
+  noiseType: NoiseType,
+): readonly [string, string, string] {
+  return [
+    endsWithPeriod(caseDiagnosis(room)),
+    endsWithPeriod(casePriority(room, noiseType)),
+    endsWithPeriod(multiFrameHelp(room, noiseType)),
+  ];
 }
 
-/** Short static blurb for the product card next to recommendations. */
+export function caseVerdict(room: RoomAnswers, noiseType: NoiseType): string {
+  return caseVerdictParts(room, noiseType).join(' ');
+}
+
+/** Product value block: what is unique about the material, without repeating the case diagnosis. */
+export const MULTIFRAME_PRODUCT_CLAIM =
+  'Цельная акустическая поверхность внутри привычного потолка.';
+
 export const MULTIFRAME_PRODUCT_BLURB =
-  'MultiFrame — бескаркасные акустические панели под натяжной или другой финишный потолок. Пористый материал с рельефной поверхностью рассеивает и поглощает энергию шума, панели стыкуются без каркаса и минваты — сверху остаётся привычное полотно.';
+  'Рельефные пористые панели MultiFrame стыкуются в сплошной бескаркасный слой: он рассеивает и поглощает энергию шума, а потолочная полость перестаёт подыгрывать перекрытию как пустой барабан. Снаружи остаётся чистый финишный потолок, внутри — работающая акустика без минваты, тяжёлого каркаса и долгой стройки.';
 
 export const MULTIFRAME_PANEL_IMG = `${import.meta.env.BASE_URL}images/multiframe-panel.jpg`;
 
