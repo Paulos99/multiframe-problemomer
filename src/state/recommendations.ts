@@ -197,7 +197,7 @@ export const MULTIFRAME_PRODUCT_CLAIM =
 export const MULTIFRAME_PRODUCT_BLURB =
   'Рельефные пористые панели MultiFrame стыкуются в сплошной бескаркасный слой: он рассеивает и поглощает энергию шума, а потолочная полость перестаёт подыгрывать перекрытию как пустой барабан. Снаружи остаётся чистый финишный потолок, внутри — работающая акустика без минваты, тяжёлого каркаса и долгой стройки.';
 
-export const MULTIFRAME_PANEL_IMG = `${import.meta.env.BASE_URL}images/multiframe-panel.jpg`;
+export const MULTIFRAME_PANEL_IMG = `${import.meta.env.BASE_URL}images/multiframe-panel-transparent.png`;
 
 /** @deprecated Prefer caseVerdict. */
 export function personalStory(room: RoomAnswers, noiseType: NoiseType): string[] {

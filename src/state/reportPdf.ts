@@ -680,7 +680,7 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
   .rec-copy { display: flex; flex-direction: column; gap: 3px; }
   .rec-copy p:first-child { color: #152018; font-weight: 600; }
   .product-body { display: grid; grid-template-columns: 88px 1fr; gap: 10px; align-items: start; }
-  .product-body img { width: 88px; height: auto; border-radius: 8px; border: 1px solid #d7e0dc; background: #fff; }
+  .product-body img { width: 88px; height: auto; border: 0; border-radius: 0; background: transparent; }
   .product-copy { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
   .product-copy strong { font-size: 11.5px; line-height: 1.3; color: #152018; }
   .db-hint { display: block; margin-top: 6px; font-size: 10px; font-weight: 650; color: #68757e; }
@@ -881,7 +881,7 @@ export async function buildAcousticProfileHtml(
 
 async function fetchPanelDataUrl(): Promise<string> {
   const base = new URL(import.meta.env.BASE_URL || '/', window.location.href);
-  return fetchDataUrl(new URL('images/multiframe-panel.jpg', base).href);
+  return fetchDataUrl(new URL('images/multiframe-panel-transparent.png', base).href);
 }
 
 /** Prefetch pdf libs so the click is not waiting on the network. */
