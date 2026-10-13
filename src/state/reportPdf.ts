@@ -15,11 +15,7 @@ import {
   shouldAskNoiseKind,
   type SessionState,
 } from './types';
-import {
-  caseVerdictParts,
-  MULTIFRAME_PRODUCT_BLURB,
-  MULTIFRAME_PRODUCT_CLAIM,
-} from './recommendations';
+import { caseVerdictParts, productAbout } from './recommendations';
 import { resolveSlab } from './acoustic/construction';
 import {
   airClassFor,
@@ -257,6 +253,8 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
   const verdictHtml = caseVerdictParts(room, noiseType)
     .map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`)
     .join('');
+  const about = productAbout(room, noiseType);
+  const productHtml = about.paragraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join('');
   const airSeries = buildAirSpectrum(session.answers);
   const impactSeries = buildImpactSpectrum(session.answers);
 
@@ -281,8 +279,8 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
             <div class="product-body">
               <img src="${panel}" alt="Панель MultiFrame" />
               <div class="product-copy">
-                <strong>${escapeHtml(MULTIFRAME_PRODUCT_CLAIM)}</strong>
-                <p>${escapeHtml(MULTIFRAME_PRODUCT_BLURB)}</p>
+                <strong>${escapeHtml(about.claim)}</strong>
+                ${productHtml}
               </div>
             </div>
           </aside>

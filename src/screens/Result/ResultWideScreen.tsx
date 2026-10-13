@@ -340,7 +340,9 @@ export function ResultWideScreen() {
             />
             <div className={styles.productCopy}>
               <strong>{p.productClaim}</strong>
-              <p>{p.productBlurb}</p>
+              {p.productParagraphs.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
             </div>
           </div>
         </aside>

@@ -34,8 +34,7 @@ import {
 import {
   caseVerdictParts,
   MULTIFRAME_PANEL_IMG,
-  MULTIFRAME_PRODUCT_BLURB,
-  MULTIFRAME_PRODUCT_CLAIM,
+  productAbout,
 } from '../../state/recommendations';
 import { wishSoundCorrectionLine, stretchDrumLine } from '../../state/wish';
 import { eventParamsFromSession, track } from '../../analytics';
@@ -232,6 +231,7 @@ export function useResultProfile() {
   const soundCorrection = wishSoundCorrectionLine(wish);
   const drumLine = stretchDrumLine(room.plannedCeiling);
   const caseVerdictParagraphs = caseVerdictParts(room, noiseType);
+  const about = productAbout(room, noiseType);
   const slabContext =
     room.slabType === 'unknown' && room.slabThickness === 'unknown'
       ? `ориентир по типу дома (${houseLabel}), ~${slab.thicknessMm} мм`
@@ -313,8 +313,8 @@ export function useResultProfile() {
     soundCorrection,
     drumLine,
     caseVerdictParagraphs,
-    productClaim: MULTIFRAME_PRODUCT_CLAIM,
-    productBlurb: MULTIFRAME_PRODUCT_BLURB,
+    productClaim: about.claim,
+    productParagraphs: about.paragraphs,
     productImageSrc: MULTIFRAME_PANEL_IMG,
     slabContext,
     showScenarioAside,
