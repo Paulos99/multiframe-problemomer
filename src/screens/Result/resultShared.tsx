@@ -4,10 +4,14 @@ import { useSession } from '../../state/SessionContext';
 import {
   CONSULTATION_URL,
   HOUSE_TYPE_OPTIONS,
+  NOISE_KIND_OPTIONS,
+  NOISY_NEIGHBORS_OPTIONS,
+  PLANNED_CEILING_OPTIONS,
   ROOM_TYPE_LABELS,
   ROOM_WISH_OPTIONS,
   SLAB_THICKNESS_OPTIONS,
   SLAB_TYPE_OPTIONS,
+  shouldAskNoiseKind,
 } from '../../state/types';
 import {
   FELT_STEP_LABELS,
@@ -27,6 +31,7 @@ import {
   prefetchAcousticProfilePdf,
   shareAcousticProfile,
 } from '../../state/reportPdf';
+import { buildRecommendations, personalStory } from '../../state/recommendations';
 import { wishScenarioLine, wishSoundCorrectionLine, stretchDrumLine } from '../../state/wish';
 import { eventParamsFromSession, track } from '../../analytics';
 import styles from './resultShared.module.css';
@@ -211,9 +216,18 @@ export function useResultProfile() {
   const slabThickLabel = optionLabel(SLAB_THICKNESS_OPTIONS, room.slabThickness);
   const houseLabel = optionLabel(HOUSE_TYPE_OPTIONS, room.houseType);
   const wishLabel = optionLabel(ROOM_WISH_OPTIONS, room.roomWish);
+  const ceilingLabel = optionLabel(PLANNED_CEILING_OPTIONS, room.plannedCeiling);
+  const neighborsLabel = optionLabel(NOISY_NEIGHBORS_OPTIONS, room.noisyNeighbors);
+  const noiseKindLabel =
+    shouldAskNoiseKind(room.noisyNeighbors) && room.noiseKind !== 'unknown'
+      ? optionLabel(NOISE_KIND_OPTIONS, room.noiseKind)
+      : null;
   const wish = room.roomWish;
+  const noiseType = session.derived?.noiseType ?? 'mixed';
   const soundCorrection = wishSoundCorrectionLine(wish);
   const drumLine = stretchDrumLine(room.plannedCeiling);
+  const storyParagraphs = personalStory(room, noiseType);
+  const recommendations = buildRecommendations(room, noiseType);
   const slabContext =
     room.slabType === 'unknown' && room.slabThickness === 'unknown'
       ? `ориентир по типу дома (${houseLabel}), ~${slab.thicknessMm} мм`
@@ -229,7 +243,11 @@ export function useResultProfile() {
     room.objectStage === 'unknown' &&
     room.plannedCeiling === 'unknown';
   const showWishScenario = wish !== 'other' && !objectAllUnknown;
-  const showScenarioAside = showWishScenario || Boolean(drumLine) || Boolean(soundCorrection);
+  const showScenarioAside =
+    showWishScenario ||
+    Boolean(drumLine) ||
+    Boolean(soundCorrection) ||
+    storyParagraphs.length > 0;
 
   const [shareState, setShareState] = useState<'idle' | 'shared' | 'copied' | 'failed'>('idle');
   const [pdfBusy, setPdfBusy] = useState(false);
@@ -296,9 +314,15 @@ export function useResultProfile() {
     roomLabel,
     houseLabel,
     wishLabel,
+    ceilingLabel,
+    neighborsLabel,
+    noiseKindLabel,
     wish,
+    noiseType,
     soundCorrection,
     drumLine,
+    storyParagraphs,
+    recommendations,
     slabContext,
     showWishScenario,
     showScenarioAside,

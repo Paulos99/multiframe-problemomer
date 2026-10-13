@@ -32,8 +32,9 @@ function sampleRoom(over: Partial<RoomAnswers> = {}): RoomAnswers {
     floorAbove: 'unknown',
     houseType: 'monolith',
     objectStage: 'newbuild',
-    plannedCeiling: 'stretch_planned',
+    plannedCeiling: 'stretch',
     noisyNeighbors: 'unknown',
+    noiseKind: 'unknown',
     roomWish: 'general',
     ...over,
   };

@@ -34,13 +34,22 @@ export type HouseTypeOption =
 
 export type ObjectStageOption = 'newbuild' | 'renovation' | 'occupied' | 'unknown';
 
-export type PlannedCeilingOption = 'stretch_planned' | 'ceiling_exists' | 'unknown';
+/** Ceiling finish the user has or plans (not MultiFrame itself). */
+export type PlannedCeilingOption =
+  | 'stretch'
+  | 'gypsum'
+  | 'plaster'
+  | 'other_exists'
+  | 'unknown';
 
 export type NoisyNeighborsOption = 'unknown' | 'usually_quiet' | 'sometimes_noisy' | 'often_noisy';
 
+/** What kind of noise they hear from above — asked only if neighbors are noisy. */
+export type NoiseKindOption = 'impact' | 'airborne' | 'mixed' | 'unknown';
+
 /**
- * Acoustic job for MultiFrame — personalizes Result copy and demo accent.
- * Does not change construction Rw/Lnw.
+ * Everyday goal — personalizes Result copy and demo accent.
+ * Does not change construction Rw/Lnw. Labels avoid MultiFrame brand.
  */
 export type RoomWishOption =
   | 'from_above'
@@ -79,6 +88,7 @@ export type RoomSubstep =
   | 'plannedCeiling'
   | 'objectStage'
   | 'noisyNeighbors'
+  | 'noiseKind'
   | 'roomWish';
 
 export type RoomFactorGroup = 'external' | 'internal';
@@ -91,6 +101,7 @@ export const ROOM_SUBSTEPS: RoomSubstep[] = [
   'plannedCeiling',
   'objectStage',
   'noisyNeighbors',
+  'noiseKind',
   'roomWish',
 ];
 
@@ -102,6 +113,7 @@ export const ROOM_FACTOR_GROUP: Record<RoomSubstep, RoomFactorGroup> = {
   plannedCeiling: 'internal',
   objectStage: 'internal',
   noisyNeighbors: 'internal',
+  noiseKind: 'internal',
   roomWish: 'internal',
 };
 
@@ -209,6 +221,8 @@ export interface RoomAnswers {
   objectStage: ObjectStageOption;
   plannedCeiling: PlannedCeilingOption;
   noisyNeighbors: NoisyNeighborsOption;
+  /** Filled when neighbors are noisy; otherwise stays `unknown`. */
+  noiseKind: NoiseKindOption;
   roomWish: RoomWishOption;
 }
 
@@ -261,9 +275,13 @@ export const FLOOR_ABOVE_OPTIONS: { id: FloorAboveOption; label: string }[] = [
   { id: 'floating', label: 'Есть шумоизоляция в полу сверху' },
 ];
 
-export const HOUSE_TYPE_OPTIONS: { id: HouseTypeOption; label: string }[] = [
+export const HOUSE_TYPE_OPTIONS: { id: HouseTypeOption; label: string; hint?: string }[] = [
   { id: 'panel', label: 'Панельный' },
-  { id: 'block', label: 'Блочный' },
+  {
+    id: 'block',
+    label: 'Блочный',
+    hint: 'газоблок, пеноблок, керамзитоблок и т.п.',
+  },
   { id: 'brick', label: 'Кирпичный' },
   { id: 'monolith', label: 'Монолит (в т.ч. монолит-кирпич)' },
   { id: 'wood', label: 'Деревянный / по балкам' },
@@ -278,8 +296,10 @@ export const OBJECT_STAGE_OPTIONS: { id: ObjectStageOption; label: string }[] = 
 ];
 
 export const PLANNED_CEILING_OPTIONS: { id: PlannedCeilingOption; label: string }[] = [
-  { id: 'stretch_planned', label: 'Планируем натяжной' },
-  { id: 'ceiling_exists', label: 'Потолок уже есть' },
+  { id: 'stretch', label: 'Натяжной' },
+  { id: 'gypsum', label: 'Гипсокартон / подвесной' },
+  { id: 'plaster', label: 'Штукатурка или покраска' },
+  { id: 'other_exists', label: 'Другой потолок уже есть' },
   { id: 'unknown', label: 'Не знаю' },
 ];
 
@@ -290,13 +310,54 @@ export const NOISY_NEIGHBORS_OPTIONS: { id: NoisyNeighborsOption; label: string 
   { id: 'often_noisy', label: 'Сверху часто шумно' },
 ];
 
-export const ROOM_WISH_OPTIONS: { id: RoomWishOption; label: string }[] = [
-  { id: 'from_above', label: 'Снизить шум сверху' },
-  { id: 'privacy_out', label: 'Чтобы соседи сверху меньше слышали вас' },
-  { id: 'music_recording', label: 'Улучшить качество музыки и записи' },
-  { id: 'general', label: 'Повысить общий акустический комфорт' },
-  { id: 'other', label: 'Другая задача' },
+export const NOISE_KIND_OPTIONS: { id: NoiseKindOption; label: string; hint?: string }[] = [
+  {
+    id: 'impact',
+    label: 'Топот и шаги',
+    hint: 'бег, передвижение мебели, падения',
+  },
+  {
+    id: 'airborne',
+    label: 'Голоса и музыка',
+    hint: 'разговоры, ТВ, колонки',
+  },
+  {
+    id: 'mixed',
+    label: 'И то, и другое',
+    hint: 'и шаги, и голоса сверху',
+  },
+  { id: 'unknown', label: 'Сложно сказать' },
 ];
+
+export const ROOM_WISH_OPTIONS: { id: RoomWishOption; label: string }[] = [
+  { id: 'from_above', label: 'Чтобы сверху стало тише' },
+  { id: 'privacy_out', label: 'Чтобы вас меньше было слышно сверху' },
+  { id: 'music_recording', label: 'Чтобы в комнате было меньше эха' },
+  { id: 'general', label: 'Общий акустический комфорт' },
+  { id: 'other', label: 'Пока не определился' },
+];
+
+/** Slab options that make sense for a given house type (logical canvas). */
+export function allowedSlabTypes(houseType: HouseTypeOption): SlabTypeOption[] {
+  switch (houseType) {
+    case 'panel':
+    case 'block':
+      return ['hollow', 'unknown'];
+    case 'brick':
+    case 'monolith':
+      return ['monolith', 'hollow', 'unknown'];
+    case 'wood':
+      return ['wood', 'unknown'];
+    case 'unknown':
+    default:
+      return ['monolith', 'hollow', 'wood', 'unknown'];
+  }
+}
+
+/** Ask noise-kind follow-up only when the user reports noise from above. */
+export function shouldAskNoiseKind(noisy: NoisyNeighborsOption): boolean {
+  return noisy === 'sometimes_noisy' || noisy === 'often_noisy';
+}
 
 /** Everyday first-layer labels (workshop 2026-09-16). SP letters stay secondary. */
 export const EVERYDAY_COMFORT_LABELS: Record<ClassLabel, string> = {

@@ -136,14 +136,14 @@
 }
 
 .dense .title {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 650;
-  line-height: 1.25;
+  line-height: 1.3;
 }
 
 .dense .hint {
-  font-size: 11px;
-  line-height: 1.3;
+  font-size: 12px;
+  line-height: 1.35;
 }
 
 .dense .check {

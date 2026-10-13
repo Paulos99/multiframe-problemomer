@@ -12,6 +12,7 @@ import {
   CALCULATOR_URL,
   HYBRID_CLASS_LABELS,
   ROOM_TYPE_LABELS,
+  shouldAskNoiseKind,
 } from './types';
 import { deriveProfile } from './derive';
 import { DEMO_AUDIO_PAIRS } from '../audio/demoAudio';
@@ -50,6 +51,7 @@ function defaultRoom() {
     objectStage: 'unknown' as const,
     plannedCeiling: 'unknown' as const,
     noisyNeighbors: 'unknown' as const,
+    noiseKind: 'unknown' as const,
     roomWish: 'general' as const,
   };
 }
@@ -83,16 +85,56 @@ export function roomSubstepIndex(sub: RoomSubstep): number {
   return ROOM_SUBSTEPS.indexOf(sub);
 }
 
-export function nextRoomSubstep(sub: RoomSubstep): RoomSubstep | null {
-  const i = roomSubstepIndex(sub);
-  if (i < 0 || i >= ROOM_SUBSTEPS.length - 1) return null;
-  return ROOM_SUBSTEPS[i + 1]!;
+/** Substeps the user actually sees (noiseKind only if neighbors are noisy). */
+export function visibleRoomSubsteps(
+  room: SessionState['answers']['room'],
+): RoomSubstep[] {
+  return ROOM_SUBSTEPS.filter(
+    (s) => s !== 'noiseKind' || shouldAskNoiseKind(room.noisyNeighbors),
+  );
 }
 
-export function prevRoomSubstep(sub: RoomSubstep): RoomSubstep | null {
+export function visibleRoomSubstepIndex(
+  sub: RoomSubstep,
+  room: SessionState['answers']['room'],
+): number {
+  return visibleRoomSubsteps(room).indexOf(sub);
+}
+
+/** Next question, skipping noiseKind when neighbors are quiet / unknown. */
+export function nextRoomSubstep(
+  sub: RoomSubstep,
+  room?: SessionState['answers']['room'],
+): RoomSubstep | null {
+  const i = roomSubstepIndex(sub);
+  if (i < 0 || i >= ROOM_SUBSTEPS.length - 1) return null;
+  let next = ROOM_SUBSTEPS[i + 1]!;
+  if (
+    next === 'noiseKind' &&
+    room &&
+    !shouldAskNoiseKind(room.noisyNeighbors)
+  ) {
+    next = ROOM_SUBSTEPS[i + 2]!;
+  }
+  return next ?? null;
+}
+
+/** Previous question, skipping noiseKind when it was not asked. */
+export function prevRoomSubstep(
+  sub: RoomSubstep,
+  room?: SessionState['answers']['room'],
+): RoomSubstep | null {
   const i = roomSubstepIndex(sub);
   if (i <= 0) return null;
-  return ROOM_SUBSTEPS[i - 1]!;
+  let prev = ROOM_SUBSTEPS[i - 1]!;
+  if (
+    prev === 'noiseKind' &&
+    room &&
+    !shouldAskNoiseKind(room.noisyNeighbors)
+  ) {
+    prev = ROOM_SUBSTEPS[i - 2]!;
+  }
+  return prev ?? null;
 }
 
 export function isLastRoomSubstep(sub: RoomSubstep): boolean {

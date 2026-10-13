@@ -8,6 +8,7 @@ import {
 } from 'react';
 import type {
   HouseTypeOption,
+  NoiseKindOption,
   NoisyNeighborsOption,
   ObjectStageOption,
   PlannedCeilingOption,
@@ -19,7 +20,7 @@ import type {
   SlabTypeOption,
   WizardStep,
 } from './types';
-import { ROOM_SUBSTEPS } from './types';
+import { allowedSlabTypes, ROOM_SUBSTEPS, shouldAskNoiseKind } from './types';
 import {
   canProceed,
   createInitialSession,
@@ -48,6 +49,7 @@ interface SessionApi {
   setObjectStage: (v: ObjectStageOption) => void;
   setPlannedCeiling: (v: PlannedCeilingOption) => void;
   setNoisyNeighbors: (v: NoisyNeighborsOption) => void;
+  setNoiseKind: (v: NoiseKindOption) => void;
   setRoomWish: (v: RoomWishOption) => void;
   canGoNext: boolean;
 }
@@ -71,7 +73,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       if (!canProceed(prev)) return prev;
 
       if (prev.step === 'room') {
-        const nextSub = nextRoomSubstep(prev.roomSubstep);
+        const nextSub = nextRoomSubstep(prev.roomSubstep, prev.answers.room);
         if (nextSub) {
           return { ...prev, roomSubstep: nextSub };
         }
@@ -98,7 +100,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const goBack = useCallback(() => {
     setSession((prev) => {
       if (prev.step === 'room') {
-        const prevSub = prevRoomSubstep(prev.roomSubstep);
+        const prevSub = prevRoomSubstep(prev.roomSubstep, prev.answers.room);
         if (prevSub) {
           return { ...prev, roomSubstep: prevSub };
         }
@@ -188,8 +190,22 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     [patchRoom],
   );
   const setHouseType = useCallback(
-    (houseType: HouseTypeOption) => patchRoom({ houseType }),
-    [patchRoom],
+    (houseType: HouseTypeOption) => {
+      patch((s) => {
+        const allowed = allowedSlabTypes(houseType);
+        const slabType = allowed.includes(s.answers.room.slabType)
+          ? s.answers.room.slabType
+          : 'unknown';
+        return {
+          ...s,
+          answers: {
+            ...s.answers,
+            room: { ...s.answers.room, houseType, slabType },
+          },
+        };
+      });
+    },
+    [patch],
   );
   const setObjectStage = useCallback(
     (objectStage: ObjectStageOption) => patchRoom({ objectStage }),
@@ -200,7 +216,17 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     [patchRoom],
   );
   const setNoisyNeighbors = useCallback(
-    (noisyNeighbors: NoisyNeighborsOption) => patchRoom({ noisyNeighbors }),
+    (noisyNeighbors: NoisyNeighborsOption) => {
+      if (shouldAskNoiseKind(noisyNeighbors)) {
+        patchRoom({ noisyNeighbors });
+      } else {
+        patchRoom({ noisyNeighbors, noiseKind: 'unknown' });
+      }
+    },
+    [patchRoom],
+  );
+  const setNoiseKind = useCallback(
+    (noiseKind: NoiseKindOption) => patchRoom({ noiseKind }),
     [patchRoom],
   );
   const setRoomWish = useCallback(
@@ -224,6 +250,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       setObjectStage,
       setPlannedCeiling,
       setNoisyNeighbors,
+      setNoiseKind,
       setRoomWish,
       canGoNext: canProceed(session),
     }),
@@ -242,6 +269,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       setObjectStage,
       setPlannedCeiling,
       setNoisyNeighbors,
+      setNoiseKind,
       setRoomWish,
     ],
   );

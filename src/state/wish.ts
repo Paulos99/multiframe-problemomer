@@ -1,4 +1,9 @@
-import type { NoiseType, PlannedCeilingOption, RoomWishOption } from './types';
+import type {
+  NoiseKindOption,
+  NoiseType,
+  PlannedCeilingOption,
+  RoomWishOption,
+} from './types';
 
 export type WishAudioGroup = 'air' | 'impact' | 'mixed';
 
@@ -28,19 +33,27 @@ export function wishNoiseType(wish: RoomWishOption, fallback: NoiseType): NoiseT
   return fallback;
 }
 
-/** Result callout: how MultiFrame answers the chosen job. */
+/** Map explicit noise-kind answer to NoiseType (unknown → null). */
+export function noiseKindToType(kind: NoiseKindOption): NoiseType | null {
+  if (kind === 'impact') return 'impact';
+  if (kind === 'airborne') return 'airborne';
+  if (kind === 'mixed') return 'mixed';
+  return null;
+}
+
+/** Result callout: how MultiFrame answers the chosen everyday goal. */
 export function wishScenarioLine(wish: RoomWishOption): string {
   switch (wish) {
     case 'from_above':
       return 'Вы хотите, чтобы сверху стало тише. MultiFrame на потолке смягчает топот и разговоры, которые доходят через плиту.';
     case 'privacy_out':
-      return 'Вы хотите, чтобы соседи сверху меньше слышали вас. Потолок с MultiFrame глушит голоса и музыку, которые уходят вверх через плиту.';
+      return 'Вы хотите, чтобы вас меньше было слышно сверху. Потолок с MultiFrame глушит голоса и музыку, которые уходят вверх через плиту.';
     case 'music_recording':
-      return 'Вы хотите, чтобы музыка и запись звучали чище. Панель MultiFrame поглощает эхо в комнате, и сверху тоже становится тише.';
+      return 'Вы хотите меньше эха в комнате. Панель MultiFrame поглощает отражения, и сверху тоже становится тише.';
     case 'general':
-      return 'Вы хотите, чтобы в комнате стало спокойнее. MultiFrame снижает и голоса сверху, и шаги.';
+      return 'Вам важен общий акустический комфорт. MultiFrame снижает и голоса сверху, и шаги.';
     case 'other':
-      return 'Так выглядит профиль комнаты с MultiFrame.';
+      return 'Так выглядит профиль комнаты с MultiFrame — ниже разберём, что это даёт именно вам.';
   }
 }
 
@@ -51,7 +64,7 @@ export function wishAudioLead(wish: RoomWishOption): string {
     case 'privacy_out':
       return 'Сначала голоса: речь уходит вверх через плиту.';
     case 'music_recording':
-      return 'Сравните голоса и смешанный шум. Когда фона меньше, запись звучит чище.';
+      return 'Сравните голоса и смешанный шум. Когда эха меньше, комната звучит спокойнее.';
     case 'general':
     case 'other':
     default:
@@ -65,8 +78,24 @@ export function wishSoundCorrectionLine(wish: RoomWishOption): string | null {
   return 'Перфорация MultiFrame ещё уменьшает эхо в самой комнате.';
 }
 
-/** Stretch-ceiling drum effect — auto from planned ceiling, not a Q8 card. */
+/** Stretch-ceiling drum effect — only for stretch finish. */
 export function stretchDrumLine(plannedCeiling: PlannedCeilingOption): string | null {
-  if (plannedCeiling !== 'stretch_planned') return null;
+  if (plannedCeiling !== 'stretch') return null;
   return 'Под обычным натяжным потолком зазор может гудеть, как барабан, и усиливать шум сверху. Панели MultiFrame убирают этот эффект.';
+}
+
+/** Short ceiling-specific note for personalization (non-stretch). */
+export function ceilingContextLine(plannedCeiling: PlannedCeilingOption): string | null {
+  switch (plannedCeiling) {
+    case 'stretch':
+      return stretchDrumLine(plannedCeiling);
+    case 'gypsum':
+      return 'Гипсокартонный потолок сам по себе слабо гасит шум сверху. MultiFrame добавляет акустический слой без тяжёлого каркаса.';
+    case 'plaster':
+      return 'Штукатурка или покраска почти не изолируют шум сверху. MultiFrame можно заложить при обновлении потолка.';
+    case 'other_exists':
+      return 'Даже если потолок уже есть, MultiFrame имеет смысл при замене или доработке — эффект зависит от того, что между плитой и финишем.';
+    default:
+      return null;
+  }
 }

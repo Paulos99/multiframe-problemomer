@@ -248,12 +248,13 @@ export const FELT_STEPS: FeltStep[] = [
   'quiet',
 ];
 
+/** Align with housing comfort norms (СП А/Б/В) shown on Result. */
 export const FELT_STEP_LABELS: Record<FeltStep, string> = {
-  danger: 'Очень шумно',
-  uncomfortable: 'Некомфортно',
-  acceptable: 'Приемлемо',
-  comfort: 'Комфортно',
-  quiet: 'Тихо',
+  danger: 'Сильный дискомфорт',
+  uncomfortable: 'Ниже допустимого',
+  acceptable: 'Допустимый (В)',
+  comfort: 'Комфорт (Б)',
+  quiet: 'Высокий комфорт (А)',
 };
 
 /**

@@ -5,20 +5,21 @@ import { Field, TextInput } from '../../ui/Field';
 import { useSession } from '../../state/SessionContext';
 import {
   HOUSE_TYPE_OPTIONS,
+  NOISE_KIND_OPTIONS,
   NOISY_NEIGHBORS_OPTIONS,
   OBJECT_STAGE_OPTIONS,
   PLANNED_CEILING_OPTIONS,
   ROOM_FACTOR_GROUP,
   ROOM_FACTOR_GROUP_LABEL,
-  ROOM_SUBSTEPS,
   ROOM_TYPE_LABELS,
   ROOM_WISH_OPTIONS,
   SLAB_THICKNESS_OPTIONS,
   SLAB_TYPE_OPTIONS,
+  allowedSlabTypes,
   type RoomSubstep,
   type RoomType,
 } from '../../state/types';
-import { roomNextHint, roomSubstepIndex } from '../../state/session';
+import { roomNextHint, visibleRoomSubstepIndex, visibleRoomSubsteps } from '../../state/session';
 import styles from './RoomScreen.module.css';
 
 const ROOM_TYPES = Object.keys(ROOM_TYPE_LABELS) as RoomType[];
@@ -28,10 +29,17 @@ const SUBSTEP_TITLE: Record<RoomSubstep, string> = {
   slabType: 'Выберите тип перекрытия',
   slabThickness: 'Выберите толщину перекрытия',
   basics: 'Укажите тип комнаты и площадь',
-  plannedCeiling: 'Какой потолок планируете?',
+  plannedCeiling: 'Какой у вас потолок?',
   objectStage: 'На какой стадии объект?',
   noisyNeighbors: 'Насколько шумно сверху?',
-  roomWish: 'Какую задачу должен решить MultiFrame?',
+  noiseKind: 'Что именно слышно сверху?',
+  roomWish: 'Что для вас важнее всего?',
+};
+
+const SUBSTEP_LEAD: Partial<Record<RoomSubstep, string>> = {
+  houseType: 'Если дом из блоков — выберите «Блочный» (газоблок, пеноблок и т.п.).',
+  slabType: 'Покажем только варианты, которые обычно бывают в таком доме.',
+  noiseKind: 'Простыми примерами — так точнее подсветим, что важно именно вам.',
 };
 
 export function RoomScreen() {
@@ -45,6 +53,7 @@ export function RoomScreen() {
     setObjectStage,
     setPlannedCeiling,
     setNoisyNeighbors,
+    setNoiseKind,
     setRoomWish,
     canGoNext,
   } = useSession();
@@ -52,18 +61,32 @@ export function RoomScreen() {
   const room = session.answers.room;
   const sub = session.roomSubstep;
   const hint = roomNextHint(session);
-  const idx = roomSubstepIndex(sub);
-  const total = ROOM_SUBSTEPS.length;
-  const progressPct = Math.round(((idx + 1) / total) * 100);
+  const visible = visibleRoomSubsteps(room);
+  const idx = visibleRoomSubstepIndex(sub, room);
+  const total = visible.length;
+  const progressPct = Math.round(((Math.max(idx, 0) + 1) / total) * 100);
   const factorLabel = ROOM_FACTOR_GROUP_LABEL[ROOM_FACTOR_GROUP[sub]];
+  const slabOptions = SLAB_TYPE_OPTIONS.filter((opt) =>
+    allowedSlabTypes(room.houseType).includes(opt.id),
+  );
+  const slabHint =
+    room.houseType === 'panel' || room.houseType === 'block'
+      ? 'Для панельного и блочного дома обычно многопустотная плита (ПК).'
+      : room.houseType === 'wood'
+        ? 'В деревянном доме перекрытие чаще по балкам.'
+        : room.houseType === 'brick' || room.houseType === 'monolith'
+          ? 'Чаще сплошная ж/б плита; иногда многопустотная (ПК).'
+          : undefined;
 
   return (
     <Screen
       stickyHead
       eyebrow={factorLabel}
-      lead={`Вопрос ${idx + 1} из ${total} · ${factorLabel}`}
+      lead={`Вопрос ${Math.max(idx, 0) + 1} из ${total} · ${factorLabel}`}
       title={SUBSTEP_TITLE[sub]}
     >
+      {SUBSTEP_LEAD[sub] ? <p className={styles.subLead}>{SUBSTEP_LEAD[sub]}</p> : null}
+
       <div className={styles.progressWrap} aria-hidden>
         <div className={styles.progressTrack}>
           <div className={styles.progressFill} style={{ width: `${progressPct}%` }} />
@@ -77,6 +100,7 @@ export function RoomScreen() {
               key={opt.id}
               dense
               title={opt.label}
+              hint={opt.hint}
               selected={room.houseType === opt.id}
               onClick={() => setHouseType(opt.id)}
             />
@@ -85,17 +109,20 @@ export function RoomScreen() {
       ) : null}
 
       {sub === 'slabType' ? (
-        <div className={styles.grid}>
-          {SLAB_TYPE_OPTIONS.map((opt) => (
-            <CardSelect
-              key={opt.id}
-              dense
-              title={opt.label}
-              selected={room.slabType === opt.id}
-              onClick={() => setSlabType(opt.id)}
-            />
-          ))}
-        </div>
+        <>
+          {slabHint ? <p className={styles.subLead}>{slabHint}</p> : null}
+          <div className={styles.grid}>
+            {slabOptions.map((opt) => (
+              <CardSelect
+                key={opt.id}
+                dense
+                title={opt.label}
+                selected={room.slabType === opt.id}
+                onClick={() => setSlabType(opt.id)}
+              />
+            ))}
+          </div>
+        </>
       ) : null}
 
       {sub === 'slabThickness' ? (
@@ -189,6 +216,21 @@ export function RoomScreen() {
               title={opt.label}
               selected={room.noisyNeighbors === opt.id}
               onClick={() => setNoisyNeighbors(opt.id)}
+            />
+          ))}
+        </div>
+      ) : null}
+
+      {sub === 'noiseKind' ? (
+        <div className={styles.grid}>
+          {NOISE_KIND_OPTIONS.map((opt) => (
+            <CardSelect
+              key={opt.id}
+              dense
+              title={opt.label}
+              hint={opt.hint}
+              selected={room.noiseKind === opt.id}
+              onClick={() => setNoiseKind(opt.id)}
             />
           ))}
         </div>

@@ -5,12 +5,17 @@ import QRCode from 'qrcode';
 import {
   CALCULATOR_URL,
   HOUSE_TYPE_OPTIONS,
+  NOISE_KIND_OPTIONS,
+  NOISY_NEIGHBORS_OPTIONS,
+  PLANNED_CEILING_OPTIONS,
   ROOM_TYPE_LABELS,
   ROOM_WISH_OPTIONS,
   SLAB_THICKNESS_OPTIONS,
   SLAB_TYPE_OPTIONS,
+  shouldAskNoiseKind,
   type SessionState,
 } from './types';
+import { buildRecommendations, personalStory } from './recommendations';
 import { resolveSlab } from './acoustic/construction';
 import {
   airClassFor,
@@ -245,12 +250,34 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
   const impactAfter = impactFeltFromIndex(a.Lnw);
   const scenario = wishScenarioLine(room.roomWish);
   const drum = stretchDrumLine(room.plannedCeiling);
+  const noiseType = session.derived?.noiseType ?? 'mixed';
+  const story = personalStory(room, noiseType);
+  const recs = buildRecommendations(room, noiseType);
   const airSeries = buildAirSpectrum(session.answers);
   const impactSeries = buildImpactSpectrum(session.answers);
 
   const deltaRw = Math.abs(Math.round(sim.delta.Rw));
   const deltaLnw = Math.abs(Math.round(sim.delta.Lnw));
   const quieterMax = Math.max(sim.perceivedAirPct, sim.perceivedImpactPct);
+  const noiseKindCell =
+    shouldAskNoiseKind(room.noisyNeighbors) && room.noiseKind !== 'unknown'
+      ? `<div><dt>Тип шума</dt><dd>${escapeHtml(optLabel(NOISE_KIND_OPTIONS, room.noiseKind))}</dd></div>`
+      : '';
+  const neighborsCell =
+    room.noisyNeighbors !== 'unknown'
+      ? `<div><dt>Шум сверху</dt><dd>${escapeHtml(optLabel(NOISY_NEIGHBORS_OPTIONS, room.noisyNeighbors))}</dd></div>`
+      : '';
+  const personalHtml =
+    story.length || recs.length
+      ? `<section class="personal">
+          ${story.map((p) => `<p>${escapeHtml(p)}</p>`).join('')}
+          ${
+            recs.length
+              ? `<h2>Рекомендации</h2><ul>${recs.map((r) => `<li>${escapeHtml(r)}</li>`).join('')}</ul>`
+              : ''
+          }
+        </section>`
+      : '';
   const comfortBefore = Math.max(0, Math.min(100, 100 - rev.echoInRoomBefore));
   const comfortAfter = Math.max(0, Math.min(100, 100 - rev.echoInRoomAfter));
   const echoDrop = Math.max(0, rev.echoInRoomBefore - rev.echoInRoomAfter);
@@ -636,6 +663,16 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
     font-size: 12px; line-height: 1.45; color: #5f6b73;
   }
   .closing b { color: #152018; }
+  .personal {
+    margin: 0 0 14px; padding: 12px 14px; border-radius: 12px;
+    border: 1px solid rgba(1,100,79,.18); background: #f7fbf9;
+  }
+  .personal p { margin: 0 0 8px; font-size: 12px; line-height: 1.45; color: #5f6b73; }
+  .personal p:last-child { margin-bottom: 0; }
+  .personal h2 { margin: 10px 0 6px; font-size: 13px; color: #152018; }
+  .personal ul { margin: 0; padding-left: 1.1em; }
+  .personal li { font-size: 12px; line-height: 1.4; color: #5f6b73; margin-bottom: 4px; }
+  .db-hint { display: block; margin-top: 6px; font-size: 10px; font-weight: 650; color: #68757e; }
 </style></head><body>
 <div class="sheet" id="mf-report-root">
 
@@ -654,23 +691,28 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
         <div><dt>Перекрытие</dt><dd>${escapeHtml(slabLabel)}</dd></div>
         <div><dt>Тип дома</dt><dd>${escapeHtml(optLabel(HOUSE_TYPE_OPTIONS, room.houseType))}</dd></div>
         <div><dt>Комната</dt><dd>${escapeHtml(roomName)} · ${escapeHtml(area)}</dd></div>
-        <div><dt>Задача</dt><dd>${escapeHtml(optLabel(ROOM_WISH_OPTIONS, room.roomWish))}</dd></div>
+        <div><dt>Потолок</dt><dd>${escapeHtml(optLabel(PLANNED_CEILING_OPTIONS, room.plannedCeiling))}</dd></div>
+        <div><dt>Цель</dt><dd>${escapeHtml(optLabel(ROOM_WISH_OPTIONS, room.roomWish))}</dd></div>
+        ${neighborsCell}
+        ${noiseKindCell}
       </dl>
     </section>
 
+    ${personalHtml}
+
     <div class="kpi-row">
       <article class="kpi">
-        <span class="k">Δ Rw · изоляция воздушного шума</span>
-        <span class="v">+${deltaRw}<em>дБ</em></span>
-        ${pillSvg(`≈ на ${sim.perceivedAirPct}% тише`, { bg: '#dceee8', fg: '#01644f' })}
+        <span class="k">Воздушный шум · тише на слух</span>
+        <span class="v">≈${sim.perceivedAirPct}<em>%</em></span>
+        <span class="db-hint">изоляция · ≈ +${deltaRw} дБ (Rw)</span>
       </article>
       <article class="kpi">
-        <span class="k">Δ Lnw · уровень ударного шума</span>
-        <span class="v">−${deltaLnw}<em>дБ</em></span>
-        ${pillSvg(`≈ на ${sim.perceivedImpactPct}% тише`, { bg: '#dceee8', fg: '#01644f' })}
+        <span class="k">Ударный шум · тише на слух</span>
+        <span class="v">≈${sim.perceivedImpactPct}<em>%</em></span>
+        <span class="db-hint">удар · ≈ −${deltaLnw} дБ (Lnw)</span>
       </article>
       <article class="kpi">
-        <span class="k">Тише на слух</span>
+        <span class="k">Тише на слух · максимум</span>
         <span class="v">≈${quieterMax}<em>%</em></span>
         ${pillSvg(`воздух ${sim.perceivedAirPct}% · удар ${sim.perceivedImpactPct}%`, { bg: '#dceee8', fg: '#01644f', fontSize: 9, padX: 8 })}
       </article>

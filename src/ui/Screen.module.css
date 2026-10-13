@@ -17,6 +17,13 @@
   letter-spacing: -0.015em;
 }
 
+/* Room questions: larger uppercase titles for readability after leadership review */
+.headSticky h1 {
+  font-size: clamp(1.35rem, 3.4vw, 1.75rem);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .eyebrow {
   margin: 0 0 6px;
   font-size: 11px;
@@ -60,8 +67,9 @@
 
 @media (max-width: 520px) {
   .headSticky h1 {
-    font-size: 1.2rem;
+    font-size: 1.28rem;
     margin-bottom: 4px;
+    letter-spacing: 0.035em;
   }
 
   .headSticky p {

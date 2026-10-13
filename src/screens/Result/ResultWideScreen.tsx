@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Button } from '../../ui/Button';
 import { CompactAudio } from '../../ui/CompactAudio';
 import { EchoComfort, EchoComfortRings } from '../../ui/EchoComfort';
@@ -119,40 +119,50 @@ function KpiRow({
       aria-label="Ключевые показатели"
     >
       <article className={styles.kpiCard} onMouseEnter={rw.onMouseEnter}>
-        <span className={styles.kpiLabel}>Δ Rw · изоляция воздушного шума</span>
+        <span className={styles.kpiLabel}>Воздушный шум · тише на слух</span>
         <div className={styles.kpiMain}>
-          <CountUpValue
-            className={styles.kpiValue}
-            value={deltaRw}
-            prefix="+"
-            suffix={<em>дБ</em>}
-            replayKey={rw.replayKey}
-          />
+          {quieterAir > 0 ? (
+            <CountUpValue
+              className={styles.kpiValue}
+              value={quieterAir}
+              prefix="≈"
+              suffix={<em>%</em>}
+              replayKey={rw.replayKey}
+            />
+          ) : (
+            <strong className={styles.kpiValue}>
+              —<em>%</em>
+            </strong>
+          )}
           <DeltaBars before={rwBefore} after={rwAfter} />
         </div>
-        {quieterAir > 0 ? (
-          <span className={styles.kpiPill}>≈ на {quieterAir}% тише</span>
-        ) : (
-          <span className={styles.kpiPillLight}>без заметного снижения</span>
-        )}
+        <span className={styles.kpiDbHint}>
+          изоляция воздуха · ≈ +{deltaRw} дБ (Rw)
+          <em>больше Rw — лучше изоляция, не «громче»</em>
+        </span>
       </article>
       <article className={styles.kpiCard} onMouseEnter={lnw.onMouseEnter}>
-        <span className={styles.kpiLabel}>Δ Lnw · уровень ударного шума</span>
+        <span className={styles.kpiLabel}>Ударный шум · тише на слух</span>
         <div className={styles.kpiMain}>
-          <CountUpValue
-            className={styles.kpiValue}
-            value={deltaLnw}
-            prefix="−"
-            suffix={<em>дБ</em>}
-            replayKey={lnw.replayKey}
-          />
+          {quieterImpact > 0 ? (
+            <CountUpValue
+              className={styles.kpiValue}
+              value={quieterImpact}
+              prefix="≈"
+              suffix={<em>%</em>}
+              replayKey={lnw.replayKey}
+            />
+          ) : (
+            <strong className={styles.kpiValue}>
+              —<em>%</em>
+            </strong>
+          )}
           <DeltaBars before={lnwBefore} after={lnwAfter} invert />
         </div>
-        {quieterImpact > 0 ? (
-          <span className={styles.kpiPill}>≈ на {quieterImpact}% тише</span>
-        ) : (
-          <span className={styles.kpiPillLight}>без заметного снижения</span>
-        )}
+        <span className={styles.kpiDbHint}>
+          удар · ≈ −{deltaLnw} дБ (Lnw)
+          <em>меньше Lnw — тише удар сверху</em>
+        </span>
       </article>
       <article className={styles.kpiCard} onMouseEnter={comfort.onMouseEnter}>
         <span className={styles.kpiLabel}>Акустический комфорт</span>
@@ -164,7 +174,7 @@ function KpiRow({
         />
       </article>
       <article className={styles.kpiCard} onMouseEnter={quieter.onMouseEnter}>
-        <span className={styles.kpiLabel}>Тише на слух</span>
+        <span className={styles.kpiLabel}>Тише на слух · максимум</span>
         <CountUpValue
           className={styles.kpiValue}
           value={quieterMax}
@@ -243,10 +253,6 @@ export function ResultWideScreen() {
   const { goBack } = useSession();
   const p = useResultProfile();
   const rootRef = useScrollDrift();
-  const [hoverHz, setHoverHz] = useState<number | null>(null);
-  const onHzHover = useCallback((hz: number | null) => {
-    setHoverHz(hz);
-  }, []);
 
   const deltaRw = Math.abs(Math.round(p.sim.delta.Rw));
   const deltaLnw = Math.abs(Math.round(p.sim.delta.Lnw));
@@ -264,7 +270,14 @@ export function ResultWideScreen() {
   if (p.room.ceilingAreaM2) {
     objectCells.push({ label: 'Площадь', value: `${p.room.ceilingAreaM2} м²` });
   }
-  objectCells.push({ label: 'Задача', value: p.wishLabel });
+  objectCells.push({ label: 'Потолок', value: p.ceilingLabel });
+  objectCells.push({ label: 'Цель', value: p.wishLabel });
+  if (p.room.noisyNeighbors !== 'unknown') {
+    objectCells.push({ label: 'Шум сверху', value: p.neighborsLabel });
+  }
+  if (p.noiseKindLabel) {
+    objectCells.push({ label: 'Тип шума', value: p.noiseKindLabel });
+  }
 
   return (
     <div className={styles.root} ref={rootRef}>
@@ -286,6 +299,33 @@ export function ResultWideScreen() {
           ))}
         </dl>
       </section>
+
+      {p.storyParagraphs.length > 0 || p.recommendations.length > 0 ? (
+        <section
+          className={`${styles.personalBlock} ${styles.driftSoft}`}
+          data-reveal
+          aria-label="Персональные рекомендации"
+        >
+          {p.storyParagraphs.length > 0 ? (
+            <div className={styles.personalStory}>
+              <h2>В вашем случае</h2>
+              {p.storyParagraphs.map((para) => (
+                <p key={para.slice(0, 48)}>{para}</p>
+              ))}
+            </div>
+          ) : null}
+          {p.recommendations.length > 0 ? (
+            <div className={styles.recsBlock}>
+              <h2>Рекомендации</h2>
+              <ul>
+                {p.recommendations.map((item) => (
+                  <li key={item.slice(0, 48)}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+        </section>
+      ) : null}
 
       <KpiRow
         deltaRw={deltaRw}
@@ -449,8 +489,6 @@ export function ResultWideScreen() {
         <div className={styles.chartsGrid}>
           <SpectrumChart
             tall
-            externalHz={hoverHz}
-            onHzHover={onHzHover}
             title="Воздушный шум (голоса и музыка)"
             subtitle="изоляция от голосов и музыки сверху"
             series={p.sim.airSpectrum}
@@ -461,8 +499,6 @@ export function ResultWideScreen() {
           />
           <SpectrumChart
             tall
-            externalHz={hoverHz}
-            onHzHover={onHzHover}
             title="Ударный шум (шаги и падения)"
             subtitle="изоляция от шагов и падений"
             series={p.sim.impactSpectrum}

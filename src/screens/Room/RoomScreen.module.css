@@ -1,3 +1,10 @@
+.subLead {
+  margin: -8px 0 4px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
 .progressWrap {
   margin: -2px 0 6px;
 }

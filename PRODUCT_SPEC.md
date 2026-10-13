@@ -113,6 +113,7 @@ Screen-by-screen product contract for the MVP SPA. Exact Russian UI strings are 
 | 2026-09-17 | **Uniqueness block rewrite (owner):** two cards `Только плёнка` vs `Плёнка + MultiFrame` — three parallel bullets (вид / шум / что под полотном). Lead: тишина зависит от слоя между плитой и полотном. No nonsense table rows (e.g. «минвата» vs обычный натяжной). |
 | 2026-09-17 | **Uniqueness pillars (owner):** no stretch-film comparison. Grid of 5 StP pillars: звукоизоляция+комфорт, безопасность, экологичность, быстрый монтаж, универсальность. Lead `Эффективно. Безопасно. Без долгой стройки.` Title + one line each. |
 | 2026-09-18 | Consultation CTA: `Запросить консультацию или подбор` opens `https://stp-multiframe.ru/#section-partner` (bottom «Связаться с нами» / contacts) in a new tab. In-app lead form removed. Calculator + copy summary stay. |
+| 2026-10-13 | **Post demo (leadership):** Room titles UPPERCASE + denser cards; `Блочный` hint (газоблок/пеноблок); slab options filtered by house type; ceiling = `Натяжной` · `Гипсокартон / подвесной` · `Штукатурка или покраска` · `Другой потолок уже есть` · `Не знаю`; after noisyNeighbors if noisy → `noiseKind` (топот / голоса / оба); last question = everyday goal **without MultiFrame brand**; Result: personal story + recommendations, KPI % first / dB secondary, felt labels = SP housing norms, independent spectrum hover. |
 
 ---
 
@@ -366,10 +367,12 @@ Owner: do **not** put «пока без чистового пола» under floo
 **House-type coverage (confirmed):** most frequent apartment cases = panel / block / brick / monolith (+ clad monolith). Wood/beam for private or old beam floors. Do not add separate «сталинка» / «хрущёвка» cards — those are eras, partly covered by type (+ deferred year).
 | Тип дома | Proxy when slab unknown; typical construction | `Панельный` · `Блочный` · `Кирпичный` · `Монолит` (в т.ч. монолит-кирпич) · `Деревянный / по балкам` · `Не знаю` | Common RU apartment stock. Сталинка → usually `Кирпичный` (hint, not separate card). Skip rare types. | `Панельный` · `Блочный` · `Кирпичный` · `Монолит` (в т.ч. монолит-кирпич) · `Деревянный / по балкам` · `Не знаю` | |
 | Стадия объекта | Narrative without «мешает ли» | `Новостройка / до заселения` · `Идёт ремонт` · `Уже живут` · `Не знаю` | Confirmed | `Новостройка / до заселения` · `Идёт ремонт` · `Уже живут` · `Не знаю` | |
-| Планируемый потолок | Fit story for MultiFrame under finish | `Планируем натяжной` · `Потолок уже есть` · `Не знаю` | Owner chose plain **B** — no ГКЛ/«черновой» jargon | `Планируем натяжной` · `Потолок уже есть` · `Не знаю` | |
+| Планируемый потолок | Fit story for MultiFrame under finish | `Натяжной` · `Гипсокартон / подвесной` · `Штукатурка или покраска` · `Другой потолок уже есть` · `Не знаю` | Post-demo 2026-10-13: full ceiling types, not stretch-only | |
 | Шумные соседи сверху | Expectation of upstairs activity (not “does it bother you”) | `Не знаю` · `Обычно тихо` · `Сверху бывает шумно` · `Сверху часто шумно` | Owner chose **B** — softer third label. Fourth step = frequent noise. Replaces «кто сверху». Must **not** sound like complaint quiz |
+| Тип шума сверху | Personalize Result air/impact emphasis | `Топот и шаги` · `Голоса и музыка` · `И то, и другое` · `Сложно сказать` | Asked **only** if sometimes/often noisy |
+| Что важнее | Everyday goal (no MultiFrame brand in question) | `Чтобы сверху стало тише` · `Чтобы вас меньше было слышно сверху` · `Чтобы в комнате было меньше эха` · `Общий акустический комфорт` · `Пока не определился` | Product explained on Result |
 
-**Field order on Room (2026-09-16):** тип дома → тип перекрытия → толщина перекрытия → тип комнаты + площадь → планируемый потолок → стадия → шумные соседи → что важно. **Пол сверху снят с UI.**
+**Field order on Room (2026-10-13):** тип дома → тип перекрытия (filtered by house) → толщина → тип комнаты + площадь → потолок → стадия → шумные соседи → [тип шума если шумно] → что важнее. **Пол сверху снят с UI.**
 
 **Room required vs optional (confirmed 2026-09-13):**
 - **Required to proceed:** `roomType` + `area` (> 0).
@@ -598,7 +601,7 @@ Walk **norms → current → MultiFrame → why → CTA** on one scroll. Officia
 | MF title | `С MultiFrame` |
 | MF header | `С MultiFrame: уровень комфорта по нормам «{official}»` |
 | Channel axes | `Воздушный шум (голоса и музыка)` · `Ударный шум (шаги и падения)` |
-| Felt steps | `Очень шумно` · `Некомфортно` · `Приемлемо` · `Комфортно` · `Тихо` (from Rw/Lnw ↔ А/Б/В) |
+| Felt steps | `Сильный дискомфорт` · `Ниже допустимого` · `Допустимый (В)` · `Комфорт (Б)` · `Высокий комфорт (А)` (aligned with SP housing norms) |
 | Level in room | `Сейчас: ≈ N дБ` · under MultiFrame also `→ с MultiFrame: ≈ M дБ` |
 | Audio groups | `Воздушный шум` · `Ударный шум` · `Смешанный шум` |
 | Why title | `Уникальность системы MultiFrame` |

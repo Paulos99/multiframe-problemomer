@@ -1,10 +1,30 @@
 /**
  * Deep-link: encode RoomAnswers into ?p= so messengers / paste open the same Result.
  */
-import type { RoomAnswers, SessionState } from './types';
+import type {
+  NoiseKindOption,
+  PlannedCeilingOption,
+  RoomAnswers,
+  SessionState,
+} from './types';
 import { createInitialSession, withDerived } from './session';
 
 const SHARE_PARAM = 'p';
+
+/** Migrate legacy ceiling ids from older share links. */
+function migratePlannedCeiling(raw: unknown): PlannedCeilingOption {
+  if (raw === 'stretch_planned' || raw === 'stretch') return 'stretch';
+  if (raw === 'ceiling_exists' || raw === 'other_exists') return 'other_exists';
+  if (raw === 'gypsum' || raw === 'plaster' || raw === 'unknown') return raw;
+  return 'unknown';
+}
+
+function migrateNoiseKind(raw: unknown): NoiseKindOption {
+  if (raw === 'impact' || raw === 'airborne' || raw === 'mixed' || raw === 'unknown') {
+    return raw;
+  }
+  return 'unknown';
+}
 
 function toBase64Url(raw: string): string {
   const b64 = btoa(raw);
@@ -34,10 +54,17 @@ export function encodeRoomAnswers(room: RoomAnswers): string {
 export function decodeRoomAnswers(token: string): RoomAnswers | null {
   try {
     const json = binaryToUtf8(fromBase64Url(token));
-    const data = JSON.parse(json) as Partial<RoomAnswers>;
+    const data = JSON.parse(json) as Partial<RoomAnswers> & {
+      plannedCeiling?: unknown;
+      noiseKind?: unknown;
+    };
     if (!data || typeof data !== 'object') return null;
     if (typeof data.slabType !== 'string' || typeof data.roomWish !== 'string') return null;
-    return data as RoomAnswers;
+    return {
+      ...(data as RoomAnswers),
+      plannedCeiling: migratePlannedCeiling(data.plannedCeiling),
+      noiseKind: migrateNoiseKind(data.noiseKind),
+    };
   } catch {
     return null;
   }
