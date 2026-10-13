@@ -31,7 +31,11 @@ import {
   prefetchAcousticProfilePdf,
   shareAcousticProfile,
 } from '../../state/reportPdf';
-import { caseVerdict } from '../../state/recommendations';
+import {
+  caseVerdict,
+  MULTIFRAME_PANEL_IMG,
+  MULTIFRAME_PRODUCT_BLURB,
+} from '../../state/recommendations';
 import { wishSoundCorrectionLine, stretchDrumLine } from '../../state/wish';
 import { eventParamsFromSession, track } from '../../analytics';
 import styles from './resultShared.module.css';
@@ -308,6 +312,8 @@ export function useResultProfile() {
     soundCorrection,
     drumLine,
     caseVerdictText,
+    productBlurb: MULTIFRAME_PRODUCT_BLURB,
+    productImageSrc: MULTIFRAME_PANEL_IMG,
     slabContext,
     showScenarioAside,
     pdfBusy,

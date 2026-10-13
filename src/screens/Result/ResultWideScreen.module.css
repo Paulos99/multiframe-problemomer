@@ -42,23 +42,6 @@
 }
 
 /* ——— Object hero asset ——— */
-/* Same 4-col track as .kpiRow so edges line up with KPI cards */
-.objectCaseRow {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  align-items: start;
-  min-width: 0;
-}
-
-.objectCaseRow > .objectSpec {
-  grid-column: span 3;
-}
-
-.objectCaseRow > .caseVerdict {
-  grid-column: span 1;
-}
-
 .objectSpec {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -66,6 +49,7 @@
   align-items: stretch;
   padding: 0;
   min-width: 0;
+  width: 100%;
   border-radius: 20px;
   border: 1px solid rgba(1, 100, 79, 0.28);
   background:
@@ -98,7 +82,7 @@
   margin: 0;
   padding: 14px 14px 14px 6px;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
 }
 
@@ -497,35 +481,61 @@
   opacity: 0.9;
 }
 
-.caseVerdict {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-self: start;
-  gap: 10px;
+.recProductRow {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 12px;
+  align-items: start;
   min-width: 0;
-  padding: 18px 16px;
-  border-radius: 20px;
-  border: 1px solid var(--border-color);
-  background:
-    linear-gradient(160deg, rgba(1, 100, 79, 0.06), transparent 55%),
-    var(--bg-card);
-  box-shadow: var(--shadow-sm);
 }
 
-.caseVerdict h2 {
+.recommendations,
+.productAbout {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 18px 18px 16px;
+  border-radius: 22px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.04), 0 8px 20px rgba(17, 24, 39, 0.04);
+}
+
+.recommendations h2,
+.productAbout h2 {
   margin: 0;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
   letter-spacing: -0.01em;
   color: var(--accent-color);
 }
 
-.caseVerdict p {
+.recommendations p,
+.productAbout p {
   margin: 0;
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 1.55;
   color: var(--text-secondary);
+}
+
+.productAboutBody {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.productPhoto {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 160px;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 14px;
+  background: #f4f6f5;
+  border: 1px solid var(--border-color);
 }
 
 /* ——— Shared panel / widget chrome ——— */
@@ -1371,14 +1381,8 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  /* KPI becomes 2×2 — drop 3+1 sync, stack object + verdict */
-  .objectCaseRow {
-    grid-template-columns: 1fr;
-  }
-
-  .objectCaseRow > .objectSpec,
-  .objectCaseRow > .caseVerdict {
-    grid-column: auto;
+  .objectSpecGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -1395,6 +1399,14 @@
 @media (max-width: 1100px) {
   .closeRow {
     grid-template-columns: 1fr;
+  }
+
+  .recProductRow {
+    grid-template-columns: 1fr;
+  }
+
+  .productAboutBody {
+    grid-template-columns: minmax(140px, 0.7fr) 1fr;
   }
 
   .objectSpec {
@@ -1414,6 +1426,14 @@
 }
 
 @media (max-width: 900px) {
+  .productAboutBody {
+    grid-template-columns: 1fr;
+  }
+
+  .productPhoto {
+    max-height: 200px;
+  }
+
   .root {
     gap: 14px;
   }

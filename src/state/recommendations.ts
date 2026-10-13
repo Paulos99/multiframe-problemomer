@@ -1,169 +1,12 @@
 import type {
   HouseTypeOption,
   NoiseType,
-  NoisyNeighborsOption,
-  ObjectStageOption,
   PlannedCeilingOption,
   RoomAnswers,
-  RoomType,
   RoomWishOption,
-  SlabThicknessOption,
   SlabTypeOption,
 } from './types';
-import {
-  ROOM_TYPE_LABELS,
-  shouldAskNoiseKind,
-} from './types';
-
-function housePhrase(house: HouseTypeOption): string | null {
-  switch (house) {
-    case 'panel':
-      return 'в панельном доме';
-    case 'block':
-      return 'в блочном доме';
-    case 'brick':
-      return 'в кирпичном доме';
-    case 'monolith':
-      return 'в монолитном доме';
-    case 'wood':
-      return 'в доме с деревянными перекрытиями';
-    default:
-      return null;
-  }
-}
-
-function slabPhrase(type: SlabTypeOption, thick: SlabThicknessOption): string | null {
-  const kind =
-    type === 'hollow'
-      ? 'пустотной плитой'
-      : type === 'monolith'
-        ? 'сплошной ж/б плитой'
-        : type === 'wood'
-          ? 'деревянным перекрытием'
-          : null;
-  const mm =
-    thick === 'up_to_160'
-      ? 'до ~160 мм'
-      : thick === 'about_160_200'
-        ? '~160–200 мм'
-        : thick === 'about_200_250'
-          ? '~200–250 мм'
-          : thick === 'over_250'
-            ? 'толще ~250 мм'
-            : null;
-
-  if (kind && mm) return `с ${kind} ${mm}`;
-  if (kind) return `с ${kind}`;
-  if (mm) return `с перекрытием ${mm}`;
-  return null;
-}
-
-function roomPhrase(roomType: RoomType | null, area: number | null): string | null {
-  const name = roomType && roomType !== 'other' ? ROOM_TYPE_LABELS[roomType].toLowerCase() : null;
-  if (name && area != null && area > 0) return `в ${nameGenitive(roomType!)} ~${formatArea(area)} м²`;
-  if (name) return `в ${nameGenitive(roomType!)}`;
-  if (area != null && area > 0) return `в помещении ~${formatArea(area)} м²`;
-  return null;
-}
-
-/** Prepositional-ish room names for «в …». */
-function nameGenitive(type: RoomType): string {
-  switch (type) {
-    case 'living':
-      return 'гостиной';
-    case 'bedroom':
-      return 'спальне';
-    case 'kids':
-      return 'детской';
-    case 'kitchen':
-      return 'кухне';
-    case 'office':
-      return 'кабинете';
-    default:
-      return 'комнате';
-  }
-}
-
-function formatArea(n: number): string {
-  return Number.isInteger(n) ? String(n) : String(Math.round(n * 10) / 10);
-}
-
-function stagePhrase(stage: ObjectStageOption): string | null {
-  switch (stage) {
-    case 'newbuild':
-      return 'на стадии новостройки, до заселения';
-    case 'renovation':
-      return 'на стадии ремонта';
-    case 'occupied':
-      return 'в уже обжитом жилье';
-    default:
-      return null;
-  }
-}
-
-function ceilingPhrase(ceiling: PlannedCeilingOption): { prep: string | null; drum: boolean } {
-  switch (ceiling) {
-    case 'stretch':
-      return { prep: 'под натяжной потолок', drum: true };
-    case 'gypsum':
-      return { prep: 'под гипсокартонный или подвесной потолок', drum: false };
-    case 'plaster':
-      return { prep: 'при штукатурке или покраске потолка', drum: false };
-    case 'other_exists':
-      return { prep: 'при уже существующем потолке', drum: false };
-    default:
-      return { prep: null, drum: false };
-  }
-}
-
-function noiseFrequencyPhrase(noisy: NoisyNeighborsOption): string | null {
-  switch (noisy) {
-    case 'often_noisy':
-      return 'сверху часто шумно';
-    case 'sometimes_noisy':
-      return 'сверху бывает шумно';
-    case 'usually_quiet':
-      return 'сверху обычно тихо';
-    default:
-      return null;
-  }
-}
-
-function noiseKindPhrase(room: RoomAnswers): string | null {
-  if (!shouldAskNoiseKind(room.noisyNeighbors) || room.noiseKind === 'unknown') return null;
-  switch (room.noiseKind) {
-    case 'impact':
-      return 'слышны топот и шаги';
-    case 'airborne':
-      return 'слышны голоса и музыка';
-    case 'mixed':
-      return 'слышны и шаги, и голоса';
-    default:
-      return null;
-  }
-}
-
-function wishPhrase(wish: RoomWishOption): string | null {
-  switch (wish) {
-    case 'from_above':
-      return 'вам важно, чтобы сверху стало тише';
-    case 'privacy_out':
-      return 'вам важно, чтобы вас меньше было слышно сверху';
-    case 'music_recording':
-      return 'вам важно убрать лишнее эхо в комнате';
-    case 'general':
-      return 'вам важен общий акустический комфорт';
-    default:
-      return null;
-  }
-}
-
-function joinClauses(parts: string[]): string {
-  if (parts.length === 0) return '';
-  if (parts.length === 1) return parts[0]!;
-  if (parts.length === 2) return `${parts[0]} ${parts[1]}`;
-  return parts.join(', ');
-}
+import { shouldAskNoiseKind } from './types';
 
 function capitalize(s: string): string {
   if (!s) return s;
@@ -176,80 +19,107 @@ function endsWithPeriod(s: string): string {
   return /[.!?…]$/.test(t) ? t : `${t}.`;
 }
 
-/**
- * Practitioner-style case verdict: 2–3 connected sentences covering all known answers.
- */
-export function caseVerdict(room: RoomAnswers, noiseType: NoiseType): string {
-  const house = housePhrase(room.houseType);
-  const slab = slabPhrase(room.slabType, room.slabThickness);
-  const place = roomPhrase(room.roomType, room.ceilingAreaM2);
-  const stage = stagePhrase(room.objectStage);
-  const { prep: ceilingPrep, drum } = ceilingPhrase(room.plannedCeiling);
-  const freq = noiseFrequencyPhrase(room.noisyNeighbors);
-  const kind = noiseKindPhrase(room);
-  const wish = wishPhrase(room.roomWish);
+/** How this construction typically carries sound — expert characterization. */
+function acousticCharacter(room: RoomAnswers): string {
+  const house = room.houseType;
+  const slab = room.slabType;
+  const ceiling = room.plannedCeiling;
 
-  // ——— Sentence 1: object ———
-  const objectBits: string[] = [];
-  if (house) objectBits.push(house);
-  if (slab) objectBits.push(slab);
-  if (place) objectBits.push(place);
-  if (stage) objectBits.push(stage);
-  if (ceilingPrep) objectBits.push(ceilingPrep);
+  const slabBit = slabCharacter(slab, house);
+  const ceilingBit = ceilingCharacter(ceiling);
+  const place =
+    room.roomType === 'bedroom' || room.roomType === 'kids'
+      ? 'В жилой комнате, где важна тишина,'
+      : room.roomType === 'office'
+        ? 'В кабинете,'
+        : 'В этом помещении';
 
-  let s1: string;
-  if (objectBits.length > 0) {
-    let lead = capitalize(joinClauses(objectBits));
-    if (drum) {
-      lead +=
-        ' зазор под полотном часто работает как барабан и усиливает шум сверху';
-    } else if (room.plannedCeiling === 'gypsum') {
-      lead +=
-        ' сам по себе такой потолок слабо гасит шум сверху';
-    } else if (room.plannedCeiling === 'plaster') {
-      lead +=
-        ' штукатурка почти не изолирует шум сверху';
-    } else if (room.plannedCeiling === 'other_exists') {
-      lead +=
-        ' эффект зависит от того, что между плитой и финишем';
-    } else {
-      lead += ' акустика потолка заметно влияет на то, как слышен шум сверху';
-    }
-    s1 = endsWithPeriod(lead);
-  } else {
-    s1 = 'По ответам об объекте картина пока общая, но потолок всё равно задаёт, насколько слышен шум сверху.';
+  if (slabBit && ceilingBit) {
+    return `${place} ${slabBit}, а ${ceilingBit}`;
+  }
+  if (slabBit) {
+    return `${place} ${slabBit}`;
+  }
+  if (ceilingBit) {
+    return `${place} ${ceilingBit}`;
+  }
+  return `${place} шум сверху проходит через плиту и зависит от того, что лежит между перекрытием и финишным потолком`;
+}
+
+function slabCharacter(slab: SlabTypeOption, house: HouseTypeOption): string | null {
+  if (slab === 'hollow' || (slab === 'unknown' && (house === 'panel' || house === 'block'))) {
+    return 'пустотная плита хорошо пропускает и удар, и голоса — конструкция «звонкая»';
+  }
+  if (slab === 'wood' || (slab === 'unknown' && house === 'wood')) {
+    return 'деревянное перекрытие слабо держит ударный шум и низкие частоты';
+  }
+  if (slab === 'monolith' || (slab === 'unknown' && (house === 'monolith' || house === 'brick'))) {
+    return 'сплошная ж/б плита тяжелее пустотной, но в жилом доме без акустики сверху всё равно слышны и шаги, и речь';
+  }
+  if (house === 'panel') {
+    return 'в панельном доме перекрытие обычно пустотное и довольно «прозрачное» для шума соседей';
+  }
+  if (house === 'block') {
+    return 'в блочном доме перекрытие часто пустотное, и шум сверху доходит отчётливо';
+  }
+  return null;
+}
+
+function ceilingCharacter(ceiling: PlannedCeilingOption): string | null {
+  switch (ceiling) {
+    case 'stretch':
+      return 'воздушный зазор под обычным натяжным работает как барабан и может усиливать звук сверху';
+    case 'gypsum':
+      return 'гипсокартон или подвес сам по себе почти не спасает от шума через плиту';
+    case 'plaster':
+      return 'штукатурка или покраска почти не добавляют изоляции от соседей сверху';
+    case 'other_exists':
+      return 'уже смонтированный потолок мало что меняет, пока между плитой и финишем нет акустического слоя';
+    default:
+      return null;
+  }
+}
+
+function problemLine(room: RoomAnswers, noiseType: NoiseType): string | null {
+  const kind =
+    shouldAskNoiseKind(room.noisyNeighbors) && room.noiseKind !== 'unknown'
+      ? room.noiseKind
+      : null;
+
+  const freq = room.noisyNeighbors;
+  let noisePart: string | null = null;
+  if (freq === 'often_noisy') {
+    if (kind === 'impact') noisePart = 'Сверху часто слышен топот и шаги — это мешает отдыхать';
+    else if (kind === 'airborne') noisePart = 'Сверху часто доходят голоса и музыка — фон не отпускает';
+    else if (kind === 'mixed') noisePart = 'Сверху часто слышны и шаги, и голоса — помещение почти не даёт тишины';
+    else noisePart = 'Сверху часто шумно — соседи слышны слишком отчётливо';
+  } else if (freq === 'sometimes_noisy') {
+    if (kind === 'impact') noisePart = 'Иногда сверху проходит топот — в такие моменты комната теряет комфорт';
+    else if (kind === 'airborne') noisePart = 'Иногда сверху пробиваются голоса и музыка';
+    else if (kind === 'mixed') noisePart = 'Иногда сверху слышны и шаги, и разговоры';
+    else noisePart = 'Шум сверху бывает не постоянно, но уже заметно снижает комфорт';
+  } else if (freq === 'usually_quiet') {
+    noisePart = 'Сейчас сверху обычно тихо, но запас по изоляции всё равно полезен на будущее';
+  } else if (noiseType === 'impact') {
+    noisePart = 'Главный риск здесь — ударный шум: шаги и падения через плиту';
+  } else if (noiseType === 'airborne') {
+    noisePart = 'Главный риск здесь — воздушный шум: речь и музыка через перекрытие';
   }
 
-  // ——— Sentence 2: request (noise + wish) ———
-  const requestBits: string[] = [];
-  if (freq && kind) {
-    requestBits.push(`${freq}: ${kind}`);
-  } else if (freq) {
-    requestBits.push(freq);
-  } else if (kind) {
-    requestBits.push(kind);
-  }
-  if (wish) requestBits.push(wish);
+  const wish = room.roomWish;
+  let wishPart: string | null = null;
+  if (wish === 'from_above') wishPart = 'нужно, чтобы сверху стало заметно тише';
+  else if (wish === 'privacy_out') wishPart = 'важно, чтобы вас меньше было слышно сверху';
+  else if (wish === 'music_recording') wishPart = 'мешает эхо в самой комнате';
+  else if (wish === 'general') wishPart = 'нужен спокойный акустический фон';
 
-  const hasRequest = requestBits.length > 0;
-  let s2: string | null = null;
-  if (hasRequest) {
-    const body =
-      requestBits.length === 1
-        ? requestBits[0]!
-        : requestBits.length === 2
-          ? `${requestBits[0]}, и ${requestBits[1]}`
-          : `${requestBits.slice(0, -1).join(', ')}, и ${requestBits[requestBits.length - 1]!}`;
-    const timing =
-      room.objectStage === 'newbuild' || room.objectStage === 'renovation'
-        ? 'MultiFrame лучше заложить до финишного потолка'
-        : room.objectStage === 'occupied'
-          ? 'MultiFrame можно поставить при замене или доработке потолка'
-          : 'потолок с MultiFrame здесь уместен';
-    s2 = endsWithPeriod(capitalize(`${body} — ${timing}`));
-  }
+  if (noisePart && wishPart) return `${noisePart} Вам ${wishPart}`;
+  if (noisePart) return noisePart;
+  if (wishPart) return `Вам ${wishPart}`;
+  return null;
+}
 
-  // ——— Sentence 3: effect ———
+function multiFrameHelp(room: RoomAnswers, noiseType: NoiseType): string {
   const impactHeavy =
     noiseType === 'impact' ||
     noiseType === 'mixed' ||
@@ -258,54 +128,65 @@ export function caseVerdict(room: RoomAnswers, noiseType: NoiseType): string {
   const airHeavy =
     noiseType === 'airborne' ||
     room.noiseKind === 'airborne' ||
-    room.roomWish === 'privacy_out' ||
-    room.roomWish === 'music_recording';
+    room.roomWish === 'privacy_out';
+  const drum = room.plannedCeiling === 'stretch';
 
-  let effect: string;
+  const timing =
+    room.objectStage === 'newbuild' || room.objectStage === 'renovation'
+      ? 'лучше заложить панели до финишного потолка'
+      : room.objectStage === 'occupied'
+        ? 'можно поставить при замене или доработке потолка'
+        : 'стоит поставить под финишный потолок';
+
+  let core: string;
   if (room.roomWish === 'music_recording') {
-    effect =
-      'Панель снимает эхо в самой комнате и одновременно смягчает фон сверху';
+    core = `MultiFrame ${timing}: панель гасит эхо в комнате и одновременно смягчает фон сверху`;
   } else if (room.roomWish === 'privacy_out') {
-    effect =
-      'Потолок с MultiFrame глушит голоса и музыку, которые уходят вверх через плиту';
+    core = `MultiFrame ${timing}: слой под потолком глушит голоса и музыку, которые уходят вверх через плиту`;
   } else if (impactHeavy && airHeavy) {
-    effect =
-      'Удар смягчится заметно, голоса и музыка сверху тоже станут мягче';
+    core = `MultiFrame ${timing}: удар сверху станет мягче, голоса и музыка — тише`;
   } else if (impactHeavy) {
-    effect = 'Топот и шаги сверху станут заметно мягче';
+    core = `MultiFrame ${timing}: топот и шаги сверху станут заметно мягче`;
   } else if (airHeavy) {
-    effect = 'Голоса и музыка сверху станут заметно мягче';
-  } else if (room.noisyNeighbors === 'usually_quiet') {
-    effect =
-      'Даже если сейчас сверху тихо, MultiFrame поднимает запас комфорта и страхует от будущих соседей';
+    core = `MultiFrame ${timing}: голоса и музыка сверху станут заметно мягче`;
+  } else if (drum) {
+    core = `MultiFrame ${timing}: панели убирают «барабан» под натяжным и делают фон сверху спокойнее`;
   } else {
-    effect = 'С MultiFrame сверху станет тише, а в комнате спокойнее';
+    core = `MultiFrame ${timing}: сверху станет тише, а в комнате спокойнее`;
   }
 
   if (impactHeavy) {
-    effect +=
-      '; полную норму по удару часто добивает ещё пол у соседа сверху';
+    core +=
+      '. Полную норму по удару часто добивает ещё пол у соседа сверху — потолок закрывает свою часть задачи';
   } else if (drum) {
-    effect += '; панели как раз убирают «барабан» под натяжным';
+    core += '. Именно акустический слой под полотном решает усиление в зазоре';
   }
 
-  const s3 = endsWithPeriod(effect);
-
-  // Assemble 2 or 3 sentences
-  if (s2) {
-    return `${s1} ${s2} ${s3}`;
-  }
-  // Fold timing into effect when no explicit noise/wish request
-  const timingOnly =
-    room.objectStage === 'newbuild'
-      ? 'Лучший момент заложить MultiFrame — до финишного потолка. '
-      : room.objectStage === 'renovation'
-        ? 'Пока идёт ремонт, MultiFrame удобно поставить до финиша. '
-        : '';
-  return `${s1} ${timingOnly}${s3}`.replace(/\s+/g, ' ').trim();
+  return endsWithPeriod(capitalize(core));
 }
 
-/** @deprecated Prefer caseVerdict — kept for any leftover call sites. */
+/**
+ * Expert recommendations for Result: acoustic character + problem + MultiFrame help.
+ * 2–3 connected sentences; answers shape wording without sounding like a field dump.
+ */
+export function caseVerdict(room: RoomAnswers, noiseType: NoiseType): string {
+  const s1 = endsWithPeriod(acousticCharacter(room));
+  const problem = problemLine(room, noiseType);
+  const s3 = multiFrameHelp(room, noiseType);
+
+  if (problem) {
+    return `${s1} ${endsWithPeriod(problem)} ${s3}`;
+  }
+  return `${s1} ${s3}`;
+}
+
+/** Short static blurb for the product card next to recommendations. */
+export const MULTIFRAME_PRODUCT_BLURB =
+  'MultiFrame — бескаркасные акустические панели под натяжной или другой финишный потолок. Пористый материал с рельефной поверхностью рассеивает и поглощает энергию шума, панели стыкуются без каркаса и минваты — сверху остаётся привычное полотно.';
+
+export const MULTIFRAME_PANEL_IMG = `${import.meta.env.BASE_URL}images/multiframe-panel.jpg`;
+
+/** @deprecated Prefer caseVerdict. */
 export function personalStory(room: RoomAnswers, noiseType: NoiseType): string[] {
   return [caseVerdict(room, noiseType)];
 }

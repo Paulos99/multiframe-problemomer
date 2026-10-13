@@ -15,7 +15,7 @@ import {
   shouldAskNoiseKind,
   type SessionState,
 } from './types';
-import { caseVerdict } from './recommendations';
+import { caseVerdict, MULTIFRAME_PRODUCT_BLURB } from './recommendations';
 import { resolveSlab } from './acoustic/construction';
 import {
   airClassFor,
@@ -70,7 +70,7 @@ const PILLARS = [
 
 type QrBundle = { site: string; calc: string };
 type LogoBundle = { stp: string; mf: string };
-type ReportAssets = { qr: QrBundle; logos: LogoBundle };
+type ReportAssets = { qr: QrBundle; logos: LogoBundle; panel: string };
 
 function optLabel<T extends string>(
   options: { id: T; label: string }[],
@@ -226,7 +226,7 @@ function pageChrome(
 }
 
 function buildReportDocument(session: SessionState, assets: ReportAssets): string {
-  const { qr, logos } = assets;
+  const { qr, logos, panel } = assets;
   const handoff = buildLeadHandoff(session);
   const room = handoff.room;
   const slab = resolveSlab(room);
@@ -265,9 +265,18 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
     room.noisyNeighbors !== 'unknown'
       ? `<div><dt>Шум сверху</dt><dd>${escapeHtml(optLabel(NOISY_NEIGHBORS_OPTIONS, room.noisyNeighbors))}</dd></div>`
       : '';
-  const personalHtml = `<section class="personal">
-          <h2>В вашем случае</h2>
-          <p>${escapeHtml(verdict)}</p>
+  const recProductHtml = `<section class="rec-product">
+          <aside class="recs">
+            <h2>Рекомендации:</h2>
+            <p>${escapeHtml(verdict)}</p>
+          </aside>
+          <aside class="product">
+            <h2>Что такое MultiFrame</h2>
+            <div class="product-body">
+              <img src="${panel}" alt="Панель MultiFrame" />
+              <p>${escapeHtml(MULTIFRAME_PRODUCT_BLURB)}</p>
+            </div>
+          </aside>
         </section>`;
   const comfortBefore = Math.max(0, Math.min(100, 100 - rev.echoInRoomBefore));
   const comfortAfter = Math.max(0, Math.min(100, 100 - rev.echoInRoomAfter));
@@ -649,15 +658,18 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
     font-size: 12px; line-height: 1.45; color: #5f6b73;
   }
   .closing b { color: #152018; }
-  .personal {
-    margin: 0 0 14px; padding: 12px 14px; border-radius: 12px;
+  .rec-product {
+    display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 10px;
+    margin: 0 0 14px;
+  }
+  .recs, .product {
+    padding: 12px 14px; border-radius: 12px;
     border: 1px solid rgba(1,100,79,.18); background: #f7fbf9;
   }
-  .personal p { margin: 0 0 8px; font-size: 12px; line-height: 1.45; color: #5f6b73; }
-  .personal p:last-child { margin-bottom: 0; }
-  .personal h2 { margin: 10px 0 6px; font-size: 13px; color: #152018; }
-  .personal ul { margin: 0; padding-left: 1.1em; }
-  .personal li { font-size: 12px; line-height: 1.4; color: #5f6b73; margin-bottom: 4px; }
+  .recs h2, .product h2 { margin: 0 0 6px; font-size: 13px; color: #01644f; }
+  .recs p, .product p { margin: 0; font-size: 11px; line-height: 1.45; color: #5f6b73; }
+  .product-body { display: grid; grid-template-columns: 88px 1fr; gap: 10px; align-items: start; }
+  .product-body img { width: 88px; height: auto; border-radius: 8px; border: 1px solid #d7e0dc; background: #fff; }
   .db-hint { display: block; margin-top: 6px; font-size: 10px; font-weight: 650; color: #68757e; }
 </style></head><body>
 <div class="sheet" id="mf-report-root">
@@ -682,8 +694,6 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
         ${noiseKindCell}
       </dl>
     </section>
-
-    ${personalHtml}
 
     <div class="kpi-row">
       <article class="kpi">
@@ -711,6 +721,8 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
         }
       </article>
     </div>
+
+    ${recProductHtml}
 
     <div class="card" style="margin-bottom:0">
       <h2><span class="sec-idx">01</span>Класс комфорта</h2>
@@ -846,8 +858,17 @@ export async function buildAcousticProfileHtml(
   if (!full.derived) {
     throw new Error('Нет расчёта для отчёта');
   }
-  const [qr, logoBundle] = await Promise.all([buildQrBundle(), buildLogoBundle(logos)]);
-  return buildReportDocument(full, { qr, logos: logoBundle });
+  const [qr, logoBundle, panel] = await Promise.all([
+    buildQrBundle(),
+    buildLogoBundle(logos),
+    fetchPanelDataUrl(),
+  ]);
+  return buildReportDocument(full, { qr, logos: logoBundle, panel });
+}
+
+async function fetchPanelDataUrl(): Promise<string> {
+  const base = new URL(import.meta.env.BASE_URL || '/', window.location.href);
+  return fetchDataUrl(new URL('images/multiframe-panel.jpg', base).href);
 }
 
 /** Prefetch pdf libs so the click is not waiting on the network. */
@@ -908,8 +929,12 @@ export async function downloadAcousticProfilePdf(session: SessionState): Promise
     throw new Error('Нет расчёта для отчёта');
   }
 
-  const [qr, logos] = await Promise.all([buildQrBundle(), buildLogoBundle()]);
-  const html = buildReportDocument(full, { qr, logos });
+  const [qr, logos, panel] = await Promise.all([
+    buildQrBundle(),
+    buildLogoBundle(),
+    fetchPanelDataUrl(),
+  ]);
+  const html = buildReportDocument(full, { qr, logos, panel });
   const iframe = document.createElement('iframe');
   iframe.setAttribute('aria-hidden', 'true');
   iframe.setAttribute('title', 'PDF');

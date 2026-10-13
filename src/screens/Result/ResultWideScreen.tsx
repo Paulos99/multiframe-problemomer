@@ -285,29 +285,18 @@ export function ResultWideScreen() {
         <h1>Акустический профиль помещения</h1>
       </header>
 
-      <section
-        className={`${styles.objectCaseRow} ${styles.driftSlow}`}
-        data-reveal
-        aria-label="Объект и вердикт"
-      >
-        <div className={styles.objectSpec}>
-          <div className={styles.objectSpecLabel}>
-            <strong>Параметры объекта</strong>
-          </div>
-          <dl className={styles.objectSpecGrid}>
-            {objectCells.map((cell) => (
-              <div key={cell.label}>
-                <dt>{cell.label}</dt>
-                <dd>{cell.value}</dd>
-              </div>
-            ))}
-          </dl>
+      <section className={`${styles.objectSpec} ${styles.driftSlow}`} data-reveal aria-label="Параметры объекта">
+        <div className={styles.objectSpecLabel}>
+          <strong>Параметры объекта</strong>
         </div>
-
-        <aside className={styles.caseVerdict} aria-label="В вашем случае">
-          <h2>В вашем случае</h2>
-          <p>{p.caseVerdictText}</p>
-        </aside>
+        <dl className={styles.objectSpecGrid}>
+          {objectCells.map((cell) => (
+            <div key={cell.label}>
+              <dt>{cell.label}</dt>
+              <dd>{cell.value}</dd>
+            </div>
+          ))}
+        </dl>
       </section>
 
       <KpiRow
@@ -323,6 +312,32 @@ export function ResultWideScreen() {
         lnwBefore={p.sim.before.Lnw}
         lnwAfter={p.sim.after.Lnw}
       />
+
+      <section
+        className={`${styles.recProductRow} ${styles.driftSoft}`}
+        data-reveal
+        aria-label="Рекомендации и продукт"
+      >
+        <aside className={styles.recommendations} aria-label="Рекомендации">
+          <h2>Рекомендации:</h2>
+          <p>{p.caseVerdictText}</p>
+        </aside>
+        <aside className={styles.productAbout} aria-label="Что такое MultiFrame">
+          <h2>Что такое MultiFrame</h2>
+          <div className={styles.productAboutBody}>
+            <img
+              className={styles.productPhoto}
+              src={p.productImageSrc}
+              alt="Панель MultiFrame"
+              width={480}
+              height={360}
+              loading="lazy"
+              decoding="async"
+            />
+            <p>{p.productBlurb}</p>
+          </div>
+        </aside>
+      </section>
 
       <section className={`${styles.panel} ${styles.driftSoft}`} data-reveal aria-label="Нормы комфорта для жилья">
         <div className={styles.normsHead}>
