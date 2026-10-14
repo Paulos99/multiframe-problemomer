@@ -138,7 +138,7 @@ function KpiRow({
         </div>
         <span className={styles.kpiDbHint}>
           изоляция воздуха · +{deltaRw} дБ (Rw)
-          <em>больше Rw — лучше изоляция, не «громче»</em>
+          <em>больше Rw — лучше изоляция</em>
         </span>
       </article>
       <article className={styles.kpiCard} onMouseEnter={lnw.onMouseEnter}>
