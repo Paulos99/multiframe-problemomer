@@ -279,7 +279,7 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
             <div class="product-body">
               <img src="${panel}" alt="Панель MultiFrame" />
               <div class="product-copy">
-                <strong>${escapeHtml(about.claim)}</strong>
+                ${about.claim ? `<strong>${escapeHtml(about.claim)}</strong>` : ''}
                 ${productHtml}
               </div>
             </div>

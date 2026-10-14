@@ -339,7 +339,7 @@ export function ResultWideScreen() {
               decoding="async"
             />
             <div className={styles.productCopy}>
-              <strong>{p.productClaim}</strong>
+              {p.productClaim ? <strong>{p.productClaim}</strong> : null}
               {p.productParagraphs.map((paragraph) => (
                 <p key={paragraph}>{paragraph}</p>
               ))}

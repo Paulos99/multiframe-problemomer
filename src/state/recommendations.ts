@@ -188,42 +188,25 @@ export function caseVerdict(room: RoomAnswers, noiseType: NoiseType): string {
 
 export interface ProductAbout {
   claim: string;
-  paragraphs: readonly [string, string, string];
+  paragraphs: readonly string[];
 }
 
-function materialEffect(room: RoomAnswers, noiseType: NoiseType): string {
-  const kind = heardKind(room, noiseType);
-  if (room.roomWish === 'music_recording') {
-    return 'Эхо из комнаты тоже уходит в эти каналы и затихает внутри, а не отражается обратно.';
-  }
-  if (room.roomWish === 'privacy_out' || kind === 'airborne') {
-    return 'Голос затихает в панели, а не возвращается в комнату и не уходит наверх.';
-  }
-  if (kind === 'impact') {
-    return 'Жёсткий каркас при этом принимает энергию шагов.';
-  }
-  if (room.plannedCeiling === 'stretch') {
-    return 'Поэтому зазор под полотном перестаёт гудеть.';
-  }
-  return 'Звук рассеивается в панели, а не усиливается в потолке.';
-}
-
-/** Product explanation from the StP MultiFrame brochure: closed air gap, not a springy frame. */
-export function productAbout(room: RoomAnswers, noiseType: NoiseType): ProductAbout {
+/** Product explanation for the Result «Что такое MultiFrame» block. */
+export function productAbout(_room: RoomAnswers, _noiseType: NoiseType): ProductAbout {
   return {
-    claim: 'Звук рассеивается в панели, а не гудит в зазоре.',
+    claim: '',
     paragraphs: [
-      'Между плитой и полотном остаётся замкнутый воздух. Он упругий и гудит, как барабан.',
-      `MultiFrame не даёт этому воздуху свободно двигаться. Сквозные отверстия работают как каналы: звук заходит в открытый наполнитель и рассеивается. ${materialEffect(room, noiseType)}`,
-      'Панель — это жёсткий ударопрочный каркас и акустический наполнитель. Панели стыкуются в одно полотно и крепятся одним дюбелем по центру, без минваты и металлического профиля.',
+      'StP MultiFrame — это модульная звукоизоляционная панель, которая делает дом тише и комфортнее за счёт двойного эффекта: она блокирует ударный и воздушный шум от соседей (до 17 дБ) и одновременно поглощает эхо внутри помещения, улучшая акустику.',
+      'Панели изготовлены из экологичных, негорючих и гипоаллергенных материалов, безопасны для здоровья всей семьи.',
+      'Это продуманное решение для тех, кто ценит тишину, здоровье и качество жизни.',
     ],
   };
 }
 
-export const MULTIFRAME_PRODUCT_CLAIM = 'Звук рассеивается в панели, а не гудит в зазоре.';
+export const MULTIFRAME_PRODUCT_CLAIM = '';
 
 export const MULTIFRAME_PRODUCT_BLURB =
-  'Между плитой и полотном воздух гудит, как барабан. MultiFrame останавливает это движение: сквозные отверстия работают как каналы, и звук рассеивается в открытом наполнителе. Жёсткий каркас и панели стыкуются в одно полотно, крепление — один дюбель по центру.';
+  'StP MultiFrame — это модульная звукоизоляционная панель, которая делает дом тише и комфортнее за счёт двойного эффекта: она блокирует ударный и воздушный шум от соседей (до 17 дБ) и одновременно поглощает эхо внутри помещения, улучшая акустику. Панели изготовлены из экологичных, негорючих и гипоаллергенных материалов, безопасны для здоровья всей семьи. Это продуманное решение для тех, кто ценит тишину, здоровье и качество жизни.';
 
 export const MULTIFRAME_PANEL_IMG = `${import.meta.env.BASE_URL}images/multiframe-panel-transparent.png`;
 
