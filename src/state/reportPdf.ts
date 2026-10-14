@@ -712,17 +712,17 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
     <div class="kpi-row">
       <article class="kpi">
         <span class="k">Воздушный шум · тише на слух</span>
-        <span class="v">≈${sim.perceivedAirPct}<em>%</em></span>
-        <span class="db-hint">изоляция · ≈ +${deltaRw} дБ (Rw)</span>
+        <span class="v">−${sim.perceivedAirPct}<em>%</em></span>
+        <span class="db-hint">изоляция · +${deltaRw} дБ (Rw)</span>
       </article>
       <article class="kpi">
         <span class="k">Ударный шум · тише на слух</span>
-        <span class="v">≈${sim.perceivedImpactPct}<em>%</em></span>
-        <span class="db-hint">удар · ≈ −${deltaLnw} дБ (Lnw)</span>
+        <span class="v">−${sim.perceivedImpactPct}<em>%</em></span>
+        <span class="db-hint">удар · −${deltaLnw} дБ (Lnw)</span>
       </article>
       <article class="kpi">
         <span class="k">Тише на слух · максимум</span>
-        <span class="v">≈${quieterMax}<em>%</em></span>
+        <span class="v">−${quieterMax}<em>%</em></span>
         ${pillSvg(`воздух ${sim.perceivedAirPct}% · удар ${sim.perceivedImpactPct}%`, { bg: '#dceee8', fg: '#01644f', fontSize: 9, padX: 8 })}
       </article>
       <article class="kpi">
