@@ -45,9 +45,9 @@ export function noiseKindToType(kind: NoiseKindOption): NoiseType | null {
 export function wishScenarioLine(wish: RoomWishOption): string {
   switch (wish) {
     case 'from_above':
-      return 'Вы хотите, чтобы сверху стало тише. MultiFrame на потолке смягчает топот и разговоры, которые доходят через плиту.';
+      return 'Вы хотите не слышать шум сверху. MultiFrame на потолке смягчает топот и разговоры, которые доходят через плиту.';
     case 'privacy_out':
-      return 'Вы хотите, чтобы вас меньше было слышно сверху. Потолок с MultiFrame глушит голоса и музыку, которые уходят вверх через плиту.';
+      return 'Вы хотите, чтобы сверху не слышали вас. Потолок с MultiFrame глушит голоса и музыку, которые уходят вверх через плиту.';
     case 'music_recording':
       return 'Вы хотите меньше эха в комнате. Панель MultiFrame поглощает отражения, и сверху тоже становится тише.';
     case 'general':

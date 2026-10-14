@@ -235,9 +235,9 @@ export function buildRecommendations(
 export function wishLabelFor(wish: RoomWishOption): string {
   switch (wish) {
     case 'from_above':
-      return 'Чтобы сверху стало тише';
+      return 'Чтобы не слышать шум сверху';
     case 'privacy_out':
-      return 'Чтобы вас меньше было слышно сверху';
+      return 'Чтобы сверху не слышали вас';
     case 'music_recording':
       return 'Чтобы в комнате было меньше эха';
     case 'general':

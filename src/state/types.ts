@@ -330,8 +330,8 @@ export const NOISE_KIND_OPTIONS: { id: NoiseKindOption; label: string; hint?: st
 ];
 
 export const ROOM_WISH_OPTIONS: { id: RoomWishOption; label: string }[] = [
-  { id: 'from_above', label: 'Чтобы сверху стало тише' },
-  { id: 'privacy_out', label: 'Чтобы вас меньше было слышно сверху' },
+  { id: 'from_above', label: 'Чтобы не слышать шум сверху' },
+  { id: 'privacy_out', label: 'Чтобы сверху не слышали вас' },
   { id: 'music_recording', label: 'Чтобы в комнате было меньше эха' },
   { id: 'general', label: 'Общий акустический комфорт' },
   { id: 'other', label: 'Пока не определился' },
