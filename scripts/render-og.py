@@ -1,13 +1,13 @@
-"""Render public/og-share.jpg — full-bleed brand card for messengers."""
+"""Render public/og-share.jpg — maximum type size for messenger thumbs."""
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 W, H = 1280, 720
 
-BG_DEEP = (12, 51, 44)  # #0c332c
-BG_MID = (1, 100, 79)  # #01644f
+BG_DEEP = (12, 51, 44)
+BG_MID = (1, 100, 79)
 BG_LIGHT = (42, 179, 139)
 INK = (255, 255, 255)
-MUTED = (196, 220, 212)
+MUTED = (220, 236, 230)
 BTN_BG = (255, 255, 255)
 BTN_TEXT = (1, 100, 79)
 
@@ -39,108 +39,83 @@ def draw_text(draw: ImageDraw.ImageDraw, text: str, xy: tuple[int, int], font, f
     return text_size(font, text)
 
 
+def draw_centered(draw, text, y, font, fill) -> int:
+    tw, th = text_size(font, text)
+    box = font.getbbox(text)
+    x = (W - tw) // 2 - box[0]
+    draw.text((x, y), text, font=font, fill=fill)
+    return th
+
+
 base = Image.new("RGBA", (W, H), (*BG_DEEP, 255))
 grad = Image.new("RGBA", (W, H), (0, 0, 0, 0))
 gdraw = ImageDraw.Draw(grad)
-for i, alpha in enumerate((90, 70, 48, 28)):
-    gdraw.ellipse(
-        (420 + i * 40, -180 + i * 20, 1480 + i * 30, 620 + i * 40),
-        fill=(*BG_MID, alpha),
-    )
-gdraw.ellipse((-320, 280, 520, 980), fill=(*BG_LIGHT, 36))
-gdraw.ellipse((900, 420, 1600, 980), fill=(*BG_MID, 50))
-base.alpha_composite(grad.filter(ImageFilter.GaussianBlur(64)))
+gdraw.ellipse((200, -260, 1200, 420), fill=(*BG_MID, 90))
+gdraw.ellipse((-200, 400, 600, 1000), fill=(*BG_LIGHT, 38))
+gdraw.ellipse((700, 380, 1500, 980), fill=(*BG_MID, 55))
+base.alpha_composite(grad.filter(ImageFilter.GaussianBlur(80)))
 
 rail = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-ImageDraw.Draw(rail).rectangle((0, 0, W, 8), fill=(*BG_LIGHT, 180))
+ImageDraw.Draw(rail).rectangle((0, 0, W, 12), fill=(*BG_LIGHT, 210))
 base.alpha_composite(rail)
 
 draw = ImageDraw.Draw(base)
 
-# Brand lockup
+# Brand centered row
 stp = trim(recolor(Image.open("public/logo-stp.png"), INK))
 mf = trim(recolor(Image.open("public/logo-multiframe.png"), INK))
-stp_h = 72
+stp_h = 70
 stp = stp.resize((round(stp.width * stp_h / stp.height), stp_h), Image.Resampling.LANCZOS)
-mf_h = 44
+mf_h = 46
 mf = mf.resize((round(mf.width * mf_h / mf.height), mf_h), Image.Resampling.LANCZOS)
-
-left = 72
-top = 56
-base.alpha_composite(stp, (left, top))
-mf_x = left + stp.width + 18
-base.alpha_composite(mf, (mf_x, top + (stp_h - mf_h) // 2 + 2))
-
-brand_font = ImageFont.truetype(FONT, 28)
+brand_font = ImageFont.truetype(FONT, 34)
 brand = "Проблемомер"
 bw, bh = text_size(brand_font, brand)
-div_x = mf_x + mf.width + 22
-draw.line((div_x, top + 16, div_x, top + stp_h - 16), fill=(*MUTED, 160), width=2)
-draw_text(draw, brand, (div_x + 20, top + (stp_h - bh) // 2), brand_font, MUTED)
+gap = 18
+div = 18
+row_w = stp.width + gap + mf.width + div + 2 + div + bw
+row_x = (W - row_w) // 2
+row_y = 48
+base.alpha_composite(stp, (row_x, row_y))
+mf_x = row_x + stp.width + gap
+base.alpha_composite(mf, (mf_x, row_y + (stp_h - mf_h) // 2 + 1))
+div_x = mf_x + mf.width + div
+draw.line((div_x, row_y + 14, div_x, row_y + stp_h - 14), fill=(*MUTED, 170), width=3)
+draw_text(draw, brand, (div_x + div, row_y + (stp_h - bh) // 2), brand_font, MUTED)
 
-# Panel on the right — smaller, further right, no text collision
-panel = Image.open("public/images/multiframe-panel-transparent.png").convert("RGBA")
-ph = 380
-panel = panel.resize((round(panel.width * ph / panel.height), ph), Image.Resampling.LANCZOS)
-glow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-ImageDraw.Draw(glow).ellipse((900, 180, 1280, 620), fill=(255, 255, 255, 24))
-base.alpha_composite(glow.filter(ImageFilter.GaussianBlur(36)))
-px = W - panel.width + 20  # bleed slightly off right edge
-py = (H - panel.height) // 2 + 36
-base.alpha_composite(panel, (px, py))
+# Massive centered copy
+title_font = ImageFont.truetype(FONT, 96)
+sub_font = ImageFont.truetype(FONT, 46)
+btn_font = ImageFont.truetype(FONT, 48)
 
-# Copy stays in left column (clear of panel)
-title_font = ImageFont.truetype(FONT, 66)
-sub_font = ImageFont.truetype(FONT_REG, 28)
-btn_font = ImageFont.truetype(FONT, 30)
-
-y = 196
-_, th1 = draw_text(draw, "Слышите соседей", (left, y), title_font, INK)
-y += th1 + 2
-_, th2 = draw_text(draw, "сверху?", (left, y), title_font, INK)
-y += th2 + 26
-
-_, sh1 = draw_text(draw, "Узнайте за 2 минуты,", (left, y), sub_font, MUTED)
-y += sh1 + 6
-_, sh2 = draw_text(draw, "насколько тише станет комната", (left, y), sub_font, MUTED)
-y += sh2 + 38
+y = 190
+y += draw_centered(draw, "Слышите соседей", y, title_font, INK) - 2
+y += draw_centered(draw, "сверху?", y, title_font, INK) + 16
+y += draw_centered(draw, "Узнайте за 2 минуты, насколько тише", y, sub_font, MUTED) + 34
 
 label = "Пройти расчёт бесплатно"
 lw, lh = text_size(btn_font, label)
-btn_w = max(lw + 88, 440)
-btn_h = 80
-btn_x = left
+btn_w = lw + 80
+btn_h = lh + 44
+btn_x = (W - btn_w) // 2
 btn_y = y
 
 bshadow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
 ImageDraw.Draw(bshadow).rounded_rectangle(
-    (btn_x, btn_y + 8, btn_x + btn_w, btn_y + btn_h + 14),
-    radius=16,
-    fill=(0, 0, 0, 70),
+    (btn_x, btn_y + 12, btn_x + btn_w, btn_y + btn_h + 18),
+    radius=22,
+    fill=(0, 0, 0, 85),
 )
-base.alpha_composite(bshadow.filter(ImageFilter.GaussianBlur(12)))
+base.alpha_composite(bshadow.filter(ImageFilter.GaussianBlur(16)))
 
 draw = ImageDraw.Draw(base)
-draw.rounded_rectangle(
-    (btn_x, btn_y, btn_x + btn_w, btn_y + btn_h),
-    radius=16,
-    fill=BTN_BG,
-)
+draw.rounded_rectangle((btn_x, btn_y, btn_x + btn_w, btn_y + btn_h), radius=22, fill=BTN_BG)
 lb = btn_font.getbbox(label)
 draw.text(
     (btn_x + (btn_w - lw) // 2 - lb[0], btn_y + (btn_h - lh) // 2 - lb[1] - 1),
     label,
     font=btn_font,
     fill=BTN_TEXT,
-)
-
-trust_font = ImageFont.truetype(FONT_REG, 22)
-draw_text(
-    draw,
-    "Без регистрации · результат сразу",
-    (left, btn_y + btn_h + 18),
-    trust_font,
-    MUTED,
 )
 
 rgb = base.convert("RGB")
