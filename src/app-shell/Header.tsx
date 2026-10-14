@@ -2,34 +2,26 @@ import { useEffect, useState } from 'react';
 import styles from './Header.module.css';
 
 const BASE = import.meta.env.BASE_URL;
+const THEME_KEY = 'mf_theme';
 
-function MoonIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden>
-      <path
-        fill="currentColor"
-        d="M16.5 3.2a8.8 8.8 0 1 0 4.3 15.1 7.2 7.2 0 0 1-9-9.7 7.4 7.4 0 0 1 4.7-5.4Z"
-      />
-    </svg>
-  );
-}
-
-function SunIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden>
-      <circle cx="12" cy="12" r="4.2" fill="currentColor" />
-      <g stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-        <path d="M12 3.2v2.2M12 18.6v2.2M3.2 12h2.2M18.6 12h2.2M5.7 5.7l1.6 1.6M16.7 16.7l1.6 1.6M5.7 18.3l1.6-1.6M16.7 7.3l1.6-1.6" />
-      </g>
-    </svg>
-  );
+function readDark(): boolean {
+  try {
+    return localStorage.getItem(THEME_KEY) === 'dark';
+  } catch {
+    return false;
+  }
 }
 
 export function Header() {
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState(readDark);
 
   useEffect(() => {
     document.body.classList.toggle('theme-dark', dark);
+    try {
+      localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light');
+    } catch {
+      /* ignore quota / private mode */
+    }
   }, [dark]);
 
   return (
@@ -51,15 +43,22 @@ export function Header() {
           />
           <span className={styles.product}>Проблемомер</span>
         </div>
-        <button
-          type="button"
-          className={styles.theme}
-          onClick={() => setDark((v) => !v)}
-          aria-label={dark ? 'Светлая тема' : 'Тёмная тема'}
-          title={dark ? 'Светлая тема' : 'Тёмная тема'}
-        >
-          <span className={styles.themeIcon}>{dark ? <SunIcon /> : <MoonIcon />}</span>
-        </button>
+        <div className={styles.themeToggle}>
+          <span className={styles.themeLabel}>Тема</span>
+          <label className={styles.themeSwitch} title="Светлая / тёмная тема">
+            <input
+              type="checkbox"
+              checked={dark}
+              onChange={(e) => setDark(e.target.checked)}
+              aria-label="Переключить тёмную тему"
+            />
+            <span className={styles.switchTrack}>
+              <span className={styles.iconSun} aria-hidden />
+              <span className={styles.iconMoon} aria-hidden />
+              <span className={styles.switchThumb} />
+            </span>
+          </label>
+        </div>
       </div>
     </header>
   );
