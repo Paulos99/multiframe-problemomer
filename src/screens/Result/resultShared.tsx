@@ -230,7 +230,10 @@ export function useResultProfile() {
   const noiseType = session.derived?.noiseType ?? 'mixed';
   const soundCorrection = wishSoundCorrectionLine(wish);
   const drumLine = stretchDrumLine(room.plannedCeiling);
-  const caseVerdictParagraphs = caseVerdictParts(room, noiseType);
+  const caseVerdictParagraphs = caseVerdictParts(room, noiseType, {
+    perceivedAirPct: sim.perceivedAirPct,
+    perceivedImpactPct: sim.perceivedImpactPct,
+  });
   const about = productAbout(room, noiseType);
   const slabContext =
     room.slabType === 'unknown' && room.slabThickness === 'unknown'

@@ -18,7 +18,10 @@ export function deriveProfile(answers: SessionAnswers): DerivedProfile {
   const simulation = deriveSimulation(answers);
   const comfortLevel = simulation.feelingBefore;
   const noiseType = inferNoiseType(answers);
-  const verdict = caseVerdict(answers.room, noiseType);
+  const verdict = caseVerdict(answers.room, noiseType, {
+    perceivedAirPct: simulation.perceivedAirPct,
+    perceivedImpactPct: simulation.perceivedImpactPct,
+  });
   return {
     comfortLevel,
     noiseType,

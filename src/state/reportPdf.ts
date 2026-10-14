@@ -250,7 +250,10 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
   const impactAfter = impactFeltFromIndex(a.Lnw);
   const drum = stretchDrumLine(room.plannedCeiling);
   const noiseType = session.derived?.noiseType ?? 'mixed';
-  const verdictHtml = caseVerdictParts(room, noiseType)
+  const verdictHtml = caseVerdictParts(room, noiseType, {
+    perceivedAirPct: sim.perceivedAirPct,
+    perceivedImpactPct: sim.perceivedImpactPct,
+  })
     .map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`)
     .join('');
   const about = productAbout(room, noiseType);
