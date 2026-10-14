@@ -845,29 +845,6 @@
 }
 
 
-.scenario {
-  margin: 0;
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(1, 100, 79, 0.16);
-  background: color-mix(in srgb, var(--accent-soft) 45%, var(--bg-card));
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.scenario p {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.45;
-  color: var(--text-primary);
-}
-
-.scenarioExtra {
-  font-size: 12px !important;
-  color: var(--text-secondary) !important;
-}
-
 .feltStack {
   display: flex;
   flex-direction: column;

@@ -410,15 +410,6 @@ export function ResultWideScreen() {
             <h2>Эффективность MultiFrame</h2>
           </header>
 
-          {p.showScenarioAside ? (
-            <aside className={styles.scenario} aria-label="Нюансы потолка">
-              {p.drumLine ? <p>{p.drumLine}</p> : null}
-              {p.soundCorrection ? (
-                <p className={styles.scenarioExtra}>{p.soundCorrection}</p>
-              ) : null}
-            </aside>
-          ) : null}
-
           <div className={styles.feltStack}>
             <FeltScale
               title="Воздушный шум (голоса и музыка)"

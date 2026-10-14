@@ -36,7 +36,6 @@ import {
   MULTIFRAME_PANEL_IMG,
   productAbout,
 } from '../../state/recommendations';
-import { wishSoundCorrectionLine, stretchDrumLine } from '../../state/wish';
 import { eventParamsFromSession, track } from '../../analytics';
 import styles from './resultShared.module.css';
 
@@ -228,8 +227,6 @@ export function useResultProfile() {
       : null;
   const wish = room.roomWish;
   const noiseType = session.derived?.noiseType ?? 'mixed';
-  const soundCorrection = wishSoundCorrectionLine(wish);
-  const drumLine = stretchDrumLine(room.plannedCeiling);
   const caseVerdictParagraphs = caseVerdictParts(room, noiseType, {
     perceivedAirPct: sim.perceivedAirPct,
     perceivedImpactPct: sim.perceivedImpactPct,
@@ -241,7 +238,6 @@ export function useResultProfile() {
       : `${slabTypeLabel}, ${slabThickLabel}`;
 
   const calcUrl = buildCalculatorUrl(session.cta);
-  const showScenarioAside = Boolean(drumLine) || Boolean(soundCorrection);
 
   const [shareState, setShareState] = useState<'idle' | 'shared' | 'copied' | 'failed'>('idle');
   const [pdfBusy, setPdfBusy] = useState(false);
@@ -313,14 +309,11 @@ export function useResultProfile() {
     noiseKindLabel,
     wish,
     noiseType,
-    soundCorrection,
-    drumLine,
     caseVerdictParagraphs,
     productClaim: about.claim,
     productParagraphs: about.paragraphs,
     productImageSrc: MULTIFRAME_PANEL_IMG,
     slabContext,
-    showScenarioAside,
     pdfBusy,
     pdfError,
     shareLabel,

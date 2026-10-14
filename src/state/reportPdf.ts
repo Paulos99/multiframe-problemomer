@@ -31,7 +31,6 @@ import {
 import { buildLeadHandoff, withDerived } from './session';
 import { buildAirSpectrum, buildImpactSpectrum } from './spectrum';
 import { comfortRingSvg, spectrumChartSvg } from './chartSvg';
-import { stretchDrumLine } from './wish';
 import {
   buildShareClipboardText,
   buildShareUrl,
@@ -248,7 +247,6 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
   const airAfter = airFeltFromIndex(a.Rw);
   const impactNow = impactFeltFromIndex(b.Lnw);
   const impactAfter = impactFeltFromIndex(a.Lnw);
-  const drum = stretchDrumLine(room.plannedCeiling);
   const noiseType = session.derived?.noiseType ?? 'mixed';
   const verdictHtml = caseVerdictParts(room, noiseType, {
     perceivedAirPct: sim.perceivedAirPct,
@@ -315,8 +313,6 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
     (p) =>
       `<li class="pillar"><span class="pillar-mark"></span><div><strong>${escapeHtml(p.title)}</strong><p>${escapeHtml(p.text)}</p></div></li>`,
   ).join('');
-
-  const wishBlock = `${drum ? `<p class="muted">${escapeHtml(drum)}</p>` : ''}`;
 
   const normRow = (key: string, label: string, rw: string, lnw: string, muted?: boolean) => {
     const isNow = key === hybridBefore;
@@ -772,7 +768,6 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
     ${pageChrome(2, TOTAL, roomLine, logos)}
     <div class="card" style="margin-bottom:0">
       <h2><span class="sec-idx">02</span>Прогноз с MultiFrame</h2>
-      ${wishBlock}
       <div class="felt">
         <div class="felt-row">
           <span>Воздух · ${FELT_STEP_LABELS[airNow]} → <b>${FELT_STEP_LABELS[airAfter]}</b> · Rw ≈ ${Math.round(b.Rw)} → ≈ ${Math.round(a.Rw)} дБ</span>
