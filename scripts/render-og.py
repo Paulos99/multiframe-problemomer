@@ -90,9 +90,7 @@ btn_font = ImageFont.truetype(FONT, 48)
 
 y = 158
 y += draw_centered(draw, "Слышите соседей", y, title_font, INK) - 2
-y += draw_centered(draw, "сверху?", y, title_font, INK) + 16
-y += draw_centered(draw, "Узнайте за 2 минуты,", y, sub_font, MUTED) + 4
-y += draw_centered(draw, "сработает ли звукоизоляция", y, sub_font, MUTED)
+title_bottom = y + draw_centered(draw, "сверху?", y, title_font, INK)
 
 label = "Пройти расчёт бесплатно"
 lw, lh = text_size(btn_font, label)
@@ -100,6 +98,18 @@ btn_w = lw + 80
 btn_h = lh + 44
 btn_x = (W - btn_w) // 2
 btn_y = H - btn_h - 32
+
+# Subtitle sits in the gap between headline and CTA
+sub1 = "Узнайте за 2 минуты,"
+sub2 = "сработает ли звукоизоляция"
+_, sh1 = text_size(sub_font, sub1)
+_, sh2 = text_size(sub_font, sub2)
+sub_block_h = sh1 + 4 + sh2
+gap_top = title_bottom
+gap_bottom = btn_y
+sub_y = gap_top + (gap_bottom - gap_top - sub_block_h) // 2
+sub_y += draw_centered(draw, sub1, sub_y, sub_font, MUTED) + 4
+draw_centered(draw, sub2, sub_y, sub_font, MUTED)
 
 bshadow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
 ImageDraw.Draw(bshadow).rounded_rectangle(
