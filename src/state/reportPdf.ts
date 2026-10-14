@@ -1048,7 +1048,7 @@ export async function shareAcousticProfile(
   try {
     if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
       await navigator.share({
-        title: 'Ощутите эффект звукоизоляции',
+        title: 'Слышите соседей сверху? Проверьте комнату бесплатно',
         text: SHARE_MARKETING_BLURB,
         url,
       });
