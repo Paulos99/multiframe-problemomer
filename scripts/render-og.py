@@ -88,17 +88,18 @@ title_font = ImageFont.truetype(FONT, 96)
 sub_font = ImageFont.truetype(FONT, 46)
 btn_font = ImageFont.truetype(FONT, 48)
 
-y = 190
+y = 158
 y += draw_centered(draw, "Слышите соседей", y, title_font, INK) - 2
 y += draw_centered(draw, "сверху?", y, title_font, INK) + 16
-y += draw_centered(draw, "Узнайте за 2 минуты, насколько тише", y, sub_font, MUTED) + 34
+y += draw_centered(draw, "Узнайте за 2 минуты,", y, sub_font, MUTED) + 4
+y += draw_centered(draw, "сработает ли звукоизоляция", y, sub_font, MUTED)
 
 label = "Пройти расчёт бесплатно"
 lw, lh = text_size(btn_font, label)
 btn_w = lw + 80
 btn_h = lh + 44
 btn_x = (W - btn_w) // 2
-btn_y = y
+btn_y = H - btn_h - 32
 
 bshadow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
 ImageDraw.Draw(bshadow).rounded_rectangle(
