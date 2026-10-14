@@ -13,6 +13,7 @@
 import { SPECTRUM_HZ, atHz, clamp, round0, round1 } from './bands';
 import type { ConstructionResult } from './construction';
 import { calibrateToLnw, calibrateToRw, iso717Lnw, iso717Rw } from './iso717';
+import { isolationToLn, lnToIsolation } from './materials';
 import { scaleIndexDelta } from './marketing';
 
 /** Foamblock 120 — measured ΔR(f) (MF − bare). */
@@ -154,14 +155,6 @@ function scaleToMean(shape: number[], meanTarget: number): number[] {
   if (Math.abs(m) < 0.05) return shape.map((v) => round1(v + meanTarget));
   const k = meanTarget / m;
   return shape.map((v) => round1(v * k));
-}
-
-function isolationToLn(iso: readonly number[]): number[] {
-  return iso.map((v) => round1(90 - v));
-}
-
-function lnToIsolation(ln: readonly number[]): number[] {
-  return ln.map((v) => round1(90 - v));
 }
 
 export interface MultiFrameResult {

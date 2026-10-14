@@ -24,6 +24,7 @@ import {
   INSITU_LEAK_LNW,
   INSITU_LEAK_RW,
   kindTextureDelta,
+  lnToIsolation,
   type SlabKind,
 } from './materials';
 
@@ -119,10 +120,6 @@ export function resolveFloor(room: RoomAnswers): FloorFinish {
  */
 export function resolveDrum(_room: RoomAnswers): boolean {
   return true;
-}
-
-function lnToIsolation(ln: readonly number[]): number[] {
-  return ln.map((v) => round1(90 - v));
 }
 
 export function assembleConstruction(

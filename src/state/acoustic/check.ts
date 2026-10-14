@@ -141,6 +141,31 @@ export function assertModelAnchors(): string[] {
     );
   }
 
+  // Product wood + flanking: chart isolation must stay ≥ 0 (I = 110 − Ln).
+  const woodProduct = buildConstruction(
+    sampleRoom({
+      slabType: 'wood',
+      houseType: 'wood',
+      floorAbove: 'ordinary',
+      objectStage: 'occupied',
+      plannedCeiling: 'stretch',
+    }),
+  );
+  const woodMf = applyMultiFrame(woodProduct);
+  const woodIsoMin = Math.min(...woodProduct.impactIsolation, ...woodMf.impactIsolation);
+  if (woodIsoMin < 0) {
+    errors.push(
+      `wood impactIsolation must stay ≥ 0 on chart (got min ${woodIsoMin}; LF was going negative with ref 90)`,
+    );
+  }
+  for (const hz of [100, 125, 160] as const) {
+    const before = band(woodProduct.impactIsolation, hz);
+    const after = band(woodMf.impactIsolation, hz);
+    if (before < 0 || after < 0) {
+      errors.push(`wood impactIsolation at ${hz} Hz must be ≥ 0 (before ${before}, after ${after})`);
+    }
+  }
+
   if (band(pk220.R, 125) >= band(solid180.R, 125) - 0.5) {
     errors.push(
       `ПК should dip more at 125 Hz than solid 180 (${band(pk220.R, 125)} vs ${band(solid180.R, 125)})`,

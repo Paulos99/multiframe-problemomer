@@ -28,6 +28,20 @@ export const PK220 = { Rw: 52, Lnw: 74 } as const;
 /** Bare timber joist + board — ASSUMPTION (Trofimov ТС-6.x is a finished system). */
 export const WOOD_BARE = { Rw: 46, Lnw: 84 } as const;
 
+/**
+ * Chart impact isolation I(f) = REF − Ln(f). Must clear wood LF Ln (~95–100)
+ * or the spectrum tooltip shows negative «дБ» on timber floors.
+ */
+export const IMPACT_ISO_REF_DB = 110;
+
+export function lnToIsolation(ln: readonly number[]): number[] {
+  return ln.map((v) => round1(IMPACT_ISO_REF_DB - v));
+}
+
+export function isolationToLn(iso: readonly number[]): number[] {
+  return iso.map((v) => round1(IMPACT_ISO_REF_DB - v));
+}
+
 const RHO_RC = 2500;
 const C_AIR = 343;
 /** Longitudinal speed in dense concrete, m/s. */
