@@ -125,7 +125,7 @@ function KpiRow({
             <CountUpValue
               className={styles.kpiValue}
               value={quieterAir}
-              prefix="≈"
+              prefix="−"
               suffix={<em>%</em>}
               replayKey={rw.replayKey}
             />
@@ -137,7 +137,7 @@ function KpiRow({
           <DeltaBars before={rwBefore} after={rwAfter} />
         </div>
         <span className={styles.kpiDbHint}>
-          изоляция воздуха · ≈ +{deltaRw} дБ (Rw)
+          изоляция воздуха · +{deltaRw} дБ (Rw)
           <em>больше Rw — лучше изоляция, не «громче»</em>
         </span>
       </article>
@@ -148,7 +148,7 @@ function KpiRow({
             <CountUpValue
               className={styles.kpiValue}
               value={quieterImpact}
-              prefix="≈"
+              prefix="−"
               suffix={<em>%</em>}
               replayKey={lnw.replayKey}
             />
@@ -160,7 +160,7 @@ function KpiRow({
           <DeltaBars before={lnwBefore} after={lnwAfter} invert />
         </div>
         <span className={styles.kpiDbHint}>
-          удар · ≈ −{deltaLnw} дБ (Lnw)
+          удар · −{deltaLnw} дБ (Lnw)
           <em>меньше Lnw — тише удар сверху</em>
         </span>
       </article>
@@ -178,7 +178,7 @@ function KpiRow({
         <CountUpValue
           className={styles.kpiValue}
           value={quieterMax}
-          prefix="≈"
+          prefix="−"
           suffix={<em>%</em>}
           replayKey={quieter.replayKey}
         />
