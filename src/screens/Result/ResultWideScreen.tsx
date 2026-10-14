@@ -119,7 +119,7 @@ function KpiRow({
       aria-label="Ключевые показатели"
     >
       <article className={styles.kpiCard} onMouseEnter={rw.onMouseEnter}>
-        <span className={styles.kpiLabel}>Воздушный шум · тише на слух</span>
+        <span className={styles.kpiLabel}>Воздушный шум</span>
         <div className={styles.kpiMain}>
           {quieterAir > 0 ? (
             <CountUpValue
@@ -142,7 +142,7 @@ function KpiRow({
         </span>
       </article>
       <article className={styles.kpiCard} onMouseEnter={lnw.onMouseEnter}>
-        <span className={styles.kpiLabel}>Ударный шум · тише на слух</span>
+        <span className={styles.kpiLabel}>Ударный шум</span>
         <div className={styles.kpiMain}>
           {quieterImpact > 0 ? (
             <CountUpValue
@@ -174,7 +174,7 @@ function KpiRow({
         />
       </article>
       <article className={styles.kpiCard} onMouseEnter={quieter.onMouseEnter}>
-        <span className={styles.kpiLabel}>Тише на слух · максимум</span>
+        <span className={styles.kpiLabel}>Снижение шума</span>
         <CountUpValue
           className={styles.kpiValue}
           value={quieterMax}
