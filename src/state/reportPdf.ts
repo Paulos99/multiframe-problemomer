@@ -365,7 +365,7 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
   .page {
     width: ${PAGE_W}px;
     height: ${PAGE_H}px;
-    padding: 28px 36px 48px;
+    padding: 28px 36px 58px;
     position: relative;
     background:
       radial-gradient(120% 60% at 100% 0%, rgba(1,100,79,.06), transparent 55%),
@@ -404,9 +404,12 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
   }
 
   .page-bottom {
-    position: absolute; left: 36px; right: 36px; bottom: 18px;
+    position: absolute; left: 36px; right: 36px; bottom: 14px;
+    z-index: 2;
     display: flex; justify-content: space-between; gap: 12px;
-    padding-top: 10px; border-top: 1px solid #dce6e1;
+    padding: 10px 0 0;
+    border-top: 1px solid #dce6e1;
+    background: #f4f7f6;
     font-size: 10px; color: #7a8790;
   }
 
@@ -606,10 +609,17 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
   .chart figcaption strong { display: block; font-size: 13px; font-weight: 800; letter-spacing: -.01em; }
   .chart figcaption span { display: block; font-size: 11px; color: #5f6b73; margin-top: 2px; }
   .badge {
-    flex-shrink: 0; text-align: right; background: #f7faf8; border: 1px solid #dce6e1;
-    padding: 5px 9px; border-radius: 10px; font-size: 10.5px; color: #5f6b73;
+    flex-shrink: 0;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+    text-align: right; background: #f7faf8; border: 1px solid #dce6e1;
+    padding: 6px 9px; border-radius: 10px; font-size: 10.5px; color: #5f6b73;
   }
-  .badge b { display: block; color: #152018; font-size: 12px; font-weight: 800; }
+  .badge b { display: block; color: #152018; font-size: 12px; font-weight: 800; line-height: 1.2; }
+  .badge-nums {
+    display: block; font-size: 10.5px; color: #5f6b73; line-height: 1.25;
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .badge .pill-svg { display: block; margin: 0; }
   .legend {
     list-style: none; margin: 6px 0 0; padding: 0;
     display: flex; gap: 14px; font-size: 11px; color: #5f6b73; font-weight: 650;
@@ -677,8 +687,8 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
     border: 1px solid rgba(1,100,79,.18); background: #f7fbf9;
   }
   .recs h2, .product h2 { margin: 0 0 6px; font-size: 13px; color: #01644f; }
-  .recs p, .product p { margin: 0; font-size: 11px; line-height: 1.45; color: #5f6b73; }
-  .rec-copy { display: flex; flex-direction: column; gap: 3px; }
+  .recs p, .product p { margin: 0; font-size: 10.5px; line-height: 1.4; color: #5f6b73; }
+  .rec-copy { display: flex; flex-direction: column; gap: 2px; }
   .rec-copy p:first-child { color: #152018; font-weight: 600; }
   .product-body { display: grid; grid-template-columns: 88px 1fr; gap: 10px; align-items: start; }
   .product-body img { width: 88px; height: auto; border: 0; border-radius: 0; background: transparent; }
@@ -754,7 +764,6 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
           <div class="chips">воздух ${chipLabel(airClassFor(a.Rw))} · удар ${chipLabel(impactClassFor(a.Lnw))}</div>
         </div>
       </div>
-      ${normsTable}
     </div>
   </section>
 
@@ -795,6 +804,7 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
           <p class="muted" style="text-align:center;margin-top:10px">MultiFrame — звукоизоляция и звукопоглощение в комнате</p>
         </div>
       </div>
+      ${normsTable}
     </div>
   </section>
 

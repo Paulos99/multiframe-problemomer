@@ -137,7 +137,7 @@ export function spectrumChartSvg(
   const quieter =
     opts.quieterPct != null && opts.quieterPct > 0
       ? (() => {
-          const text = `≈ ${opts.quieterPct}% тише`;
+          const text = `−${opts.quieterPct}%`;
           const fontSize = 10;
           const padX = 8;
           const height = 20;
@@ -155,7 +155,7 @@ export function spectrumChartSvg(
     </div>
     <div class="badge">
       <b>${opts.indexKind}</b>
-      <span>≈ ${Math.round(opts.indexBefore)} → ≈ ${Math.round(opts.indexAfter)}</span>
+      <span class="badge-nums">${Math.round(opts.indexBefore)} → ${Math.round(opts.indexAfter)}</span>
       ${quieter}
     </div>
   </figcaption>
