@@ -31,6 +31,7 @@ import {
   withDerived,
 } from './session';
 import { tryRestoreSharedSession } from './shareLink';
+import { toggleRoomWish as toggleWishInList } from './wish';
 import { resetAnalyticsSessionId } from '../analytics';
 import { useFunnelAnalytics } from '../analytics/useFunnelAnalytics';
 
@@ -50,7 +51,8 @@ interface SessionApi {
   setPlannedCeiling: (v: PlannedCeilingOption) => void;
   setNoisyNeighbors: (v: NoisyNeighborsOption) => void;
   setNoiseKind: (v: NoiseKindOption) => void;
-  setRoomWish: (v: RoomWishOption) => void;
+  setRoomWishes: (v: RoomWishOption[]) => void;
+  toggleRoomWish: (v: RoomWishOption) => void;
   canGoNext: boolean;
 }
 
@@ -229,9 +231,24 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     (noiseKind: NoiseKindOption) => patchRoom({ noiseKind }),
     [patchRoom],
   );
-  const setRoomWish = useCallback(
-    (roomWish: RoomWishOption) => patchRoom({ roomWish }),
+  const setRoomWishes = useCallback(
+    (roomWishes: RoomWishOption[]) => patchRoom({ roomWishes }),
     [patchRoom],
+  );
+  const toggleRoomWish = useCallback(
+    (id: RoomWishOption) => {
+      patch((s) => ({
+        ...s,
+        answers: {
+          ...s.answers,
+          room: {
+            ...s.answers.room,
+            roomWishes: toggleWishInList(s.answers.room.roomWishes, id),
+          },
+        },
+      }));
+    },
+    [patch],
   );
 
   const value = useMemo<SessionApi>(
@@ -251,7 +268,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       setPlannedCeiling,
       setNoisyNeighbors,
       setNoiseKind,
-      setRoomWish,
+      setRoomWishes,
+      toggleRoomWish,
       canGoNext: canProceed(session),
     }),
     [
@@ -270,7 +288,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       setPlannedCeiling,
       setNoisyNeighbors,
       setNoiseKind,
-      setRoomWish,
+      setRoomWishes,
+      toggleRoomWish,
     ],
   );
 

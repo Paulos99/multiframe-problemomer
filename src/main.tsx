@@ -1,8 +1,11 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { registerSW } from 'virtual:pwa-register';
 import App from './App';
 import { captureChannelFromUrl, getConsent, initMetrika } from './analytics';
 import './styles/global.css';
+
+registerSW({ immediate: true });
 
 const redirect = sessionStorage.getItem('mf-spa-redirect');
 if (redirect) {

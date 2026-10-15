@@ -38,11 +38,14 @@ function pick(params: URLSearchParams, key: string): string | undefined {
 }
 
 /** Capture UTM / ref / mgr from the current URL once; keep first-touch for the tab. */
-export function captureChannelFromUrl(href = window.location.href): ChannelAttribution {
+export function captureChannelFromUrl(href?: string): ChannelAttribution {
   const existing = readStored();
   if (existing && Object.keys(existing).length > 0) return existing;
 
-  const url = new URL(href);
+  const resolved =
+    href ??
+    (typeof window !== 'undefined' ? window.location.href : 'https://local.invalid/');
+  const url = new URL(resolved);
   const p = url.searchParams;
   const channel: ChannelAttribution = {};
 

@@ -223,7 +223,11 @@ export interface RoomAnswers {
   noisyNeighbors: NoisyNeighborsOption;
   /** Filled when neighbors are noisy; otherwise stays `unknown`. */
   noiseKind: NoiseKindOption;
-  roomWish: RoomWishOption;
+  /**
+   * Everyday goals — multi-select. Empty until the user picks on the wish step.
+   * Legacy share links may still send a single `roomWish` string.
+   */
+  roomWishes: RoomWishOption[];
 }
 
 export interface SessionAnswers {
@@ -277,11 +281,7 @@ export const FLOOR_ABOVE_OPTIONS: { id: FloorAboveOption; label: string }[] = [
 
 export const HOUSE_TYPE_OPTIONS: { id: HouseTypeOption; label: string; hint?: string }[] = [
   { id: 'panel', label: 'Панельный' },
-  {
-    id: 'block',
-    label: 'Блочный',
-    hint: 'газоблок, пеноблок, керамзитоблок и т.п.',
-  },
+  { id: 'block', label: 'Блочный' },
   { id: 'brick', label: 'Кирпичный' },
   { id: 'monolith', label: 'Монолит (в т.ч. монолит-кирпич)' },
   { id: 'wood', label: 'Деревянный / по балкам' },
@@ -329,13 +329,21 @@ export const NOISE_KIND_OPTIONS: { id: NoiseKindOption; label: string; hint?: st
   { id: 'unknown', label: 'Сложно сказать' },
 ];
 
+/** Selectable on the wish step — «general» kept in type for legacy links only. */
 export const ROOM_WISH_OPTIONS: { id: RoomWishOption; label: string }[] = [
   { id: 'from_above', label: 'Чтобы не слышать шум сверху' },
   { id: 'privacy_out', label: 'Чтобы сверху не слышали вас' },
   { id: 'music_recording', label: 'Чтобы в комнате было меньше эха' },
-  { id: 'general', label: 'Общий акустический комфорт' },
   { id: 'other', label: 'Пока не определился' },
 ];
+
+export const ROOM_WISH_ALL_LABELS: Record<RoomWishOption, string> = {
+  from_above: 'Чтобы не слышать шум сверху',
+  privacy_out: 'Чтобы сверху не слышали вас',
+  music_recording: 'Чтобы в комнате было меньше эха',
+  general: 'Общий акустический комфорт',
+  other: 'Пока не определился',
+};
 
 /** Slab options that make sense for a given house type (logical canvas). */
 export function allowedSlabTypes(houseType: HouseTypeOption): SlabTypeOption[] {

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef } from 'react';
 import { Button } from '../../ui/Button';
 import { CompactAudio } from '../../ui/CompactAudio';
 import { EchoComfort, EchoComfortRings } from '../../ui/EchoComfort';
@@ -13,74 +13,8 @@ import {
 } from './resultShared';
 import styles from './ResultWideScreen.module.css';
 
-function prefersReducedMotion(): boolean {
-  return (
-    typeof window !== 'undefined' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  );
-}
-
-/** Count 0 → target; parent bumps `replayKey` on card hover. */
-function CountUpValue({
-  value,
-  prefix = '',
-  suffix,
-  className,
-  replayKey = 0,
-}: {
-  value: number;
-  prefix?: string;
-  suffix?: ReactNode;
-  className?: string;
-  replayKey?: number;
-}) {
-  const [display, setDisplay] = useState(value);
-  const cancelRef = useRef<() => void>(() => {});
-
-  useEffect(() => {
-    setDisplay(value);
-  }, [value]);
-
-  useEffect(() => () => cancelRef.current(), []);
-
-  useEffect(() => {
-    if (replayKey === 0) return;
-    cancelRef.current();
-    if (prefersReducedMotion()) {
-      setDisplay(value);
-      return;
-    }
-    setDisplay(0);
-    const start = performance.now();
-    const dur = 720;
-    let raf = 0;
-    const tick = (now: number) => {
-      const t = Math.min(1, (now - start) / dur);
-      const eased = 1 - (1 - t) ** 3;
-      setDisplay(Math.round(value * eased));
-      if (t < 1) raf = requestAnimationFrame(tick);
-      else cancelRef.current = () => {};
-    };
-    raf = requestAnimationFrame(tick);
-    cancelRef.current = () => cancelAnimationFrame(raf);
-  }, [replayKey, value]);
-
-  return (
-    <strong className={className}>
-      {prefix}
-      {display}
-      {suffix}
-    </strong>
-  );
-}
-
-function useHoverReplay() {
-  const [replayKey, setReplayKey] = useState(0);
-  return {
-    replayKey,
-    onMouseEnter: () => setReplayKey((n) => n + 1),
-  };
-}
+/** Flip to true to restore frequency charts if clients ask. */
+export const SHOW_FREQUENCY_CHARTS = false;
 
 function KpiRow({
   deltaRw,
@@ -107,28 +41,20 @@ function KpiRow({
   lnwBefore: number;
   lnwAfter: number;
 }) {
-  const rw = useHoverReplay();
-  const lnw = useHoverReplay();
-  const comfort = useHoverReplay();
-  const quieter = useHoverReplay();
-
   return (
     <section
       className={`${styles.kpiRow} ${styles.driftSoft}`}
       data-reveal
       aria-label="Ключевые показатели"
     >
-      <article className={styles.kpiCard} onMouseEnter={rw.onMouseEnter}>
+      <article className={styles.kpiCard}>
         <span className={styles.kpiLabel}>Воздушный шум</span>
         <div className={styles.kpiMain}>
           {quieterAir > 0 ? (
-            <CountUpValue
-              className={styles.kpiValue}
-              value={quieterAir}
-              prefix="−"
-              suffix={<em>%</em>}
-              replayKey={rw.replayKey}
-            />
+            <strong className={styles.kpiValue}>
+              −{quieterAir}
+              <em>%</em>
+            </strong>
           ) : (
             <strong className={styles.kpiValue}>
               —<em>%</em>
@@ -141,17 +67,14 @@ function KpiRow({
           <em>больше Rw — лучше изоляция</em>
         </span>
       </article>
-      <article className={styles.kpiCard} onMouseEnter={lnw.onMouseEnter}>
+      <article className={styles.kpiCard}>
         <span className={styles.kpiLabel}>Ударный шум</span>
         <div className={styles.kpiMain}>
           {quieterImpact > 0 ? (
-            <CountUpValue
-              className={styles.kpiValue}
-              value={quieterImpact}
-              prefix="−"
-              suffix={<em>%</em>}
-              replayKey={lnw.replayKey}
-            />
+            <strong className={styles.kpiValue}>
+              −{quieterImpact}
+              <em>%</em>
+            </strong>
           ) : (
             <strong className={styles.kpiValue}>
               —<em>%</em>
@@ -164,24 +87,16 @@ function KpiRow({
           <em>меньше Lnw — тише удар сверху</em>
         </span>
       </article>
-      <article className={styles.kpiCard} onMouseEnter={comfort.onMouseEnter}>
+      <article className={styles.kpiCard}>
         <span className={styles.kpiLabel}>Акустический комфорт</span>
-        <EchoComfortRings
-          before={echoBefore}
-          after={echoAfter}
-          compact
-          hoverPlay={comfort.replayKey}
-        />
+        <EchoComfortRings before={echoBefore} after={echoAfter} compact />
       </article>
-      <article className={styles.kpiCard} onMouseEnter={quieter.onMouseEnter}>
+      <article className={styles.kpiCard}>
         <span className={styles.kpiLabel}>Снижение шума</span>
-        <CountUpValue
-          className={styles.kpiValue}
-          value={quieterMax}
-          prefix="−"
-          suffix={<em>%</em>}
-          replayKey={quieter.replayKey}
-        />
+        <strong className={styles.kpiValue}>
+          −{quieterMax}
+          <em>%</em>
+        </strong>
         <span className={styles.kpiPill}>
           воздух {quieterAir}% · удар {quieterImpact}%
         </span>
@@ -468,46 +383,48 @@ export function ResultWideScreen() {
         </div>
       </section>
 
-      <section className={`${styles.charts} ${styles.driftSoft}`} data-reveal aria-label="Изоляция по частотам">
-        <header className={styles.chartsHead}>
-          <div>
-            <h2>Изоляция по частотам</h2>
-            <p className={styles.panelLead}>
-              Чем выше линия, тем лучше перекрытие изолирует шум на этой частоте.
-            </p>
+      {SHOW_FREQUENCY_CHARTS ? (
+        <section className={`${styles.charts} ${styles.driftSoft}`} data-reveal aria-label="Изоляция по частотам">
+          <header className={styles.chartsHead}>
+            <div>
+              <h2>Изоляция по частотам</h2>
+              <p className={styles.panelLead}>
+                Чем выше линия, тем лучше перекрытие изолирует шум на этой частоте.
+              </p>
+            </div>
+            <div className={styles.chartsLegend} aria-hidden>
+              <span>
+                <i className={styles.legNow} /> Сейчас
+              </span>
+              <span>
+                <i className={styles.legAfter} /> MultiFrame
+              </span>
+            </div>
+          </header>
+          <div className={styles.chartsGrid}>
+            <SpectrumChart
+              tall
+              title="Воздушный шум (голоса и музыка)"
+              subtitle="изоляция от голосов и музыки сверху"
+              series={p.sim.airSpectrum}
+              yLabel="дБ"
+              indexBadge={{ kind: 'Rw', before: p.sim.before.Rw, after: p.sim.after.Rw }}
+              reductionDb={Math.abs(p.sim.delta.Rw)}
+              reductionPct={p.sim.perceivedAirPct}
+            />
+            <SpectrumChart
+              tall
+              title="Ударный шум (шаги и падения)"
+              subtitle="изоляция от шагов и падений"
+              series={p.sim.impactSpectrum}
+              yLabel="дБ"
+              indexBadge={{ kind: 'Lnw', before: p.sim.before.Lnw, after: p.sim.after.Lnw }}
+              reductionDb={Math.abs(p.sim.delta.Lnw)}
+              reductionPct={p.sim.perceivedImpactPct}
+            />
           </div>
-          <div className={styles.chartsLegend} aria-hidden>
-            <span>
-              <i className={styles.legNow} /> Сейчас
-            </span>
-            <span>
-              <i className={styles.legAfter} /> MultiFrame
-            </span>
-          </div>
-        </header>
-        <div className={styles.chartsGrid}>
-          <SpectrumChart
-            tall
-            title="Воздушный шум (голоса и музыка)"
-            subtitle="изоляция от голосов и музыки сверху"
-            series={p.sim.airSpectrum}
-            yLabel="дБ"
-            indexBadge={{ kind: 'Rw', before: p.sim.before.Rw, after: p.sim.after.Rw }}
-            reductionDb={Math.abs(p.sim.delta.Rw)}
-            reductionPct={p.sim.perceivedAirPct}
-          />
-          <SpectrumChart
-            tall
-            title="Ударный шум (шаги и падения)"
-            subtitle="изоляция от шагов и падений"
-            series={p.sim.impactSpectrum}
-            yLabel="дБ"
-            indexBadge={{ kind: 'Lnw', before: p.sim.before.Lnw, after: p.sim.after.Lnw }}
-            reductionDb={Math.abs(p.sim.delta.Lnw)}
-            reductionPct={p.sim.perceivedImpactPct}
-          />
-        </div>
-      </section>
+        </section>
+      ) : null}
 
       <div className={styles.closeRow}>
         <section className={styles.panel} data-reveal aria-label="Уникальность системы MultiFrame">

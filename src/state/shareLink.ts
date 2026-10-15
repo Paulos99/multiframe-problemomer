@@ -8,6 +8,7 @@ import type {
   SessionState,
 } from './types';
 import { createInitialSession, withDerived } from './session';
+import { normalizeRoomWishes } from './wish';
 
 const SHARE_PARAM = 'p';
 
@@ -59,9 +60,18 @@ export function decodeRoomAnswers(token: string): RoomAnswers | null {
       noiseKind?: unknown;
     };
     if (!data || typeof data !== 'object') return null;
-    if (typeof data.slabType !== 'string' || typeof data.roomWish !== 'string') return null;
+    if (typeof data.slabType !== 'string') return null;
+    const roomWishes = normalizeRoomWishes(
+      (data as { roomWishes?: unknown }).roomWishes,
+      (data as { roomWish?: unknown }).roomWish,
+    );
+    if (roomWishes.length === 0 && typeof (data as { roomWish?: unknown }).roomWish !== 'string') {
+      // Allow incomplete legacy payloads only when roomWish was present (handled above).
+    }
+    const { roomWish: _legacy, ...rest } = data as RoomAnswers & { roomWish?: string };
     return {
-      ...(data as RoomAnswers),
+      ...(rest as RoomAnswers),
+      roomWishes: roomWishes.length > 0 ? roomWishes : ['other'],
       plannedCeiling: migratePlannedCeiling(data.plannedCeiling),
       noiseKind: migrateNoiseKind(data.noiseKind),
     };

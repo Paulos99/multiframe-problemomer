@@ -9,7 +9,6 @@ import {
   NOISY_NEIGHBORS_OPTIONS,
   PLANNED_CEILING_OPTIONS,
   ROOM_TYPE_LABELS,
-  ROOM_WISH_OPTIONS,
   SLAB_THICKNESS_OPTIONS,
   SLAB_TYPE_OPTIONS,
   shouldAskNoiseKind,
@@ -31,6 +30,10 @@ import {
 import { buildLeadHandoff, withDerived } from './session';
 import { buildAirSpectrum, buildImpactSpectrum } from './spectrum';
 import { comfortRingSvg, spectrumChartSvg } from './chartSvg';
+import { wishLabelsJoined } from './wish';
+
+/** Keep in sync with ResultWideScreen — hide frequency page until clients ask. */
+const SHOW_FREQUENCY_CHARTS = false;
 import {
   buildShareClipboardText,
   buildShareUrl,
@@ -344,7 +347,7 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
       </table>
     </div>`;
 
-  const TOTAL = 4;
+  const TOTAL = SHOW_FREQUENCY_CHARTS ? 4 : 3;
 
   return `<!DOCTYPE html>
 <html lang="ru"><head><meta charset="utf-8" />
@@ -709,7 +712,7 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
         <div><dt>Тип дома</dt><dd>${escapeHtml(optLabel(HOUSE_TYPE_OPTIONS, room.houseType))}</dd></div>
         <div><dt>Комната</dt><dd>${escapeHtml(roomName)} · ${escapeHtml(area)}</dd></div>
         <div><dt>Потолок</dt><dd>${escapeHtml(optLabel(PLANNED_CEILING_OPTIONS, room.plannedCeiling))}</dd></div>
-        <div><dt>Цель</dt><dd>${escapeHtml(optLabel(ROOM_WISH_OPTIONS, room.roomWish))}</dd></div>
+        <div><dt>Цель</dt><dd>${escapeHtml(wishLabelsJoined(room.roomWishes))}</dd></div>
         ${neighborsCell}
         ${noiseKindCell}
       </dl>
@@ -803,7 +806,9 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
     </div>
   </section>
 
-  <!-- PAGE 3 -->
+  ${
+    SHOW_FREQUENCY_CHARTS
+      ? `<!-- PAGE 3 -->
   <section class="page" data-page="3">
     ${pageChrome(3, TOTAL, roomLine, logos)}
     <h2 style="margin:0 0 6px;font-size:15px;font-weight:800"><span class="sec-idx">03</span>Изоляция по частотам</h2>
@@ -824,13 +829,15 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
 
     ${airSvg}
     ${impactSvg}
-  </section>
+  </section>`
+      : ''
+  }
 
-  <!-- PAGE 4 -->
-  <section class="page" data-page="4">
-    ${pageChrome(4, TOTAL, roomLine, logos)}
+  <!-- LAST PAGE -->
+  <section class="page" data-page="${TOTAL}">
+    ${pageChrome(TOTAL, TOTAL, roomLine, logos)}
     <div class="card">
-      <h2><span class="sec-idx">04</span>Уникальность MultiFrame</h2>
+      <h2><span class="sec-idx">${SHOW_FREQUENCY_CHARTS ? '04' : '03'}</span>Уникальность MultiFrame</h2>
       <ul class="pillars">${pillars}</ul>
     </div>
 

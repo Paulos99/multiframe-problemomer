@@ -68,20 +68,34 @@ function furnishingFactor(room: RoomAnswers): number {
  * Incoming noise → impact; privacy / music → airborne speech band.
  */
 function wishUseAdj(room: RoomAnswers, f: number, kind: 'air' | 'impact'): number {
-  switch (room.roomWish) {
-    case 'from_above':
-      if (kind === 'impact') return f <= 250 ? 2.4 : 1.1;
-      return f >= 200 && f <= 2500 ? 1.1 : 0.3;
-    case 'privacy_out':
-    case 'music_recording':
-      if (kind === 'air') return f >= 250 && f <= 2500 ? 2.6 : 0.5;
-      return f <= 200 ? -0.4 : 0;
-    case 'general':
-      if (kind === 'air') return f >= 250 && f <= 4000 ? 1.4 : 0.6;
-      return f >= 250 && f <= 2000 ? 1.3 : 0.5;
-    default:
-      return 0;
+  // Lazy import avoided — keep pure: inline via dynamic wishes list.
+  const wishes = room.roomWishes ?? [];
+  if (wishes.length === 0) return 0;
+  let sum = 0;
+  for (const wish of wishes) {
+    switch (wish) {
+      case 'from_above':
+        sum += kind === 'impact' ? (f <= 250 ? 2.4 : 1.1) : f >= 200 && f <= 2500 ? 1.1 : 0.3;
+        break;
+      case 'privacy_out':
+      case 'music_recording':
+        sum += kind === 'air' ? (f >= 250 && f <= 2500 ? 2.6 : 0.5) : f <= 200 ? -0.4 : 0;
+        break;
+      case 'general':
+        sum +=
+          kind === 'air'
+            ? f >= 250 && f <= 4000
+              ? 1.4
+              : 0.6
+            : f >= 250 && f <= 2000
+              ? 1.3
+              : 0.5;
+        break;
+      default:
+        break;
+    }
   }
+  return Math.min(sum, kind === 'air' ? 4.5 : 4.0);
 }
 
 /** Equivalent absorption A(f), m² sabin. Kitchen stays hard at HF; bedroom more HF. */

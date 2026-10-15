@@ -97,10 +97,13 @@ function feelingFromReceived(
   side: DerivedSimSide,
   receivedAir: number,
   loudNeighbors: boolean,
-  wish: RoomAnswers['roomWish'],
+  wishes: RoomAnswers['roomWishes'],
 ): ComfortLevel {
-  const airLimit =
-    wish === 'from_above' || wish === 'music_recording' || wish === 'privacy_out' ? 54 : 58;
+  const focused =
+    wishes.includes('from_above') ||
+    wishes.includes('music_recording') ||
+    wishes.includes('privacy_out');
+  const airLimit = focused ? 54 : 58;
   if (loudNeighbors || receivedAir >= airLimit) {
     if (side.classLabel === 'A' && side.classStatus === 'ok') return 'ok';
     return 'bothers';
@@ -178,8 +181,8 @@ export function deriveSimulation(answers: SessionAnswers): DerivedSimulation {
     deltaRange: mf.deltaRange,
     uiLabel: SIMULATION_BADGE,
     slabKey: constr.resolved.slabKey,
-    feelingBefore: feelingFromReceived(before, recAirBefore, loudNeighbors, answers.room.roomWish),
-    feelingAfter: feelingFromReceived(after, recAirAfter, false, answers.room.roomWish),
+    feelingBefore: feelingFromReceived(before, recAirBefore, loudNeighbors, answers.room.roomWishes),
+    feelingAfter: feelingFromReceived(after, recAirAfter, false, answers.room.roomWishes),
     honestLines: [
       'Индексы Rw и Lnw зависят от перекрытия, пола сверху и типа дома — не от того, насколько громко шумят соседи.',
       'Громкость в комнате считается по спектру: как шумят сверху, тип комнаты, площадь и мебель.',

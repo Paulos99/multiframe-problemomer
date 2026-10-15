@@ -71,7 +71,7 @@ export function eventParamsFromSession(
     plannedCeiling: room.plannedCeiling,
     noisyNeighbors: room.noisyNeighbors,
     noiseKind: room.noiseKind,
-    roomWish: room.roomWish,
+    roomWishes: room.roomWishes.join('|') || undefined,
     roomSubstep: session.roomSubstep,
     classBefore: sim ? comfortClassFor(sim.before.Rw, sim.before.Lnw) : undefined,
     classAfter: sim ? comfortClassFor(sim.after.Rw, sim.after.Lnw) : undefined,

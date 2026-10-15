@@ -100,8 +100,8 @@ btn_x = (W - btn_w) // 2
 btn_y = H - btn_h - 32
 
 # Subtitle sits in the gap between headline and CTA
-sub1 = "Узнайте за 2 минуты,"
-sub2 = "сработает ли звукоизоляция"
+sub1 = "Узнайте за 2 минуты"
+sub2 = "эффект от звукоизоляции потолка"
 _, sh1 = text_size(sub_font, sub1)
 _, sh2 = text_size(sub_font, sub2)
 sub_block_h = sh1 + 4 + sh2

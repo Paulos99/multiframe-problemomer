@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Screen } from '../../ui/Screen';
 import { CardSelect } from '../../ui/CardSelect';
 import { Field, TextInput } from '../../ui/Field';
@@ -37,9 +36,9 @@ const SUBSTEP_TITLE: Record<RoomSubstep, string> = {
 };
 
 const SUBSTEP_LEAD: Partial<Record<RoomSubstep, string>> = {
-  houseType: 'Если дом из блоков — выберите «Блочный» (газоблок, пеноблок и т.п.).',
   slabType: 'Покажем только варианты, которые обычно бывают в таком доме.',
   noiseKind: 'Простыми примерами — так точнее подсветим, что важно именно вам.',
+  roomWish: 'Можно выбрать несколько вариантов.',
 };
 
 export function RoomScreen() {
@@ -54,10 +53,9 @@ export function RoomScreen() {
     setPlannedCeiling,
     setNoisyNeighbors,
     setNoiseKind,
-    setRoomWish,
+    toggleRoomWish,
     canGoNext,
   } = useSession();
-  const [wishPicked, setWishPicked] = useState(false);
   const room = session.answers.room;
   const sub = session.roomSubstep;
   const hint = roomNextHint(session);
@@ -237,20 +235,24 @@ export function RoomScreen() {
       ) : null}
 
       {sub === 'roomWish' ? (
-        <div className={styles.grid}>
-          {ROOM_WISH_OPTIONS.map((opt) => (
-            <CardSelect
-              key={opt.id}
-              dense
-              title={opt.label}
-              selected={wishPicked && room.roomWish === opt.id}
-              onClick={() => {
-                setWishPicked(true);
-                setRoomWish(opt.id);
-              }}
-            />
-          ))}
-        </div>
+        <>
+          <div className={styles.grid}>
+            {ROOM_WISH_OPTIONS.map((opt) => (
+              <CardSelect
+                key={opt.id}
+                dense
+                title={opt.label}
+                selected={room.roomWishes.includes(opt.id)}
+                onClick={() => toggleRoomWish(opt.id)}
+              />
+            ))}
+          </div>
+          {!canGoNext && hint ? (
+            <p className={styles.validation} role="status">
+              {hint}
+            </p>
+          ) : null}
+        </>
       ) : null}
     </Screen>
   );

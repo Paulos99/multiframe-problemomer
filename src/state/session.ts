@@ -2,6 +2,7 @@ import type {
   AudioState,
   ClassLabel,
   CtaPayload,
+  RoomWishOption,
   SessionState,
   WizardStep,
   RoomSubstep,
@@ -52,7 +53,7 @@ function defaultRoom() {
     plannedCeiling: 'unknown' as const,
     noisyNeighbors: 'unknown' as const,
     noiseKind: 'unknown' as const,
-    roomWish: 'general' as const,
+    roomWishes: [] as RoomWishOption[],
   };
 }
 
@@ -193,8 +194,11 @@ export function canProceed(session: SessionState): boolean {
     case 'start':
       return true;
     case 'room':
-      if (session.roomSubstep === 'basics' || isLastRoomSubstep(session.roomSubstep)) {
+      if (session.roomSubstep === 'basics') {
         return roomBasicsComplete(session);
+      }
+      if (session.roomSubstep === 'roomWish' || isLastRoomSubstep(session.roomSubstep)) {
+        return session.answers.room.roomWishes.length > 0;
       }
       return true;
     case 'processing':
@@ -208,6 +212,10 @@ export function canProceed(session: SessionState): boolean {
 
 export function roomNextHint(session: SessionState): string | null {
   if (session.step !== 'room') return null;
+  if (session.roomSubstep === 'roomWish') {
+    if (session.answers.room.roomWishes.length === 0) return 'выберите хотя бы один вариант';
+    return null;
+  }
   if (session.roomSubstep !== 'basics') return null;
   if (session.answers.room.roomType == null) return 'выберите тип';
   if (

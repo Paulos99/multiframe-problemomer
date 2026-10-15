@@ -3,6 +3,7 @@ import type {
   RoomAnswers,
   RoomWishOption,
 } from './types';
+import { ROOM_WISH_ALL_LABELS } from './types';
 
 export interface VerdictPcts {
   perceivedAirPct: number;
@@ -57,6 +58,10 @@ function heardKind(room: RoomAnswers, noiseType: NoiseType): NoiseType | 'unknow
   return noiseType;
 }
 
+function hasWish(room: RoomAnswers, id: RoomWishOption): boolean {
+  return room.roomWishes.includes(id);
+}
+
 function slabNoun(room: RoomAnswers): string {
   const { slabType: slab, houseType: house } = room;
   if (slab === 'hollow' || (slab === 'unknown' && (house === 'panel' || house === 'block'))) {
@@ -91,26 +96,33 @@ function ceilingWithSlab(room: RoomAnswers): string {
 function diagnosisBeat(room: RoomAnswers, noiseType: NoiseType): string {
   const kind = heardKind(room, noiseType);
   const construction = ceilingWithSlab(room);
+  const parts: string[] = [];
 
-  if (room.roomWish === 'privacy_out') {
-    return `Ваши разговоры и музыка уходят наверх тем же путём, которым чужой шум приходит вниз, а ${construction}`;
+  if (hasWish(room, 'privacy_out')) {
+    parts.push(
+      `Ваши разговоры и музыка уходят наверх тем же путём, которым чужой шум приходит вниз, а ${construction}`,
+    );
   }
-  if (room.roomWish === 'music_recording') {
-    return `В ${roomWhere(room)} звук долго не затихает: жёсткий потолок возвращает эхо обратно, а ${construction}`;
+  if (hasWish(room, 'music_recording')) {
+    parts.push(
+      `В ${roomWhere(room)} звук долго не затихает: жёсткий потолок возвращает эхо обратно, а ${construction}`,
+    );
   }
 
-  if (room.noisyNeighbors === 'usually_quiet') {
-    return `Сейчас сверху обычно тихо, но если соседи станут шумнее, звук пройдёт почти без препятствий: ${construction}`;
+  if (parts.length === 0) {
+    if (room.noisyNeighbors === 'usually_quiet') {
+      return `Сейчас сверху обычно тихо, но если соседи станут шумнее, звук пройдёт почти без препятствий: ${construction}`;
+    }
+    const heard =
+      kind === 'impact'
+        ? 'Вы слышите шаги и стук сверху'
+        : kind === 'airborne'
+          ? 'Вы слышите голоса и музыку сверху'
+          : 'Вы слышите то шаги, то разговоры';
+    return `${heard}, и ${construction}`;
   }
 
-  const heard =
-    kind === 'impact'
-      ? 'Вы слышите шаги и стук сверху'
-      : kind === 'airborne'
-        ? 'Вы слышите голоса и музыку сверху'
-        : 'Вы слышите то шаги, то разговоры';
-
-  return `${heard}, и ${construction}`;
+  return parts.join(' ');
 }
 
 /** Beat 2: MultiFrame mechanism. */
@@ -130,19 +142,31 @@ function pctBeat(pcts: VerdictPcts): string {
 /** Beat 4: lived sensory effect. */
 function sensationBeat(room: RoomAnswers, noiseType: NoiseType): string {
   const kind = heardKind(room, noiseType);
-  if (room.roomWish === 'music_recording') {
-    return 'Эхо в комнате станет короче и мягче, а шум сверху тоже притихнет';
+  const bits: string[] = [];
+  if (hasWish(room, 'music_recording')) {
+    bits.push('Эхо в комнате станет короче и мягче');
   }
-  if (room.roomWish === 'privacy_out') {
-    return 'Вас будет меньше слышно наверху, а чужие голоса сверху перестанут быть навязчивыми';
+  if (hasWish(room, 'privacy_out')) {
+    bits.push('вас будет меньше слышно наверху');
   }
-  if (kind === 'impact') {
-    return 'Топот станет приглушённым и потеряет свою резкость';
+  if (hasWish(room, 'from_above') || bits.length === 0) {
+    if (kind === 'airborne') {
+      bits.push('громкие голоса и музыка сверху перестанут быть навязчивыми');
+    } else if (kind === 'impact') {
+      bits.push('топот станет приглушённым и потеряет свою резкость');
+    } else {
+      bits.push(
+        'топот станет приглушённым и потеряет свою резкость, а громкие голоса перестанут быть навязчивыми',
+      );
+    }
   }
-  if (kind === 'airborne') {
-    return 'Громкие голоса и музыка сверху перестанут быть навязчивыми';
+  if (bits.length === 1) {
+    const s = bits[0]!;
+    return s.charAt(0).toUpperCase() + s.slice(1);
   }
-  return 'Топот станет приглушённым и потеряет свою резкость, а громкие голоса перестанут быть навязчивыми';
+  return bits
+    .map((s, i) => (i === 0 ? s.charAt(0).toUpperCase() + s.slice(1) : s))
+    .join(', а ');
 }
 
 /** Beat 5: honesty + room as comfort zone. */
@@ -151,10 +175,10 @@ function closingBeat(room: RoomAnswers, noiseType: NoiseType): string {
   const kind = heardKind(room, noiseType);
   const impactHeavy = kind === 'impact' || kind === 'mixed' || kind === 'unknown';
 
-  if (room.roomWish === 'music_recording') {
+  if (hasWish(room, 'music_recording') && !hasWish(room, 'from_above')) {
     return `MultiFrame уберёт раздражающее эхо и сделает ${zone} зоной комфорта и спокойствия`;
   }
-  if (room.roomWish === 'privacy_out') {
+  if (hasWish(room, 'privacy_out') && !hasWish(room, 'from_above')) {
     return `MultiFrame снизит утечку звука наверх и сделает ${zone} зоной комфорта и спокойствия`;
   }
 
@@ -212,7 +236,7 @@ export const MULTIFRAME_PRODUCT_CLAIM = '';
 export const MULTIFRAME_PRODUCT_BLURB =
   'StP MultiFrame — это модульная звукоизоляционная панель, которая делает дом тише и комфортнее за счёт двойного эффекта: она блокирует ударный и воздушный шум от соседей (до 17 дБ) и одновременно поглощает эхо внутри помещения, улучшая акустику. Панели изготовлены из экологичных, негорючих и гипоаллергенных материалов, безопасны для здоровья всей семьи. Это продуманное решение для тех, кто ценит тишину, здоровье и качество жизни.';
 
-export const MULTIFRAME_PANEL_IMG = `${import.meta.env.BASE_URL}images/multiframe-panel-transparent.png`;
+export const MULTIFRAME_PANEL_IMG = `${(import.meta as ImportMeta & { env?: { BASE_URL?: string } }).env?.BASE_URL ?? '/'}images/multiframe-panel-transparent.png`;
 
 /** @deprecated Prefer caseVerdict. */
 export function personalStory(
@@ -233,16 +257,5 @@ export function buildRecommendations(
 }
 
 export function wishLabelFor(wish: RoomWishOption): string {
-  switch (wish) {
-    case 'from_above':
-      return 'Чтобы не слышать шум сверху';
-    case 'privacy_out':
-      return 'Чтобы сверху не слышали вас';
-    case 'music_recording':
-      return 'Чтобы в комнате было меньше эха';
-    case 'general':
-      return 'Общий акустический комфорт';
-    default:
-      return 'Пока не определился';
-  }
+  return ROOM_WISH_ALL_LABELS[wish] ?? ROOM_WISH_ALL_LABELS.other;
 }

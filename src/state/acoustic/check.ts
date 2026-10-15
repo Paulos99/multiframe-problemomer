@@ -35,7 +35,7 @@ function sampleRoom(over: Partial<RoomAnswers> = {}): RoomAnswers {
     plannedCeiling: 'stretch',
     noisyNeighbors: 'unknown',
     noiseKind: 'unknown',
-    roomWish: 'general',
+    roomWishes: ['general'],
     ...over,
   };
 }
@@ -451,9 +451,11 @@ export function assertModelAnchors(): string[] {
     objectStage: 'occupied' as const,
     noisyNeighbors: 'unknown' as const,
   };
-  const simWishGeneral = deriveSimulation(sampleAnswers({ ...wishBase, roomWish: 'general' }));
-  const simWishAbove = deriveSimulation(sampleAnswers({ ...wishBase, roomWish: 'from_above' }));
-  const simWishMusic = deriveSimulation(sampleAnswers({ ...wishBase, roomWish: 'music_recording' }));
+  const simWishGeneral = deriveSimulation(sampleAnswers({ ...wishBase, roomWishes: ['general'] }));
+  const simWishAbove = deriveSimulation(sampleAnswers({ ...wishBase, roomWishes: ['from_above'] }));
+  const simWishMusic = deriveSimulation(
+    sampleAnswers({ ...wishBase, roomWishes: ['music_recording'] }),
+  );
   if (simWishAbove.before.Rw !== simWishGeneral.before.Rw) {
     errors.push(
       `wish must not change construction Rw (${simWishAbove.before.Rw} vs ${simWishGeneral.before.Rw})`,
@@ -515,7 +517,7 @@ export function assertModelAnchors(): string[] {
     roomType: 'kids',
     ceilingAreaM2: 22,
     houseType: 'panel',
-    roomWish: 'from_above',
+    roomWishes: ['from_above'],
   });
   const token = encodeRoomAnswers(shareRoom);
   const decoded = decodeRoomAnswers(token);

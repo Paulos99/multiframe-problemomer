@@ -8,7 +8,6 @@ import {
   NOISY_NEIGHBORS_OPTIONS,
   PLANNED_CEILING_OPTIONS,
   ROOM_TYPE_LABELS,
-  ROOM_WISH_OPTIONS,
   SLAB_THICKNESS_OPTIONS,
   SLAB_TYPE_OPTIONS,
   shouldAskNoiseKind,
@@ -36,6 +35,7 @@ import {
   MULTIFRAME_PANEL_IMG,
   productAbout,
 } from '../../state/recommendations';
+import { primaryWish, wishLabelsJoined } from '../../state/wish';
 import { eventParamsFromSession, track } from '../../analytics';
 import styles from './resultShared.module.css';
 
@@ -218,14 +218,14 @@ export function useResultProfile() {
   const slabTypeLabel = optionLabel(SLAB_TYPE_OPTIONS, room.slabType);
   const slabThickLabel = optionLabel(SLAB_THICKNESS_OPTIONS, room.slabThickness);
   const houseLabel = optionLabel(HOUSE_TYPE_OPTIONS, room.houseType);
-  const wishLabel = optionLabel(ROOM_WISH_OPTIONS, room.roomWish);
+  const wishLabel = wishLabelsJoined(room.roomWishes);
   const ceilingLabel = optionLabel(PLANNED_CEILING_OPTIONS, room.plannedCeiling);
   const neighborsLabel = optionLabel(NOISY_NEIGHBORS_OPTIONS, room.noisyNeighbors);
   const noiseKindLabel =
     shouldAskNoiseKind(room.noisyNeighbors) && room.noiseKind !== 'unknown'
       ? optionLabel(NOISE_KIND_OPTIONS, room.noiseKind)
       : null;
-  const wish = room.roomWish;
+  const wish = primaryWish(room.roomWishes);
   const noiseType = session.derived?.noiseType ?? 'mixed';
   const caseVerdictParagraphs = caseVerdictParts(room, noiseType, {
     perceivedAirPct: sim.perceivedAirPct,

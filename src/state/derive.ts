@@ -1,7 +1,7 @@
 import type { DerivedProfile, NoiseType, SessionAnswers } from './types';
 import { deriveSimulation } from './simulation';
 import { caseVerdict } from './recommendations';
-import { noiseKindToType, wishNoiseType } from './wish';
+import { noiseKindToType, wishNoiseTypeFromWishes } from './wish';
 
 function inferNoiseType(answers: SessionAnswers): NoiseType {
   const fromKind = noiseKindToType(answers.room.noiseKind);
@@ -11,7 +11,7 @@ function inferNoiseType(answers: SessionAnswers): NoiseType {
   let fallback: NoiseType = 'mixed';
   if (n === 'often_noisy' || n === 'sometimes_noisy') fallback = 'mixed';
   else if (n === 'usually_quiet') fallback = 'airborne';
-  return wishNoiseType(answers.room.roomWish, fallback);
+  return wishNoiseTypeFromWishes(answers.room.roomWishes, fallback);
 }
 
 export function deriveProfile(answers: SessionAnswers): DerivedProfile {
