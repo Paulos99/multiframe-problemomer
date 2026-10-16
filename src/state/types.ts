@@ -119,6 +119,13 @@ export const ROOM_FACTOR_GROUP_LABEL: Record<RoomFactorGroup, string> = {
   internal: 'Внутренние факторы',
 };
 
+/** Default goals when the wish question is skipped — все эффекты материала. */
+export const DEFAULT_ROOM_WISHES: RoomWishOption[] = [
+  'from_above',
+  'privacy_out',
+  'music_recording',
+];
+
 export type ClassLabel = 'A' | 'B' | 'V' | 'below';
 export type ClassStatus = 'ok' | 'partial' | 'below';
 
@@ -223,7 +230,7 @@ export interface RoomAnswers {
   /** Filled when neighbors are noisy; otherwise stays `unknown`. */
   noiseKind: NoiseKindOption;
   /**
-   * Everyday goals — multi-select. Empty until the user picks on the wish step.
+   * Everyday goals — defaults to all material benefits (wish step removed).
    * Legacy share links may still send a single `roomWish` string.
    */
   roomWishes: RoomWishOption[];
