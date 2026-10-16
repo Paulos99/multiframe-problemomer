@@ -88,8 +88,7 @@ export type RoomSubstep =
   | 'plannedCeiling'
   | 'objectStage'
   | 'noisyNeighbors'
-  | 'noiseKind'
-  | 'roomWish';
+  | 'noiseKind';
 
 export type RoomFactorGroup = 'external' | 'internal';
 
@@ -102,7 +101,6 @@ export const ROOM_SUBSTEPS: RoomSubstep[] = [
   'objectStage',
   'noisyNeighbors',
   'noiseKind',
-  'roomWish',
 ];
 
 export const ROOM_FACTOR_GROUP: Record<RoomSubstep, RoomFactorGroup> = {
@@ -114,7 +112,6 @@ export const ROOM_FACTOR_GROUP: Record<RoomSubstep, RoomFactorGroup> = {
   objectStage: 'internal',
   noisyNeighbors: 'internal',
   noiseKind: 'internal',
-  roomWish: 'internal',
 };
 
 export const ROOM_FACTOR_GROUP_LABEL: Record<RoomFactorGroup, string> = {
