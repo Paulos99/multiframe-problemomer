@@ -4,9 +4,9 @@
     <meta charset="UTF-8" />
     <title>MultiFrame Проблемомер</title>
     <script>
-      // SPA fallback for GitHub Pages project site
+      // SPA fallback for static hosting without index fallback; __BASE_PATH__ is replaced at build time
       sessionStorage.setItem('mf-spa-redirect', location.pathname + location.search + location.hash);
-      location.replace('/multiframe-problemomer/');
+      location.replace('__BASE_PATH__');
     </script>
   </head>
   <body></body>

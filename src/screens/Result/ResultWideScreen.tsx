@@ -1,15 +1,19 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { Button } from '../../ui/Button';
 import { CompactAudio } from '../../ui/CompactAudio';
 import { EchoComfort, EchoComfortRings } from '../../ui/EchoComfort';
 import { SpectrumChart } from '../../ui/SpectrumChart';
 import { useSession } from '../../state/SessionContext';
+import { noiseKpiLines } from '../../state/noiseKpi';
+import { IMPACT_SCALE_STEPS } from '../../state/simulation';
 import type { ClassLabel } from '../../state/types';
 import {
   FeltScale,
   MULTIFRAME_PILLARS,
   NORM_ROWS,
+  normRowKey,
   useResultProfile,
+  type ResultView,
 } from './resultShared';
 import styles from './ResultWideScreen.module.css';
 
@@ -17,11 +21,8 @@ import styles from './ResultWideScreen.module.css';
 export const SHOW_FREQUENCY_CHARTS = false;
 
 function KpiRow({
-  deltaRw,
-  deltaLnw,
   quieterAir,
   quieterImpact,
-  quieterMax,
   echoBefore,
   echoAfter,
   rwBefore,
@@ -29,11 +30,8 @@ function KpiRow({
   lnwBefore,
   lnwAfter,
 }: {
-  deltaRw: number;
-  deltaLnw: number;
   quieterAir: number;
   quieterImpact: number;
-  quieterMax: number;
   echoBefore: number;
   echoAfter: number;
   rwBefore: number;
@@ -41,6 +39,8 @@ function KpiRow({
   lnwBefore: number;
   lnwAfter: number;
 }) {
+  const air = noiseKpiLines('air', rwBefore, rwAfter, quieterAir);
+  const impact = noiseKpiLines('impact', lnwBefore, lnwAfter, quieterImpact);
   return (
     <section
       className={`${styles.kpiRow} ${styles.driftSoft}`}
@@ -50,56 +50,22 @@ function KpiRow({
       <article className={styles.kpiCard}>
         <span className={styles.kpiLabel}>Воздушный шум</span>
         <div className={styles.kpiMain}>
-          {quieterAir > 0 ? (
-            <strong className={styles.kpiValue}>
-              −{quieterAir}
-              <em>%</em>
-            </strong>
-          ) : (
-            <strong className={styles.kpiValue}>
-              —<em>%</em>
-            </strong>
-          )}
+          <strong className={styles.kpiValue}>{air.primary}</strong>
           <DeltaBars before={rwBefore} after={rwAfter} />
         </div>
-        <span className={styles.kpiDbHint}>
-          изоляция воздуха · +{deltaRw} дБ (Rw)
-          <em>больше Rw — лучше изоляция</em>
-        </span>
+        <span className={styles.kpiDbHint}>{air.secondary}</span>
       </article>
       <article className={styles.kpiCard}>
         <span className={styles.kpiLabel}>Ударный шум</span>
         <div className={styles.kpiMain}>
-          {quieterImpact > 0 ? (
-            <strong className={styles.kpiValue}>
-              −{quieterImpact}
-              <em>%</em>
-            </strong>
-          ) : (
-            <strong className={styles.kpiValue}>
-              —<em>%</em>
-            </strong>
-          )}
+          <strong className={styles.kpiValue}>{impact.primary}</strong>
           <DeltaBars before={lnwBefore} after={lnwAfter} invert />
         </div>
-        <span className={styles.kpiDbHint}>
-          удар · −{deltaLnw} дБ (Lnw)
-          <em>меньше Lnw — тише удар сверху</em>
-        </span>
+        <span className={styles.kpiDbHint}>{impact.secondary}</span>
       </article>
       <article className={styles.kpiCard}>
         <span className={styles.kpiLabel}>Акустический комфорт</span>
         <EchoComfortRings before={echoBefore} after={echoAfter} compact />
-      </article>
-      <article className={styles.kpiCard}>
-        <span className={styles.kpiLabel}>Снижение шума</span>
-        <strong className={styles.kpiValue}>
-          −{quieterMax}
-          <em>%</em>
-        </strong>
-        <span className={styles.kpiPill}>
-          воздух {quieterAir}% · удар {quieterImpact}%
-        </span>
       </article>
     </section>
   );
@@ -164,18 +130,32 @@ function useScrollDrift() {
   return rootRef;
 }
 
-export function ResultWideScreen() {
-  const { goBack } = useSession();
-  const p = useResultProfile();
+/**
+ * Панель результата: параметры, показатели, рекомендации, шкалы и сравнение на слух.
+ * Общая для кабинета и для страницы клиента; цены, сохранение и ссылка приходят снаружи.
+ */
+export function ResultDashboard({
+  p,
+  title = 'Акустический профиль помещения',
+  titleExtra = null,
+  estimate = null,
+  next = null,
+}: {
+  p: ResultView;
+  title?: string;
+  /** Действия рядом с заголовком (в кабинете — «Ссылка для клиента»). */
+  titleExtra?: ReactNode;
+  /** Смета с ценами. На странице клиента её нет. */
+  estimate?: ReactNode;
+  /** «Следующий шаг». На странице клиента его нет. */
+  next?: ReactNode;
+}) {
   const rootRef = useScrollDrift();
 
-  const deltaRw = Math.abs(Math.round(p.sim.delta.Rw));
-  const deltaLnw = Math.abs(Math.round(p.sim.delta.Lnw));
   const quieterAir = p.sim.perceivedAirPct;
   const quieterImpact = p.sim.perceivedImpactPct;
-  const quieterMax = Math.max(quieterAir, quieterImpact);
-  const classNow = p.hybridBefore as ClassLabel;
-  const classMf = p.hybridAfter as ClassLabel;
+  const classNow = normRowKey(p.hybridBefore as ClassLabel);
+  const classMf = normRowKey(p.hybridAfter as ClassLabel);
 
   const objectCells: { label: string; value: string }[] = [
     { label: 'Перекрытие', value: p.slabContext },
@@ -196,12 +176,13 @@ export function ResultWideScreen() {
   return (
     <div className={styles.root} ref={rootRef}>
       <header className={styles.titleBar} data-reveal>
-        <h1>Акустический профиль помещения</h1>
+        <h1>{title}</h1>
+        {titleExtra}
       </header>
 
-      <section className={`${styles.objectSpec} ${styles.driftSlow}`} data-reveal aria-label="Параметры объекта">
+      <section className={`${styles.objectSpec} ${styles.driftSlow}`} data-reveal aria-label="Параметры комнаты">
         <div className={styles.objectSpecLabel}>
-          <strong>Параметры объекта</strong>
+          <strong>Параметры комнаты</strong>
         </div>
         <dl className={styles.objectSpecGrid}>
           {objectCells.map((cell) => (
@@ -214,11 +195,8 @@ export function ResultWideScreen() {
       </section>
 
       <KpiRow
-        deltaRw={deltaRw}
-        deltaLnw={deltaLnw}
         quieterAir={quieterAir}
         quieterImpact={quieterImpact}
-        quieterMax={quieterMax}
         echoBefore={p.sim.reverb.echoInRoomBefore}
         echoAfter={p.sim.reverb.echoInRoomAfter}
         rwBefore={p.sim.before.Rw}
@@ -269,7 +247,8 @@ export function ResultWideScreen() {
             <span className={styles.normsSp}>по СП 51.13330.2011</span>
           </h2>
           <p className={styles.normDefs}>
-            <b>Rw</b> воздух · больше лучше &nbsp;·&nbsp; <b>Lnw</b> удар · меньше лучше
+            <b>Изоляция воздуха</b> <small className={styles.indexHint}>Rw</small> · больше лучше
+            &nbsp;·&nbsp; <b>Удар сверху</b> <small className={styles.indexHint}>Lnw</small> · меньше лучше
           </p>
         </div>
         <div className={styles.tableWrap}>
@@ -277,8 +256,12 @@ export function ResultWideScreen() {
             <thead>
               <tr>
                 <th>Уровень</th>
-                <th>Rw</th>
-                <th>Lnw</th>
+                <th>
+                  Изоляция <small className={styles.indexHint}>Rw</small>
+                </th>
+                <th>
+                  Удар <small className={styles.indexHint}>Lnw</small>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -300,6 +283,7 @@ export function ResultWideScreen() {
                           ) : null}
                         </span>
                         <span className={styles.normLevelLabel}>{r.label}</span>
+                        <small className={styles.indexHint}>{r.sp}</small>
                         {isNow ? <span className={styles.normPillNow}>Сейчас</span> : null}
                         {isMf ? <span className={styles.normPillMf}>MultiFrame</span> : null}
                       </span>
@@ -343,6 +327,7 @@ export function ResultWideScreen() {
               indexKind="Lnw"
               nowIndex={p.sim.before.Lnw}
               afterIndex={p.sim.after.Lnw}
+              steps={IMPACT_SCALE_STEPS}
               quieterPct={p.sim.perceivedImpactPct}
               quieterDeltaDb={Math.abs(p.sim.delta.Lnw)}
               mode="nowAndAfter"
@@ -367,7 +352,7 @@ export function ResultWideScreen() {
             <div className={styles.listenCol}>
               <header className={styles.listenColHead}>
                 <h3>
-                  Звукоизоляция <span>(снижение шума)</span>
+                  Звукоизоляция <span>(голоса и шаги сверху)</span>
                 </h3>
               </header>
               <CompactAudio
@@ -425,7 +410,9 @@ export function ResultWideScreen() {
         </section>
       ) : null}
 
-      <div className={styles.closeRow}>
+      {estimate}
+
+      <div className={`${styles.closeRow} ${next ? '' : styles.closeRowSingle}`}>
         <section className={styles.panel} data-reveal aria-label="Уникальность системы MultiFrame">
           <h2>Уникальность MultiFrame</h2>
           <ul className={styles.uniqGrid}>
@@ -441,43 +428,58 @@ export function ResultWideScreen() {
           </ul>
         </section>
 
-        <section
-          className={`${styles.panel} ${styles.nextPanel}`}
-          data-reveal
-          aria-label="Следующий шаг"
-        >
-          <h2>Следующий шаг</h2>
-          <p className={styles.panelLead}>
-            Подберите комплектацию MultiFrame или запросите консультацию.
-          </p>
-          <div className={styles.nextActions}>
-            <Button fullWidth onClick={p.openCalc}>
-              Рассчитать количество MultiFrame
-            </Button>
-            <Button variant="secondary" fullWidth onClick={p.openConsultation}>
-              Запросить консультацию или подбор
-            </Button>
-            <div className={styles.splitActions}>
-              <Button
-                variant="ghost"
-                disabled={p.pdfBusy}
-                onClick={() => void p.onDownloadProfile()}
-              >
-                {p.pdfBusy ? 'Готовим PDF…' : 'Скачать PDF'}
-              </Button>
-              <Button variant="ghost" onClick={() => void p.onShare()}>
-                {p.shareLabel}
-              </Button>
-            </div>
-            {p.pdfError ? (
-              <p className={styles.pdfError} role="alert">
-                Не удалось скачать. Разрешите всплывающие окна и нажмите ещё раз.
-              </p>
-            ) : null}
-          </div>
-        </section>
+        {next}
       </div>
+    </div>
+  );
+}
 
+export function ResultWideScreen() {
+  const { goBack } = useSession();
+  const p = useResultProfile();
+
+  return (
+    <>
+      <ResultDashboard
+        p={p}
+        next={
+          <section
+            className={`${styles.panel} ${styles.nextPanel}`}
+            data-reveal
+            aria-label="Следующий шаг"
+          >
+            <h2>Следующий шаг</h2>
+            <p className={styles.panelLead}>
+              Подберите комплектацию MultiFrame или запросите консультацию.
+            </p>
+            <div className={styles.nextActions}>
+              <Button fullWidth onClick={p.openCalc}>
+                Рассчитать количество MultiFrame
+              </Button>
+              <Button variant="secondary" fullWidth onClick={p.openConsultation}>
+                Запросить консультацию или подбор
+              </Button>
+              <div className={styles.splitActions}>
+                <Button
+                  variant="ghost"
+                  disabled={p.pdfBusy}
+                  onClick={() => void p.onDownloadProfile()}
+                >
+                  {p.pdfBusy ? 'Готовим PDF…' : 'Скачать PDF'}
+                </Button>
+                <Button variant="ghost" onClick={() => void p.onShare()}>
+                  {p.shareLabel}
+                </Button>
+              </div>
+              {p.pdfError ? (
+                <p className={styles.pdfError} role="alert">
+                  Не удалось скачать. Разрешите всплывающие окна и нажмите ещё раз.
+                </p>
+              ) : null}
+            </div>
+          </section>
+        }
+      />
       <nav className={styles.footerActions} aria-label="Действия после расчёта">
         <button type="button" className={styles.footerBtn} onClick={goBack}>
           <span className={styles.footerBtnIcon} aria-hidden>
@@ -489,6 +491,6 @@ export function ResultWideScreen() {
           Пройти ещё раз
         </button>
       </nav>
-    </div>
+    </>
   );
 }

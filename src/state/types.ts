@@ -114,17 +114,17 @@ export const ROOM_FACTOR_GROUP: Record<RoomSubstep, RoomFactorGroup> = {
   noiseKind: 'internal',
 };
 
-export const ROOM_FACTOR_GROUP_LABEL: Record<RoomFactorGroup, string> = {
-  external: 'Внешние факторы',
-  internal: 'Внутренние факторы',
-};
-
 /** Default goals when the wish question is skipped — все эффекты материала. */
 export const DEFAULT_ROOM_WISHES: RoomWishOption[] = [
   'from_above',
   'privacy_out',
   'music_recording',
 ];
+
+export const ROOM_FACTOR_GROUP_LABEL: Record<RoomFactorGroup, string> = {
+  external: 'Внешние факторы',
+  internal: 'Внутренние факторы',
+};
 
 export type ClassLabel = 'A' | 'B' | 'V' | 'below';
 export type ClassStatus = 'ok' | 'partial' | 'below';
@@ -386,23 +386,42 @@ export function shouldAskNoiseKind(noisy: NoisyNeighborsOption): boolean {
   return noisy === 'sometimes_noisy' || noisy === 'often_noisy';
 }
 
-/** Everyday first-layer labels (workshop 2026-09-16). SP letters stay secondary. */
-export const EVERYDAY_COMFORT_LABELS: Record<ClassLabel, string> = {
-  A: 'Тихо',
-  B: 'Комфортно',
-  V: 'Допустимо',
-  below: 'Некомфортно',
+/**
+ * Шкала Проблемомера: ровно три уровня (решение Павла, 2026-10-29).
+ * Внутри хранятся прежние коды классов СП (A/B/V/below), чтобы не ломать сохранённые данные и аналитику;
+ * человеку показываем только три слова ниже.
+ */
+export type ScaleLevel = 'discomfort' | 'comfort' | 'high';
+export const SCALE_LEVELS: readonly ScaleLevel[] = ['discomfort', 'comfort', 'high'];
+export const SCALE_LEVEL_LABELS: Record<ScaleLevel, string> = {
+  discomfort: 'Дискомфорт',
+  comfort: 'Комфорт',
+  high: 'Высокий комфорт',
 };
 
-/** Hybrid comfort class labels (UI) */
+/** Какой уровень шкалы соответствует классу СП: А → высокий, Б и В → комфорт, ниже В → дискомфорт. */
+export const CLASS_TO_LEVEL: Record<ClassLabel, ScaleLevel> = {
+  A: 'high',
+  B: 'comfort',
+  V: 'comfort',
+  below: 'discomfort',
+};
+
+/** Название уровня для итога по комнате (см. CLASS_TO_LEVEL). */
 export const HYBRID_CLASS_LABELS: Record<ClassLabel, string> = {
-  A: 'Высокий комфорт (А)',
-  B: 'Комфорт (Б)',
-  V: 'Допустимый (В)',
-  below: 'Дискомфорт',
+  A: SCALE_LEVEL_LABELS.high,
+  B: SCALE_LEVEL_LABELS.comfort,
+  V: SCALE_LEVEL_LABELS.comfort,
+  below: SCALE_LEVEL_LABELS.discomfort,
 };
 
-export const CALCULATOR_URL = 'https://paulos99.github.io/MF_StP/';
+/**
+ * Калькулятор MultiFrame (ссылка кнопки «Рассчитать» и QR в PDF).
+ * Меняется при сборке переменной VITE_CALCULATOR_URL; по умолчанию — боевой адрес.
+ */
+export const CALCULATOR_URL: string =
+  (import.meta.env?.VITE_CALCULATOR_URL as string | undefined)?.trim() ||
+  'https://stp-multiframe.ru/calc/';
 
 /** StP site contact block («Связаться с нами») at the bottom of the page. */
 export const CONSULTATION_URL = 'https://stp-multiframe.ru/#section-partner';

@@ -14,22 +14,27 @@ import {
   shouldAskNoiseKind,
   type SessionState,
 } from './types';
+import { HYBRID_CLASS_LABELS } from './types';
 import { caseVerdictParts, productAbout } from './recommendations';
-import { resolveSlab } from './acoustic/construction';
 import {
   airClassFor,
   airFeltFromIndex,
-  CLASS_CYR,
   comfortClassFor,
   FELT_STEP_LABELS,
   impactClassFor,
   impactFeltFromIndex,
-  NORMS,
+  NORM_ROWS,
+  normRowKey,
   officialComfortLabel,
+  airFeltAfterMultiFrame,
+  comfortClassAfterMultiFrame,
+  impactFeltAfterMultiFrame,
 } from './simulation';
+import { noiseKpiLines } from './noiseKpi';
 import { buildLeadHandoff, withDerived } from './session';
 import { buildAirSpectrum, buildImpactSpectrum } from './spectrum';
 import { comfortRingSvg, spectrumChartSvg } from './chartSvg';
+
 /** Keep in sync with ResultWideScreen — hide frequency page until clients ask. */
 const SHOW_FREQUENCY_CHARTS = false;
 import {
@@ -60,7 +65,7 @@ const PILLARS = [
   },
   {
     title: 'Быстрый монтаж',
-    text: 'Сначала панели, затем натяжное полотно — без каркаса и без долгой стройки.',
+    text: 'Сначала панели, затем натяжное полотно — без долгой стройки.',
   },
   {
     title: 'Универсальность',
@@ -81,8 +86,7 @@ function optLabel<T extends string>(
 }
 
 function chipLabel(cls: ClassLabel): string {
-  if (cls === 'below') return 'вне нормы';
-  return CLASS_CYR[cls];
+  return HYBRID_CLASS_LABELS[cls].toLowerCase();
 }
 
 function escapeHtml(s: string): string {
@@ -229,25 +233,27 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
   const { qr, logos, panel } = assets;
   const handoff = buildLeadHandoff(session);
   const room = handoff.room;
-  const slab = resolveSlab(room);
   const sim = session.derived!.simulation;
   const rev = sim.reverb;
   const b = sim.before;
   const a = sim.after;
   const hybridBefore = comfortClassFor(b.Rw, b.Lnw);
-  const hybridAfter = comfortClassFor(a.Rw, a.Lnw);
+  const hybridAfter = comfortClassAfterMultiFrame(a.Rw, a.Lnw);
   const roomName = roomTypeLabel(room);
   const area = room.ceilingAreaM2 != null ? `${room.ceilingAreaM2} м²` : 'н/д';
   const roomLine = `${roomName} · ${area}`;
+  const slabTypeLabel = optLabel(SLAB_TYPE_OPTIONS, room.slabType);
   const slabLabel =
-    room.slabType === 'unknown' && room.slabThickness === 'unknown'
-      ? `ориентир по типу дома (${optLabel(HOUSE_TYPE_OPTIONS, room.houseType)}), ~${slab.thicknessMm} мм`
-      : `${optLabel(SLAB_TYPE_OPTIONS, room.slabType)}, ${optLabel(SLAB_THICKNESS_OPTIONS, room.slabThickness)}`;
+    !room.slabThickness || room.slabThickness === 'unknown'
+      ? room.slabType === 'unknown'
+        ? 'типовая ~220 мм'
+        : `${slabTypeLabel}, типовая ~220 мм`
+      : `${slabTypeLabel}, ${optLabel(SLAB_THICKNESS_OPTIONS, room.slabThickness)}`;
 
   const airNow = airFeltFromIndex(b.Rw);
-  const airAfter = airFeltFromIndex(a.Rw);
+  const airAfter = airFeltAfterMultiFrame(a.Rw);
   const impactNow = impactFeltFromIndex(b.Lnw);
-  const impactAfter = impactFeltFromIndex(a.Lnw);
+  const impactAfter = impactFeltAfterMultiFrame(a.Lnw);
   const noiseType = session.derived?.noiseType ?? 'mixed';
   const verdictHtml = caseVerdictParts(room, noiseType, {
     perceivedAirPct: sim.perceivedAirPct,
@@ -255,14 +261,15 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
   })
     .map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`)
     .join('');
-  const about = productAbout(room, noiseType);
+  const about = productAbout(room, noiseType, { airDb: sim.delta.Rw, impactDb: sim.delta.Lnw });
   const productHtml = about.paragraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join('');
   const airSeries = buildAirSpectrum(session.answers);
   const impactSeries = buildImpactSpectrum(session.answers);
 
   const deltaRw = Math.abs(Math.round(sim.delta.Rw));
   const deltaLnw = Math.abs(Math.round(sim.delta.Lnw));
-  const quieterMax = Math.max(sim.perceivedAirPct, sim.perceivedImpactPct);
+  const airKpi = noiseKpiLines('air', b.Rw, a.Rw, sim.perceivedAirPct);
+  const impactKpi = noiseKpiLines('impact', b.Lnw, a.Lnw, sim.perceivedImpactPct);
   const noiseKindCell =
     shouldAskNoiseKind(room.noisyNeighbors) && room.noiseKind !== 'unknown'
       ? `<div><dt>Тип шума</dt><dd>${escapeHtml(optLabel(NOISE_KIND_OPTIONS, room.noiseKind))}</dd></div>`
@@ -315,17 +322,19 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
       `<li class="pillar"><span class="pillar-mark"></span><div><strong>${escapeHtml(p.title)}</strong><p>${escapeHtml(p.text)}</p></div></li>`,
   ).join('');
 
-  const normRow = (key: string, label: string, rw: string, lnw: string, muted?: boolean) => {
-    const isNow = key === hybridBefore;
-    const isMf = key === hybridAfter;
+  const rowKeyNow = normRowKey(hybridBefore);
+  const rowKeyMf = normRowKey(hybridAfter);
+  const normRow = (row: (typeof NORM_ROWS)[number]) => {
+    const isNow = row.key === rowKeyNow;
+    const isMf = row.key === rowKeyMf;
     const mark = isMf
       ? pillSvg('MultiFrame', { bg: '#01644f', fg: '#ffffff', fontSize: 9, padX: 8, height: 20 })
       : isNow
         ? pillSvg('Сейчас', { bg: '#68757e', fg: '#ffffff', fontSize: 9, padX: 8, height: 20 })
         : '';
-    return `<tr class="${muted ? 'muted' : ''} ${isNow || isMf ? 'marked' : ''}">
-      <td><span class="norm-name">${escapeHtml(label)}</span></td>
-      <td>${rw}</td><td>${lnw}</td>
+    return `<tr class="${row.muted ? 'muted' : ''} ${isNow || isMf ? 'marked' : ''}">
+      <td><span class="norm-name">${escapeHtml(row.label)}</span> <span class="muted">${escapeHtml(row.sp)}</span></td>
+      <td>${escapeHtml(row.rw)}</td><td>${escapeHtml(row.lnw)}</td>
       <td>${mark}</td>
     </tr>`;
   };
@@ -337,10 +346,7 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
       <table class="norms">
         <thead><tr><th>Уровень</th><th>Rw</th><th>Lnw</th><th></th></tr></thead>
         <tbody>
-          ${normRow('A', 'Высокий комфорт (А)', `≥ ${NORMS.A.Rw}`, `≤ ${NORMS.A.Lnw}`)}
-          ${normRow('B', 'Комфорт (Б)', `≥ ${NORMS.B.Rw}`, `≤ ${NORMS.B.Lnw}`)}
-          ${normRow('V', 'Допустимый (В)', `≥ ${NORMS.V.Rw}`, `≤ ${NORMS.V.Lnw}`)}
-          ${normRow('below', 'Ниже допустимого', `&lt; ${NORMS.V.Rw}`, `&gt; ${NORMS.V.Lnw}`, true)}
+          ${NORM_ROWS.map(normRow).join('')}
         </tbody>
       </table>
     </div>`;
@@ -469,6 +475,10 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
   .kpi .v {
     font-size: 28px; font-weight: 850; letter-spacing: -.04em; line-height: 1;
     font-variant-numeric: tabular-nums; color: #0f1c16;
+  }
+  .kpi .v-phrase {
+    font-size: 22px; font-weight: 850; letter-spacing: -.03em; line-height: 1.1;
+    color: #0f1c16;
   }
   .kpi .v em {
     font-style: normal; font-size: 12px; font-weight: 700;
@@ -699,11 +709,10 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
   <section class="page" data-page="1">
     ${pageChrome(1, TOTAL, roomLine, logos)}
     <h1 class="hero-title">Акустический профиль помещения</h1>
-    <p class="hero-sub">Объект: <b>${escapeHtml(roomName)}</b>, ${escapeHtml(area)}. Эффект MultiFrame для этого помещения.</p>
-
-    <section class="object" aria-label="Объект">
+    <p class="hero-sub">Комната: <b>${escapeHtml(roomName)}</b>, ${escapeHtml(area)}. Эффект MultiFrame для этого помещения.</p>
+    <section class="object" aria-label="Комната">
       <div class="object-label">
-        <strong>Параметры объекта</strong>
+        <strong>Параметры комнаты</strong>
       </div>
       <dl class="object-grid">
         <div><dt>Перекрытие</dt><dd>${escapeHtml(slabLabel)}</dd></div>
@@ -718,18 +727,13 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
     <div class="kpi-row">
       <article class="kpi">
         <span class="k">Воздушный шум</span>
-        <span class="v">−${sim.perceivedAirPct}<em>%</em></span>
-        <span class="db-hint">изоляция · +${deltaRw} дБ (Rw)</span>
+        <span class="v-phrase">${escapeHtml(airKpi.primary)}</span>
+        <span class="db-hint">${escapeHtml(airKpi.secondary)}</span>
       </article>
       <article class="kpi">
         <span class="k">Ударный шум</span>
-        <span class="v">−${sim.perceivedImpactPct}<em>%</em></span>
-        <span class="db-hint">удар · −${deltaLnw} дБ (Lnw)</span>
-      </article>
-      <article class="kpi">
-        <span class="k">Снижение шума</span>
-        <span class="v">−${quieterMax}<em>%</em></span>
-        ${pillSvg(`воздух ${sim.perceivedAirPct}% · удар ${sim.perceivedImpactPct}%`, { bg: '#dceee8', fg: '#01644f', fontSize: 9, padX: 8 })}
+        <span class="v-phrase">${escapeHtml(impactKpi.primary)}</span>
+        <span class="db-hint">${escapeHtml(impactKpi.secondary)}</span>
       </article>
       <article class="kpi">
         <span class="k">Акустический комфорт</span>
@@ -750,13 +754,13 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
         <div class="cmp">
           <div class="k">Сейчас</div>
           <h3>«${escapeHtml(officialComfortLabel(hybridBefore))}»</h3>
-          <div class="nums">Rw ≈ ${Math.round(b.Rw)} дБ · Lnw ≈ ${Math.round(b.Lnw)} дБ</div>
+          <div class="nums">изоляция воздуха ≈ ${Math.round(b.Rw)} дБ · удар сверху ≈ ${Math.round(b.Lnw)} дБ</div>
           <div class="chips">воздух ${chipLabel(airClassFor(b.Rw))} · удар ${chipLabel(impactClassFor(b.Lnw))}</div>
         </div>
         <div class="cmp after">
           <div class="k">С MultiFrame</div>
           <h3>«${escapeHtml(officialComfortLabel(hybridAfter))}»</h3>
-          <div class="nums">Rw ≈ ${Math.round(a.Rw)} дБ · Lnw ≈ ${Math.round(a.Lnw)} дБ</div>
+          <div class="nums">изоляция воздуха ≈ ${Math.round(a.Rw)} дБ · удар сверху ≈ ${Math.round(a.Lnw)} дБ</div>
           <div class="chips">воздух ${chipLabel(airClassFor(a.Rw))} · удар ${chipLabel(impactClassFor(a.Lnw))}</div>
         </div>
       </div>
@@ -770,11 +774,11 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
       <h2><span class="sec-idx">02</span>Прогноз с MultiFrame</h2>
       <div class="felt">
         <div class="felt-row">
-          <span>Воздух · ${FELT_STEP_LABELS[airNow]} → <b>${FELT_STEP_LABELS[airAfter]}</b> · Rw ≈ ${Math.round(b.Rw)} → ≈ ${Math.round(a.Rw)} дБ</span>
+          <span>Воздух · ${FELT_STEP_LABELS[airNow]} → <b>${FELT_STEP_LABELS[airAfter]}</b> · изоляция ≈ ${Math.round(b.Rw)} → ≈ ${Math.round(a.Rw)} дБ</span>
           ${pillSvg(`≈ ${sim.perceivedAirPct}% тише`, { bg: '#dceee8', fg: '#01644f', fontSize: 11, height: 24 })}
         </div>
         <div class="felt-row">
-          <span>Удар · ${FELT_STEP_LABELS[impactNow]} → <b>${FELT_STEP_LABELS[impactAfter]}</b> · Lnw ≈ ${Math.round(b.Lnw)} → ≈ ${Math.round(a.Lnw)} дБ</span>
+          <span>Удар · ${FELT_STEP_LABELS[impactNow]} → <b>${FELT_STEP_LABELS[impactAfter]}</b> · удар сверху ≈ ${Math.round(b.Lnw)} → ≈ ${Math.round(a.Lnw)} дБ</span>
           ${pillSvg(`≈ ${sim.perceivedImpactPct}% тише`, { bg: '#dceee8', fg: '#01644f', fontSize: 11, height: 24 })}
         </div>
       </div>
@@ -863,7 +867,7 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
     </div>
 
     <div class="closing">
-      Документ собран по ответам в Проблемомере для объекта «${escapeHtml(roomName)}».
+      Документ собран по ответам в Проблемомере для комнаты «${escapeHtml(roomName)}».
       Это <b>экспертная оценка</b>, не инженерный расчёт и не гарантия цифр.
     </div>
   </section>
@@ -945,8 +949,10 @@ function triggerDownload(blob: Blob, filename: string): void {
   window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
 
-/** Render report as one A4 page image each → PDF download. */
-export async function downloadAcousticProfilePdf(session: SessionState): Promise<void> {
+/** Render report as one A4 page image each → PDF blob («Профиль» объекта). */
+export async function renderAcousticProfilePdf(
+  session: SessionState,
+): Promise<{ blob: Blob; filename: string }> {
   const full = session.derived ? session : withDerived(session);
   if (!full.derived) {
     throw new Error('Нет расчёта для отчёта');
@@ -1031,10 +1037,16 @@ export async function downloadAcousticProfilePdf(session: SessionState): Promise
     const roomName = roomTypeLabel(room, 'komnata');
     const safe = roomName.replace(/[^\wа-яА-ЯёЁ\-]+/gi, '_').slice(0, 24);
     const filename = `MultiFrame_результаты_${safe}_${room.ceilingAreaM2 ?? 'area'}.pdf`;
-    triggerDownload(pdf.output('blob'), filename);
+    return { blob: pdf.output('blob'), filename };
   } finally {
     iframe.remove();
   }
+}
+
+/** Render report → PDF download. */
+export async function downloadAcousticProfilePdf(session: SessionState): Promise<void> {
+  const { blob, filename } = await renderAcousticProfilePdf(session);
+  triggerDownload(blob, filename);
 }
 
 /** Copy deep-link (answer chain). Web Share when available. */

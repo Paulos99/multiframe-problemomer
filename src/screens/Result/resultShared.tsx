@@ -11,23 +11,25 @@ import {
   SLAB_THICKNESS_OPTIONS,
   SLAB_TYPE_OPTIONS,
   shouldAskNoiseKind,
+  type SessionState,
 } from '../../state/types';
 import {
   FELT_STEP_LABELS,
   FELT_STEPS,
-  NORMS,
+  airFeltAfterMultiFrame,
   airFeltFromIndex,
+  comfortClassAfterMultiFrame,
   comfortClassFor,
   deriveSimulation,
+  impactFeltAfterMultiFrame,
   impactFeltFromIndex,
   officialComfortLabel,
   type FeltStep,
 } from '../../state/simulation';
-import { resolveSlab } from '../../state/acoustic/construction';
 import { buildCalculatorUrl } from '../../state/session';
 import {
-  downloadAcousticProfilePdf,
   prefetchAcousticProfilePdf,
+  downloadAcousticProfilePdf,
   shareAcousticProfile,
 } from '../../state/reportPdf';
 import {
@@ -39,20 +41,7 @@ import { primaryWish } from '../../state/wish';
 import { eventParamsFromSession, track } from '../../analytics';
 import styles from './resultShared.module.css';
 
-/** Official SP thresholds А/Б/В + explicit «ниже допустимого» band. */
-export const NORM_ROWS: { key: string; label: string; rw: string; lnw: string; muted?: boolean }[] =
-  [
-    { key: 'A', label: 'Высокий комфорт (А)', rw: `≥ ${NORMS.A.Rw}`, lnw: `≤ ${NORMS.A.Lnw}` },
-    { key: 'B', label: 'Комфорт (Б)', rw: `≥ ${NORMS.B.Rw}`, lnw: `≤ ${NORMS.B.Lnw}` },
-    { key: 'V', label: 'Допустимый (В)', rw: `≥ ${NORMS.V.Rw}`, lnw: `≤ ${NORMS.V.Lnw}` },
-    {
-      key: 'below',
-      label: 'Ниже допустимого',
-      rw: `< ${NORMS.V.Rw}`,
-      lnw: `> ${NORMS.V.Lnw}`,
-      muted: true,
-    },
-  ];
+export { NORM_ROWS, normRowKey } from '../../state/simulation';
 
 /** StP site pillars — title + one line, no vs-comparison with plain stretch film. */
 export const MULTIFRAME_PILLARS = [
@@ -70,7 +59,7 @@ export const MULTIFRAME_PILLARS = [
   },
   {
     title: 'Быстрый монтаж',
-    text: 'Сначала панели, затем натяжное полотно — без каркаса и без долгой стройки.',
+    text: 'Сначала панели, затем натяжное полотно — без долгой стройки.',
   },
   {
     title: 'Универсальность',
@@ -86,10 +75,6 @@ export function optionLabel<T extends string>(
   return options.find((o) => o.id === id)?.label ?? 'не указано';
 }
 
-function feltIndex(step: FeltStep): number {
-  return FELT_STEPS.indexOf(step);
-}
-
 export function FeltScale({
   title,
   now,
@@ -100,6 +85,7 @@ export function FeltScale({
   indexKind,
   nowIndex,
   afterIndex,
+  steps = FELT_STEPS,
 }: {
   title: string;
   now: FeltStep;
@@ -111,14 +97,19 @@ export function FeltScale({
   indexKind: 'Rw' | 'Lnw';
   nowIndex: number;
   afterIndex?: number;
+  /** Ступени шкалы: для удара — без «Высокого комфорта». */
+  steps?: FeltStep[];
 }) {
-  const nowIdx = feltIndex(now);
-  const afterIdx = after ? feltIndex(after) : -1;
-  const same = mode === 'nowAndAfter' && after && now === after;
+  const nowShown = now;
+  const afterShown = after;
+  const nowIdx = steps.indexOf(now);
+  const afterIdx = after ? steps.indexOf(after) : -1;
+  const same = mode === 'nowAndAfter' && Boolean(afterShown) && nowShown === afterShown;
   const nowVal = Math.round(nowIndex);
   const afterVal = afterIndex != null ? Math.round(afterIndex) : null;
   const direction =
-    indexKind === 'Rw' ? 'чем больше число, тем лучше' : 'чем меньше число, тем лучше';
+    indexKind === 'Rw' ? 'чем больше децибел, тем лучше изоляция' : 'чем меньше децибел, тем тише шаги';
+  const indexWord = indexKind === 'Rw' ? 'изоляция воздуха' : 'удар сверху';
 
   return (
     <div
@@ -126,11 +117,11 @@ export function FeltScale({
       role="img"
       aria-label={
         mode === 'nowOnly'
-          ? `${title}: сейчас ${FELT_STEP_LABELS[now]}, ${indexKind} ≈ ${nowVal} дБ`
-          : `${title}: сейчас ${FELT_STEP_LABELS[now]}, ${indexKind} ≈ ${nowVal} дБ; с MultiFrame ${
-              after ? FELT_STEP_LABELS[after] : ''
-            }${afterVal != null ? `, ${indexKind} ≈ ${afterVal} дБ` : ''}${
-              quieterPct != null ? `, станет на ≈ ${quieterPct}% тише` : ''
+          ? `${title}: сейчас ${FELT_STEP_LABELS[nowShown]}, ${indexWord} ≈ ${nowVal} дБ`
+          : `${title}: сейчас ${FELT_STEP_LABELS[nowShown]}, ${indexWord} ≈ ${nowVal} дБ; с MultiFrame ${
+              afterShown ? FELT_STEP_LABELS[afterShown] : ''
+            }${afterVal != null ? `, ${indexWord} ≈ ${afterVal} дБ` : ''}${
+              quieterPct != null ? `, в комнате примерно на ${quieterPct}% тише` : ''
             }`
       }
     >
@@ -138,7 +129,7 @@ export function FeltScale({
         <strong>{title}</strong>
         {mode === 'nowAndAfter' && quieterPct != null ? (
           <b className={styles.quieterLine}>
-            станет на ≈ {quieterPct}% тише
+            в комнате примерно на {quieterPct}% тише
             <SoundPressureHelpButton
               highlightDb={quieterDeltaDb}
               label={`Таблица снижения звукового давления для ${indexKind}`}
@@ -150,12 +141,14 @@ export function FeltScale({
       <p className={styles.feltDb}>
         {mode === 'nowOnly' || afterVal == null ? (
           <>
-            Сейчас: <b>{indexKind} ≈ {nowVal} дБ</b>
+            Сейчас: <b>{indexWord} ≈ {nowVal} дБ</b>
+            <span className={styles.indexHint}>{indexKind}</span>
             <span> · {direction}</span>
           </>
         ) : (
           <>
-            <b>{indexKind}</b>:{' '}
+            <b>{indexWord}</b>{' '}
+            <span className={styles.indexHint}>{indexKind}</span>:{' '}
             <b>≈ {nowVal} дБ</b>
             <span aria-hidden> → </span>
             <b>≈ {afterVal} дБ</b>
@@ -166,17 +159,17 @@ export function FeltScale({
 
       <div className={styles.feltTrack} aria-hidden>
         <span className={styles.feltLine} />
-        {FELT_STEPS.map((step, i) => {
+        {steps.map((step, i) => {
           const isNow = i === nowIdx;
           const isAfter = mode === 'nowAndAfter' && i === afterIdx;
           const both = same && isNow;
-          const edge = i === 0 ? 'start' : i === FELT_STEPS.length - 1 ? 'end' : 'mid';
+          const edge = i === 0 ? 'start' : i === steps.length - 1 ? 'end' : 'mid';
           return (
             <span
               key={step}
               className={`${styles.feltStep} ${isNow || isAfter || both ? styles.feltStepActive : ''}`}
               data-edge={edge}
-              style={{ left: `${(i / (FELT_STEPS.length - 1)) * 100}%` }}
+              style={{ left: `${(i / (steps.length - 1)) * 100}%` }}
             >
               {both ? (
                 <span className={`${styles.feltMark} ${styles.feltMarkBoth}`}>Сейчас · После</span>
@@ -188,7 +181,7 @@ export function FeltScale({
                   ) : null}
                 </>
               )}
-              <span className={styles.feltDot} data-danger={step === 'danger' ? '' : undefined} />
+              <span className={styles.feltDot} />
               <span className={styles.feltLabel}>{FELT_STEP_LABELS[step]}</span>
             </span>
           );
@@ -198,25 +191,26 @@ export function FeltScale({
   );
 }
 
-/** Shared derived data + actions for the Result dashboard. */
-export function useResultProfile() {
-  const { session, restart } = useSession();
+/** Всё, что экран результата берёт из ответов: без входа, сети и действий. Им же пользуется страница клиента. */
+export function deriveResultView(session: SessionState) {
   const room = session.answers.room;
   const sim = session.derived?.simulation ?? deriveSimulation(session.answers);
   const hybridBefore = comfortClassFor(sim.before.Rw, sim.before.Lnw);
-  const hybridAfter = comfortClassFor(sim.after.Rw, sim.after.Lnw);
+  const hybridAfter = comfortClassAfterMultiFrame(sim.after.Rw, sim.after.Lnw);
   const beforeOfficial = officialComfortLabel(hybridBefore);
   const afterOfficial = officialComfortLabel(hybridAfter);
 
   const airNowFelt = airFeltFromIndex(sim.before.Rw);
-  const airAfterFelt = airFeltFromIndex(sim.after.Rw);
+  const airAfterFelt = airFeltAfterMultiFrame(sim.after.Rw);
   const impactNowFelt = impactFeltFromIndex(sim.before.Lnw);
-  const impactAfterFelt = impactFeltFromIndex(sim.after.Lnw);
+  const impactAfterFelt = impactFeltAfterMultiFrame(sim.after.Lnw);
 
   const roomLabel = room.roomType ? roomTypeLabel(room) : null;
-  const slab = resolveSlab(room);
   const slabTypeLabel = optionLabel(SLAB_TYPE_OPTIONS, room.slabType);
-  const slabThickLabel = optionLabel(SLAB_THICKNESS_OPTIONS, room.slabThickness);
+  const slabThickLabel =
+    !room.slabThickness || room.slabThickness === 'unknown'
+      ? 'типовая ~220 мм'
+      : optionLabel(SLAB_THICKNESS_OPTIONS, room.slabThickness);
   const houseLabel = optionLabel(HOUSE_TYPE_OPTIONS, room.houseType);
   const wishLabel = 'Все эффекты материала';
   const ceilingLabel = optionLabel(PLANNED_CEILING_OPTIONS, room.plannedCeiling);
@@ -231,11 +225,50 @@ export function useResultProfile() {
     perceivedAirPct: sim.perceivedAirPct,
     perceivedImpactPct: sim.perceivedImpactPct,
   });
-  const about = productAbout(room, noiseType);
+  const about = productAbout(room, noiseType, {
+    airDb: sim.delta.Rw,
+    impactDb: sim.delta.Lnw,
+  });
   const slabContext =
-    room.slabType === 'unknown' && room.slabThickness === 'unknown'
-      ? `ориентир по типу дома (${houseLabel}), ~${slab.thicknessMm} мм`
+    room.slabThickness === 'unknown' || !room.slabThickness
+      ? room.slabType === 'unknown'
+        ? 'типовая ~220 мм'
+        : `${slabTypeLabel}, типовая ~220 мм`
       : `${slabTypeLabel}, ${slabThickLabel}`;
+
+  return {
+    session,
+    room,
+    sim,
+    hybridBefore,
+    hybridAfter,
+    beforeOfficial,
+    afterOfficial,
+    airNowFelt,
+    airAfterFelt,
+    impactNowFelt,
+    impactAfterFelt,
+    roomLabel,
+    houseLabel,
+    wishLabel,
+    ceilingLabel,
+    neighborsLabel,
+    noiseKindLabel,
+    wish,
+    noiseType,
+    caseVerdictParagraphs,
+    productClaim: about.claim,
+    productParagraphs: about.paragraphs,
+    productImageSrc: MULTIFRAME_PANEL_IMG,
+    slabContext,
+  };
+}
+
+export type ResultView = ReturnType<typeof deriveResultView>;
+
+export function useResultProfile() {
+  const { session, restart } = useSession();
+  const view = deriveResultView(session);
 
   const calcUrl = buildCalculatorUrl(session.cta);
 
@@ -289,31 +322,8 @@ export function useResultProfile() {
           : 'Поделиться';
 
   return {
-    session,
+    ...view,
     restart,
-    room,
-    sim,
-    hybridBefore,
-    hybridAfter,
-    beforeOfficial,
-    afterOfficial,
-    airNowFelt,
-    airAfterFelt,
-    impactNowFelt,
-    impactAfterFelt,
-    roomLabel,
-    houseLabel,
-    wishLabel,
-    ceilingLabel,
-    neighborsLabel,
-    noiseKindLabel,
-    wish,
-    noiseType,
-    caseVerdictParagraphs,
-    productClaim: about.claim,
-    productParagraphs: about.paragraphs,
-    productImageSrc: MULTIFRAME_PANEL_IMG,
-    slabContext,
     pdfBusy,
     pdfError,
     shareLabel,
