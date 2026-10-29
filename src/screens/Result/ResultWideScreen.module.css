@@ -748,6 +748,17 @@
   }
 }
 
+.normNote {
+  display: block;
+  margin-top: 2px;
+  max-width: 15em;
+  font-size: 0.72em;
+  font-weight: 550;
+  line-height: 1.25;
+  color: var(--text-secondary);
+  white-space: normal;
+}
+
 .normLevelLabel {
   font-weight: 650;
 }

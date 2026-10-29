@@ -156,7 +156,7 @@ function benefitParagraph(room: RoomAnswers, noiseType: NoiseType, pcts: Verdict
   return sentence(`С панелями на потолке ${numbers}${echo}`);
 }
 
-const NEXT_STEP = 'Следующий шаг — замер комнаты и точный расчёт';
+const NEXT_STEP = 'Следующий шаг — расчёт панелей на комнату и запрос на консультацию эксперта MultiFrame';
 
 /** Part 3 — honest limit (when the client hears the neighbours) and the next step. */
 function limitParagraph(room: RoomAnswers): string {

@@ -4,6 +4,7 @@ import { impulseToAudioBuffer } from './reverbImpulse';
 import {
   keyBandHz,
   MASTER_PLAYBACK_GAIN,
+  stemSideGain,
   STEM_CALIBRATION,
   stemIdFromSrc,
   type StemId,
@@ -319,7 +320,7 @@ function roomProcess(
 
   const limiter = softLimiter(ctx);
   const ceiling = ctx.createGain();
-  ceiling.gain.value = MASTER_PLAYBACK_GAIN;
+  ceiling.gain.value = MASTER_PLAYBACK_GAIN * stemSideGain(stemId, isAfter ? 'after' : 'before');
 
   // trim → muffler×2 → room → after → EQ → split dry/wet → merge → limiter
   trim.connect(muffler1);

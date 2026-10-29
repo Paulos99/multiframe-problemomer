@@ -5,7 +5,7 @@ import { EchoComfort, EchoComfortRings } from '../../ui/EchoComfort';
 import { SpectrumChart } from '../../ui/SpectrumChart';
 import { useSession } from '../../state/SessionContext';
 import { noiseKpiLines } from '../../state/noiseKpi';
-import { IMPACT_SCALE_STEPS } from '../../state/simulation';
+import { IMPACT_HIGH_NOTE, IMPACT_SCALE_STEPS } from '../../state/simulation';
 import type { ClassLabel } from '../../state/types';
 import {
   FeltScale,
@@ -293,6 +293,7 @@ export function ResultDashboard({
                     </td>
                     <td>
                       {r.lnw} <em>дБ</em>
+                      {r.lnwNote ? <small className={styles.normNote}>{r.lnwNote}</small> : null}
                     </td>
                   </tr>
                 );
@@ -328,6 +329,7 @@ export function ResultDashboard({
               nowIndex={p.sim.before.Lnw}
               afterIndex={p.sim.after.Lnw}
               steps={IMPACT_SCALE_STEPS}
+              stepNotes={{ high: IMPACT_HIGH_NOTE }}
               quieterPct={p.sim.perceivedImpactPct}
               quieterDeltaDb={Math.abs(p.sim.delta.Lnw)}
               mode="nowAndAfter"
