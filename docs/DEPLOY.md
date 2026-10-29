@@ -96,6 +96,6 @@ VITE_BASE_PATH=/test/problemomer/ VITE_SITE_URL=https://stp-multiframe.ru/test/p
 
 ## 8. Проверочный стенд и выпуски
 
-Автоматическая выкладка на GitHub Pages (`.github/workflows/deploy.yml`) остаётся проверочным стендом по адресу https://paulos99.github.io/multiframe-problemomer/. Сборка в этом workflow сама подставляет путь `/multiframe-problemomer/`, на боевую сборку это не влияет.
+Автоматическая выкладка на GitHub Pages (`.github/workflows/deploy.yml`) остаётся проверочным стендом по адресу https://paulos99.github.io/multiframe-problemomer/. Сборка в этом workflow сама подставляет путь `/multiframe-problemomer/`, на боевую сборку это не влияет. Стенд скрыт от поисковиков: в его страницы добавляются `<meta name="robots" content="noindex,nofollow">` и файл `robots.txt` (`vite.config.ts`, только при сборке рабочим процессом GitHub Pages; принудительно — `NOINDEX=1` или `NOINDEX=0`). В боевой сборке и в выпуске по метке их нет.
 
 Проверки (`.github/workflows/ci.yml`: типы, тесты, сборка, архив `problemomer-dist`) работают на каждый запрос на слияние и на `main`. Выпуск по метке `vX.Y.Z` (архив для сервера) описан в [handover/RELEASE.md](handover/RELEASE.md).

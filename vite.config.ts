@@ -26,7 +26,25 @@ function normalizeSiteUrl(raw: string | undefined, base: string): string {
   return `${value.replace(/\/+$/, '')}/`;
 }
 
-/** Подставляет адрес сайта в index.html и в запасную страницу 404.html. */
+
+const NOINDEX_META = '<meta name="robots" content="noindex,nofollow" />';
+
+export function addNoindexMeta(html: string): string {
+  if (/name=["']robots["']/.test(html)) return html;
+  return html.replace(/<head>/, `<head>\n    ${NOINDEX_META}`);
+}
+
+/**
+ * Стенд на GitHub Pages скрывается от поисковиков: noindex в index.html и 404.html и файл robots.txt.
+ * В боевых сборках (метка выпуска, локальная сборка) этого нет. Принудительно: NOINDEX=1 / NOINDEX=0.
+ */
+export function isStandBuild(env: NodeJS.ProcessEnv = process.env): boolean {
+  if (env.NOINDEX === '1') return true;
+  if (env.NOINDEX === '0') return false;
+  return env.GITHUB_ACTIONS === 'true' && env.GITHUB_WORKFLOW === PAGES_WORKFLOW;
+}
+
+/** Подставляет адрес сайта в index.html и в запасную страницу 404.html; на стенде добавляет запрет индексации. */
 function siteUrlPlugin(base: string, siteUrl: string): Plugin {
   let outDir = 'dist';
   return {
@@ -35,12 +53,18 @@ function siteUrlPlugin(base: string, siteUrl: string): Plugin {
       outDir = resolve(config.root, config.build.outDir);
     },
     transformIndexHtml(html) {
-      return html.replaceAll('__SITE_URL__', siteUrl);
+      const out = html.replaceAll('__SITE_URL__', siteUrl);
+      return isStandBuild() ? addNoindexMeta(out) : out;
+    },
+    generateBundle() {
+      if (!isStandBuild()) return;
+      this.emitFile({ type: 'asset', fileName: 'robots.txt', source: 'User-agent: *\nDisallow: /\n' });
     },
     closeBundle() {
       const file = resolve(outDir, '404.html');
       if (!existsSync(file)) return;
-      const html = readFileSync(file, 'utf8').replaceAll('__BASE_PATH__', base);
+      let html = readFileSync(file, 'utf8').replaceAll('__BASE_PATH__', base);
+      if (isStandBuild()) html = addNoindexMeta(html);
       writeFileSync(file, html);
     },
   };
