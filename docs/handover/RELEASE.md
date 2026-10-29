@@ -13,7 +13,7 @@
    git tag -a v1.0.0 -m "Что изменилось"
    git push origin v1.0.0
    ```
-4. Рабочий процесс «Выпуск» (`.github/workflows/release.yml`; до переноса файл лежит в `deploy/github-workflows/`)
+4. Рабочий процесс «Выпуск» (`.github/workflows/release.yml`)
    проверяет, что метка лежит на `main`, повторяет проверки, собирает сайт под боевой адрес и публикует на странице
    [Releases](https://github.com/Paulos99/multiframe-problemomer/releases):
    - `problemomer-vX.Y.Z.zip` — готовая папка сайта (содержимое кладётся прямо в каталог сайта);
