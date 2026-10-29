@@ -1,5 +1,7 @@
 # Выкладка Проблемомера на stp-multiframe.ru/problemomer/
 
+> Актуальный пакет документов для передачи, со скриптом установки и отката по метке выпуска: [handover/](handover/README.md). Ниже — краткая справка.
+
 Короткая инструкция для команды маркетинга и администратора сайта.
 Целевой адрес: **https://stp-multiframe.ru/problemomer/**
 
@@ -7,7 +9,7 @@
 
 ## 1. Где взять готовую сборку
 
-Вариант А (без установки программ, после включения проверок из `docs/ci-proposed/`, см. раздел 8). В репозитории откройте **Actions → CI**, выберите последний зелёный запуск на ветке `main` и скачайте архив **problemomer-dist**. Внутри лежит готовая папка сайта.
+Вариант А (без установки программ): со страницы **Releases** репозитория скачайте архив `problemomer-vX.Y.Z.zip` нужного выпуска (рабочий процесс «Выпуск» публикует его при постановке метки). Внутри лежит готовая папка сайта. Установка одной командой — [handover/DEPLOY.md](handover/DEPLOY.md).
 
 Вариант Б (на своём компьютере, нужен Node.js 22):
 
@@ -92,8 +94,8 @@ VITE_BASE_PATH=/test/problemomer/ VITE_SITE_URL=https://stp-multiframe.ru/test/p
 
 Перед выкладкой сохраните копию текущей папки `problemomer/` (например, `problemomer.prev/`). Для отката верните её на место. Старые установленные копии обновятся сами при следующем заходе.
 
-## 8. Проверочный стенд
+## 8. Проверочный стенд и выпуски
 
-Автоматическая выкладка на GitHub Pages (`.github/workflows/deploy.yml`) остаётся проверочным стендом по адресу https://paulos99.github.io/multiframe-problemomer/. Сборка в этом workflow сама подставляет путь `/multiframe-problemomer/` (см. `vite.config.ts`), на боевую сборку это не влияет.
+Автоматическая выкладка на GitHub Pages (`.github/workflows/deploy.yml`) остаётся проверочным стендом по адресу https://paulos99.github.io/multiframe-problemomer/. Сборка в этом workflow сама подставляет путь `/multiframe-problemomer/`, на боевую сборку это не влияет.
 
-Заготовки проверок для GitHub Actions лежат в `docs/ci-proposed/`: `ci.yml` (типы, тесты, сборка, архив `problemomer-dist`) и `deploy.yml` (стенд с явными переменными). Файлы в `.github/workflows/` бот менять не может: нужен доступ с правом `workflow`. Чтобы включить, скопируйте `docs/ci-proposed/ci.yml` в `.github/workflows/ci.yml`. Пока этого не сделано, готовую сборку получайте по варианту Б из раздела 1.
+Проверки (`.github/workflows/ci.yml`: типы, тесты, сборка, архив `problemomer-dist`) работают на каждый запрос на слияние и на `main`. Выпуск по метке `vX.Y.Z` (архив для сервера) описан в [handover/RELEASE.md](handover/RELEASE.md).
