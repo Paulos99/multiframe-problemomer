@@ -75,6 +75,19 @@ export const PLAYBACK_REF_DBA = PLAYBACK_REF_DBA_AIR;
 /** Global headroom after room FX. */
 export const MASTER_PLAYBACK_GAIN = 0.62;
 
+/**
+ * Поправка громкости воспроизведения по звуку и стороне («До» / «После»): множитель к текущему уровню
+ * после ограничителя. Файлы не пережимаются, меняется только усиление при проигрывании.
+ * Пылесос: «До» тише на 20% (×0,8), «После» тише на 5% (×0,95).
+ */
+export const STEM_SIDE_GAIN: Partial<Record<StemId, { before: number; after: number }>> = {
+  vacuum: { before: 0.8, after: 0.95 },
+};
+
+export function stemSideGain(stemId: StemId, side: 'before' | 'after'): number {
+  return STEM_SIDE_GAIN[stemId]?.[side] ?? 1;
+}
+
 export const KEY_BAND_INDICES = [1, 3, 5, 7, 10, 13, 15] as const;
 
 export function keyBandHz(): number[] {

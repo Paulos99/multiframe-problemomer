@@ -29,6 +29,7 @@ import {
   airFeltAfterMultiFrame,
   comfortClassAfterMultiFrame,
   impactFeltAfterMultiFrame,
+  IMPACT_HIGH_NOTE,
 } from './simulation';
 import { noiseKpiLines } from './noiseKpi';
 import { buildLeadHandoff, withDerived } from './session';
@@ -334,7 +335,7 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
         : '';
     return `<tr class="${row.muted ? 'muted' : ''} ${isNow || isMf ? 'marked' : ''}">
       <td><span class="norm-name">${escapeHtml(row.label)}</span> <span class="muted">${escapeHtml(row.sp)}</span></td>
-      <td>${escapeHtml(row.rw)}</td><td>${escapeHtml(row.lnw)}</td>
+      <td>${escapeHtml(row.rw)}</td><td>${escapeHtml(row.lnw)}${row.lnwNote ? `<br /><span class="norm-note">${escapeHtml(row.lnwNote)}</span>` : ''}</td>
       <td>${mark}</td>
     </tr>`;
   };
@@ -583,6 +584,8 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
   .norms tr.muted td { color: #7a8790; }
   .norms tr.marked td { background: #e7f3ef; }
   .norm-name { font-weight: 700; }
+  .norm-note { display: inline-block; margin-top: 2px; font-size: 9px; font-weight: 500; line-height: 1.25; color: #5d6b73; }
+  .felt-note { margin: 2px 0 0; font-size: 10px; line-height: 1.3; color: #5d6b73; }
 
   .note {
     margin: 0 0 12px; font-size: 12px; color: #5f6b73; line-height: 1.4;
@@ -781,6 +784,7 @@ function buildReportDocument(session: SessionState, assets: ReportAssets): strin
           <span>Удар · ${FELT_STEP_LABELS[impactNow]} → <b>${FELT_STEP_LABELS[impactAfter]}</b> · удар сверху ≈ ${Math.round(b.Lnw)} → ≈ ${Math.round(a.Lnw)} дБ</span>
           ${pillSvg(`≈ ${sim.perceivedImpactPct}% тише`, { bg: '#dceee8', fg: '#01644f', fontSize: 11, height: 24 })}
         </div>
+        <p class="felt-note">По удару «${FELT_STEP_LABELS.high}» ${escapeHtml(IMPACT_HIGH_NOTE)}.</p>
       </div>
       <div class="comfort-row">
         <div class="rings-card">

@@ -75,6 +75,23 @@
   overflow: visible;
 }
 
+.feltTrack[data-noted] {
+  height: 104px;
+}
+
+.feltNote {
+  position: absolute;
+  top: 62px;
+  right: 0;
+  width: 15em;
+  max-width: 62vw;
+  font-size: 9.5px;
+  font-weight: 550;
+  line-height: 1.25;
+  text-align: right;
+  color: var(--text-secondary);
+}
+
 .feltLine {
   position: absolute;
   left: 0;

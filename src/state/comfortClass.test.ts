@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import {
   FELT_STEPS,
+  IMPACT_HIGH_NOTE,
   IMPACT_SCALE_STEPS,
   NORM_ROWS,
   airFeltAfterMultiFrame,
@@ -142,11 +143,26 @@ describe('шкала Проблемомера: ровно три уровня', 
     assert.equal(airFeltFromIndex(49), 'discomfort');
   });
 
-  it('удар: Lnw до 60 дБ — «Комфорт», выше — «Дискомфорт»; высокого комфорта по удару нет', () => {
-    assert.equal(impactFeltFromIndex(55), 'comfort');
+  it('удар: три точки шкалы, но расчёт выше «Комфорта» не поднимает; пояснение к «Высокому комфорту»', () => {
+    assert.equal(impactFeltFromIndex(40), 'comfort'); // «Высокий комфорт» по удару — только с полом у соседей сверху
     assert.equal(impactFeltFromIndex(60), 'comfort');
     assert.equal(impactFeltFromIndex(61), 'discomfort');
-    assert.deepEqual(IMPACT_SCALE_STEPS, ['discomfort', 'comfort']);
+    assert.deepEqual(IMPACT_SCALE_STEPS, ['discomfort', 'comfort', 'high']);
+    assert.equal(IMPACT_HIGH_NOTE, 'достижим только со звукоизоляцией пола у соседей сверху');
+    assert.equal(NORM_ROWS[0].label, 'Высокий комфорт');
+    assert.equal(NORM_ROWS[0].lnwNote, IMPACT_HIGH_NOTE);
+    assert.equal(NORM_ROWS[1].lnwNote, undefined);
+  });
+
+  it('с MultiFrame итог по комнате не выше «Комфорта»: класс А требует высокого комфорта по удару', () => {
+    assert.equal(comfortClassAfterMultiFrame(60, 50), 'B');
+    assert.equal(comfortClassAfterMultiFrame(54, 55), 'B');
+    assert.equal(comfortClassAfterMultiFrame(41, 75), 'V');
+    for (const room of allRooms()) {
+      const sim = deriveSimulation(answers(room));
+      assert.notEqual(comfortClassAfterMultiFrame(sim.after.Rw, sim.after.Lnw), 'A');
+      assert.notEqual(impactFeltAfterMultiFrame(sim.after.Lnw), 'high');
+    }
   });
 
   it('классы СП сводятся к уровням: А → высокий, Б и В → комфорт, ниже В → дискомфорт', () => {

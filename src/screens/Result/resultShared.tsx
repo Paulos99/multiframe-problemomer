@@ -86,6 +86,7 @@ export function FeltScale({
   nowIndex,
   afterIndex,
   steps = FELT_STEPS,
+  stepNotes,
 }: {
   title: string;
   now: FeltStep;
@@ -97,8 +98,10 @@ export function FeltScale({
   indexKind: 'Rw' | 'Lnw';
   nowIndex: number;
   afterIndex?: number;
-  /** Ступени шкалы: для удара — без «Высокого комфорта». */
+  /** Ступени шкалы. */
   steps?: FeltStep[];
+  /** Пояснение рядом с точкой шкалы (для удара: «Высокий комфорт»). */
+  stepNotes?: Partial<Record<FeltStep, string>>;
 }) {
   const nowShown = now;
   const afterShown = after;
@@ -157,7 +160,7 @@ export function FeltScale({
         )}
       </p>
 
-      <div className={styles.feltTrack} aria-hidden>
+      <div className={styles.feltTrack} data-noted={stepNotes ? '1' : undefined} aria-hidden={stepNotes ? undefined : true}>
         <span className={styles.feltLine} />
         {steps.map((step, i) => {
           const isNow = i === nowIdx;
@@ -183,6 +186,7 @@ export function FeltScale({
               )}
               <span className={styles.feltDot} />
               <span className={styles.feltLabel}>{FELT_STEP_LABELS[step]}</span>
+              {stepNotes?.[step] ? <span className={styles.feltNote}>{stepNotes[step]}</span> : null}
             </span>
           );
         })}
