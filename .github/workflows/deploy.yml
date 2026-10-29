@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy to GitHub Pages (проверочный стенд)
 
 on:
   push:
@@ -33,6 +33,9 @@ jobs:
 
       - name: Install and build
         env:
+          # Проверочный стенд живёт в подпапке GitHub Pages; боевой адрес собирается по умолчанию (см. docs/DEPLOY.md)
+          VITE_BASE_PATH: /multiframe-problemomer/
+          VITE_SITE_URL: https://paulos99.github.io/multiframe-problemomer/
           VITE_YM_ID: ${{ secrets.VITE_YM_ID }}
           VITE_ANALYTICS_INGEST_URL: ${{ secrets.VITE_ANALYTICS_INGEST_URL }}
         run: npm ci && npm run build
@@ -48,6 +51,6 @@ jobs:
         with:
           path: dist
 
-      - name: Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages (проверочный стенд)
         id: deployment
         uses: actions/deploy-pages@v4
