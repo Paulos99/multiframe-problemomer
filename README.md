@@ -22,7 +22,7 @@ npm run preview
 
 Страница открывается по адресу `http://localhost:5173/problemomer/` (путь на сайте задаётся переменной `VITE_BASE_PATH`).
 
-Боевой адрес: **https://stp-multiframe.ru/problemomer/**. Как собрать и выложить — [docs/DEPLOY.md](docs/DEPLOY.md).
+Боевой адрес: **https://stp-multiframe.ru/problemomer/**. Пакет документов для команды, размещающей сайт (выпуски по метке, установка, откат, безопасность): [docs/handover/](docs/handover/README.md). Краткая справка по выкладке — [docs/DEPLOY.md](docs/DEPLOY.md).
 Проверочный стенд на GitHub Pages собирается автоматически: `https://paulos99.github.io/multiframe-problemomer/`.
 
 Проверки: `npx tsc -b`, `npm test`, `npm run check:acoustic`.
