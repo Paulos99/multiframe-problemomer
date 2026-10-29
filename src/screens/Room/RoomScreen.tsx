@@ -28,7 +28,7 @@ const SUBSTEP_TITLE: Record<RoomSubstep, string> = {
   slabThickness: 'Выберите толщину перекрытия',
   basics: 'Укажите тип комнаты и площадь',
   plannedCeiling: 'Какой у вас потолок?',
-  objectStage: 'На какой стадии объект?',
+  objectStage: 'На какой стадии комната?',
   noisyNeighbors: 'Насколько шумно сверху?',
   noiseKind: 'Что именно слышно сверху?',
 };
@@ -77,7 +77,7 @@ export function RoomScreen() {
     <Screen
       stickyHead
       eyebrow={factorLabel}
-      lead={`Вопрос ${Math.max(idx, 0) + 1} из ${total} · ${factorLabel}`}
+      lead={`Вопрос ${Math.max(idx, 0) + 1} из ${total}`}
       title={SUBSTEP_TITLE[sub]}
     >
       {SUBSTEP_LEAD[sub] ? <p className={styles.subLead}>{SUBSTEP_LEAD[sub]}</p> : null}
@@ -164,14 +164,15 @@ export function RoomScreen() {
           ) : null}
 
           <Field
-            label="Площадь потолка, м²"
-            hint="Нужна, чтобы посчитать количество панелей"
+            label="Площадь комнаты, м²"
+            hint="Нужна, чтобы подобрать количество панелей MultiFrame"
           >
             <TextInput
               type="number"
               inputMode="decimal"
               min={1}
               step={0.1}
+              aria-label="Площадь комнаты, м²"
               placeholder="Например, 18"
               value={room.ceilingAreaM2 ?? ''}
               onChange={(e) => {

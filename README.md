@@ -20,11 +20,14 @@ npm run build
 npm run preview
 ```
 
-Base path для GitHub Pages: `/multiframe-problemomer/`.
+Страница открывается по адресу `http://localhost:5173/problemomer/` (путь на сайте задаётся переменной `VITE_BASE_PATH`).
 
-Ожидаемый URL после деплоя:
+Боевой адрес: **https://stp-multiframe.ru/problemomer/**. Как собрать и выложить — [docs/DEPLOY.md](docs/DEPLOY.md).
+Проверочный стенд на GitHub Pages собирается автоматически: `https://paulos99.github.io/multiframe-problemomer/`.
 
-`https://paulos99.github.io/multiframe-problemomer/`
+Проверки: `npx tsc -b`, `npm test`, `npm run check:acoustic`.
+
+Шкала комфорта (три уровня «Дискомфорт / Комфорт / Высокий комфорт»): [docs/comfort-scale.md](docs/comfort-scale.md).
 
 ## Скоп MVP
 
@@ -56,7 +59,7 @@ Base path для GitHub Pages: `/multiframe-problemomer/`.
 ## Заглушки
 
 - Аудио генерируется процедурно (Web Audio), помечено «демо»
-- Ссылка калькулятора: `https://paulos99.github.io/MF_StP/?area=…`
+- Ссылка калькулятора (кнопка и QR в PDF): `https://stp-multiframe.ru/calc/` (меняется переменной `VITE_CALCULATOR_URL`)
 - Консультация: `https://stp-multiframe.ru/#section-partner`
 
 ## Аналитика (анонимно)

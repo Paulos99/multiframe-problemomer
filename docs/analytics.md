@@ -33,7 +33,7 @@
 
 ## Каналы (шаблон ссылок)
 
-База (Pages): `https://paulos99.github.io/multiframe-problemomer/`
+База: `https://stp-multiframe.ru/problemomer/`
 
 | Канал | Пример |
 | ----- | ------ |
@@ -77,4 +77,4 @@
 
 ## Политика
 
-Краткая страница: [`/privacy.html`](../public/privacy.html) (на Pages: `…/multiframe-problemomer/privacy.html`).
+Краткая страница: [`/privacy.html`](../public/privacy.html) (на сайте: `…/problemomer/privacy.html`).
