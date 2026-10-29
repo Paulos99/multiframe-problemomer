@@ -41,7 +41,8 @@ export function addNoindexMeta(html: string): string {
 export function isStandBuild(env: NodeJS.ProcessEnv = process.env): boolean {
   if (env.NOINDEX === '1') return true;
   if (env.NOINDEX === '0') return false;
-  return env.GITHUB_ACTIONS === 'true' && env.GITHUB_WORKFLOW === PAGES_WORKFLOW;
+  // Имя процесса стенда: «Deploy to GitHub Pages (проверочный стенд)»; процесс выпуска называется иначе.
+  return env.GITHUB_ACTIONS === 'true' && (env.GITHUB_WORKFLOW ?? '').startsWith(PAGES_WORKFLOW);
 }
 
 /** Подставляет адрес сайта в index.html и в запасную страницу 404.html; на стенде добавляет запрет индексации. */
