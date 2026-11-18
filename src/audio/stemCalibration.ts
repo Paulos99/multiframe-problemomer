@@ -84,6 +84,13 @@ export const STEM_SIDE_GAIN: Partial<Record<StemId, { before: number; after: num
   vacuum: { before: 0.8, after: 0.95 },
 };
 
+/**
+ * Общая громкость всех звуков «До» и «После»: ×0,7 к прежнему уровню (на 30% тише).
+ * Применяется одним множителем на выходе, поэтому разница «До/После» и поправки пылесоса сохраняются.
+ * Это усиление внутри Web Audio, а не audio.volume, — на iPhone оно тоже действует.
+ */
+export const PLAYBACK_LEVEL = 0.7;
+
 export function stemSideGain(stemId: StemId, side: 'before' | 'after'): number {
   return STEM_SIDE_GAIN[stemId]?.[side] ?? 1;
 }
