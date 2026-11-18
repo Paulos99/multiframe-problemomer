@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, useSyncExternalStore, type ReactNode } from 'react';
 import { Button } from '../../ui/Button';
 import { CompactAudio } from '../../ui/CompactAudio';
 import { EchoComfort, EchoComfortRings } from '../../ui/EchoComfort';
@@ -98,6 +98,24 @@ function DeltaBars({ before, after, invert }: { before: number; after: number; i
   );
 }
 
+/** Телефон/узкий экран: «Сравнить на слух» стоит сразу после «Акустического комфорта». */
+const MOBILE_QUERY = '(max-width: 900px)';
+
+function subscribeMobile(cb: () => void) {
+  if (typeof window === 'undefined' || !window.matchMedia) return () => {};
+  const mq = window.matchMedia(MOBILE_QUERY);
+  mq.addEventListener?.('change', cb);
+  return () => mq.removeEventListener?.('change', cb);
+}
+
+function useIsMobile(): boolean {
+  return useSyncExternalStore(
+    subscribeMobile,
+    () => typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia(MOBILE_QUERY).matches,
+    () => false,
+  );
+}
+
 /** Soft depth drift while scrolling — desktop only (skip touch / narrow). */
 function useScrollDrift() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -151,6 +169,7 @@ export function ResultDashboard({
   next?: ReactNode;
 }) {
   const rootRef = useScrollDrift();
+  const isMobile = useIsMobile();
 
   const quieterAir = p.sim.perceivedAirPct;
   const quieterImpact = p.sim.perceivedImpactPct;
@@ -173,43 +192,40 @@ export function ResultDashboard({
     objectCells.push({ label: 'Тип шума', value: p.noiseKindLabel });
   }
 
-  return (
-    <div className={styles.root} ref={rootRef}>
-      <header className={styles.titleBar} data-reveal>
-        <h1>{title}</h1>
-        {titleExtra}
-      </header>
-
-      <section className={`${styles.objectSpec} ${styles.driftSlow}`} data-reveal aria-label="Параметры комнаты">
-        <div className={styles.objectSpecLabel}>
-          <strong>Параметры комнаты</strong>
-        </div>
-        <dl className={styles.objectSpecGrid}>
-          {objectCells.map((cell) => (
-            <div key={cell.label}>
-              <dt>{cell.label}</dt>
-              <dd>{cell.value}</dd>
+  const listenSide = (
+        <div className={styles.listenSide} aria-label="Сравнить на слух">
+          <header className={styles.listenSideHead}>
+            <h2>Сравнить на слух</h2>
+            <p className={styles.panelLead}>Эхо в комнате и звук сверху — до и после.</p>
+          </header>
+          <div className={styles.listenSideBody}>
+            <div className={styles.listenCol}>
+              <header className={styles.listenColHead}>
+                <h3>
+                  Эхо в комнате <span>(акустический комфорт)</span>
+                </h3>
+              </header>
+              <EchoComfort sim={p.sim} variant="dashboard" showGauges={false} hideHead />
             </div>
-          ))}
-        </dl>
-      </section>
+            <div className={styles.listenCol}>
+              <header className={styles.listenColHead}>
+                <h3>
+                  Звукоизоляция <span>(голоса и шаги сверху)</span>
+                </h3>
+              </header>
+              <CompactAudio
+                pairs={p.session.audio.pairs}
+                sim={p.sim}
+                wish={p.wish}
+                hideHead
+                stacked
+              />
+            </div>
+          </div>
+        </div>
+  );
 
-      <KpiRow
-        quieterAir={quieterAir}
-        quieterImpact={quieterImpact}
-        echoBefore={p.sim.reverb.echoInRoomBefore}
-        echoAfter={p.sim.reverb.echoInRoomAfter}
-        rwBefore={p.sim.before.Rw}
-        rwAfter={p.sim.after.Rw}
-        lnwBefore={p.sim.before.Lnw}
-        lnwAfter={p.sim.after.Lnw}
-      />
-
-      <section
-        className={`${styles.recProductRow} ${styles.driftSoft}`}
-        data-reveal
-        aria-label="Рекомендации и продукт"
-      >
+  const recommendations = (
         <aside className={styles.recommendations} aria-label="Рекомендации">
           <h2>Рекомендации:</h2>
           <div className={styles.recommendationCopy}>
@@ -218,6 +234,9 @@ export function ResultDashboard({
             ))}
           </div>
         </aside>
+  );
+
+  const productAbout = (
         <aside className={styles.productAbout} aria-label="Что такое MultiFrame">
           <h2>Что такое MultiFrame</h2>
           <div className={styles.productAboutBody}>
@@ -238,8 +257,9 @@ export function ResultDashboard({
             </div>
           </div>
         </aside>
-      </section>
+  );
 
+  const normsSection = (
       <section className={`${styles.panel} ${styles.driftSoft}`} data-reveal aria-label="Нормы комфорта для жилья">
         <div className={styles.normsHead}>
           <h2>
@@ -302,7 +322,9 @@ export function ResultDashboard({
           </table>
         </div>
       </section>
+  );
 
+  const effectSection = (
       <section className={`${styles.effectListen} ${styles.driftSlow}`} data-reveal aria-label="Эффективность и сравнение на слух">
         <div className={styles.effectCol}>
           <header className={styles.effectTop}>
@@ -337,37 +359,69 @@ export function ResultDashboard({
           </div>
         </div>
 
-        <div className={styles.listenSide} aria-label="Сравнить на слух">
-          <header className={styles.listenSideHead}>
-            <h2>Сравнить на слух</h2>
-            <p className={styles.panelLead}>Эхо в комнате и звук сверху — до и после.</p>
-          </header>
-          <div className={styles.listenSideBody}>
-            <div className={styles.listenCol}>
-              <header className={styles.listenColHead}>
-                <h3>
-                  Эхо в комнате <span>(акустический комфорт)</span>
-                </h3>
-              </header>
-              <EchoComfort sim={p.sim} variant="dashboard" showGauges={false} hideHead />
-            </div>
-            <div className={styles.listenCol}>
-              <header className={styles.listenColHead}>
-                <h3>
-                  Звукоизоляция <span>(голоса и шаги сверху)</span>
-                </h3>
-              </header>
-              <CompactAudio
-                pairs={p.session.audio.pairs}
-                sim={p.sim}
-                wish={p.wish}
-                hideHead
-                stacked
-              />
-            </div>
-          </div>
-        </div>
+        {isMobile ? null : listenSide}
       </section>
+  );
+
+  return (
+    <div className={styles.root} ref={rootRef}>
+      <header className={styles.titleBar} data-reveal>
+        <h1>{title}</h1>
+        {titleExtra}
+      </header>
+
+      <section className={`${styles.objectSpec} ${styles.driftSlow}`} data-reveal aria-label="Параметры комнаты">
+        <div className={styles.objectSpecLabel}>
+          <strong>Параметры комнаты</strong>
+        </div>
+        <dl className={styles.objectSpecGrid}>
+          {objectCells.map((cell) => (
+            <div key={cell.label}>
+              <dt>{cell.label}</dt>
+              <dd>{cell.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      <KpiRow
+        quieterAir={quieterAir}
+        quieterImpact={quieterImpact}
+        echoBefore={p.sim.reverb.echoInRoomBefore}
+        echoAfter={p.sim.reverb.echoInRoomAfter}
+        rwBefore={p.sim.before.Rw}
+        rwAfter={p.sim.after.Rw}
+        lnwBefore={p.sim.before.Lnw}
+        lnwAfter={p.sim.after.Lnw}
+      />
+
+      {isMobile ? listenSide : null}
+
+      {isMobile ? (
+        <>
+          <div className={styles.recProductRow} data-reveal>
+            {recommendations}
+          </div>
+          {effectSection}
+          {normsSection}
+          <div className={styles.recProductRow} data-reveal>
+            {productAbout}
+          </div>
+        </>
+      ) : (
+        <>
+      <section
+        className={`${styles.recProductRow} ${styles.driftSoft}`}
+        data-reveal
+        aria-label="Рекомендации и продукт"
+      >
+        {recommendations}
+        {isMobile ? null : productAbout}
+      </section>
+          {normsSection}
+          {effectSection}
+        </>
+      )}
 
       {SHOW_FREQUENCY_CHARTS ? (
         <section className={`${styles.charts} ${styles.driftSoft}`} data-reveal aria-label="Изоляция по частотам">
