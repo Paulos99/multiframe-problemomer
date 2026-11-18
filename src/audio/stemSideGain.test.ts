@@ -17,10 +17,13 @@ test('общая громкость ×0,5 одинаково для «До» и 
   assert.equal(MASTER_PLAYBACK_GAIN, 0.62);
 });
 
-test('громкость по типу шума: ударный и смешанный ×1/3, воздушный ×0,7, эхо ×1', async () => {
+test('громкость по типу шума: ударный и смешанный ×1/3, воздушный «До» ×0,35 и «После» ×0,7, эхо ×0,7', async () => {
   const { groupLevel } = await import('./stemCalibration');
-  assert.equal(groupLevel('impact'), 1 / 3);
-  assert.equal(groupLevel('mixed'), 1 / 3);
-  assert.equal(groupLevel('air'), 0.7);
-  assert.equal(groupLevel('echo'), 1);
+  for (const side of ['before', 'after'] as const) {
+    assert.equal(groupLevel('impact', side), 1 / 3);
+    assert.equal(groupLevel('mixed', side), 1 / 3);
+    assert.equal(groupLevel('echo', side), 0.7);
+  }
+  assert.equal(groupLevel('air', 'after'), 0.7);
+  assert.equal(groupLevel('air', 'before'), 0.35);
 });
