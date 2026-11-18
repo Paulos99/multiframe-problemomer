@@ -16,3 +16,11 @@ test('общая громкость ×0,5 одинаково для «До» и 
   assert.equal(PLAYBACK_LEVEL, 0.5);
   assert.equal(MASTER_PLAYBACK_GAIN, 0.62);
 });
+
+test('громкость по типу шума: ударный и смешанный ×1/3, воздушный ×0,7, эхо ×1', async () => {
+  const { groupLevel } = await import('./stemCalibration');
+  assert.equal(groupLevel('impact'), 1 / 3);
+  assert.equal(groupLevel('mixed'), 1 / 3);
+  assert.equal(groupLevel('air'), 0.7);
+  assert.equal(groupLevel('echo'), 1);
+});
